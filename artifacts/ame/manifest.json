@@ -1,0 +1,78 @@
+{
+  "checkpoints": {
+    "control": {
+      "path": "control/model_199.pt",
+      "sha256": "6c8b03e220d6125c5ee36e615df31e0f40183f9664f40272d56689d23cda32d4"
+    },
+    "attention": {
+      "path": "attention/model_199.pt",
+      "sha256": "afac46b0de3b00d2d6d474db956b88c20c853a501c63311c013966fc1f5dfff0"
+    }
+  },
+  "training_steps_per_arm": 2457600,
+  "seed": 44,
+  "source_references": 208,
+  "evaluations": {
+    "control": {
+      "mujoco_platform": {
+        "successes": 2,
+        "total": 5
+      },
+      "native_platform": {
+        "successes": 4,
+        "total": 32
+      },
+      "native_stones": {
+        "successes": 14,
+        "total": 32
+      },
+      "native_stairs": {
+        "successes": 9,
+        "total": 32
+      },
+      "mujoco_stairs": {
+        "successes": 5,
+        "total": 5
+      },
+      "mujoco_stones": {
+        "successes": 0,
+        "total": 5
+      }
+    },
+    "attention": {
+      "native_stones_without_branch": {
+        "successes": 22,
+        "total": 32
+      },
+      "mujoco_platform": {
+        "successes": 0,
+        "total": 5
+      },
+      "native_platform": {
+        "successes": 4,
+        "total": 32
+      },
+      "native_stones": {
+        "successes": 17,
+        "total": 32
+      },
+      "native_stairs": {
+        "successes": 26,
+        "total": 32
+      },
+      "mujoco_stairs": {
+        "successes": 0,
+        "total": 5
+      },
+      "mujoco_stones": {
+        "successes": 0,
+        "total": 5
+      }
+    }
+  },
+  "initializer": {
+    "published_path": "artifacts/perceptive/checkpoints/student.pt",
+    "sha256": "72a6e62cd71f4c693d36cbaec86954f0ed9a9f52fb7bea437b194c9e317e793d"
+  },
+  "diagnostics": "Early stopped grid-order attempt is not included in either arm's completed training budget."
+}

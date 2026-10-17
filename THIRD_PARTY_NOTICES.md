@@ -1,5 +1,16 @@
 # Third-party notices
 
+## AME-inspired experiment
+
+`perceptive_rl/attention.py` is an independent implementation informed by the
+architecture described in He et al., “Attention-Based Map Encoding for Learning
+Generalized Legged Locomotion” (https://arxiv.org/abs/2506.09588).
+SII-FUSC/AME_Locomotion and the official leggedrobotics/ame2_minimal were inspected
+as references. Their encoder source and G1 checkpoints are not redistributed in
+this project. The experiment differs from both implementations and is not an
+official reproduction. New Go2 checkpoints retain the initializer provenance
+and asset restrictions described below.
+
 ## Isaac Lab perceptive locomotion experiments
 
 - Framework: [Isaac Lab 2.3.2](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2), BSD-3-Clause; installed externally rather than vendored.

@@ -18,6 +18,14 @@ python -m go2_nav.active_run --scene course --goal 13 0 --jump-backend nju --con
 
 ![绕障、台阶、跳坑与到达目标的仿真片段](artifacts/active/mission_preview.png)
 
+## AME 地形注意力增量实验
+
+参考 [SII-FUSC/AME_Locomotion](https://github.com/SII-FUSC/AME_Locomotion) 与 AME 原论文，独立实现适配 Go2 的 CNN + 本体状态查询地形注意力分支。
+完成原 MLP 与注意力策略两组同预算 PPO 继训，并分别测试 Isaac、MuJoCo 与分支消融。
+**本次增量训练出现退化，尚未超过上一版学生；新模型仅作为实验权重，不替换原稳定策略。**
+详见 [参考判断与训练/回放说明](docs/AME_REFERENCE.md)、[完整结果与失败视频](AME_VALIDATION.md)。
+用户提供的仓库是 G1 第三方复现，G1 权重不能直接用于 Go2；AME 的局部地形编码可服务在线无预建图越障，目标点导航仍需上层策略。
+
 ## 感知运动 RL：高台与梅花桩训练实验
 
 新增 Isaac Lab GPU 训练、理想地形教师、深度/雷达学生蒸馏与学生 PPO 微调入口，网络直接输出 12 个关节动作。

@@ -1,0 +1,48 @@
+{
+  "source_references": 221,
+  "videos": [
+    {
+      "path": "control_eval/mujoco_platform/episode_0.mp4",
+      "frames": 299
+    },
+    {
+      "path": "control_eval/mujoco_stairs/episode_0.mp4",
+      "frames": 288
+    },
+    {
+      "path": "control_eval/mujoco_stones/episode_0.mp4",
+      "frames": 109
+    },
+    {
+      "path": "attention_eval/mujoco_platform/episode_0.mp4",
+      "frames": 108
+    },
+    {
+      "path": "attention_eval/mujoco_stairs/episode_0.mp4",
+      "frames": 85
+    },
+    {
+      "path": "attention_eval/mujoco_stones/episode_0.mp4",
+      "frames": 59
+    }
+  ],
+  "cpu_latency": {
+    "control": {
+      "median_ms": 0.09612273424863815,
+      "p95_ms": 0.10382197797298431,
+      "parameters": 380812
+    },
+    "attention": {
+      "median_ms": 0.3233933821320534,
+      "p95_ms": 0.4650130867958069,
+      "parameters": 413754
+    }
+  },
+  "torch": "2.14.1+cpu",
+  "attention_branch_on_native_stones": {
+    "sampled_frames": 57,
+    "action_rms": 0.07881838828325272,
+    "joint_offset_rms_rad": 0.01970459707081318
+  },
+  "latency_protocol": "CPU one thread, batch 1, 100 warmup, 500 timed calls; excludes sensing and control"
+}

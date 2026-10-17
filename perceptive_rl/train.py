@@ -12,6 +12,7 @@ parser.add_argument("--iterations", type=int, default=2000)
 parser.add_argument("--seed", type=int, default=42)
 parser.add_argument("--blind", action="store_true")
 parser.add_argument("--fused", action="store_true", help="Use occlusion-aware depth/lidar observations instead of ideal height rays")
+parser.add_argument("--attention", action="store_true", help="AME-inspired CNN and proprioceptive attention; requires --fused")
 parser.add_argument("--kind", choices=["mixed", "flat", "stairs", "platform", "stones"], default="mixed")
 parser.add_argument("--resume")
 parser.add_argument("--bootstrap", help="Initialize network weights only; start a new PPO optimizer and curriculum")
@@ -47,6 +48,12 @@ agent.max_iterations = args.iterations
 agent.save_interval = 100
 agent.obs_groups = {"policy": ["policy"], "critic": ["critic"]}
 agent.policy.init_noise_std = .6
+if args.attention:
+    if not args.fused:
+        raise ValueError("--attention requires --fused")
+    from .attention import register_policy
+    register_policy()
+    agent.policy.class_name = "AttentionActorCritic"
 agent.algorithm.entropy_coef = .005
 agent.algorithm.num_learning_epochs = 4
 source = snapshot(out)
@@ -72,7 +79,17 @@ if args.bootstrap:
     if args.resume:
         raise ValueError("Choose resume or bootstrap")
     checkpoint = torch.load(args.bootstrap, map_location=cfg.sim.device, weights_only=False)
-    runner.alg.policy.load_state_dict(checkpoint["model_state_dict"], strict=True)
+    state = checkpoint["model_state_dict"]
+    if args.attention and "actor.0.weight" in state:
+        # Preserve the published student exactly; only the new branch starts fresh.
+        initial = runner.alg.policy.state_dict()
+        for key, value in state.items():
+            target = "actor.base." + key[6:] if key.startswith("actor.") else key
+            if target in initial:
+                initial[target] = value
+        runner.alg.policy.load_state_dict(initial, strict=True)
+    else:
+        runner.alg.policy.load_state_dict(state, strict=True)
 try:
     runner.learn(num_learning_iterations=args.iterations, init_at_random_ep_len=True)
     (out/"completed.json").write_text(json.dumps({"requested_iterations": args.iterations,
