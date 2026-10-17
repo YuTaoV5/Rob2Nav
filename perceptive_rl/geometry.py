@@ -1,6 +1,9 @@
 """Shared physical geometry for Isaac Lab training and MuJoCo comparison."""
 
 def lane_boxes(difficulty, kind, size=(10., 3.)):
+    if kind.startswith("ame_"):
+        from .ame_terrain import boxes
+        return boxes(difficulty, kind)
     length, width = size
     boxes = []
 

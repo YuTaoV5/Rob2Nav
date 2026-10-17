@@ -23,9 +23,11 @@ from .provenance import snapshot
 
 def populate(world, scene, cfg):
     world.remove(world.find("geom[@name='floor']"))
-    meta = {"water": [], "gaps": [], "goal_height": 0., "surfaces": [], "goal": [7.55, 0.]}
+    ame = cfg["kind"].startswith("ame_")
+    meta = {"water": [], "gaps": [], "goal_height": 0., "surfaces": [], "goal": [3.55 if ame else 7.55, 0.]}
     for i, (x0, x1, y0, y1, top, bottom) in enumerate(lane_boxes(cfg["difficulty"], cfg["kind"])):
-        x0 -= 1.; x1 -= 1.; y0 -= 1.5; y1 -= 1.5
+        ox,oy = (4.,4.) if ame else (1.,1.5)
+        x0 -= ox; x1 -= ox; y0 -= oy; y1 -= oy
         ET.SubElement(world, "geom", name=f"lane_{i}", type="box",
             pos=f"{(x0+x1)/2} {(y0+y1)/2} {(top+bottom)/2}",
             size=f"{(x1-x0)/2} {(y1-y0)/2} {(top-bottom)/2}",
@@ -155,7 +157,7 @@ def main():
     p.add_argument("--backend", choices=["moe", "ik", "learned"], required=True)
     p.add_argument("--actor")
     p.add_argument("--io")
-    p.add_argument("--kind", choices=["flat", "stairs", "platform", "stones"], default="stairs")
+    p.add_argument("--kind", choices=["flat", "stairs", "platform", "stones", "ame_stakes", "ame_alternate", "ame_stakes12"], default="stairs")
     p.add_argument("--difficulty", type=float, default=.5)
     p.add_argument("--episodes", type=int, default=5)
     p.add_argument("--seed", type=int, default=801)
@@ -166,7 +168,8 @@ def main():
     if args.backend == "learned" and not (args.actor and args.io):
         p.error("learned requires --actor and --io")
     cfg = terrain_config()
-    cfg.update(kind=args.kind, difficulty=args.difficulty, goal=[7.55, 0.],
+    goal_x = 3.5 if args.kind.startswith("ame_") else 7.5
+    cfg.update(kind=args.kind, difficulty=args.difficulty, goal=[goal_x+.05, 0.],
         max_seconds=18., navigation_dt=.02, anticipatory_lift=args.backend == "ik",
         test_friction=args.friction,
         auto_jump=False, jump_backend="disabled", sensor_payload_kg=0., goal_tolerance=.15,
@@ -215,7 +218,7 @@ def main():
                                    (env.model.geom_bodyid[c.geom2] == env.base_id and env.model.geom_bodyid[c.geom1] == 0) for c in env.data.contact)
                     fall |= base_hit
                     left_lane = bool(abs(env.data.qpos[1]) > .85 or env.data.qpos[0] < -.7)
-                    reached = bool(env.data.qpos[0] > 7.5 and support >= 2 and env.rotation[2, 2] > .7)
+                    reached = bool(env.data.qpos[0] > goal_x and support >= 2 and env.rotation[2, 2] > .7)
                     trace.append({"time": (step+1)*.02, "position": env.data.qpos[:3].tolist(), "support_feet": support})
                     if writer and step % 2 == 0:
                         writer.append_data(env.render())

@@ -14,7 +14,7 @@ def reached(env):
     sensor = env.scene["contact_forces"]
     foot_ids = [i for i, name in enumerate(sensor.body_names) if "foot" in name]
     support = (sensor.data.net_forces_w[:, foot_ids, 2] > 5.).sum(-1) >= 2
-    return ((p[:, 0] > 7.5) & (p[:, 1].abs() < .8) & (p[:, 2] > .18) & support
+    return ((p[:, 0] > getattr(env.cfg,"route_goal_x",7.5)) & (p[:, 1].abs() < .8) & (p[:, 2] > .18) & support
             & (robot.data.projected_gravity_b[:, 2] < -.7))
 
 
@@ -38,7 +38,7 @@ def lane_center(env):
 def terrain_curriculum(env, env_ids):
     terrain = env.scene.terrain
     p = env.scene["robot"].data.root_pos_w[env_ids]-env.scene.env_origins[env_ids]
-    up = (p[:, 0] > 7.) & (p[:, 1].abs() < .8)
+    up = (p[:, 0] > getattr(env.cfg,"route_goal_x",7.5)-.5) & (p[:, 1].abs() < .8)
     down = (p[:, 0] < 3.) & ~up
     terrain.update_env_origins(env_ids, up, down)
     return terrain.terrain_levels.float().mean()
@@ -52,8 +52,11 @@ def make_cfg(num_envs=2048, seed=42, blind=False, kind="mixed", evaluation=False
     cfg.episode_length_s = 16.
     kinds = ["flat", "stairs", "platform", "stones"] if kind == "mixed" else [kind]
     proportions = {"flat": .15, "stairs": .30, "platform": .25, "stones": .30}
+    if kind.startswith("ame_"):
+        cfg.route_goal_x = 3.5
+        proportions[kind] = 1.
     cfg.scene.terrain.terrain_generator = TerrainGeneratorCfg(
-        seed=seed, size=(10., 3.), border_width=3., num_rows=10, num_cols=20 if kind == "mixed" else 4,
+        seed=seed, size=(8.,8.) if kind.startswith("ame_") else (10., 3.), border_width=3., num_rows=10, num_cols=20 if kind == "mixed" else 4,
         horizontal_scale=.1, vertical_scale=.005, slope_threshold=.75,
         use_cache=False, curriculum=True, difficulty_range=(0., 1.),
         sub_terrains={k: LaneCfg(kind=k, proportion=proportions[k]) for k in kinds},

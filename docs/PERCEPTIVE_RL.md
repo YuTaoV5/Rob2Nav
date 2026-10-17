@@ -71,16 +71,16 @@ Isaac Lab 关节顺序为先四个 hip、再四个 thigh、再四个 calf，**�
 ## 运行
 
 在安装 Isaac Lab 2.3.2、Isaac Sim 5.1 和 RSL-RL 3.1.2 的 Python 中运行，避免用 MuJoCo 的轻量环境启动 Isaac Lab。
-下面服务器路径只是当前已验证环境示例。
+下面服务器路径只是当前已验证环境示例。历史宽桩实验显式使用 `--kind mixed`；当前训练默认值已改为 AME 窄桩，不能省略该参数来复现实验。
 
 ```bash
 cd /root/gpufree-data/Rob2Nav
 # 从零训练，理想地形扫描教师
-/root/isaacsim/python.sh -m perceptive_rl.train --headless \
+/root/isaacsim/python.sh -m perceptive_rl.train --headless --kind mixed \
   --num-envs 2048 --iterations 1800 --output outputs/perceptive/scan
 
 # 另一条路线：以外部 rough 检查点初始化，新建 PPO 优化器与越障课程
-/root/isaacsim/python.sh -m perceptive_rl.train --headless --teacher-velocity \
+/root/isaacsim/python.sh -m perceptive_rl.train --headless --teacher-velocity --kind mixed \
   --bootstrap /path/to/official_rough_checkpoint.pt --num-envs 2048 \
   --iterations 400 --output outputs/perceptive/teacher
 
@@ -88,7 +88,7 @@ cd /root/gpufree-data/Rob2Nav
 /root/isaacsim/python.sh -m perceptive_rl.distill --headless \
   --teacher outputs/perceptive/teacher/model_399.pt --num-envs 1024 \
   --steps 1500 --output outputs/perceptive/distill
-/root/isaacsim/python.sh -m perceptive_rl.train --headless --fused \
+/root/isaacsim/python.sh -m perceptive_rl.train --headless --fused --kind mixed \
   --resume outputs/perceptive/distill/student.pt --num-envs 1024 \
   --iterations 300 --output outputs/perceptive/student
 ```

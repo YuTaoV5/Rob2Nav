@@ -50,7 +50,7 @@ flowchart LR
 这能区分“多训练了一段”和“增加注意力结构”带来的变化；单次种子的小规模实验不能证明架构普遍优越。先看固定难度 0.5 的 Isaac 和 MuJoCo 完整通过率，再考虑加大训练量。测试保留失败案例，视频不计作额外独立成功样本。
 
 ```bash
-/root/isaacsim/python.sh -m perceptive_rl.train --headless --fused \
+/root/isaacsim/python.sh -m perceptive_rl.train --headless --fused --kind mixed \
   --attention --bootstrap artifacts/perceptive/checkpoints/student.pt \
   --num-envs 512 --iterations 200 --seed 44 --output outputs/ame/attention
 # 对照：去掉 --attention，输出改为 outputs/ame/control。

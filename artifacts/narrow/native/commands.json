@@ -1,0 +1,65 @@
+[
+  {
+    "command": [
+      "/root/isaacsim/python.sh",
+      "-m",
+      "perceptive_rl.evaluate",
+      "--headless",
+      "--checkpoint",
+      "outputs/perceptive/student/model_299.pt",
+      "--num-envs",
+      "32",
+      "--fused",
+      "--kind",
+      "ame_stakes",
+      "--difficulty",
+      "1.0",
+      "--output",
+      "outputs/narrow_exact/native/ame_stakes_1.00"
+    ],
+    "returncode": 0,
+    "successes": 0
+  },
+  {
+    "command": [
+      "/root/isaacsim/python.sh",
+      "-m",
+      "perceptive_rl.evaluate",
+      "--headless",
+      "--checkpoint",
+      "outputs/perceptive/student/model_299.pt",
+      "--num-envs",
+      "32",
+      "--fused",
+      "--kind",
+      "ame_alternate",
+      "--difficulty",
+      "1.0",
+      "--output",
+      "outputs/narrow_exact/native/ame_alternate_1.00"
+    ],
+    "returncode": 0,
+    "successes": 0
+  },
+  {
+    "command": [
+      "/root/isaacsim/python.sh",
+      "-m",
+      "perceptive_rl.evaluate",
+      "--headless",
+      "--checkpoint",
+      "outputs/perceptive/student/model_299.pt",
+      "--num-envs",
+      "32",
+      "--fused",
+      "--kind",
+      "ame_stakes12",
+      "--difficulty",
+      "1.0",
+      "--output",
+      "outputs/narrow_exact/native/ame_stakes12_1.00"
+    ],
+    "returncode": 0,
+    "successes": 0
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "command": [
+      "/root/gpufree-data/envs/go2-mapless/bin/python",
+      "-m",
+      "perceptive_rl.mujoco_compare",
+      "--backend",
+      "learned",
+      "--episodes",
+      "5",
+      "--actor",
+      "artifacts/perceptive/student_native/stairs_0.50/actor.pt",
+      "--io",
+      "artifacts/perceptive/student_native/stairs_0.50/summary.json",
+      "--kind",
+      "ame_stakes",
+      "--difficulty",
+      "1.0",
+      "--output",
+      "outputs/narrow_exact/mujoco/ame_stakes_1.00",
+      "--video"
+    ],
+    "returncode": 0,
+    "successes": 0
+  },
+  {
+    "command": [
+      "/root/gpufree-data/envs/go2-mapless/bin/python",
+      "-m",
+      "perceptive_rl.mujoco_compare",
+      "--backend",
+      "learned",
+      "--episodes",
+      "5",
+      "--actor",
+      "artifacts/perceptive/student_native/stairs_0.50/actor.pt",
+      "--io",
+      "artifacts/perceptive/student_native/stairs_0.50/summary.json",
+      "--kind",
+      "ame_alternate",
+      "--difficulty",
+      "1.0",
+      "--output",
+      "outputs/narrow_exact/mujoco/ame_alternate_1.00",
+      "--video"
+    ],
+    "returncode": 0,
+    "successes": 0
+  },
+  {
+    "command": [
+      "/root/gpufree-data/envs/go2-mapless/bin/python",
+      "-m",
+      "perceptive_rl.mujoco_compare",
+      "--backend",
+      "learned",
+      "--episodes",
+      "5",
+      "--actor",
+      "artifacts/perceptive/student_native/stairs_0.50/actor.pt",
+      "--io",
+      "artifacts/perceptive/student_native/stairs_0.50/summary.json",
+      "--kind",
+      "ame_stakes12",
+      "--difficulty",
+      "1.0",
+      "--output",
+      "outputs/narrow_exact/mujoco/ame_stakes12_1.00",
+      "--video"
+    ],
+    "returncode": 0,
+    "successes": 0
+  }
+]

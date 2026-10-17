@@ -12,7 +12,7 @@ def lane(difficulty, cfg):
         mesh = trimesh.creation.box((x1-x0, y1-y0, top-bottom))
         mesh.apply_translation(((x0+x1)/2, (y0+y1)/2, (top+bottom)/2))
         meshes.append(mesh)
-    return meshes, np.array([1., cfg.size[1]/2, 0.])
+    return meshes, np.array([4.,4.,0.] if cfg.kind.startswith("ame_") else [1., cfg.size[1]/2, 0.])
 
 
 @configclass

@@ -18,6 +18,12 @@ python -m go2_nav.active_run --scene course --goal 13 0 --jump-backend nju --con
 
 ![绕障、台阶、跳坑与到达目标的仿真片段](artifacts/active/mission_preview.png)
 
+## AME 窄梅花桩
+
+新增 AME 复现配置对应的 **20×20 cm 方桩**：完整 8×8 m 场地、2×2 m 中心平台、双列/交替排列、±3 cm 高差、2 m 深坑；另有明确区分的 12 cm 支撑面压力测试。
+Isaac 与 MuJoCo 共用几何，训练入口默认地形改为 `ame_stakes`，课程从 40 cm 逐步缩小到 20 cm。
+旧 `stones` 是宽支撑面历史对照，其成绩不代表窄桩能力。见 [尺寸来源、评估、视频与使用命令](NARROW_VALIDATION.md)。
+
 ## AME 地形注意力增量实验
 
 参考 [SII-FUSC/AME_Locomotion](https://github.com/SII-FUSC/AME_Locomotion) 与 AME 原论文，独立实现适配 Go2 的 CNN + 本体状态查询地形注意力分支。
