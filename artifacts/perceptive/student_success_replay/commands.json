@@ -1,0 +1,54 @@
+[
+  {
+    "command": [
+      "/root/gpufree-data/envs/go2-mapless/bin/python",
+      "-m",
+      "perceptive_rl.mujoco_compare",
+      "--backend",
+      "learned",
+      "--episodes",
+      "1",
+      "--actor",
+      "outputs/perceptive/student_native/stairs_0.50/actor.pt",
+      "--io",
+      "outputs/perceptive/student_native/stairs_0.50/summary.json",
+      "--kind",
+      "stairs",
+      "--difficulty",
+      "0.5",
+      "--output",
+      "outputs/perceptive/student_success_replay/stairs_0.50",
+      "--seed",
+      "802",
+      "--video"
+    ],
+    "returncode": 0,
+    "successes": 1
+  },
+  {
+    "command": [
+      "/root/gpufree-data/envs/go2-mapless/bin/python",
+      "-m",
+      "perceptive_rl.mujoco_compare",
+      "--backend",
+      "learned",
+      "--episodes",
+      "1",
+      "--actor",
+      "outputs/perceptive/student_native/stairs_0.50/actor.pt",
+      "--io",
+      "outputs/perceptive/student_native/stairs_0.50/summary.json",
+      "--kind",
+      "stones",
+      "--difficulty",
+      "0.5",
+      "--output",
+      "outputs/perceptive/student_success_replay/stones_0.50",
+      "--seed",
+      "802",
+      "--video"
+    ],
+    "returncode": 0,
+    "successes": 1
+  }
+]

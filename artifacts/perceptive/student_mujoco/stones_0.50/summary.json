@@ -1,0 +1,102 @@
+{
+  "args": {
+    "backend": "learned",
+    "actor": "outputs/perceptive/student_native/stairs_0.50/actor.pt",
+    "io": "outputs/perceptive/student_native/stairs_0.50/summary.json",
+    "kind": "stones",
+    "difficulty": 0.5,
+    "episodes": 5,
+    "seed": 801,
+    "friction": 0.8,
+    "video": true,
+    "output": "outputs/perceptive/student_mujoco/stones_0.50"
+  },
+  "successes": 2,
+  "episodes": [
+    {
+      "episode": 0,
+      "success": false,
+      "fall": true,
+      "left_lane": false,
+      "position": [
+        4.54882143750389,
+        0.40941932827334115,
+        0.11364507290106948
+      ],
+      "climbed_platform": false,
+      "seconds": 8.16,
+      "calf_impulse_proxy": 67.81694762690117
+    },
+    {
+      "episode": 1,
+      "success": true,
+      "fall": false,
+      "left_lane": false,
+      "position": [
+        7.535678015647009,
+        -0.6850475377468889,
+        0.3610082752075672
+      ],
+      "climbed_platform": false,
+      "seconds": 14.0,
+      "calf_impulse_proxy": 118.86885418637462
+    },
+    {
+      "episode": 2,
+      "success": false,
+      "fall": true,
+      "left_lane": false,
+      "position": [
+        3.094505155508155,
+        0.3966770176774895,
+        0.1582681598033616
+      ],
+      "climbed_platform": false,
+      "seconds": 5.98,
+      "calf_impulse_proxy": 15.983024070704902
+    },
+    {
+      "episode": 3,
+      "success": true,
+      "fall": false,
+      "left_lane": false,
+      "position": [
+        7.527921617154458,
+        0.08232364521489692,
+        0.3531058421310273
+      ],
+      "climbed_platform": false,
+      "seconds": 14.24,
+      "calf_impulse_proxy": 126.52275657511275
+    },
+    {
+      "episode": 4,
+      "success": false,
+      "fall": true,
+      "left_lane": false,
+      "position": [
+        3.059351906950586,
+        0.2754198691638401,
+        0.1329786943048275
+      ],
+      "climbed_platform": false,
+      "seconds": 6.44,
+      "calf_impulse_proxy": 55.51663762852239
+    }
+  ],
+  "source_sha256": {
+    "sensors.py": "7969f94e808f7f9c8296ab1bcb2de3c2676f05c141cef8c30dddaf17114e2835",
+    "train.py": "84dacc3794e5f95734c89a2893eeb242ba7499e7db47c140da8e73e0688d4f90",
+    "mujoco_compare.py": "ad941eaa6cd23da32154487d83190ac0de89491098e288baf034c384d3daac1a",
+    "geometry.py": "f487919205a33b1bcd4fcf88a5db5dd847e989067a76560ecab4c694263127c2",
+    "__init__.py": "06ca119b451072a57a5aa9d6e58214358583823cdd3a9542f6086c39db117b0a",
+    "elevation.py": "980e97d41dfe30875cd97359b3c7fb46a0811907823ebb6006cf97bc012e64f2",
+    "provenance.py": "049b88bed74efd4b1fb655f000ed07a7f75e7eb893af70fdef2ec27d07773677",
+    "evaluate.py": "a7a137273555151e7d49a5cb6d4a285562ead6b610df73027103e42341f1e646",
+    "distill.py": "544513bdc6f404ff54b550cc5eaf324efe3b3838686fa373255eeca58502948f",
+    "task.py": "6979cfc735d0ce17e27551478ee9ced136d9d0aecd9b219097e53bf8e9b17eab",
+    "io.py": "0c3edaf8f712e48c9cc0956208430dd69f5b0d451c2dfa18a38f19c2ffdabfa2",
+    "terrain.py": "89d5fa479ab7a490d9578fae9481ca1f68d8a6cdcd0e45c1bb986531fcc8e0b6"
+  },
+  "actor_sha256": "49d1c9865cc949b187c35ef47767818ca6987368aa941d58a985d5ba8eb10522"
+}

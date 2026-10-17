@@ -1,0 +1,65 @@
+[
+  {
+    "command": [
+      "/root/isaacsim/python.sh",
+      "-m",
+      "perceptive_rl.evaluate",
+      "--headless",
+      "--checkpoint",
+      "outputs/perceptive/distill/student.pt",
+      "--num-envs",
+      "32",
+      "--fused",
+      "--kind",
+      "stairs",
+      "--difficulty",
+      "0.5",
+      "--output",
+      "outputs/perceptive/distilled_native/stairs_0.50"
+    ],
+    "returncode": 0,
+    "successes": 32
+  },
+  {
+    "command": [
+      "/root/isaacsim/python.sh",
+      "-m",
+      "perceptive_rl.evaluate",
+      "--headless",
+      "--checkpoint",
+      "outputs/perceptive/distill/student.pt",
+      "--num-envs",
+      "32",
+      "--fused",
+      "--kind",
+      "platform",
+      "--difficulty",
+      "0.5",
+      "--output",
+      "outputs/perceptive/distilled_native/platform_0.50"
+    ],
+    "returncode": 0,
+    "successes": 28
+  },
+  {
+    "command": [
+      "/root/isaacsim/python.sh",
+      "-m",
+      "perceptive_rl.evaluate",
+      "--headless",
+      "--checkpoint",
+      "outputs/perceptive/distill/student.pt",
+      "--num-envs",
+      "32",
+      "--fused",
+      "--kind",
+      "stones",
+      "--difficulty",
+      "0.5",
+      "--output",
+      "outputs/perceptive/distilled_native/stones_0.50"
+    ],
+    "returncode": 0,
+    "successes": 16
+  }
+]

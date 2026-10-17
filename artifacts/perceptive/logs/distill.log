@@ -1,0 +1,223 @@
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /workspace/isaaclab/apps/isaaclab.python.headless.kit
+Loading user config located at: '/isaac-sim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /isaac-sim/kit/logs/Kit/Isaac-Sim/5.1/kit_20261017_165245.log
+2026-10-17T08:52:45Z [480ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2026-10-17T08:52:46Z [1,037ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
+2026-10-17T08:52:46Z [1,360ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+2026-10-17T08:52:50Z [4,980ms] [Warning] [carb.graphics-vulkan.plugin] Could not initialize nvperf_grfx_host library. PerfSDK disabled
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.126.09    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA L40                       | Yes: 0 |     | 46068   MB | 10de      | 0          |
+|     |                                  |        |     |            | 26b5      | b882e3b8.. |
+|     |                                  |        |     |            | 9c        |            |
+|=============================================================================================|
+| OS: 24.04.4 LTS (Noble Numbat) ubuntu, Version: 24.04.4, Kernel: 5.15.0-168-generic
+| XServer Vendor: The X.Org Foundation, XServer Version: 12101011 (1.21.1.11)
+| Processor: Intel(R) Xeon(R) Platinum 8358 CPU @ 2.60GHz
+| Bare Metal Cores: 64 | Bare Metal Logical Cores: 128
+| Core Usage Quota: 14
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 122880 | Free Memory: 116703
+| Total Page/Swap (MB): 0 | Free Page/Swap: 0
+|---------------------------------------------------------------------------------------------|
+2026-10-17T08:52:50Z [5,196ms] [Warning] [gpu.foundation.plugin] ECC is enabled on physical device 0
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-10-17_16-52-52.log[0m
+[36m======================================================================================[0m
+
+[33m16:52:52 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 43
+	Physics step-size     : 0.005
+	Rendering step-size   : 0.02
+	Environment step-size : 0.02
+[INFO] Generating terrains based on curriculum took : 0.870063 seconds
+[INFO]: Time taken for scene creation : 3.327178 seconds
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 1024
+	Environment spacing   : 3.0
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : ['/World/ground']
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Time taken for simulation start : 3.116761 seconds
+[INFO] Command Manager:  <CommandManager> contains 1 active terms.
++------------------------------------------------+
+|              Active Command Terms              |
++-------+---------------+------------------------+
+| Index | Name          |          Type          |
++-------+---------------+------------------------+
+|   0   | base_velocity | UniformVelocityCommand |
++-------+---------------+------------------------+
+
+[INFO] Event Manager:  <EventManager> contains 2 active terms.
++--------------------------------------+
+| Active Event Terms in Mode: 'startup' |
++----------+---------------------------+
+|  Index   | Name                      |
++----------+---------------------------+
+|    0     | physics_material          |
+|    1     | add_base_mass             |
++----------+---------------------------+
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++---------+---------------------------+
+|  Index  | Name                      |
++---------+---------------------------+
+|    0    | reset_base                |
+|    1    | reset_robot_joints        |
++---------+---------------------------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++---------------------+
+| Active Recorder Terms |
++-----------+---------+
+|   Index   | Name    |
++-----------+---------+
++-----------+---------+
+
+[INFO] Action Manager:  <ActionManager> contains 1 active terms.
++------------------------------------+
+|  Active Action Terms (shape: 12)   |
++--------+-------------+-------------+
+| Index  | Name        |   Dimension |
++--------+-------------+-------------+
+|   0    | joint_pos   |          12 |
++--------+-------------+-------------+
+
+[INFO] Observation Manager: <ObservationManager> contains 2 groups.
++----------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (419,)) |
++-----------+--------------------------------+-------------+
+|   Index   | Name                           |    Shape    |
++-----------+--------------------------------+-------------+
+|     0     | base_ang_vel                   |     (3,)    |
+|     1     | projected_gravity              |     (3,)    |
+|     2     | velocity_commands              |     (3,)    |
+|     3     | joint_pos                      |    (12,)    |
+|     4     | joint_vel                      |    (12,)    |
+|     5     | actions                        |    (12,)    |
+|     6     | height_scan                    |    (374,)   |
++-----------+--------------------------------+-------------+
++----------------------------------------------------------+
+| Active Observation Terms in Group: 'critic' (shape: (235,)) |
++-----------+--------------------------------+-------------+
+|   Index   | Name                           |    Shape    |
++-----------+--------------------------------+-------------+
+|     0     | base_lin_vel                   |     (3,)    |
+|     1     | base_ang_vel                   |     (3,)    |
+|     2     | projected_gravity              |     (3,)    |
+|     3     | velocity_commands              |     (3,)    |
+|     4     | joint_pos                      |    (12,)    |
+|     5     | joint_vel                      |    (12,)    |
+|     6     | actions                        |    (12,)    |
+|     7     | height_scan                    |    (187,)   |
++-----------+--------------------------------+-------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 4 active terms.
++---------------------------------+
+|     Active Termination Terms    |
++-------+--------------+----------+
+| Index | Name         | Time Out |
++-------+--------------+----------+
+|   0   | time_out     |   True   |
+|   1   | base_contact |  False   |
+|   2   | reached      |   True   |
+|   3   | off_lane     |  False   |
++-------+--------------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 14 active terms.
++-----------------------------------------+
+|           Active Reward Terms           |
++-------+----------------------+----------+
+| Index | Name                 |   Weight |
++-------+----------------------+----------+
+|   0   | track_lin_vel_xy_exp |      1.5 |
+|   1   | track_ang_vel_z_exp  |     0.75 |
+|   2   | lin_vel_z_l2         |     -0.5 |
+|   3   | ang_vel_xy_l2        |    -0.05 |
+|   4   | dof_torques_l2       |  -0.0002 |
+|   5   | dof_acc_l2           | -2.5e-07 |
+|   6   | action_rate_l2       |    -0.01 |
+|   7   | feet_air_time        |      0.1 |
+|   8   | undesired_contacts   |     -0.3 |
+|   9   | flat_orientation_l2  |      0.0 |
+|   10  | dof_pos_limits       |     -1.0 |
+|   11  | forward_progress     |      1.0 |
+|   12  | lane_center          |     -1.0 |
+|   13  | reached              |    100.0 |
++-------+----------------------+----------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 1 active terms.
++---------------------------+
+|  Active Curriculum Terms  |
++--------+------------------+
+| Index  | Name             |
++--------+------------------+
+|   0    | terrain_levels   |
++--------+------------------+
+
+[INFO]: Completed setting up the environment...
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 policy :  ['policy']
+	 critic :  ['critic']
+--------------------------------------------------------------------------------
+Actor MLP: MLP(
+  (0): Linear(in_features=419, out_features=512, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=512, out_features=256, bias=True)
+  (3): ELU(alpha=1.0)
+  (4): Linear(in_features=256, out_features=128, bias=True)
+  (5): ELU(alpha=1.0)
+  (6): Linear(in_features=128, out_features=12, bias=True)
+)
+Critic MLP: MLP(
+  (0): Linear(in_features=235, out_features=512, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=512, out_features=256, bias=True)
+  (3): ELU(alpha=1.0)
+  (4): Linear(in_features=256, out_features=128, bias=True)
+  (5): ELU(alpha=1.0)
+  (6): Linear(in_features=128, out_features=1, bias=True)
+)
+{"step": 0, "mse": 0.8101069331169128, "teacher_probability": 1.0, "terrain_level": 2.294921875, "observed_fraction": 0.2854069173336029}
+{"step": 50, "mse": 0.19109615683555603, "teacher_probability": 0.9333333333333333, "terrain_level": 2.294921875, "observed_fraction": 0.37703147530555725}
+{"step": 100, "mse": 0.22228628396987915, "teacher_probability": 0.8666666666666667, "terrain_level": 2.294921875, "observed_fraction": 0.310646116733551}
+{"step": 150, "mse": 0.06807239353656769, "teacher_probability": 0.8, "terrain_level": 2.294921875, "observed_fraction": 0.27064359188079834}
+{"step": 200, "mse": 0.03760289028286934, "teacher_probability": 0.7333333333333334, "terrain_level": 2.2919921875, "observed_fraction": 0.27712443470954895}
+{"step": 250, "mse": 0.02982369065284729, "teacher_probability": 0.6666666666666667, "terrain_level": 2.291015625, "observed_fraction": 0.2878979444503784}
+{"step": 300, "mse": 0.02777695469558239, "teacher_probability": 0.6, "terrain_level": 2.291015625, "observed_fraction": 0.296159565448761}
+{"step": 350, "mse": 0.028656860813498497, "teacher_probability": 0.5333333333333333, "terrain_level": 2.314453125, "observed_fraction": 0.31321021914482117}
+{"step": 400, "mse": 0.026145678013563156, "teacher_probability": 0.4666666666666667, "terrain_level": 2.5966796875, "observed_fraction": 0.31631746888160706}
+{"step": 450, "mse": 0.028095342218875885, "teacher_probability": 0.4, "terrain_level": 2.8544921875, "observed_fraction": 0.3209705054759979}
+{"step": 500, "mse": 0.07662947475910187, "teacher_probability": 0.33333333333333337, "terrain_level": 3.03125, "observed_fraction": 0.3180408179759979}
+{"step": 550, "mse": 0.08789364993572235, "teacher_probability": 0.2666666666666667, "terrain_level": 3.1640625, "observed_fraction": 0.31243211030960083}
+{"step": 600, "mse": 0.0798012912273407, "teacher_probability": 0.19999999999999996, "terrain_level": 3.2529296875, "observed_fraction": 0.302661269903183}
+{"step": 650, "mse": 0.10585912317037582, "teacher_probability": 0.1333333333333333, "terrain_level": 3.2607421875, "observed_fraction": 0.30589383840560913}
+{"step": 700, "mse": 0.09011752903461456, "teacher_probability": 0.06666666666666665, "terrain_level": 3.265625, "observed_fraction": 0.30153849720954895}
+{"step": 750, "mse": 0.08155792951583862, "teacher_probability": 0.0, "terrain_level": 3.2998046875, "observed_fraction": 0.30605050921440125}
+{"step": 800, "mse": 0.06524766981601715, "teacher_probability": 0.0, "terrain_level": 3.4033203125, "observed_fraction": 0.30727773904800415}
+{"step": 850, "mse": 0.117228202521801, "teacher_probability": 0.0, "terrain_level": 3.5400390625, "observed_fraction": 0.3155602514743805}
+{"step": 900, "mse": 0.08954666554927826, "teacher_probability": 0.0, "terrain_level": 3.6826171875, "observed_fraction": 0.31348177790641785}
+{"step": 950, "mse": 0.08397840708494186, "teacher_probability": 0.0, "terrain_level": 3.8330078125, "observed_fraction": 0.3172888159751892}
+{"step": 1000, "mse": 0.08793210238218307, "teacher_probability": 0.0, "terrain_level": 3.9541015625, "observed_fraction": 0.31416067481040955}
+{"step": 1050, "mse": 0.08782859891653061, "teacher_probability": 0.0, "terrain_level": 4.0283203125, "observed_fraction": 0.30875563621520996}
+{"step": 1100, "mse": 0.09042493999004364, "teacher_probability": 0.0, "terrain_level": 4.076171875, "observed_fraction": 0.3078574240207672}
+{"step": 1150, "mse": 0.0960397943854332, "teacher_probability": 0.0, "terrain_level": 4.115234375, "observed_fraction": 0.29949134588241577}
+{"step": 1200, "mse": 0.08803288638591766, "teacher_probability": 0.0, "terrain_level": 4.16015625, "observed_fraction": 0.3027813732624054}
+{"step": 1250, "mse": 0.08254590630531311, "teacher_probability": 0.0, "terrain_level": 4.212890625, "observed_fraction": 0.30339759588241577}
+{"step": 1300, "mse": 0.0938882827758789, "teacher_probability": 0.0, "terrain_level": 4.3046875, "observed_fraction": 0.30334538221359253}
+{"step": 1350, "mse": 0.08244878053665161, "teacher_probability": 0.0, "terrain_level": 4.388671875, "observed_fraction": 0.3139778971672058}
+{"step": 1400, "mse": 0.07099409401416779, "teacher_probability": 0.0, "terrain_level": 4.494140625, "observed_fraction": 0.31334078311920166}
+{"step": 1450, "mse": 0.08257918059825897, "teacher_probability": 0.0, "terrain_level": 4.6171875, "observed_fraction": 0.309335321187973}
+DISTILLATION_COMPLETE 1500

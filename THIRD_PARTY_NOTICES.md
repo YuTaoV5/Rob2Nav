@@ -1,5 +1,14 @@
 # Third-party notices
 
+## Isaac Lab perceptive locomotion experiments
+
+- Framework: [Isaac Lab 2.3.2](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2), BSD-3-Clause; installed externally rather than vendored.
+- Optimizer: [RSL-RL 3.1.2](https://github.com/leggedrobotics/rsl_rl), BSD-3-Clause.
+- The Go2 USD and external initial rough checkpoint are downloaded from NVIDIA's Isaac Lab asset server. NVIDIA assets and checkpoints retain their original terms; the root source-code license does not relicense them or derived weights.
+- `artifacts/perceptive/manifest.json` identifies the external initializer URL and SHA-256, and separately identifies Rob2Nav's fine-tuned teacher and student checkpoints.
+- The from-scratch teacher, fine-tuned teacher, student imitation and student PPO are distinct training stages. They do not update the vendored RoboGauge or NJU checkpoints.
+- Extreme Parkour, Robot Parkour Learning and Vision Locomotion are methodological references, linked in [the experiment documentation](docs/PERCEPTIVE_RL.md). This extension does not claim to reproduce their full training methods or published performance.
+
 ## NJU quadrupedal-agility
 
 - Source: https://github.com/NJU-RLC/quadrupedal-agility

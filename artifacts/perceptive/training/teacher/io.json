@@ -1,0 +1,102 @@
+{
+  "joint_names": [
+    "FL_hip_joint",
+    "FR_hip_joint",
+    "RL_hip_joint",
+    "RR_hip_joint",
+    "FL_thigh_joint",
+    "FR_thigh_joint",
+    "RL_thigh_joint",
+    "RR_thigh_joint",
+    "FL_calf_joint",
+    "FR_calf_joint",
+    "RL_calf_joint",
+    "RR_calf_joint"
+  ],
+  "default_joint_pos": [
+    0.10000000149011612,
+    -0.10000000149011612,
+    0.10000000149011612,
+    -0.10000000149011612,
+    0.800000011920929,
+    0.800000011920929,
+    1.0,
+    1.0,
+    -1.5,
+    -1.5,
+    -1.5,
+    -1.5
+  ],
+  "stiffness": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "damping": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "action_scale": 0.25,
+  "observation_terms": {
+    "policy": [
+      "base_lin_vel",
+      "base_ang_vel",
+      "projected_gravity",
+      "velocity_commands",
+      "joint_pos",
+      "joint_vel",
+      "actions",
+      "height_scan"
+    ],
+    "critic": [
+      "base_lin_vel",
+      "base_ang_vel",
+      "projected_gravity",
+      "velocity_commands",
+      "joint_pos",
+      "joint_vel",
+      "actions",
+      "height_scan"
+    ]
+  },
+  "observation_shapes": {
+    "policy": [
+      235
+    ],
+    "critic": [
+      235
+    ]
+  },
+  "scan": {
+    "x": [
+      -0.55,
+      1.05,
+      0.1
+    ],
+    "y": [
+      -0.5,
+      0.5,
+      0.1
+    ],
+    "ordering": "xy"
+  }
+}

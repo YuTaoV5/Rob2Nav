@@ -1,0 +1,42 @@
+{
+  "evaluation_groups": [
+    "final_moe",
+    "final_ik",
+    "teacher_native",
+    "student_native",
+    "teacher_mujoco",
+    "student_mujoco",
+    "teacher_native_video",
+    "student_native_video",
+    "student_sensor_ablation",
+    "distilled_native",
+    "student_success_replay"
+  ],
+  "checkpoints": {
+    "teacher.pt": {
+      "source": "outputs/perceptive/teacher/model_399.pt",
+      "sha256": "03a0ede211f2c658a38bb6974d7ddd1ff8d44d95e97b1f3b9f45a252569c0bd9"
+    },
+    "student.pt": {
+      "source": "outputs/perceptive/student/model_299.pt",
+      "sha256": "72a6e62cd71f4c693d36cbaec86954f0ed9a9f52fb7bea437b194c9e317e793d"
+    },
+    "distillation_teacher.pt": {
+      "source": "outputs/perceptive/teacher/model_399.pt",
+      "sha256": "03a0ede211f2c658a38bb6974d7ddd1ff8d44d95e97b1f3b9f45a252569c0bd9"
+    },
+    "scratch_300.pt": {
+      "source": "outputs/perceptive/scan/model_300.pt",
+      "sha256": "0d42575937c222c5e9fc23ad6cd49cf1428eb58255595b352536ef5cdd3ca512"
+    },
+    "distilled_student.pt": {
+      "source": "outputs/perceptive/distill/student.pt",
+      "sha256": "34e94128dcfe57e76a32565b017e3118f3c1dfa0761680bbf4793ae01a303090"
+    }
+  },
+  "external_initialization": {
+    "url": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/IsaacLab/PretrainedCheckpoints/rsl_rl/Isaac-Velocity-Rough-Unitree-Go2-v0/checkpoint.pt",
+    "sha256": "f2aa77bf0349c10ec2a00071162e37123d0cf80f3447c3989c17a618e1b24ad2",
+    "description": "External NVIDIA initial rough policy, iteration 1499; not newly trained by Rob2Nav."
+  }
+}

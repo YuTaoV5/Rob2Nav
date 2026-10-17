@@ -1,0 +1,60 @@
+{
+  "args": {
+    "backend": "learned",
+    "actor": "outputs/perceptive/teacher200_platform/actor.pt",
+    "io": "outputs/perceptive/teacher200_platform/summary.json",
+    "kind": "flat",
+    "difficulty": 0.5,
+    "episodes": 2,
+    "seed": 801,
+    "friction": 0.8,
+    "video": true,
+    "output": "outputs/perceptive/pretrained_mujoco_flat_fixed"
+  },
+  "successes": 0,
+  "episodes": [
+    {
+      "episode": 0,
+      "success": false,
+      "fall": false,
+      "left_lane": true,
+      "position": [
+        3.3065434496290744,
+        0.8504432568142305,
+        0.3563188676335851
+      ],
+      "climbed_platform": false,
+      "seconds": 5.46,
+      "calf_impulse_proxy": 0.0
+    },
+    {
+      "episode": 1,
+      "success": false,
+      "fall": false,
+      "left_lane": true,
+      "position": [
+        3.308080279935388,
+        0.8502631064855146,
+        0.35610819786718534
+      ],
+      "climbed_platform": false,
+      "seconds": 5.44,
+      "calf_impulse_proxy": 0.0
+    }
+  ],
+  "source_sha256": {
+    "sensors.py": "5c5ce746d5545d1c93c154aa23ec1a3faf55f5524337d7c70b06cb724a3e98e5",
+    "train.py": "54fce2d9458d7bdc422a636500b1cac0dfc481d00a685c68908ec30353d0dc97",
+    "mujoco_compare.py": "d2fa67434092a61975f8ce15c82bf1d64ff35a045c52dd89ace9a3f45fe54157",
+    "geometry.py": "f487919205a33b1bcd4fcf88a5db5dd847e989067a76560ecab4c694263127c2",
+    "__init__.py": "06ca119b451072a57a5aa9d6e58214358583823cdd3a9542f6086c39db117b0a",
+    "elevation.py": "980e97d41dfe30875cd97359b3c7fb46a0811907823ebb6006cf97bc012e64f2",
+    "provenance.py": "049b88bed74efd4b1fb655f000ed07a7f75e7eb893af70fdef2ec27d07773677",
+    "evaluate.py": "d0b4dc3af246d1eb64adbe76d212afc06f0c78e242807bdb1e2a959c6d12d74c",
+    "distill.py": "8fbbe5d235f31636a38d8433b2a2c30bc50a23aed7840b96e0ca158d24c0c2dc",
+    "task.py": "6979cfc735d0ce17e27551478ee9ced136d9d0aecd9b219097e53bf8e9b17eab",
+    "io.py": "0c3edaf8f712e48c9cc0956208430dd69f5b0d451c2dfa18a38f19c2ffdabfa2",
+    "terrain.py": "89d5fa479ab7a490d9578fae9481ca1f68d8a6cdcd0e45c1bb986531fcc8e0b6"
+  },
+  "actor_sha256": "253250b63823879401e8ddbf28e6c3bd13d27725c31296605de78dbb17d2131a"
+}

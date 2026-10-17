@@ -18,6 +18,28 @@ python -m go2_nav.active_run --scene course --goal 13 0 --jump-backend nju --con
 
 ![绕障、台阶、跳坑与到达目标的仿真片段](artifacts/active/mission_preview.png)
 
+## 感知运动 RL：高台与梅花桩训练实验
+
+新增 Isaac Lab GPU 训练、理想地形教师、深度/雷达学生蒸馏与学生 PPO 微调入口，网络直接输出 12 个关节动作。
+该实验不使用运行时 MoE 或抬脚 IK；另以相同 MuJoCo 几何比较原 MoE、MoE + IK 与新训练权重。
+教师可读取理想高度，学生使用有遮挡的模拟传感器返回、未知区域掩码和短时已见地形记忆；二者的成绩分别报告。
+
+**训练权重是否更强，以完整通过率与失败记录为准；不能仅凭训练奖励或爬上平台的一帧判断。**
+见 [训练、导出及复现说明](docs/PERCEPTIVE_RL.md) · [独立评估报告](PERCEPTIVE_VALIDATION.md)。
+
+本轮可见深度/雷达学生完成教师蒸馏与 300 轮 PPO。在统一 MuJoCo 测试中，楼梯、高台、梅花桩完整通过分别为 **4/5、5/5、2/5**；同条件 MoE + IK 为 **0/5、3/5、0/5**。
+Isaac 原生学生成绩为 **32/32、32/32、28/32**，梅花桩存在明显迁移损失。这里的高台为 21.5 cm，结果仅覆盖固定模板与有限种子，未做实机验证；新策略尚未替换主导航控制器。
+
+[学生爬高台视频](artifacts/perceptive/student_mujoco/platform_0.50/episode_0.mp4) · [梅花桩成功回放（seed 802）](artifacts/perceptive/student_success_replay/stones_0.50/episode_0.mp4) · [梅花桩失败回合（seed 801）](artifacts/perceptive/student_mujoco/stones_0.50/episode_0.mp4) · [训练权重与校验清单](artifacts/perceptive/manifest.json)
+
+```bash
+# 已导出的学生可直接用轻量 MuJoCo 环境复现，无需启动 Isaac Lab
+python -m perceptive_rl.mujoco_compare --backend learned \
+  --actor artifacts/perceptive/student_native/stairs_0.50/actor.pt \
+  --io artifacts/perceptive/student_native/stairs_0.50/summary.json \
+  --kind stones --difficulty .5 --episodes 5 --video --output outputs/student_replay
+```
+
 **多地形扩展**：新增绕水坑、爬台阶、攀上垂直高台和腾空跨越深坑，提供 RoboGauge MoE 运控、关节跳跃技能及 12 维关节残差训练。见 [多地形使用说明](docs/TERRAIN.md)；多地形的训练对象和成功判定与旧版上层导航 PPO 分开。
 
 旧版四个单项场景分别通过 **3/3**。24 cm 高台的同条件本体对照中，原 MLP 为 **0/3**、MoE 为 **3/3**。旧版 `terrain_run --scene mixed` 的含水坑/下台阶串联路线仍未稳定通过，与上面的新版 `active_run --scene course` 场景及控制流程不同。见 [多地形评估](TERRAIN_VALIDATION.md)。
