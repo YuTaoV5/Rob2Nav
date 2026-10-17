@@ -1,0 +1,205 @@
+# -*- coding: utf-8 -*-
+'''
+@File    : server.py
+@Time    : 2025/12/29 10:58:05
+@Author  : wty-yy, Gemini3 Pro
+@Version : 1.0
+@Blog    : https://wty-yy.github.io/
+@Desc    : Asynchronous stress pipeline evaluation server
+'''
+import os
+
+# Headless solution for mujoco
+# For GPU
+# os.environ['MUJOCO_GL'] = 'egl'
+# For CPU (Slow)
+# os.environ['MUJOCO_GL'] = 'osmesa'
+# With a graphical user interface (GUI)
+os.environ['MUJOCO_GL'] = 'glfw'
+
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["TORCH_CPP_LOG_LEVEL"] = "ERROR"
+
+import multiprocessing
+import threading
+import uvicorn
+import queue
+import time
+import uuid
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import Dict, Optional
+import argparse
+
+from dataclasses import dataclass
+from robogauge.utils.helpers import parse_args, class_to_dict
+from robogauge.tasks.pipeline.stress_pipeline import StressPipeline
+from robogauge.scripts.status import ResponseStatus
+from pprint import pprint
+
+default_args_list = [
+    '--stress-benchmark',
+    '--stress-terrain-names', 'flat', 'wave', 'slope_fd',  'slope_bd', 'stairs_fd', 'stairs_bd', 'obstacle',
+    # '--stress-terrain-names', 'flat', 'wave',
+    # '--num-processes', '30',  # Set in CLI
+    '--seeds', '0', '1', '2',
+    '--search-seeds', '0', '1', '2', '3', '4',
+    '--frictions', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9', '1.0',
+    '--compress-logs',
+    '--headless',
+]
+
+HEARTBEAT_TIMEOUT_SECONDS = 10.0
+
+@dataclass
+class EvalTaskData:
+    model_path: str
+    step: int
+    task_name: str
+    experiment_name: str
+
+class EvalRequest(BaseModel):
+    model_path: str
+    step: int
+    task_name: str
+    experiment_name: str
+
+def update_main_heartbeat(health_dict: dict, stop_event: threading.Event, interval: float = 1.0):
+    while not stop_event.is_set():
+        health_dict["main_pid"] = os.getpid()
+        health_dict["last_heartbeat"] = time.time()
+        stop_event.wait(interval)
+
+def is_main_process_healthy(health_dict: dict) -> bool:
+    last_heartbeat = float(health_dict.get("last_heartbeat", 0.0))
+    return time.time() - last_heartbeat <= HEARTBEAT_TIMEOUT_SECONDS
+
+def run_api_server(input_queue: multiprocessing.Queue, result_dict: dict, health_dict: dict, port=9973):
+    """
+    Running in a separate subprocess.
+    I/O Process: submit requests -> put into queue -> return ID.
+    """
+    app = FastAPI()
+
+    @app.get("/health")
+    def health():
+        last_heartbeat = float(health_dict.get("last_heartbeat", 0.0))
+        heartbeat_age = time.time() - last_heartbeat
+        if heartbeat_age > HEARTBEAT_TIMEOUT_SECONDS:
+            raise HTTPException(
+                status_code=503,
+                detail=f"RoboGauge main process heartbeat is stale ({heartbeat_age:.1f}s).",
+            )
+        return {
+            "status": "ok",
+            "main_pid": health_dict.get("main_pid"),
+            "heartbeat_age": heartbeat_age,
+        }
+
+    @app.post("/submit_eval")
+    def submit_eval(req: EvalRequest):
+        if not is_main_process_healthy(health_dict):
+            raise HTTPException(status_code=503, detail="RoboGauge main process is not healthy.")
+        task_id = str(uuid.uuid4())
+        task_data = EvalTaskData(
+            model_path=req.model_path,
+            step=req.step,
+            task_name=req.task_name,
+            experiment_name=req.experiment_name
+        )
+        input_queue.put((task_id, task_data))
+
+        result_dict[task_id] = {"status": ResponseStatus.PENDING}
+        return {"task_id": task_id, "message": "Queued"}
+
+    @app.get("/get_result/{task_id}")
+    def get_result(task_id: str):
+        if task_id not in result_dict:
+            return {"status": ResponseStatus.NOT_FOUND}
+        result = result_dict[task_id]
+        if result["status"] == ResponseStatus.FINISHED:
+            result_dict.pop(task_id)
+        return result
+
+    print(f"📡 API Server listening on port {port}...")
+    uvicorn.run(app, host="127.0.0.1", port=port, log_level="error")
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--port', type=int, default=9973, help='API server port')
+    parser.add_argument('--num-processes', type=int, default=30, help='Number of parallel processes for StressPipeline')
+    args_cli = parser.parse_args()
+    print("🤖 RoboGauge Evaluation Server Starting...")
+    ctx = multiprocessing.get_context('spawn')
+    manager = ctx.Manager()
+    task_queue = manager.Queue()
+    results_store = manager.dict()
+    health_store = manager.dict()
+    heartbeat_stop = threading.Event()
+    heartbeat_thread = threading.Thread(
+        target=update_main_heartbeat,
+        args=(health_store, heartbeat_stop),
+        daemon=True,
+    )
+    heartbeat_thread.start()
+
+    api_p = ctx.Process(
+        target=run_api_server, 
+        args=(task_queue, results_store, health_store, args_cli.port),
+        daemon=True
+    )
+    api_p.start()
+
+    print("🚀 Main Process started. Waiting for tasks...")
+    print("   (StressPipeline will run directly in this Main Process)")
+
+    try:
+        while True:
+            try:
+                task_data: EvalTaskData
+                task_id, task_data = task_queue.get(timeout=1.0)
+                
+                print(f"\n🔄 [Main] Processing Task {task_id} (Step {task_data.step})...")
+                results_store[task_id] = {"status": ResponseStatus.PROCESSING}
+                
+                args_list = default_args_list.copy()
+                args_list += [
+                    '--model-path', task_data.model_path,
+                    '--task-name', task_data.task_name,
+                    '--experiment-name', task_data.experiment_name,
+                    '--num-processes', str(args_cli.num_processes),
+                ]
+                args = parse_args(args_list)
+
+                print(f"📋 Running with args:")
+                pprint(class_to_dict(args))
+                
+                pipeline = StressPipeline(args)
+                stress_results = pipeline.run() 
+
+                results_store[task_id] = {
+                    "status": ResponseStatus.FINISHED,
+                    "step": task_data.step,
+                    "results": stress_results
+                }
+                print(f"✅ [Main] Task {task_id} Finished.")
+
+            except queue.Empty:
+                continue
+            except Exception as e:
+                print(f"❌ [Main] Error: {e}")
+                import traceback
+                traceback.print_exc()
+                if 'task_id' in locals():
+                    results_store[task_id] = {"status": ResponseStatus.ERROR, "error": str(e), "error_msg": traceback.format_exc()}
+
+    except KeyboardInterrupt:
+        print("\n🛑 Shutting down...")
+        api_p.terminate()
+        api_p.join()
+        heartbeat_stop.set()
+        heartbeat_thread.join(timeout=2.0)
+
+if __name__ == "__main__":
+    main()

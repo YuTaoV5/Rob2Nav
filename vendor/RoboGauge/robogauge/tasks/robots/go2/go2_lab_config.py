@@ -1,0 +1,51 @@
+# -*- coding: utf-8 -*-
+'''
+@File    : go2_lab_config.py
+@Time    : 2026/04/11 17:59:09
+@Author  : wty-yy
+@Version : 1.0
+@Blog    : https://wty-yy.github.io/
+@Desc    : Go2 Lab Robot Configuration
+'''
+from robogauge.tasks.robots.go2.go2_config import Go2Config, Go2TerrainConfig
+
+
+class Go2LabConfig(Go2Config):
+    """Go2 Lab robot configuration aligned with RobotLab observation scaling."""
+
+    class control(Go2Config.control):
+        p_gains = [25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.0]  # [N*m/rad]
+        class scales(Go2Config.control.scales):
+            # RobotLab policy command observation uses unit scale.
+            cmd = [1.0, 1.0, 1.0]
+
+
+class Go2LabTerrainConfig(Go2LabConfig, Go2TerrainConfig):
+    """Go2 Lab robot configuration for terrain tasks."""
+
+
+class Go2Lab131Config(Go2LabConfig):
+    """Go2 Lab 1.3.1 configuration with x-only velocity observation scaling."""
+
+    class control(Go2LabConfig.control):
+        class scales(Go2LabConfig.control.scales):
+            lin_vel = [0.5, 1.0, 1.0]
+            cmd = [0.5, 1.0, 1.0]
+
+
+class Go2Lab131TerrainConfig(Go2Lab131Config, Go2TerrainConfig):
+    """Go2 Lab 1.3.1 robot configuration for terrain tasks."""
+
+
+class Go2LabPoseConfig(Go2LabConfig):
+    """Go2 Lab configuration for policies trained with pose commands."""
+
+    robot_class = 'Go2LabPose'
+
+    class control(Go2LabConfig.control):
+        command_horizon_s = 1.0
+        small_angle_threshold = 1.0e-3
+
+
+class Go2LabPoseTerrainConfig(Go2LabPoseConfig, Go2TerrainConfig):
+    """Go2 Lab pose-command configuration for terrain tasks."""

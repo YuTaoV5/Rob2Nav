@@ -1,0 +1,67 @@
+from robogauge.utils.task_register import task_register
+from robogauge.tasks.simulator.mujoco_config import MujocoConfig
+from robogauge.tasks.robots import (
+    RobotConfig,
+    Go2Config,
+    Go2Lab131Config,
+    Go2Lab131TerrainConfig,
+    Go2LabConfig,
+    Go2LabPoseConfig,
+    Go2MoEConfig,
+    Go2TerrainConfig,
+    Go2LabTerrainConfig,
+    Go2LabPoseTerrainConfig,
+    Go2MoETerrainConfig,
+)
+from robogauge.tasks.pipeline import BasePipeline
+from robogauge.tasks.gauge import BaseGaugeConfig
+
+from robogauge.tasks.custom.go2 import *
+
+# Register tasks: Task name format '<robot_model>.<terrain>'
+task_register.register('base', BasePipeline, MujocoConfig, BaseGaugeConfig, RobotConfig)
+
+# Go2 MLP
+task_register.register('go2.flat', BasePipeline, MujocoConfig, Go2FlatGaugeConfig, Go2Config)
+task_register.register('go2.slope_fd', BasePipeline, MujocoConfig, Go2SlopeForwardGaugeConfig, Go2TerrainConfig)
+task_register.register('go2.slope_bd', BasePipeline, MujocoConfig, Go2SlopeBackwardGaugeConfig, Go2TerrainConfig)
+task_register.register('go2.wave', BasePipeline, MujocoConfig, Go2WaveGaugeConfig, Go2TerrainConfig)
+task_register.register('go2.stairs_fd', BasePipeline, MujocoConfig, Go2StairsForwardGaugeConfig, Go2TerrainConfig)
+task_register.register('go2.stairs_bd', BasePipeline, MujocoConfig, Go2StairsBackwardGaugeConfig, Go2TerrainConfig)
+task_register.register('go2.obstacle', BasePipeline, MujocoConfig, Go2ObstacleGaugeConfig, Go2TerrainConfig)
+
+# Go2 MoE
+task_register.register('go2_moe.flat', BasePipeline, MujocoConfig, Go2FlatGaugeConfig, Go2MoEConfig)
+task_register.register('go2_moe.slope_fd', BasePipeline, MujocoConfig, Go2SlopeForwardGaugeConfig, Go2MoETerrainConfig)
+task_register.register('go2_moe.slope_bd', BasePipeline, MujocoConfig, Go2SlopeBackwardGaugeConfig, Go2MoETerrainConfig)
+task_register.register('go2_moe.wave', BasePipeline, MujocoConfig, Go2WaveGaugeConfig, Go2MoETerrainConfig)
+task_register.register('go2_moe.stairs_fd', BasePipeline, MujocoConfig, Go2StairsForwardGaugeConfig, Go2MoETerrainConfig)
+task_register.register('go2_moe.stairs_bd', BasePipeline, MujocoConfig, Go2StairsBackwardGaugeConfig, Go2MoETerrainConfig)
+task_register.register('go2_moe.obstacle', BasePipeline, MujocoConfig, Go2ObstacleGaugeConfig, Go2MoETerrainConfig)
+
+# Go2 Lab
+task_register.register('go2_lab.flat', BasePipeline, MujocoConfig, Go2FlatGaugeConfig, Go2LabConfig)
+task_register.register('go2_lab.slope_fd', BasePipeline, MujocoConfig, Go2SlopeForwardGaugeConfig, Go2LabTerrainConfig)
+task_register.register('go2_lab.slope_bd', BasePipeline, MujocoConfig, Go2SlopeBackwardGaugeConfig, Go2LabTerrainConfig)
+task_register.register('go2_lab.wave', BasePipeline, MujocoConfig, Go2WaveGaugeConfig, Go2LabTerrainConfig)
+task_register.register('go2_lab.stairs_fd', BasePipeline, MujocoConfig, Go2StairsForwardGaugeConfig, Go2LabTerrainConfig)
+task_register.register('go2_lab.stairs_bd', BasePipeline, MujocoConfig, Go2StairsBackwardGaugeConfig, Go2LabTerrainConfig)
+task_register.register('go2_lab.obstacle', BasePipeline, MujocoConfig, Go2ObstacleGaugeConfig, Go2LabTerrainConfig)
+
+# Go2 Lab 1.3.1: x-only velocity command observation scaling
+task_register.register('go2_lab_1.3.1.flat', BasePipeline, MujocoConfig, Go2FlatGaugeConfig, Go2Lab131Config)
+task_register.register('go2_lab_1.3.1.slope_fd', BasePipeline, MujocoConfig, Go2SlopeForwardGaugeConfig, Go2Lab131TerrainConfig)
+task_register.register('go2_lab_1.3.1.slope_bd', BasePipeline, MujocoConfig, Go2SlopeBackwardGaugeConfig, Go2Lab131TerrainConfig)
+task_register.register('go2_lab_1.3.1.wave', BasePipeline, MujocoConfig, Go2WaveGaugeConfig, Go2Lab131TerrainConfig)
+task_register.register('go2_lab_1.3.1.stairs_fd', BasePipeline, MujocoConfig, Go2StairsForwardGaugeConfig, Go2Lab131TerrainConfig)
+task_register.register('go2_lab_1.3.1.stairs_bd', BasePipeline, MujocoConfig, Go2StairsBackwardGaugeConfig, Go2Lab131TerrainConfig)
+task_register.register('go2_lab_1.3.1.obstacle', BasePipeline, MujocoConfig, Go2ObstacleGaugeConfig, Go2Lab131TerrainConfig)
+
+# Go2 Lab pose command
+task_register.register('go2_lab_pose.flat', BasePipeline, MujocoConfig, Go2FlatGaugeConfig, Go2LabPoseConfig)
+task_register.register('go2_lab_pose.slope_fd', BasePipeline, MujocoConfig, Go2SlopeForwardGaugeConfig, Go2LabPoseTerrainConfig)
+task_register.register('go2_lab_pose.slope_bd', BasePipeline, MujocoConfig, Go2SlopeBackwardGaugeConfig, Go2LabPoseTerrainConfig)
+task_register.register('go2_lab_pose.wave', BasePipeline, MujocoConfig, Go2WaveGaugeConfig, Go2LabPoseTerrainConfig)
+task_register.register('go2_lab_pose.stairs_fd', BasePipeline, MujocoConfig, Go2StairsForwardGaugeConfig, Go2LabPoseTerrainConfig)
+task_register.register('go2_lab_pose.stairs_bd', BasePipeline, MujocoConfig, Go2StairsBackwardGaugeConfig, Go2LabPoseTerrainConfig)
+task_register.register('go2_lab_pose.obstacle', BasePipeline, MujocoConfig, Go2ObstacleGaugeConfig, Go2LabPoseTerrainConfig)

@@ -1,0 +1,69 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "go2 joystick debug",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/robogauge/scripts/run.py",
+            "args": [
+                "--task", "go2_moe.flat",
+                "--experiment-name", "debug",
+                "--seed", "0",
+                "--friction", "0.6",
+                "--goals", "joystick",
+                "--write-tensorboard",
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "go2 moe flat single pipeline",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/robogauge/scripts/run.py",
+            "args": [
+                "--task", "go2_moe.flat",
+                "--experiment-name", "debug",
+                "--seed", "0",
+                "--friction", "0.6",
+                "--headless"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "go2 moe slope level pipeline",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/robogauge/scripts/run.py",
+            "args": [
+                "--task", "go2_moe.slope_bd",
+                "--experiment-name", "debug",
+                "--seed", "0",
+                // "--search-max-level",
+                // "--seeds", "0", "1", "2",
+                "--frictions", "0.4",
+                // "--headless"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "go2 mcp stairs_bd load",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/robogauge/scripts/run.py",
+            "args": [
+                "--task", "go2_moe.stairs_bd",
+                "--model-path", "/data/user/wutianyang/Coding/robotics/go2_rl_gym/logs/go2_mcp_cts/Dec31_01-21-01_/jit_models/policy_jit_0.pt",
+                "--experiment-name", "mcp_debug",
+                "--seed", "3",
+                "--level", "8",
+                "--frictions", "0.2",
+            ],
+            "env": {"DISPLAY": ":1"},
+            "console": "integratedTerminal"
+        },
+    ]
+}
