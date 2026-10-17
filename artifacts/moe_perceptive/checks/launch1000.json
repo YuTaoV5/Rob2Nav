@@ -1,0 +1,26 @@
+{
+  "pid": 24535,
+  "command": [
+    "python3",
+    "-m",
+    "moe_perceptive.pipeline",
+    "--moe",
+    "vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt",
+    "--run",
+    "/root/gpufree-data/MoE-runs/visible_moe_v1_seed42",
+    "--output",
+    "outputs/moe_perceptive/pilot1000",
+    "--baseline-check",
+    "outputs/moe_perceptive/base_flat_probe_v2/summary.json",
+    "--model-check",
+    "outputs/moe_perceptive/model_check.json",
+    "--smoke",
+    "/root/gpufree-data/MoE-runs/smoke_staged",
+    "--num-envs",
+    "512",
+    "--iterations",
+    "1000"
+  ],
+  "utc": "2026-10-17T15:24:56.097188+00:00",
+  "detached_session": true
+}

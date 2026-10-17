@@ -1,0 +1,246 @@
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /workspace/isaaclab/apps/isaaclab.python.headless.kit
+Loading user config located at: '/isaac-sim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /isaac-sim/kit/logs/Kit/Isaac-Sim/5.1/kit_20261017_211212.log
+2026-10-17T13:12:12Z [495ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2026-10-17T13:12:13Z [1,080ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
+2026-10-17T13:12:13Z [1,370ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+2026-10-17T13:12:16Z [4,871ms] [Warning] [carb.graphics-vulkan.plugin] Could not initialize nvperf_grfx_host library. PerfSDK disabled
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.126.09    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA L40                       | Yes: 0 |     | 46068   MB | 10de      | 0          |
+|     |                                  |        |     |            | 26b5      | b882e3b8.. |
+|     |                                  |        |     |            | 9c        |            |
+|=============================================================================================|
+| OS: 24.04.4 LTS (Noble Numbat) ubuntu, Version: 24.04.4, Kernel: 5.15.0-168-generic
+| XServer Vendor: The X.Org Foundation, XServer Version: 12101011 (1.21.1.11)
+| Processor: Intel(R) Xeon(R) Platinum 8358 CPU @ 2.60GHz
+| Bare Metal Cores: 64 | Bare Metal Logical Cores: 128
+| Core Usage Quota: 14
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 122880 | Free Memory: 111608
+| Total Page/Swap (MB): 0 | Free Page/Swap: 0
+|---------------------------------------------------------------------------------------------|
+2026-10-17T13:12:17Z [5,232ms] [Warning] [gpu.foundation.plugin] ECC is enabled on physical device 0
+[INFO]: Parsing configuration from: ame_locomotion.tasks.manager_based.ame_locomotion.go2.stages:Go2Stage1EnvCfg
+[INFO]: Parsing configuration from: ame_locomotion.tasks.manager_based.ame_locomotion.go2.runner_cfg:Go2RunnerCfg
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-10-17_21-12-19.log[0m
+[36m======================================================================================[0m
+
+[33m21:12:19 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 43
+	Physics step-size     : 0.005
+	Rendering step-size   : 0.02
+	Environment step-size : 0.02
+[INFO] Generating terrains based on curriculum took : 2.795962 seconds
+[INFO]: Time taken for scene creation : 5.422402 seconds
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 512
+	Environment spacing   : 2.5
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : ['/World/ground']
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Time taken for simulation start : 9.923102 seconds
+[33m21:12:34 [velocity_command.py] WARNING: The velocity command has the 'ranges.heading' attribute set to '(-3.141592653589793, 3.141592653589793)' but the heading command is not active. Consider setting the flag for the heading command to True.[0m
+[INFO] Command Manager:  <CommandManager> contains 1 active terms.
++------------------------------------------------+
+|              Active Command Terms              |
++-------+---------------+------------------------+
+| Index | Name          |          Type          |
++-------+---------------+------------------------+
+|   0   | base_velocity | UniformVelocityCommand |
++-------+---------------+------------------------+
+
+[INFO] Event Manager:  <EventManager> contains 2 active terms.
++--------------------------------------+
+| Active Event Terms in Mode: 'startup' |
++----------+---------------------------+
+|  Index   | Name                      |
++----------+---------------------------+
+|    0     | physics_material          |
++----------+---------------------------+
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++---------+---------------------------+
+|  Index  | Name                      |
++---------+---------------------------+
+|    0    | reset_base                |
+|    1    | reset_robot_joints        |
++---------+---------------------------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++---------------------+
+| Active Recorder Terms |
++-----------+---------+
+|   Index   | Name    |
++-----------+---------+
++-----------+---------+
+
+[INFO] Action Manager:  <ActionManager> contains 1 active terms.
++------------------------------------+
+|  Active Action Terms (shape: 12)   |
++--------+-------------+-------------+
+| Index  | Name        |   Dimension |
++--------+-------------+-------------+
+|   0    | joint_pos   |          12 |
++--------+-------------+-------------+
+
+[INFO] Observation Manager: <ObservationManager> contains 2 groups.
++-----------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (2124,)) |
++-----------+-------------------------------+---------------+
+|   Index   | Name                          |     Shape     |
++-----------+-------------------------------+---------------+
+|     0     | angular_velocity              |      (3,)     |
+|     1     | gravity                       |      (3,)     |
+|     2     | command                       |      (3,)     |
+|     3     | joint_pos                     |     (12,)     |
+|     4     | joint_vel                     |     (12,)     |
+|     5     | actions                       |     (12,)     |
+|     6     | height_map                    |    (2079,)    |
++-----------+-------------------------------+---------------+
++-----------------------------------------------------------+
+| Active Observation Terms in Group: 'critic' (shape: (2127,)) |
++-----------+-------------------------------+---------------+
+|   Index   | Name                          |     Shape     |
++-----------+-------------------------------+---------------+
+|     0     | linear_velocity               |      (3,)     |
+|     1     | angular_velocity              |      (3,)     |
+|     2     | gravity                       |      (3,)     |
+|     3     | command                       |      (3,)     |
+|     4     | joint_pos                     |     (12,)     |
+|     5     | joint_vel                     |     (12,)     |
+|     6     | actions                       |     (12,)     |
+|     7     | height_map                    |    (2079,)    |
++-----------+-------------------------------+---------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 6 active terms.
++------------------------------------+
+|      Active Termination Terms      |
++-------+-----------------+----------+
+| Index | Name            | Time Out |
++-------+-----------------+----------+
+|   0   | time_out        |   True   |
+|   1   | base_contact    |  False   |
+|   2   | bad_orientation |  False   |
+|   3   | pit_fall        |  False   |
+|   4   | tile_complete   |   True   |
+|   5   | route_departure |  False   |
++-------+-----------------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 15 active terms.
++-----------------------------------------+
+|           Active Reward Terms           |
++-------+----------------------+----------+
+| Index | Name                 |   Weight |
++-------+----------------------+----------+
+|   0   | track_lin_vel_xy_exp |      2.0 |
+|   1   | track_ang_vel_z_exp  |      0.5 |
+|   2   | lin_vel_z_l2         |     -2.0 |
+|   3   | ang_vel_xy_l2        |    -0.05 |
+|   4   | dof_torques_l2       |  -0.0002 |
+|   5   | dof_acc_l2           | -2.5e-07 |
+|   6   | action_rate_l2       |    -0.01 |
+|   7   | feet_air_time        |      0.1 |
+|   8   | undesired_contacts   |     -1.0 |
+|   9   | flat_orientation_l2  |     -0.5 |
+|   10  | dof_pos_limits       |     -1.0 |
+|   11  | feet_slide           |     -0.1 |
+|   12  | stand_still          |     -0.2 |
+|   13  | saturation           |    -0.05 |
+|   14  | termination          |     -5.0 |
++-------+----------------------+----------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 1 active terms.
++---------------------------+
+|  Active Curriculum Terms  |
++--------+------------------+
+| Index  | Name             |
++--------+------------------+
+|   0    | terrain_levels   |
++--------+------------------+
+
+[INFO]: Completed setting up the environment...
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 policy :  ['policy']
+	 critic :  ['critic']
+--------------------------------------------------------------------------------
+Terrain Encoder: CNN output dim=64, MHA dim=64, heads=16
+Actor MLP input_dim=109: MLP(
+  (0): Linear(in_features=109, out_features=256, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=256, out_features=128, bias=True)
+  (3): ELU(alpha=1.0)
+  (4): Linear(in_features=128, out_features=64, bias=True)
+  (5): ELU(alpha=1.0)
+  (6): Linear(in_features=64, out_features=12, bias=True)
+)
+Critic MLP: MLP(
+  (0): Linear(in_features=112, out_features=256, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=256, out_features=128, bias=True)
+  (3): ELU(alpha=1.0)
+  (4): Linear(in_features=128, out_features=64, bias=True)
+  (5): ELU(alpha=1.0)
+  (6): Linear(in_features=64, out_features=1, bias=True)
+)
+Encoder CNN: Sequential(
+  (0): Conv2d(3, 16, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2))
+  (1): ReLU()
+  (2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (3): Conv2d(16, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (4): ReLU()
+  (5): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+)
+Encoder MHA: MultiheadAttention(
+  (out_proj): NonDynamicallyQuantizableLinear(in_features=64, out_features=64, bias=True)
+)
+Encoder Actor Proprio: Linear(in_features=45, out_features=64, bias=True)
+Encoder Critic Proprio: Linear(in_features=48, out_features=64, bias=True)
+[Go2] Final CNN normalization: ['GroupNorm', 'GroupNorm']
+IMITATION {'iteration': 0, 'mse': 0.8149235472083092, 'teacher_probability': 1.0, 'elapsed_s': 3.2627933342009783}
+[Go2] Checkpoint saved: /root/gpufree-data/AME-runs/gait_imitation_pilot_v2/model_0.pt
+IMITATION {'iteration': 10, 'mse': 0.15696026012301445, 'teacher_probability': 0.9832775919732442, 'elapsed_s': 31.36535792797804}
+IMITATION {'iteration': 20, 'mse': 0.08521479833871126, 'teacher_probability': 0.9665551839464883, 'elapsed_s': 60.93292446620762}
+IMITATION {'iteration': 30, 'mse': 0.06486953888088465, 'teacher_probability': 0.9498327759197325, 'elapsed_s': 89.82577157951891}
+IMITATION {'iteration': 40, 'mse': 0.047072506975382566, 'teacher_probability': 0.9331103678929766, 'elapsed_s': 118.98356921225786}
+IMITATION {'iteration': 50, 'mse': 0.03724629990756512, 'teacher_probability': 0.9163879598662208, 'elapsed_s': 148.3493583407253}
+IMITATION {'iteration': 60, 'mse': 0.03697820799425244, 'teacher_probability': 0.8996655518394648, 'elapsed_s': 177.73360410146415}
+IMITATION {'iteration': 70, 'mse': 0.03225856879726052, 'teacher_probability': 0.882943143812709, 'elapsed_s': 207.15373096056283}
+IMITATION {'iteration': 80, 'mse': 0.02653076290152967, 'teacher_probability': 0.8662207357859532, 'elapsed_s': 236.56268785335124}
+IMITATION {'iteration': 90, 'mse': 0.023770117317326367, 'teacher_probability': 0.8494983277591973, 'elapsed_s': 265.87728971615434}
+IMITATION {'iteration': 100, 'mse': 0.022575601935386658, 'teacher_probability': 0.8327759197324415, 'elapsed_s': 295.1457392759621}
+[Go2] Checkpoint saved: /root/gpufree-data/AME-runs/gait_imitation_pilot_v2/model_100.pt
+IMITATION {'iteration': 110, 'mse': 0.020328904036432505, 'teacher_probability': 0.8160535117056856, 'elapsed_s': 324.35596188902855}
+IMITATION {'iteration': 120, 'mse': 0.019279114552773535, 'teacher_probability': 0.7993311036789298, 'elapsed_s': 353.9355422370136}
+IMITATION {'iteration': 130, 'mse': 0.018114288919605315, 'teacher_probability': 0.782608695652174, 'elapsed_s': 383.1193559523672}
+IMITATION {'iteration': 140, 'mse': 0.01735252409707755, 'teacher_probability': 0.765886287625418, 'elapsed_s': 412.2512297090143}
+IMITATION {'iteration': 150, 'mse': 0.017130842024926096, 'teacher_probability': 0.7491638795986622, 'elapsed_s': 442.1589391808957}
+IMITATION {'iteration': 160, 'mse': 0.016906806034967303, 'teacher_probability': 0.7324414715719063, 'elapsed_s': 471.402948288247}
+IMITATION {'iteration': 170, 'mse': 0.013536413083784282, 'teacher_probability': 0.7157190635451505, 'elapsed_s': 500.61825579591095}
+IMITATION {'iteration': 180, 'mse': 0.014941451780032367, 'teacher_probability': 0.6989966555183946, 'elapsed_s': 529.9125227760524}
+IMITATION {'iteration': 190, 'mse': 0.016145017987582833, 'teacher_probability': 0.6822742474916388, 'elapsed_s': 559.2450982481241}
+IMITATION {'iteration': 200, 'mse': 0.013137497997377068, 'teacher_probability': 0.6655518394648829, 'elapsed_s': 588.7173638120294}
+[Go2] Checkpoint saved: /root/gpufree-data/AME-runs/gait_imitation_pilot_v2/model_200.pt
+IMITATION {'iteration': 210, 'mse': 0.015186085598543286, 'teacher_probability': 0.6488294314381271, 'elapsed_s': 618.1137258149683}
+IMITATION {'iteration': 220, 'mse': 0.012009201804175973, 'teacher_probability': 0.6321070234113713, 'elapsed_s': 647.1962796077132}
+IMITATION {'iteration': 230, 'mse': 0.014579748502001166, 'teacher_probability': 0.6153846153846154, 'elapsed_s': 676.487852146849}
+IMITATION {'iteration': 240, 'mse': 0.01278194278711453, 'teacher_probability': 0.5986622073578596, 'elapsed_s': 706.2659781239927}
+IMITATION {'iteration': 250, 'mse': 0.013119493378326297, 'teacher_probability': 0.5819397993311037, 'elapsed_s': 735.2926132716238}
+IMITATION {'iteration': 260, 'mse': 0.01114678813610226, 'teacher_probability': 0.5652173913043479, 'elapsed_s': 764.6632030699402}
+IMITATION {'iteration': 270, 'mse': 0.013082549965474755, 'teacher_probability': 0.548494983277592, 'elapsed_s': 793.7517314385623}
+IMITATION {'iteration': 280, 'mse': 0.011815684789326042, 'teacher_probability': 0.5317725752508361, 'elapsed_s': 823.0303509384394}
+IMITATION {'iteration': 290, 'mse': 0.011431659630034119, 'teacher_probability': 0.5150501672240803, 'elapsed_s': 852.1122753117234}
+[Go2] Checkpoint saved: /root/gpufree-data/AME-runs/gait_imitation_pilot_v2/model_299.pt

@@ -1,0 +1,149 @@
+"""Train pretrained MoE terrain fusion with value/fusion/actor/joint phases."""
+import argparse,hashlib,json,math,random,time
+from pathlib import Path
+from isaaclab.app import AppLauncher
+p=argparse.ArgumentParser();p.add_argument('--moe',required=True);p.add_argument('--output',required=True)
+p.add_argument('--num-envs',type=int,default=512);p.add_argument('--iterations',type=int,default=1000)
+p.add_argument('--warmup',type=int,default=50);p.add_argument('--fusion',type=int,default=300)
+p.add_argument('--actor',type=int,default=300);p.add_argument('--seed',type=int,default=42)
+p.add_argument('--resume');p.add_argument('--kind',default='mixed',choices=['mixed','flat','stairs','platform','ame_stakes','ame_alternate'])
+AppLauncher.add_app_launcher_args(p);a=p.parse_args();app=AppLauncher(a).app
+import numpy as np
+import torch
+from isaaclab.envs import ManagerBasedRLEnv
+from isaaclab.utils.io import dump_yaml
+from isaaclab_rl.rsl_rl import RslRlVecEnvWrapper
+from isaaclab_tasks.manager_based.locomotion.velocity.config.go2.agents.rsl_rl_ppo_cfg import UnitreeGo2RoughPPORunnerCfg
+from rsl_rl.runners import OnPolicyRunner
+from .model import register_policy
+from .task import make_cfg
+from .mdp import match_joint_limits,JOINTS,DEFAULT
+from .provenance import capture
+
+torch.set_num_threads(4);torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False
+out=Path(a.output).resolve();out.mkdir(parents=True,exist_ok=False)
+meta={**capture(out,a),'torch':torch.__version__,'actor_observation':'5x45 history + 3x693 visible height/mask/age',
+      'simulation_sensors':'simplified depth/lidar rays, ideal odometry, 1 s observed-return memory',
+      'protocol':'pretrained 137k MoE, new terrain attention, progressively unfrozen PPO; not AME scratch replication'}
+(out/'manifest.json').write_text(json.dumps(meta,indent=2))
+cfg=make_cfg(a.num_envs,a.seed,a.kind);cfg.sim.device=a.device or 'cuda:0'
+dump_yaml(str(out/'env.yaml'),cfg)
+env=ManagerBasedRLEnv(cfg=cfg);match_joint_limits(env.scene['robot'])
+wrapped=RslRlVecEnvWrapper(env,clip_actions=None)
+agent=UnitreeGo2RoughPPORunnerCfg();agent.seed=a.seed;agent.device=cfg.sim.device
+agent.obs_groups={'policy':['policy'],'critic':['critic']};agent.save_interval=100
+agent.policy.class_name='MoEPerceptiveActorCritic';agent.policy.init_noise_std=.15
+agent.policy.noise_std_type='log';agent.policy.actor_obs_normalization=False;agent.policy.critic_obs_normalization=False
+agent.policy.critic_hidden_dims=[256,128,64]
+agent.algorithm.learning_rate=2e-4;agent.algorithm.schedule='fixed'
+agent.algorithm.entropy_coef=.001;agent.algorithm.num_learning_epochs=4;agent.algorithm.num_mini_batches=4
+train_cfg=agent.to_dict();train_cfg['policy']['moe_checkpoint']=a.moe
+dump_yaml(str(out/'agent.yaml'),train_cfg);register_policy()
+runner=OnPolicyRunner(wrapped,train_cfg,log_dir=str(out),device=cfg.sim.device)
+policy=runner.alg.policy;actor=policy.actor;env._moe_anchor=actor.anchor
+# Explicit stable groups permit a smaller learning rate for pretrained weights.
+old_actor=list(actor.base.actor.parameters());old_encoder=list(actor.base.student_moe_encoder.parameters())
+excluded={id(v) for v in old_actor+old_encoder+list(actor.anchor.parameters())}
+new=[v for v in policy.parameters() if id(v) not in excluded]
+runner.alg.optimizer=torch.optim.Adam([
+    {'params':new,'lr':2e-4,'name':'new'}, {'params':old_actor,'lr':2e-5,'name':'pretrained_actor'},
+    {'params':old_encoder,'lr':1e-5,'name':'pretrained_encoder'}])
+if a.resume:
+    ck=torch.load(a.resume,map_location='cpu',weights_only=False)
+    for key in ('moe_sha256','protocol'):
+        if ck['infos']['provenance'][key]!=meta[key]:raise ValueError('Resume provenance mismatch')
+    old=ck['infos']['provenance']['args']
+    for key in ('seed','num_envs','kind','warmup','fusion','actor'):
+        if old[key]!=vars(a)[key]:raise ValueError('Resume changed '+key)
+    runner.load(a.resume)
+    levels=ck['terrain_levels'].to(env.device);t=env.scene.terrain
+    t.terrain_levels[:]=levels;t.env_origins[:]=t.terrain_origins[levels,t.terrain_types]
+    env.scene.env_origins[:]=t.env_origins;env.reset()
+    random.setstate(ck['rng']['python']);np.random.set_state(ck['rng']['numpy'])
+    torch.set_rng_state(ck['rng']['torch'].cpu());torch.cuda.set_rng_state_all([v.cpu() for v in ck['rng']['cuda']])
+start_iteration=runner.current_learning_iteration
+initial={k:v.detach().cpu().clone() for k,v in actor.state_dict().items()}
+base_initial={k:v.detach().cpu().clone() for k,v in actor.base.state_dict().items()}
+phase='';rollout_calls=0;current_iteration=start_iteration
+
+
+def phase_at(it):
+    if it<a.warmup:return 'value'
+    if it<a.warmup+a.fusion:return 'fusion'
+    if it<a.warmup+a.fusion+a.actor:return 'actor'
+    return 'joint'
+
+
+def set_phase(name):
+    global phase
+    if name==phase:return
+    actor.set_phase(name);policy.log_std.requires_grad_(name!='value');phase=name
+    for g,rate in zip(runner.alg.optimizer.param_groups,(2e-4,2e-5,1e-5)):g['lr']=rate
+    record={'iteration':current_iteration,'phase':name,'residual_bound_rad':actor.residual_bound*.25,
+        'trainable_parameters':sum(v.numel() for v in policy.parameters() if v.requires_grad)}
+    with (out/'phases.jsonl').open('a') as f:f.write(json.dumps(record)+'\n')
+    print('PHASE',record,flush=True)
+
+
+original_act=runner.alg.act
+def act(obs):
+    global rollout_calls,current_iteration
+    if rollout_calls%agent.num_steps_per_env==0:
+        current_iteration=start_iteration+rollout_calls//agent.num_steps_per_env
+        set_phase(phase_at(current_iteration))
+    rollout_calls+=1
+    value=original_act(obs)
+    if not torch.isfinite(value).all():raise FloatingPointError('Nonfinite action')
+    return value
+runner.alg.act=act
+original_update=runner.alg.update
+def update():
+    result=original_update()
+    with torch.no_grad():policy.log_std.clamp_(math.log(.03),math.log(.5))
+    for name,value in policy.named_parameters():
+        if not torch.isfinite(value).all():raise FloatingPointError('Nonfinite parameter '+name)
+    if phase=='value':
+        for k,v in actor.state_dict().items():torch.testing.assert_close(v.cpu(),initial[k],rtol=0,atol=0)
+    if phase in ('value','fusion'):
+        for k,v in actor.base.state_dict().items():torch.testing.assert_close(v.cpu(),base_initial[k],rtol=0,atol=0)
+    return result
+runner.alg.update=update
+
+
+def save(path,infos=None):
+    path=Path(path);temporary=path.with_suffix('.tmp')
+    payload={'model_state_dict':policy.state_dict(),'optimizer_state_dict':runner.alg.optimizer.state_dict(),
+        'iter':runner.current_learning_iteration+1,'infos':{'provenance':meta,'phase':phase,
+        'residual_bound':actor.residual_bound,'frozen_checks_passed':True},
+        'terrain_levels':env.scene.terrain.terrain_levels.cpu(),
+        'rng':{'python':random.getstate(),'numpy':np.random.get_state(),'torch':torch.get_rng_state(),'cuda':torch.cuda.get_rng_state_all()}}
+    torch.save(payload,temporary);temporary.replace(path);print('CHECKPOINT',str(path),flush=True)
+runner.save=save
+original_log=runner.log
+def log(locs,*args,**kwargs):
+    original_log(locs,*args,**kwargs)
+    row={'iteration':locs['it'],'phase':phase,'steps_per_s':agent.num_steps_per_env*a.num_envs/(locs['collection_time']+locs['learn_time']),
+        'std_min':float(policy.log_std.exp().min()),'std_max':float(policy.log_std.exp().max()),
+        'loss':{k:float(v) for k,v in locs['loss_dict'].items()},
+        'terrain_histograms':[]}
+    terrain=env.scene.terrain
+    for col in range(8):
+        row['terrain_histograms'].append(torch.bincount(terrain.terrain_levels[terrain.terrain_types==col],minlength=10).tolist())
+    with (out/'iterations.jsonl').open('a') as f:f.write(json.dumps(row)+'\n')
+    (out/'status.json').write_text(json.dumps(row,indent=2))
+runner.log=log
+actual=env.action_manager.get_term('joint_pos')
+assert actual._joint_names==JOINTS
+torch.testing.assert_close(actual._offset[0],torch.tensor(DEFAULT,device=env.device))
+(out/'io.json').write_text(json.dumps({'joints':JOINTS,'default':DEFAULT,'action_scale':.25,'control_dt':env.step_dt,
+    'policy_dim':2304,'critic_dim':3693,'kp':20.,'kd':.5,
+    'asset_joint_names':env.scene['robot'].joint_names,
+    'joint_limits':env.scene['robot'].data.joint_pos_limits[0,[env.scene['robot'].joint_names.index(n) for n in JOINTS]].tolist()},indent=2))
+started=time.monotonic()
+try:
+    runner.learn(a.iterations,init_at_random_ep_len=False)
+    (out/'completed.json').write_text(json.dumps({'last_iteration':runner.current_learning_iteration,'additional_iterations':a.iterations,
+        'elapsed_s':time.monotonic()-started,'phase':phase,'note':'Training completion is not a terrain success result'},indent=2))
+except Exception as error:
+    (out/'failed.json').write_text(json.dumps({'error':repr(error),'iteration':current_iteration,'phase':phase},indent=2));raise
+finally:wrapped.close();app.close()

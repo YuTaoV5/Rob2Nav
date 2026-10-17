@@ -17,6 +17,10 @@ for folder in a.runs:
         elif f.name=='source' and f.is_dir():shutil.copytree(f,target/'source',dirs_exist_ok=True)
     weights=sorted(source.glob('model_*.pt'),key=lambda f:int(f.stem.split('_')[-1]))
     record={'completed':(source/'train_summary.json').exists()}
+    if record['completed']:
+        record['training_summary']=json.loads((source/'train_summary.json').read_text())
+    for name in ('protocol.json','initialization.json'):
+        if (source/name).exists():record[name.removesuffix('.json')]=json.loads((source/name).read_text())
     if weights:
         weight=weights[-1];shutil.copy2(weight,target/weight.name)
         record['checkpoint']={'path':str((target/weight.name).relative_to(out)),
@@ -28,5 +32,6 @@ for folder in a.evaluations:
     manifest['evaluations'].append(str(target.relative_to(out)))
 logdir=out/'logs';logdir.mkdir(exist_ok=True)
 for source in map(Path,a.logs):shutil.copy2(source,logdir/source.name)
+manifest['evaluations']=sorted(str(p.relative_to(out)) for p in (out/'evaluation').iterdir() if p.is_dir())
 (out/'manifest.json').write_text(json.dumps(manifest,indent=2))
 print(json.dumps(manifest,indent=2))

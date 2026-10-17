@@ -56,6 +56,10 @@ python -m critical_ame.suite --repair-rays --stage 1 \
 
 第 700 轮策略在 Stage1 低难度踏石评估中为 0/32：主要停留在出生平台，不具备进入复杂阶段的能力。训练恢复与进一步评估正在进行；未宣称复现过桩成功。
 
-首批有效训练已完成 1000 轮（恢复链中的保留 PPO 更新约 1229 万次交互；失败后丢弃的更新另计），检查点为 `stage1_fixed0701/model_999.pt`。训练继续推进至第 3000 轮；评估增加 ±3 cm 初始位置和 ±0.04 rad 朝向扰动，并与上游零扰动配置分别记录。是否进入 Stage2 以基础地形分项路线通过率判断，不按奖励或时间直接切换。
+第一阶段有效训练已完成 3000 轮（保留 PPO 更新对应 36,864,000 次交互；失败后丢弃的更新另计），最终检查点为 `stage1_1000_3000/model_2999.pt`。评估增加 ±3 cm 初始位置和 ±0.04 rad 朝向扰动，并与上游零扰动配置分别记录。是否进入 Stage2 以基础地形分项路线通过率判断，不按奖励或时间直接切换。
+
+另有[外部教师步态初始化对照](CRITICAL_AME_GAIT_INITIALIZATION.md)，其权重初始化、训练预算和结果与上述从零 PPO 恢复链分开。`critical_ame.evaluate` 保存 `policy_type` 和 `checkpoint_protocol`；后续 PPO checkpoint 继承该来源标签。模仿初始化权重只能 warm-start，包装器拒绝把它作为 PPO 状态直接 resume。
+
+新评估同时保存 `initial_map.json`、`trace.json` 中的四足位置和接触力、各首回合的 `termination_terms`。可用 `python -m critical_ame.plot_trial /path/to/trial` 绘制实测足端轨迹。视频记录环境 0 至自动重置前，终止状态以重置前捕获的 trace 为准。
 
 后续运行在 `manifest.json` 与 `source/` 保存启动时的包装器源码、参数、检查点哈希和上游版本。上游原始运行及早期诊断运行保留日志和参数，未声称它们具有当时尚未加入的包装器源码快照。

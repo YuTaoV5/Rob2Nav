@@ -14,6 +14,7 @@ p.add_argument('--num-envs',type=int,default=512)
 p.add_argument('--iterations',type=int,required=True)
 p.add_argument('--checkpoint')
 p.add_argument('--resume',action='store_true')
+p.add_argument('--critic-only',action='store_true',help='Experimental frozen-actor value warmup after external imitation')
 p.add_argument('--repair-rays',action='store_true')
 p.add_argument('--seed',type=int,default=42)
 p.add_argument('--output',required=True)
@@ -70,12 +71,38 @@ dump_yaml(str(out/'env.yaml'),cfg);dump_yaml(str(out/'agent.yaml'),agent)
 env=gym.make(f'AME-Go2-Stage{a.stage}-v0',cfg=cfg)
 wrapped=RslRlVecEnvWrapper(env,clip_actions=None)
 runner=Go2Runner(wrapped,agent.to_dict(),log_dir=str(out),device=cfg.sim.device)
-if a.checkpoint:runner.load(a.checkpoint,load_optimizer=a.resume)
+if a.checkpoint:
+    if a.resume:
+        saved=torch.load(a.checkpoint,map_location='cpu',weights_only=False)
+        info=saved.get('infos')
+        if isinstance(info,dict) and info.get('ppo_resume_allowed') is False:
+            raise ValueError('Imitation initializer requires warm-start, not PPO resume')
+    initialization=runner.load(a.checkpoint,load_optimizer=a.resume)
+    if isinstance(initialization,dict) and initialization.get('protocol'):
+        # Carry the external-initialization label through later PPO checkpoints.
+        initialization=dict(initialization,ppo_resume_allowed=True)
+        (out/'initialization.json').write_text(json.dumps(initialization,indent=2))
+        original_save=runner.save
+        def save_with_protocol(path,infos=None):
+            return original_save(path,infos=initialization if infos is None else infos)
+        runner.save=save_with_protocol
 elif a.resume:raise ValueError('Resume requires checkpoint')
+frozen={}
+if a.critic_only:
+    if not a.checkpoint:raise ValueError('Critic warmup requires an initializer')
+    for name,param in runner.alg.policy.named_parameters():
+        param.requires_grad_(name.startswith(('critic.','critic_proprio_embedding.')))
+    assert any(p.requires_grad for p in runner.alg.policy.parameters())
+    frozen={name:value.detach().cpu().clone() for name,value in runner.alg.policy.state_dict().items()
+            if not name.startswith(('critic.','critic_proprio_embedding.'))}
 start=time.monotonic()
 try:
     runner.learn(a.iterations,init_at_random_ep_len=False)
+    if frozen:
+        for name,value in frozen.items():
+            torch.testing.assert_close(value,runner.alg.policy.state_dict()[name].cpu(),rtol=0,atol=0)
     (out/'train_summary.json').write_text(json.dumps({'additional_iterations':a.iterations,
-        'last_iteration':runner.current_learning_iteration,'elapsed_s':time.monotonic()-start},indent=2))
+        'last_iteration':runner.current_learning_iteration,'elapsed_s':time.monotonic()-start,
+        'critic_only':a.critic_only,'frozen_actor_unchanged':True if frozen else None},indent=2))
 finally:
     env.close();app.close()

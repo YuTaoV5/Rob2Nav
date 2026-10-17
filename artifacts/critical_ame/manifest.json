@@ -1,8 +1,14 @@
 {
-  "timestamp_utc": "2026-10-17T12:18:49.631121+00:00",
+  "timestamp_utc": "2026-10-17T15:35:22.099959+00:00",
   "runs": {
     "smoke": {
       "completed": true,
+      "training_summary": {
+        "elapsed_s": 3.682257967069745,
+        "additional_iterations": 2,
+        "cuda_peak_allocated_gb": 0.483075584,
+        "cuda_peak_reserved_gb": 0.580911104
+      },
       "checkpoint": {
         "path": "training/smoke/model_1.pt",
         "sha256": "1c5442b6dc9680e90917b692fb0e023a16c041b78050bbb1f6aaf60ecba65d07"
@@ -20,25 +26,139 @@
     },
     "stage1_fixed0701": {
       "completed": true,
+      "training_summary": {
+        "additional_iterations": 299,
+        "last_iteration": 999,
+        "elapsed_s": 720.5345077719539
+      },
       "checkpoint": {
         "path": "training/stage1_fixed0701/model_999.pt",
         "sha256": "741b789bce34a23f223c1e47e9987b7c3f0e38860abbad01a8c0f6fd6605a6b0"
       }
     },
     "stage1_1000_3000": {
-      "completed": false,
+      "completed": true,
+      "training_summary": {
+        "additional_iterations": 2000,
+        "last_iteration": 2999,
+        "elapsed_s": 5544.633999465033
+      },
       "checkpoint": {
-        "path": "training/stage1_1000_3000/model_1200.pt",
-        "sha256": "ce40ff59673f970b652bbc79861f9583f8952eda77ef356933336676089dd52b"
+        "path": "training/stage1_1000_3000/model_2999.pt",
+        "sha256": "cde4e3abb8bedcc9a7f0b4bbb9f73e0731a6747fdc9a7bec97d066b66b7e9f64"
+      }
+    },
+    "gait_imitation_pilot": {
+      "completed": false
+    },
+    "gait_imitation_pilot_v2": {
+      "completed": true,
+      "training_summary": {
+        "last_iteration": 299,
+        "elapsed_s": 878.8535518404096,
+        "protocol": {
+          "protocol": "external MLP gait imitation; not strict AME scratch replication",
+          "teacher_sha256": "03a0ede211f2c658a38bb6974d7ddd1ff8d44d95e97b1f3b9f45a252569c0bd9",
+          "ppo_resume_allowed": false,
+          "terrain": "original stage1 rough only",
+          "teacher_probability": "linear 1.0 to 0.5",
+          "steps_per_iteration": 24,
+          "supervision": "clipped joint targets in upstream normalized action coordinates"
+        }
+      },
+      "protocol": {
+        "protocol": "external MLP gait imitation; not strict AME scratch replication",
+        "teacher_sha256": "03a0ede211f2c658a38bb6974d7ddd1ff8d44d95e97b1f3b9f45a252569c0bd9",
+        "ppo_resume_allowed": false,
+        "terrain": "original stage1 rough only",
+        "teacher_probability": "linear 1.0 to 0.5",
+        "steps_per_iteration": 24,
+        "supervision": "clipped joint targets in upstream normalized action coordinates"
+      },
+      "checkpoint": {
+        "path": "training/gait_imitation_pilot_v2/model_299.pt",
+        "sha256": "e9b0fdb8863a304e75a91204d41e4307e9c511ec1c198c0285b60bf1f311f74f"
+      }
+    },
+    "gait_ppo200": {
+      "completed": true,
+      "training_summary": {
+        "additional_iterations": 200,
+        "last_iteration": 199,
+        "elapsed_s": 866.5304506607354
+      },
+      "initialization": {
+        "protocol": "external MLP gait imitation; not strict AME scratch replication",
+        "teacher_sha256": "03a0ede211f2c658a38bb6974d7ddd1ff8d44d95e97b1f3b9f45a252569c0bd9",
+        "ppo_resume_allowed": true,
+        "terrain": "original stage1 rough only",
+        "teacher_probability": "linear 1.0 to 0.5",
+        "steps_per_iteration": 24,
+        "supervision": "clipped joint targets in upstream normalized action coordinates"
+      },
+      "checkpoint": {
+        "path": "training/gait_ppo200/model_199.pt",
+        "sha256": "9866791e5ce0c8b842a30caba2d21445110455f8b5ba2d16c6a66e3104609f36"
+      }
+    },
+    "gait_critic100": {
+      "completed": true,
+      "training_summary": {
+        "additional_iterations": 100,
+        "last_iteration": 99,
+        "elapsed_s": 207.41016555577517,
+        "critic_only": true,
+        "frozen_actor_unchanged": true
+      },
+      "initialization": {
+        "protocol": "external MLP gait imitation; not strict AME scratch replication",
+        "teacher_sha256": "03a0ede211f2c658a38bb6974d7ddd1ff8d44d95e97b1f3b9f45a252569c0bd9",
+        "ppo_resume_allowed": true,
+        "terrain": "original stage1 rough only",
+        "teacher_probability": "linear 1.0 to 0.5",
+        "steps_per_iteration": 24,
+        "supervision": "clipped joint targets in upstream normalized action coordinates"
+      },
+      "checkpoint": {
+        "path": "training/gait_critic100/model_99.pt",
+        "sha256": "1ab89c84c812c21247bc40b8d803f5b5f7af2ba45714c6f3dec27393e69f99b8"
+      }
+    },
+    "gait_warmppo200": {
+      "completed": false,
+      "initialization": {
+        "protocol": "external MLP gait imitation; not strict AME scratch replication",
+        "teacher_sha256": "03a0ede211f2c658a38bb6974d7ddd1ff8d44d95e97b1f3b9f45a252569c0bd9",
+        "ppo_resume_allowed": true,
+        "terrain": "original stage1 rough only",
+        "teacher_probability": "linear 1.0 to 0.5",
+        "steps_per_iteration": 24,
+        "supervision": "clipped joint targets in upstream normalized action coordinates"
+      },
+      "checkpoint": {
+        "path": "training/gait_warmppo200/model_100.pt",
+        "sha256": "0ee065d2e32f54f9e8e16c9a1bbc231dbb0f44ceba8446b1bce61b946cbd69e4"
       }
     }
   },
   "evaluations": [
+    "evaluation/diagnostic2200_footmap",
+    "evaluation/diagnostic2200_stones",
+    "evaluation/eval1000",
+    "evaluation/eval1500",
+    "evaluation/eval2000",
+    "evaluation/figures",
+    "evaluation/gait_assessment",
+    "evaluation/gait_ppo200_assessment",
+    "evaluation/gate3000",
+    "evaluation/original700play",
+    "evaluation/probe2000_stage2",
+    "evaluation/probe3000_stage2",
+    "evaluation/repair_probe",
     "evaluation/smoke_eval",
     "evaluation/stage1_700_stones_l0",
-    "evaluation/repair_probe",
-    "evaluation/original700play",
-    "evaluation/eval1000"
+    "evaluation/teacher_probe_s1_rough_l0",
+    "evaluation/teacher_probe_s2_double_l0"
   ],
   "note": "Archiving records progress only. No training success is inferred from completed commands."
 }

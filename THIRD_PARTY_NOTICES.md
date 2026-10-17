@@ -44,6 +44,15 @@ and asset restrictions described below.
 
 ## RoboGauge
 
+The `moe_perceptive` experiment reconstructs the actual network embedded in the
+vendored 137k deployment checkpoint and strictly reloads its actor/encoder
+tensors before staged fine-tuning. It does not recover the upstream critic or
+optimizer and is not a from-scratch run. The original artifact is unchanged.
+The AME-inspired visible-map encoder and training integration are Rob2Nav
+additions. Additional inspected go2_rl_gym revision and inherited notices are
+recorded in [MoE provenance](vendor/moe_reference/PROVENANCE.md) and
+[license](vendor/moe_reference/LICENSE).
+
 - Source: https://github.com/wty-yy/RoboGauge
 - Revision: `add2c7ee0185ea8fd93d242f86e1c8cac6e9913b`
 - Location: `vendor/RoboGauge/`

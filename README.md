@@ -18,11 +18,18 @@ python -m go2_nav.active_run --scene course --goal 13 0 --jump-backend nju --con
 
 ![绕障、台阶、跳坑与到达目标的仿真片段](artifacts/active/mission_preview.png)
 
-## criticaldamped 原项目 Go2 过桩复现（进行中）
+## 当前主线：预训练 MoE＋感知融合＋逐步解冻
 
-已按固定上游版本启动原始 Go2 两阶段训练，完成首批 1000 轮，正在继续基础阶段训练与分项验证。
+已复用 RoboGauge 原 MoE 的 actor 与历史编码器权重，加入 5 cm 可见局部地形注意力，启动 512 环境、1000 轮分阶段 PPO：先适配 critic，再训练感知，随后逐步开放原 actor 和 MoE 编码器。
+网络/历史重建检查、原 MoE 平地 16/16 首回合及四阶段短训练已通过；**尚未报告新策略的窄桩成功率**。
+训练运行在服务器，原 MoE 的 9 项同条件基线已完成；新模型训练完成后自动评估并保存窄桩视频。见 [结构、传感器假设、阶段与命令](docs/MOE_PERCEPTIVE.md)、[检查、基线、视频与训练快照](MOE_PERCEPTIVE_VALIDATION.md)。
+
+## criticaldamped 原项目 Go2 过桩复现（历史对照）
+
+已按固定上游版本完成 Go2 第一阶段 3000 轮训练，正在做分类评估；第二阶段尚未训练。
 修正了实际复现出的方块网格接缝射线求交问题；仅对未命中射线做 50 微米以内的真实网格重查询。
 **当前尚未复现成功过桩，不能将运行完成或训练奖励当成成功。** 见 [训练与运行说明](docs/CRITICAL_AME_REPRODUCTION.md)、[中间评估和故障证据](CRITICAL_AME_VALIDATION.md)。
+另有明确区分的[外部教师步态初始化与 PPO 微调对照](docs/CRITICAL_AME_GAIT_INITIALIZATION.md)，不计入原版从零训练结果。
 
 ## AME 窄梅花桩
 
