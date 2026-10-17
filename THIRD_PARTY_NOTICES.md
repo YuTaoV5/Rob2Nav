@@ -1,5 +1,15 @@
 # Third-party notices
 
+## NJU quadrupedal-agility
+
+- Source: https://github.com/NJU-RLC/quadrupedal-agility
+- Revision: `15d16ea99bc23e5d401b0b0e3b88a8edcc28f0ed`
+- Subset location: `vendor/NJUAgility/`
+- License: MIT; see [upstream license](vendor/NJUAgility/LICENSE) and notices retained in individual files.
+- The subset includes unchanged BBC networks, a normalization utility, and two upstream deployment checkpoints.
+- [Provenance](vendor/NJUAgility/PROVENANCE.md) and SHA-256 snapshot identify the files; `python scripts/check_nju.py` verifies them.
+- Rob2Nav's sensing, IK, navigation and switching code are independent additions. No NJU checkpoint weights were trained or updated in this integration.
+
 ## RoboGauge
 
 - Source: https://github.com/wty-yy/RoboGauge

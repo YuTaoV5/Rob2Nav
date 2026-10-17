@@ -102,7 +102,7 @@ class Go2MaplessEnv(gym.Env):
             self.obstacle_names.append(name)
             ET.SubElement(world, "geom", name=name, type="box", pos=f"{x} {y} {sz}", size=f"{sx} {sy} {sz}",
                           rgba="0.75 0.3 0.13 1", friction="0.8 0.02 0.01", group="0")
-        hall_end = 16. if self.scene == "mixed" else 10.
+        hall_end = 16. if self.scene in ("mixed", "course") else 10.
         box("wall_left", (hall_end-2)/2, 3.0, (hall_end+2)/2, 0.1)
         box("wall_right", (hall_end-2)/2, -3.0, (hall_end+2)/2, 0.1)
         box("wall_back", -2.0, 0, 0.1, 3)
@@ -116,13 +116,24 @@ class Go2MaplessEnv(gym.Env):
                 box(f"obstacle_{i}", x, self.np_random.uniform(-1.4, 1.4), 0.25, self.np_random.uniform(.25, .55))
         elif self.scene == "blocked":
             box("blocking_wall", 3, 0, .15, 3)
-        elif self.scene in ("water", "stairs", "platform", "gap", "mixed"):
+        elif self.scene in ("water", "stairs", "platform", "gap", "mixed", "course"):
             from .terrains import populate
             self.terrain_meta = populate(world, self.scene, self.cfg)
+            if self.scene == "course":
+                self.obstacle_names.append("course_block")
             if "goal" in self.terrain_meta:
                 self.goal = np.asarray(self.terrain_meta["goal"], dtype=float)
         elif self.scene != "empty":
             raise ValueError(f"Unknown scene: {self.scene}")
+        if self.cfg.get("goal") is not None:
+            requested = np.asarray(self.cfg["goal"], dtype=float)
+            if requested.shape != (2,) or not np.all(np.isfinite(requested)):
+                raise ValueError("goal must be two finite odometry-frame coordinates")
+            self.goal = requested.copy()
+            # Evaluation only: support height at the requested point.
+            for x0, x1, top in getattr(self, "terrain_meta", {}).get("surfaces", []):
+                if x0 <= self.goal[0] < x1:
+                    self.terrain_meta["goal_height"] = top
         goal_z = getattr(self, "terrain_meta", {}).get("goal_height", 0.)+.1
         ET.SubElement(world, "site", name="goal", type="sphere", pos=f"{self.goal[0]} {self.goal[1]} {goal_z}", size="0.15", rgba="0.1 0.8 0.2 1")
         ET.SubElement(root, "visual")

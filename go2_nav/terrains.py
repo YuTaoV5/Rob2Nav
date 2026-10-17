@@ -1,7 +1,7 @@
 """Physical terrain geometry. Metadata is for evaluation, never a planner input."""
 import xml.etree.ElementTree as ET
 
-TERRAIN_SCENES = ("water", "stairs", "platform", "gap", "mixed")
+TERRAIN_SCENES = ("water", "stairs", "platform", "gap", "mixed", "course")
 
 
 def populate(world, scene, cfg):
@@ -47,6 +47,26 @@ def populate(world, scene, cfg):
         slab("pit_bottom", start, start+gap, -depth, color="0.13 0.13 0.16 1")
         slab("landing", start+gap, 10, 0)
         meta["gaps"].append([start, start+gap, -depth])
+    elif scene == "course":
+        slab("approach", -2, 4., 0.)
+        for i in range(2):
+            slab(f"up_{i}", 4.+i*.4, 4.4+i*.4, (i+1)*h)
+        if cfg.get("course_descent", False):
+            slab("top", 4.8, 6., 2*h)
+            slab("down", 6., 6.4, h)
+            slab("mid", 6.4, 9., 0.)
+            landing_z = 0.
+        else:
+            slab("top", 4.8, 9., 2*h)
+            landing_z = 2*h
+        slab("pit_bottom", 9., 9.+gap, landing_z-depth)
+        slab("landing", 9.+gap, 16., landing_z)
+        ET.SubElement(world, "geom", name="course_block", type="box",
+            pos=f"2.3 {cfg.get('block_y', -.4)} .55", size=".3 .55 .55",
+            rgba=".7 .25 .15 1", friction=".8 .02 .01", group="0")
+        meta["gaps"].append([9., 9.+gap, landing_z-depth])
+        meta["goal_height"] = landing_z
+        meta["goal"] = [13., 0.]
     elif scene == "mixed":
         slab("approach", -2, 5.5, 0)
         water(1.1, 2.1, -.8, .8)

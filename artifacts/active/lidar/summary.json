@@ -1,0 +1,152 @@
+{
+  "config": {
+    "physics_dt": 0.002,
+    "control_dt": 0.02,
+    "navigation_dt": 0.1,
+    "max_seconds": 75.0,
+    "goal_tolerance": 0.45,
+    "max_range": 8.0,
+    "robot_radius": 0.34,
+    "lidar_position": [
+      0.0,
+      0.0,
+      0.18
+    ],
+    "lidar_azimuth_samples": 120,
+    "lidar_elevation_degrees": [
+      -7,
+      0,
+      7,
+      14,
+      21,
+      28,
+      35,
+      42,
+      49
+    ],
+    "depth_position": [
+      0.31,
+      0.0,
+      0.06
+    ],
+    "depth_pitch_degrees": 25,
+    "depth_width": 64,
+    "depth_height": 48,
+    "depth_horizontal_fov_degrees": 87,
+    "depth_vertical_fov_degrees": 58,
+    "depth_noise_std": 0.01,
+    "lidar_noise_std": 0.01,
+    "sensor_dropout": 0.005,
+    "max_vx": 0.85,
+    "max_vy": 0.25,
+    "max_wz": 1.2,
+    "settle_seconds": 1.0,
+    "sensor_payload_kg": 0.0,
+    "locomotion": "moe",
+    "max_climb_height": 0.24,
+    "jump_enabled": true,
+    "terrain_height": 0.08,
+    "gap_width": 0.3,
+    "jump_backend": "primitive",
+    "anticipatory_lift": true,
+    "water_recenter": true
+  },
+  "arguments": {
+    "scene": "stairs",
+    "goal": null,
+    "episodes": 1,
+    "seed": 200,
+    "height": 0.08,
+    "gap_width": 0.3,
+    "jump_backend": "primitive",
+    "config": null,
+    "sensors": "lidar",
+    "no_lift": false,
+    "straight": false,
+    "max_seconds": 75.0,
+    "video": false,
+    "output": "outputs/final_lidar"
+  },
+  "episodes": 1,
+  "successes": 1,
+  "results": [
+    {
+      "distance": 0.44576976952784075,
+      "success": true,
+      "collision": false,
+      "fallen": false,
+      "seconds": 15.300000000001845,
+      "path_length": 7.606399375094696,
+      "position": [
+        7.578695518611368,
+        0.1456475931375452,
+        0.668860414517279
+      ],
+      "command": [
+        0.2,
+        0.0,
+        -0.2000000000000001
+      ],
+      "water_entered": false,
+      "jumps": 0,
+      "max_airborne_time": 0.1,
+      "height_peak": 0.6881375875591665,
+      "crossed_gap_airborne": false,
+      "gap_distance": null,
+      "step_distance": null,
+      "executed_command": [
+        0.2,
+        0.0,
+        -0.2000000000000001
+      ],
+      "stance_feet": 4,
+      "body_contact": false,
+      "locomotion": "moe",
+      "anticipatory_lifts": 0,
+      "riser_contact_impulse": 12.021778991569814,
+      "first_riser_contact": 3.9799999999997833,
+      "first_lift": null,
+      "landing_confirmed": false,
+      "estimated_gap_width": null,
+      "jump_guard": null,
+      "runup_stage": null,
+      "nju_active": false,
+      "foot_lift": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "reached_goal": true,
+      "seed": 200,
+      "scene": "stairs",
+      "timeout": false,
+      "goal": [
+        8.0,
+        0.0
+      ]
+    }
+  ],
+  "source_sha256": {
+    "train.py": "7080eecfc541abde62d6cfdd6065f35c14b6b1555e299b6ab6231307785fbdef",
+    "terrain_planner.py": "f1d1094f6b568fd4629f2fcbde304734e00f4696b9cc95200fda3e637754aa31",
+    "nju_bbc.py": "cb89390765670e96f9242848a8fe03885a7fea40a6d2caff5603839af9a32945",
+    "active_env.py": "1813ec685e2fab95de0f8d55735e326e2c18ad9a950872eb7d838bdff3729437",
+    "run.py": "ee5f389e4c18eb63c23cb32d8b7f014689c9bafd059a6c7d136955e1997b61f1",
+    "snapshot.py": "a6d6fc5b4f2827595e859e2b5861f668f00822785f30c5dd5cff7e72a3e17ad6",
+    "terrain_report.py": "5212dd9bf162939bf586d955dce9cb16ad6c13c6b7fd3d91a917513cd37f2c39",
+    "terrain_env.py": "fb517fbf69c67234de17c5f9c3bb44664693efe30e7d6b1a677332096e4456b2",
+    "__init__.py": "399fe826e99a3f300d94644694b1faf1ba221748223652a87ae5459e8800cc2c",
+    "active_run.py": "938172f4f2fa48c11e436143161cef8e75fb95d61777e546c28b94fb105ee957",
+    "env.py": "d95aa248c5c21710125c72d40984e6e3c1bdde3a365e61b87777aa41a97e5c23",
+    "planner.py": "c0687cfb1c87792e39efbe85852de5f089f9a0e7b94cdc5e99112ac64a3eff27",
+    "report.py": "d6c17325035c3ca9f0b4087ea45412dc6daf7c7d37e4407666b3c1ae06b3c1d5",
+    "skill_search.py": "459724a1761d5c327339aeee22de93e24cd96e3b4558d00ec25cef9ee3b574b8",
+    "terrain_run.py": "4d605b6fcf03a0a4d005fff20927592bc6377cbd05fa23d34b1b3d7418a784ed",
+    "bbc_calibrate.py": "e90683c0fe39db9029cbe73e5486f7a69e3673d4081e6befee869556f2744f2f",
+    "terrains.py": "808bd5fb14c53a57b1c5111d5b94f3ee416ba733ac0400d5da651858ab930b98",
+    "skills.py": "a1400dc17cd04968178e455fc28b5a9d4b18750ff44b9b74622182d97fc5d3ef",
+    "residual_train.py": "244e45cb0be29a53fc36eb77ce8bebb30cc174bfd1358e16dfe9afaf81b2dd4d"
+  },
+  "observation_boundary": "ray depth/range, ideal RGB, proprioception, simulated odometry; no scene waypoint or obstacle metadata inputs"
+}

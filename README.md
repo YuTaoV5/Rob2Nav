@@ -6,9 +6,21 @@
 
 当前可用的是**反应式无地图导航基线**。同时提供 Gymnasium 环境、PPO 上层导航训练/评估入口和初始 checkpoint；初始 PPO 尚未达到可靠导航水平。
 
+**目标点感知越障扩展**：支持 `--goal X Y`，融合当前深度/点云和短时历史，在 MoE 摆腿阶段提前增加足端间隙，并提供 NJU 冻结 BBC 学习式跳跃适配器。落地区域未知或估计坑宽超出验证范围时停车。见 [使用说明与能力边界](docs/ACTIVE_NAVIGATION.md)；它使用分层规划、IK 和技能调度，并非新训练的端到端导航 RL。
+
+新版 `active_run --scene course` 在配置的障碍→台阶→深坑→目标 `(13, 0)` 任务中通过 **3/3**，平均 **27.9 s**；跳坑前包含后退蓄跑准备。台阶修正在首次立面接触前 **0.36–0.68 s** 发出，该组采样接触冲量代理值降低约 **56.5%**。修改终点为 `(13, 0.6)` 的额外检查仍失败 **0/1**，因此这是经过有限场景验证的仿真原型，尚非可靠的任意目标导航系统。见 [完整评估与失败对照](ACTIVE_VALIDATION.md)。
+
+**[观看完整感知越障任务视频](artifacts/active/course/episode_0.mp4)** · [NJU 学习式跳坑](artifacts/active/nju_gap/episode_0.mp4) · [台阶提前抬腿](artifacts/active/stairs/episode_0.mp4)
+
+```bash
+python -m go2_nav.active_run --scene course --goal 13 0 --jump-backend nju --config configs/mission_runup.json --episodes 3 --video --output outputs/course
+```
+
+![绕障、台阶、跳坑与到达目标的仿真片段](artifacts/active/mission_preview.png)
+
 **多地形扩展**：新增绕水坑、爬台阶、攀上垂直高台和腾空跨越深坑，提供 RoboGauge MoE 运控、关节跳跃技能及 12 维关节残差训练。见 [多地形使用说明](docs/TERRAIN.md)；多地形的训练对象和成功判定与旧版上层导航 PPO 分开。
 
-四个单项场景分别通过 **3/3**。24 cm 高台的同条件本体对照中，原 MLP 为 **0/3**、MoE 为 **3/3**。混合串联路线仍是实验功能，尚未稳定通过。见 [多地形评估](TERRAIN_VALIDATION.md)。
+旧版四个单项场景分别通过 **3/3**。24 cm 高台的同条件本体对照中，原 MLP 为 **0/3**、MoE 为 **3/3**。旧版 `terrain_run --scene mixed` 的含水坑/下台阶串联路线仍未稳定通过，与上面的新版 `active_run --scene course` 场景及控制流程不同。见 [多地形评估](TERRAIN_VALIDATION.md)。
 
 ## 视频与传感器预览
 

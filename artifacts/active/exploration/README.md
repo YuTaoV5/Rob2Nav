@@ -1,0 +1,1 @@
+These are exploratory frozen-policy timing searches, not RL training. Earlier searches used evolving controller/scene prototypes, including a course with descending stairs. They are retained as development evidence and are not release benchmarks. Release comparisons are the sibling directories with summary.json and archived source hashes.
