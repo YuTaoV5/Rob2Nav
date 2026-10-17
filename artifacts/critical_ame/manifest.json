@@ -1,0 +1,44 @@
+{
+  "timestamp_utc": "2026-10-17T12:18:49.631121+00:00",
+  "runs": {
+    "smoke": {
+      "completed": true,
+      "checkpoint": {
+        "path": "training/smoke/model_1.pt",
+        "sha256": "1c5442b6dc9680e90917b692fb0e023a16c041b78050bbb1f6aaf60ecba65d07"
+      }
+    },
+    "stage1_0000_1000": {
+      "completed": false,
+      "checkpoint": {
+        "path": "training/stage1_0000_1000/model_700.pt",
+        "sha256": "cd63a3d981d30fae2af537f209438402d313fbea6dd9e008f40400e03eadb313"
+      }
+    },
+    "stage1_resume0701": {
+      "completed": false
+    },
+    "stage1_fixed0701": {
+      "completed": true,
+      "checkpoint": {
+        "path": "training/stage1_fixed0701/model_999.pt",
+        "sha256": "741b789bce34a23f223c1e47e9987b7c3f0e38860abbad01a8c0f6fd6605a6b0"
+      }
+    },
+    "stage1_1000_3000": {
+      "completed": false,
+      "checkpoint": {
+        "path": "training/stage1_1000_3000/model_1200.pt",
+        "sha256": "ce40ff59673f970b652bbc79861f9583f8952eda77ef356933336676089dd52b"
+      }
+    }
+  },
+  "evaluations": [
+    "evaluation/smoke_eval",
+    "evaluation/stage1_700_stones_l0",
+    "evaluation/repair_probe",
+    "evaluation/original700play",
+    "evaluation/eval1000"
+  ],
+  "note": "Archiving records progress only. No training success is inferred from completed commands."
+}

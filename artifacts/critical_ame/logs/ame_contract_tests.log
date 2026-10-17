@@ -1,0 +1,268 @@
+.....Terrain Encoder: CNN output dim=64, MHA dim=64, heads=16
+Actor MLP input_dim=109: MLP(
+  (0): Linear(in_features=109, out_features=32, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=32, out_features=12, bias=True)
+)
+Critic MLP: MLP(
+  (0): Linear(in_features=112, out_features=32, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=32, out_features=1, bias=True)
+)
+Encoder CNN: Sequential(
+  (0): Conv2d(3, 16, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2))
+  (1): ReLU()
+  (2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (3): Conv2d(16, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (4): ReLU()
+  (5): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+)
+Encoder MHA: MultiheadAttention(
+  (out_proj): NonDynamicallyQuantizableLinear(in_features=64, out_features=64, bias=True)
+)
+Encoder Actor Proprio: Linear(in_features=45, out_features=64, bias=True)
+Encoder Critic Proprio: Linear(in_features=48, out_features=64, bias=True)
+Terrain Encoder: CNN output dim=64, MHA dim=64, heads=16
+Actor MLP input_dim=160: MLP(
+  (0): Linear(in_features=160, out_features=512, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=512, out_features=256, bias=True)
+  (3): ELU(alpha=1.0)
+  (4): Linear(in_features=256, out_features=128, bias=True)
+  (5): ELU(alpha=1.0)
+  (6): Linear(in_features=128, out_features=29, bias=True)
+)
+Critic MLP: MLP(
+  (0): Linear(in_features=163, out_features=512, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=512, out_features=256, bias=True)
+  (3): ELU(alpha=1.0)
+  (4): Linear(in_features=256, out_features=128, bias=True)
+  (5): ELU(alpha=1.0)
+  (6): Linear(in_features=128, out_features=1, bias=True)
+)
+Encoder CNN: Sequential(
+  (0): Conv2d(3, 16, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2))
+  (1): ReLU()
+  (2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (3): Conv2d(16, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (4): ReLU()
+  (5): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+)
+Encoder MHA: MultiheadAttention(
+  (out_proj): NonDynamicallyQuantizableLinear(in_features=64, out_features=64, bias=True)
+)
+Encoder Actor Proprio: Linear(in_features=96, out_features=64, bias=True)
+Encoder Critic Proprio: Linear(in_features=99, out_features=64, bias=True)
+Terrain Encoder: CNN output dim=64, MHA dim=64, heads=16
+Actor MLP input_dim=109: MLP(
+  (0): Linear(in_features=109, out_features=32, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=32, out_features=12, bias=True)
+)
+Critic MLP: MLP(
+  (0): Linear(in_features=112, out_features=32, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=32, out_features=1, bias=True)
+)
+Encoder CNN: Sequential(
+  (0): Conv2d(3, 16, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2))
+  (1): ReLU()
+  (2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (3): Conv2d(16, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (4): ReLU()
+  (5): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+)
+Encoder MHA: MultiheadAttention(
+  (out_proj): NonDynamicallyQuantizableLinear(in_features=64, out_features=64, bias=True)
+)
+Encoder Actor Proprio: Linear(in_features=45, out_features=64, bias=True)
+Encoder Critic Proprio: Linear(in_features=48, out_features=64, bias=True)
+Terrain Encoder: CNN output dim=64, MHA dim=64, heads=16
+Actor MLP input_dim=109: MLP(
+  (0): Linear(in_features=109, out_features=32, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=32, out_features=12, bias=True)
+)
+Critic MLP: MLP(
+  (0): Linear(in_features=112, out_features=32, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=32, out_features=1, bias=True)
+)
+Encoder CNN: Sequential(
+  (0): Conv2d(3, 16, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2))
+  (1): ReLU()
+  (2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (3): Conv2d(16, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (4): ReLU()
+  (5): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+)
+Encoder MHA: MultiheadAttention(
+  (out_proj): NonDynamicallyQuantizableLinear(in_features=64, out_features=64, bias=True)
+)
+Encoder Actor Proprio: Linear(in_features=45, out_features=64, bias=True)
+Encoder Critic Proprio: Linear(in_features=48, out_features=64, bias=True)
+Warning: obs_group 'policy' contains NaN or Inf: tensor([[-1.1892,  1.3932,  2.1059,  ...,  0.1955,  0.5369, -0.0570],
+        [ 0.9305,  0.1745,  1.7379,  ..., -0.1091, -0.1724,  0.3132],
+        [ 0.0924, -0.3706, -1.0104,  ...,  1.7618,  0.3944,  0.7038],
+        ...,
+        [ 2.8329,  0.9020,  0.6425,  ..., -0.0195, -0.1485, -0.2734],
+        [-0.4363,  0.0905, -1.0038,  ...,  0.5279, -0.9696, -0.1169],
+        [ 1.0312,  0.2949,  0.4361,  ...,  0.6108, -0.5551,  1.1695]])
+Warning: obs contains NaN or Inf: tensor([[-1.1892,  1.3932,  2.1059,  ...,  0.1955,  0.5369, -0.0570],
+        [ 0.9305,  0.1745,  1.7379,  ..., -0.1091, -0.1724,  0.3132],
+        [ 0.0924, -0.3706, -1.0104,  ...,  1.7618,  0.3944,  0.7038],
+        ...,
+        [ 2.8329,  0.9020,  0.6425,  ..., -0.0195, -0.1485, -0.2734],
+        [-0.4363,  0.0905, -1.0038,  ...,  0.5279, -0.9696, -0.1169],
+        [ 1.0312,  0.2949,  0.4361,  ...,  0.6108, -0.5551,  1.1695]])
+Terrain Encoder: CNN output dim=64, MHA dim=64, heads=16
+Actor MLP input_dim=109: MLP(
+  (0): Linear(in_features=109, out_features=32, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=32, out_features=12, bias=True)
+)
+Critic MLP: MLP(
+  (0): Linear(in_features=112, out_features=32, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=32, out_features=1, bias=True)
+)
+Encoder CNN: Sequential(
+  (0): Conv2d(3, 16, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2))
+  (1): ReLU()
+  (2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (3): Conv2d(16, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (4): ReLU()
+  (5): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+)
+Encoder MHA: MultiheadAttention(
+  (out_proj): NonDynamicallyQuantizableLinear(in_features=64, out_features=64, bias=True)
+)
+Encoder Actor Proprio: Linear(in_features=45, out_features=64, bias=True)
+Encoder Critic Proprio: Linear(in_features=48, out_features=64, bias=True)
+Terrain Encoder: CNN output dim=64, MHA dim=64, heads=16
+Actor MLP input_dim=109: MLP(
+  (0): Linear(in_features=109, out_features=32, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=32, out_features=12, bias=True)
+)
+Critic MLP: MLP(
+  (0): Linear(in_features=112, out_features=32, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=32, out_features=1, bias=True)
+)
+Encoder CNN: Sequential(
+  (0): Conv2d(3, 16, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2))
+  (1): ReLU()
+  (2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (3): Conv2d(16, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (4): ReLU()
+  (5): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+)
+Encoder MHA: MultiheadAttention(
+  (out_proj): NonDynamicallyQuantizableLinear(in_features=64, out_features=64, bias=True)
+)
+Encoder Actor Proprio: Linear(in_features=45, out_features=64, bias=True)
+Encoder Critic Proprio: Linear(in_features=48, out_features=64, bias=True)
+Terrain Encoder: CNN output dim=64, MHA dim=64, heads=16
+Actor MLP input_dim=109: MLP(
+  (0): Linear(in_features=109, out_features=32, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=32, out_features=12, bias=True)
+)
+Critic MLP: MLP(
+  (0): Linear(in_features=112, out_features=32, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=32, out_features=1, bias=True)
+)
+Encoder CNN: Sequential(
+  (0): Conv2d(3, 16, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2))
+  (1): ReLU()
+  (2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (3): Conv2d(16, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (4): ReLU()
+  (5): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+).
+----------------------------------------------------------------------
+Ran 6 tests in 0.250s
+
+OK
+
+Encoder MHA: MultiheadAttention(
+  (out_proj): NonDynamicallyQuantizableLinear(in_features=64, out_features=64, bias=True)
+)
+Encoder Actor Proprio: Linear(in_features=45, out_features=64, bias=True)
+Encoder Critic Proprio: Linear(in_features=48, out_features=64, bias=True)
+Terrain Encoder: CNN output dim=64, MHA dim=64, heads=16
+Actor MLP input_dim=160: MLP(
+  (0): Linear(in_features=160, out_features=512, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=512, out_features=256, bias=True)
+  (3): ELU(alpha=1.0)
+  (4): Linear(in_features=256, out_features=128, bias=True)
+  (5): ELU(alpha=1.0)
+  (6): Linear(in_features=128, out_features=29, bias=True)
+)
+Critic MLP: MLP(
+  (0): Linear(in_features=163, out_features=512, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=512, out_features=256, bias=True)
+  (3): ELU(alpha=1.0)
+  (4): Linear(in_features=256, out_features=128, bias=True)
+  (5): ELU(alpha=1.0)
+  (6): Linear(in_features=128, out_features=1, bias=True)
+)
+Encoder CNN: Sequential(
+  (0): Conv2d(3, 16, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2))
+  (1): ReLU()
+  (2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (3): Conv2d(16, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (4): ReLU()
+  (5): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+)
+Encoder MHA: MultiheadAttention(
+  (out_proj): NonDynamicallyQuantizableLinear(in_features=64, out_features=64, bias=True)
+)
+Encoder Actor Proprio: Linear(in_features=96, out_features=64, bias=True)
+Encoder Critic Proprio: Linear(in_features=99, out_features=64, bias=True)
+Terrain Encoder: CNN output dim=64, MHA dim=64, heads=16
+attach_global=True: Adding global maxpool feature (dim=64) to encoded_obs
+Actor MLP input_dim=224: MLP(
+  (0): Linear(in_features=224, out_features=512, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=512, out_features=256, bias=True)
+  (3): ELU(alpha=1.0)
+  (4): Linear(in_features=256, out_features=128, bias=True)
+  (5): ELU(alpha=1.0)
+  (6): Linear(in_features=128, out_features=29, bias=True)
+)
+Critic MLP: MLP(
+  (0): Linear(in_features=227, out_features=512, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=512, out_features=256, bias=True)
+  (3): ELU(alpha=1.0)
+  (4): Linear(in_features=256, out_features=128, bias=True)
+  (5): ELU(alpha=1.0)
+  (6): Linear(in_features=128, out_features=1, bias=True)
+)
+Encoder CNN: Sequential(
+  (0): Conv2d(3, 16, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2))
+  (1): ReLU()
+  (2): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  (3): Conv2d(16, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (4): ReLU()
+  (5): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+)
+Encoder Query Projector: Linear(in_features=128, out_features=64, bias=True)
+Encoder Global MLP: MLP(
+  (0): Linear(in_features=64, out_features=256, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=256, out_features=128, bias=True)
+  (3): ELU(alpha=1.0)
+  (4): Linear(in_features=128, out_features=64, bias=True)
+)
+Encoder MHA: MultiheadAttention(
+  (out_proj): NonDynamicallyQuantizableLinear(in_features=64, out_features=64, bias=True)
+)
+Encoder Actor Proprio: Linear(in_features=96, out_features=64, bias=True)
+Encoder Critic Proprio: Linear(in_features=99, out_features=64, bias=True)

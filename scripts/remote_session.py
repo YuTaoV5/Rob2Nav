@@ -20,6 +20,7 @@ known = Path.home()/".ssh/known_hosts"
 client.load_host_keys(str(known))
 client.set_missing_host_key_policy(paramiko.RejectPolicy())
 client.connect(args.host, port=args.port, username=args.user, password=getpass.getpass("SSH password: "), timeout=20)
+client.get_transport().set_keepalive(30)
 print("CONNECTED", flush=True)
 for line in sys.stdin:
     try:

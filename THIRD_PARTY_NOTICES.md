@@ -1,5 +1,17 @@
 # Third-party notices
 
+## Original criticaldamped Go2 AME reproduction
+
+`critical_ame` executes the external repository
+https://github.com/criticaldamped/AME_Locomotion at revision
+15d02c891273d3f4c9b55c9afe3073bcd2d9152f through isolated source paths.
+The external repository and its robot assets retain their original notices;
+they are not relicensed by Rob2Nav. This run starts from random Go2 network
+initialization, not the upstream G1 weights, RoboGauge, or the NVIDIA rough
+initializer used by the separate perceptive experiments. The bounded runtime
+ray re-query and current reproduction limits are documented in
+docs/CRITICAL_AME_REPRODUCTION.md and CRITICAL_AME_VALIDATION.md.
+
 ## AME-inspired experiment
 
 `perceptive_rl/attention.py` is an independent implementation informed by the

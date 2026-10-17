@@ -18,6 +18,12 @@ python -m go2_nav.active_run --scene course --goal 13 0 --jump-backend nju --con
 
 ![绕障、台阶、跳坑与到达目标的仿真片段](artifacts/active/mission_preview.png)
 
+## criticaldamped 原项目 Go2 过桩复现（进行中）
+
+已按固定上游版本启动原始 Go2 两阶段训练，完成首批 1000 轮，正在继续基础阶段训练与分项验证。
+修正了实际复现出的方块网格接缝射线求交问题；仅对未命中射线做 50 微米以内的真实网格重查询。
+**当前尚未复现成功过桩，不能将运行完成或训练奖励当成成功。** 见 [训练与运行说明](docs/CRITICAL_AME_REPRODUCTION.md)、[中间评估和故障证据](CRITICAL_AME_VALIDATION.md)。
+
 ## AME 窄梅花桩
 
 新增 AME 复现配置对应的 **20×20 cm 方桩**：完整 8×8 m 场地、2×2 m 中心平台、双列/交替排列、±3 cm 高差、2 m 深坑；另有明确区分的 12 cm 支撑面压力测试。
