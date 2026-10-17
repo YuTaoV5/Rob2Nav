@@ -20,9 +20,9 @@ python -m go2_nav.active_run --scene course --goal 13 0 --jump-backend nju --con
 
 ## 当前主线：预训练 MoE＋感知融合＋逐步解冻
 
-已复用 RoboGauge 原 MoE 的 actor 与历史编码器权重，加入 5 cm 可见局部地形注意力，启动 512 环境、1000 轮分阶段 PPO：先适配 critic，再训练感知，随后逐步开放原 actor 和 MoE 编码器。
-网络/历史重建检查、原 MoE 平地 16/16 首回合及四阶段短训练已通过；**尚未报告新策略的窄桩成功率**。
-训练运行在服务器，原 MoE 的 9 项同条件基线已完成；新模型训练完成后自动评估并保存窄桩视频。见 [结构、传感器假设、阶段与命令](docs/MOE_PERCEPTIVE.md)、[检查、基线、视频与训练快照](MOE_PERCEPTIVE_VALIDATION.md)。
+已复用 RoboGauge 原 MoE 的 actor 与历史编码器，加入 5 cm 可见局部地形注意力，完成 512 环境、1000 轮分阶段 PPO 和 9 项同条件评估。
+平地、楼梯、高台均为 **32/32**；**两类梅花桩在三个难度下仍全部 0/32**，尚未实现窄桩通过，当前权重不替换主控制器。
+见 [结构、传感器假设、阶段与命令](docs/MOE_PERCEPTIVE.md)、[完整结果、失败视频与最终权重](MOE_PERCEPTIVE_VALIDATION.md)。
 
 ## criticaldamped 原项目 Go2 过桩复现（历史对照）
 

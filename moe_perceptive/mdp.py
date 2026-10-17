@@ -43,7 +43,7 @@ def measured_map(env):
     yaw=torch.atan2(2*(q[:,0]*q[:,3]+q[:,1]*q[:,2]),1-2*(q[:,2]**2+q[:,3]**2))
     now=env.common_step_counter*env.step_dt
     if not hasattr(env,'_moe_map'):
-        env._moe_map=ElevationMemory(env.num_envs,env.device);env._moe_map_frame=-1e6
+        env._moe_map=ElevationMemory(env.num_envs,env.device,getattr(env.cfg,'moe_memory_lifetime',1.));env._moe_map_frame=-1e6
     frame=now-env._moe_map_frame>=.099
     if frame:env._moe_map_frame=now
     fresh=(env.episode_length_buf==0)|frame

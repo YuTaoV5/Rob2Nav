@@ -7,6 +7,8 @@ p.add_argument('--num-envs',type=int,default=512);p.add_argument('--iterations',
 p.add_argument('--warmup',type=int,default=50);p.add_argument('--fusion',type=int,default=300)
 p.add_argument('--actor',type=int,default=300);p.add_argument('--seed',type=int,default=42)
 p.add_argument('--resume');p.add_argument('--kind',default='mixed',choices=['mixed','flat','stairs','platform','ame_stakes','ame_alternate'])
+p.add_argument('--initialize-from',help='Load policy/critic only into a new experiment; do not restore optimizer or curriculum.')
+p.add_argument('--memory-lifetime',type=float,default=1.)
 AppLauncher.add_app_launcher_args(p);a=p.parse_args();app=AppLauncher(a).app
 import numpy as np
 import torch
@@ -21,12 +23,15 @@ from .mdp import match_joint_limits,JOINTS,DEFAULT
 from .provenance import capture
 
 torch.set_num_threads(4);torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False
+if a.memory_lifetime<=0:raise ValueError('Memory lifetime must be positive')
+if a.resume and a.initialize_from:raise ValueError('Choose resume or initialize-from')
 out=Path(a.output).resolve();out.mkdir(parents=True,exist_ok=False)
 meta={**capture(out,a),'torch':torch.__version__,'actor_observation':'5x45 history + 3x693 visible height/mask/age',
-      'simulation_sensors':'simplified depth/lidar rays, ideal odometry, 1 s observed-return memory',
+      'simulation_sensors':f'simplified depth/lidar rays, ideal odometry, {a.memory_lifetime:g} s observed-return memory',
       'protocol':'pretrained 137k MoE, new terrain attention, progressively unfrozen PPO; not AME scratch replication'}
 (out/'manifest.json').write_text(json.dumps(meta,indent=2))
 cfg=make_cfg(a.num_envs,a.seed,a.kind);cfg.sim.device=a.device or 'cuda:0'
+cfg.moe_memory_lifetime=a.memory_lifetime
 dump_yaml(str(out/'env.yaml'),cfg)
 env=ManagerBasedRLEnv(cfg=cfg);match_joint_limits(env.scene['robot'])
 wrapped=RslRlVecEnvWrapper(env,clip_actions=None)
@@ -48,6 +53,13 @@ new=[v for v in policy.parameters() if id(v) not in excluded]
 runner.alg.optimizer=torch.optim.Adam([
     {'params':new,'lr':2e-4,'name':'new'}, {'params':old_actor,'lr':2e-5,'name':'pretrained_actor'},
     {'params':old_encoder,'lr':1e-5,'name':'pretrained_encoder'}])
+if a.initialize_from:
+    ck=torch.load(a.initialize_from,map_location='cpu',weights_only=False)
+    if ck['infos']['provenance']['moe_sha256']!=meta['moe_sha256']:raise ValueError('Initializer MoE mismatch')
+    policy.load_state_dict(ck['model_state_dict'],strict=True)
+    meta['initialized_from_sha256']=hashlib.sha256(Path(a.initialize_from).read_bytes()).hexdigest()
+    meta['initialization_note']='Policy and critic only; fresh Adam, RNG, episodes and curriculum.'
+    (out/'manifest.json').write_text(json.dumps(meta,indent=2))
 if a.resume:
     ck=torch.load(a.resume,map_location='cpu',weights_only=False)
     for key in ('moe_sha256','protocol'):
@@ -55,6 +67,7 @@ if a.resume:
     old=ck['infos']['provenance']['args']
     for key in ('seed','num_envs','kind','warmup','fusion','actor'):
         if old[key]!=vars(a)[key]:raise ValueError('Resume changed '+key)
+    if old.get('memory_lifetime',1.)!=a.memory_lifetime:raise ValueError('Resume changed memory lifetime')
     runner.load(a.resume)
     levels=ck['terrain_levels'].to(env.device);t=env.scene.terrain
     t.terrain_levels[:]=levels;t.env_origins[:]=t.terrain_origins[levels,t.terrain_types]

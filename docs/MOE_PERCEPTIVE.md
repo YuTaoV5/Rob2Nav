@@ -80,3 +80,35 @@ python -m unittest discover -s tests -p test_moe_perceptive_memory.py
 当前控制流水线位于 `outputs/moe_perceptive/pilot1000`：原 MoE 基线与训练并行，训练完成后用同一组 9 个案例评估新权重，包括 20 cm 双列/交错桩。两组均保存首回合统计、轨迹与最窄场景视频。固定布局上多个重置条件不能作为多种布局泛化成绩。
 
 流水线通过独立进程会话启动，SSH 断开不依赖终端存活。`pipeline1000.log` 和 `launch1000.json` 记录启动；成功启动不等于完成训练。`completed.json` 只标记命令完成，通过率以逐场景 `summary.json` 为准。
+
+
+## 首轮完成与感知诊断
+
+首轮 1000 轮已完成，完整结果见 `MOE_PERCEPTIVE_VALIDATION.md`。窄桩仍为 0/32，不将该权重作为成功模型。
+
+对同一权重、同一种子执行感知记忆消融：
+
+```bash
+/root/isaacsim/python.sh -m moe_perceptive.evaluate --headless \
+  --moe "$MOE" --checkpoint /path/to/model_999.pt \
+  --kind ame_stakes --difficulty 0 --num-envs 32 \
+  --memory-lifetime 1 --diagnostic --output outputs/diagnostic_memory1
+# 在新目录改为 --memory-lifetime 4 重复运行；其输入分布不同于训练，不能当作重新训练结果。
+python -m moe_perceptive.analyze_diagnostic \
+  --trials outputs/diagnostic_memory1 outputs/diagnostic_memory4 \
+  --output outputs/coverage_diagnostic
+```
+
+诊断记录动作执行前的观测，包含机器人 0 的四脚格有效性、周围 3×3 格覆盖率和完整三通道地图。灰色表示未知，不能用理想高度补齐。覆盖率是单机器人时序诊断，完整通过率仍统计全部 32 环境。诊断不改变关节动作。
+
+
+第二轮控制命令（输出目录必须未存在）：
+
+```bash
+python -m moe_perceptive.memory_trial --moe "$MOE" \
+  --initializer /root/gpufree-data/MoE-runs/visible_moe_v1_seed42/model_999.pt \
+  --run /root/gpufree-data/MoE-runs/visible_moe_memory4_v2_seed42 \
+  --output outputs/moe_perceptive/memory4_v2 --iterations 1000
+```
+
+控制器依次执行 2 轮原生短训练、512 环境联合训练、9 项评估。初始化只加载 policy/critic，优化器、课程、回合不恢复；4 秒记忆仍只保存实际观测，不补隐藏地形。状态与每阶段命令/返回码存入输出目录。

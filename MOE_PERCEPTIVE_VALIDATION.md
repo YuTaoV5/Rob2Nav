@@ -1,6 +1,6 @@
-# 预训练 MoE 感知融合：启动与基线报告
+# 预训练 MoE 感知融合：首轮完整评估
 
-**首批训练已启动，尚无新策略通过窄桩的结果。** 本页记录已完成的模型/接口检查和原 MoE 同条件基线。训练完成后流水线会评估新权重，不能提前把下面的基线数字当成新模型成绩。
+**首轮 1000 轮训练及 9 项同条件评估已完成。平地、楼梯、高台均为 32/32；两类桩在三个难度下均为 0/32，尚未实现窄桩通过。** 归档保留完整失败记录与视频，不将奖励上升当作技能成功。
 
 ## 已验证的改造
 
@@ -34,12 +34,49 @@
 - [双列桩基线](artifacts/moe_perceptive/baseline/ame_stakes_1.00/summary.json)、[视频](artifacts/moe_perceptive/baseline/ame_stakes_1.00/episode_0.mp4)。早期多环境共享原点有视觉叠加，作为失败诊断，不用于证明动作质量。
 - [交错桩基线](artifacts/moe_perceptive/baseline/ame_alternate_1.00/summary.json)、[视频](artifacts/moe_perceptive/baseline/ame_alternate_1.00/episode_0.mp4)。该次录制仅显示机器人 0，其他环境仍正常参与统计。
 
-## 进行中的训练
+## 首轮新策略结果
 
-512 环境、1000 轮：前 50 轮适配 critic，随后训练感知分支，再逐步开放原 actor 与 MoE 编码器。训练记录与每阶段具体参数见 [方案和运行说明](docs/MOE_PERCEPTIVE.md)。这不是 AME 从零训练，也不混入此前的 MLP 教师初始化对照。
+训练为 512 环境、1000 轮，共 12,288,000 次新环境交互；使用 `model_999.pt`。评估协议与上述原 MoE 基线相同。
 
-[归档清单](artifacts/moe_perceptive/manifest.json) 保存快照时间、当时选取的 checkpoint 与所有文件 SHA256。`run_completed=false` 表示首批训练仍未完成；归档中的轮数也不一定是服务器当前轮数。训练日志、源文件快照及控制接口一并保存。初始运行的限位元数据曾按资产顺序记录，现已转换为声明的模型顺序，原数组与修正记录保留；没有改变运行中的物理状态或动作。
+| 地形 | difficulty | 原 MoE 完整通过 | 新策略完整通过 | 新策略失败终止 | 新策略平均终态前进 m |
+|---|---:|---:|---:|---:|---:|
+| 平地 | 0 | 32/32 | 32/32 | 0/32 | 3.607 |
+| 台阶 | 0.5 | 32/32 | 32/32 | 0/32 | 3.630 |
+| 高台 | 0.5 | 31/32 | 32/32 | 0/32 | 3.628 |
+| 双列桩 | 0 | 0/32 | 0/32 | 5/32 | 1.153 |
+| 双列桩 | 0.5 | 0/32 | 0/32 | 11/32 | 1.071 |
+| 双列桩 | 1 | 0/32 | 0/32 | 26/32 | 1.165 |
+| 交错桩 | 0 | 0/32 | 0/32 | 3/32 | 1.044 |
+| 交错桩 | 0.5 | 0/32 | 0/32 | 17/32 | 1.115 |
+| 交错桩 | 1 | 0/32 | 0/32 | 27/32 | 1.202 |
 
-公开归档保留选取的主训练 checkpoint；4 轮 smoke 的权重留在服务器，检查结果已归档。可从原文件快速重跑 smoke，不将其当作可部署技能权重。
+高台 31→32 仅相差一个初始状态，不能据此声称显著增强。最窄双列桩失败由 15→26，交错桩由 8→27；部分较易桩的跌倒数减少但前进距离降低，存在停滞超时，不能称为改善。当前不将新权重替换为主控制器。
 
-当前验证限于 Isaac Lab 与简化传感器射线。没有报告新策略的 MuJoCo、真实 D435i/Mid360 或实机成绩。
+- [新策略双列窄桩视频](artifacts/moe_perceptive/trained/ame_stakes_1.00/episode_0.mp4)、[统计](artifacts/moe_perceptive/trained/ame_stakes_1.00/summary.json)。
+- [新策略交错窄桩视频](artifacts/moe_perceptive/trained/ame_alternate_1.00/episode_0.mp4)、[统计](artifacts/moe_perceptive/trained/ame_alternate_1.00/summary.json)。
+- [最终权重](artifacts/moe_perceptive/training/visible_moe_v1_seed42/model_999.pt)、[导出 actor](artifacts/moe_perceptive/export/actor.pt)、[训练完成记录](artifacts/moe_perceptive/training/visible_moe_v1_seed42/completed.json)。
+
+## 归档与下一步
+
+前 50 轮适配 critic，随后训练感知分支，再逐步开放原 actor 与 MoE 编码器。具体参数见 [方案和运行说明](docs/MOE_PERCEPTIVE.md)。这不是 AME 从零训练，也不混入此前 MLP 教师初始化对照。
+
+[归档清单](artifacts/moe_perceptive/manifest.json) 保存快照时间、checkpoint 和文件 SHA256；`run_completed=true` 只表示训练命令完成，完整通过率以上表为准。训练日志与启动时源文件快照均保留。初始限位元数据曾按资产顺序记录，已转换为声明的模型顺序，原数组及修正记录保留；没有改变运行中的物理状态或动作。
+
+接下来先诊断桩边落脚和实际可见地形记忆覆盖，再决定训练修改；不直接将失败实验延长作为解决方案。诊断中的感知参数消融必须与原协议区分，不能混入上表。
+
+当前验证限于 Isaac Lab 与简化传感器射线。没有新策略的 MuJoCo、真实 D435i/Mid360 或实机成绩。
+
+
+## 感知覆盖诊断与第二轮
+
+同一 `model_999.pt`、双列桩 difficulty=0、32 环境、seed 801：仅把可见观测记忆从 1 秒改为 4 秒，两组均为 **0/32**。失败终止分别为 **5/32、23/32**；平均终态前进为 **1.153、1.366 m**。4 秒是输入分布改变后的零样本消融，不能作为改进成功。
+
+机器人 0 在平台边缘区间（机身 x=0.5–1.5 m）的足端周围 3×3 格已知比例，按 FL/FR/RL/RR：1 秒为 **3.2%/0%/0%/0%**，4 秒为 **33.9%/34.4%/16.9%/15.3%**。采样数分别 181/21，终止时间不同；只是单机器人覆盖诊断，不证明总体成功率，也不能单独确定失败原因。结果提示近身盲区与记忆寿命值得处理，但延长记忆必须重新训练适应。
+
+![动作前地图与四脚位置，灰色为未知](artifacts/moe_memory_diagnostic/coverage_diagnostic/coverage.png)
+
+[诊断统计](artifacts/moe_memory_diagnostic/coverage_diagnostic/summary.json)、[1 秒完整记录](artifacts/moe_memory_diagnostic/diagnostic_v1_memory1/summary.json)、[4 秒完整记录](artifacts/moe_memory_diagnostic/diagnostic_v1_memory4/summary.json)、[校验清单](artifacts/moe_memory_diagnostic/manifest.json)。
+
+第二轮另存为 `visible_moe_memory4_v2_seed42`：从首轮最终 policy 与 critic 初始化，使用 4 秒可见观测记忆；新 Adam、新课程与回合，从第 0 轮开始 joint 训练 1000 轮。它不是原运行的精确续训，也不是单变量同预算从头对照。运行前先做 32 环境两轮原生短训练，失败则不启动正式训练；完成后自动执行相同 9 项评估及窄桩录像。[启动参数](artifacts/moe_memory_diagnostic/launch_memory4_v2.json)。第二轮尚无通过结果。
+
+第二轮原生两轮短训练已通过，正式训练已确认进入 joint 阶段。[短训练完成记录](artifacts/moe_memory_v2_start/visible_moe_memory4_v2_seed42_smoke/completed.json)、[新实验精确源码和配置](artifacts/moe_memory_v2_start/visible_moe_memory4_v2_seed42/manifest.json)。该目录仅是启动快照，不是最终权重或评估。

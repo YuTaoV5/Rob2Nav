@@ -6,6 +6,8 @@ p=argparse.ArgumentParser();p.add_argument('--moe',required=True);p.add_argument
 p.add_argument('--kind',choices=['flat','stairs','platform','ame_stakes','ame_alternate'],required=True)
 p.add_argument('--difficulty',type=float,default=0.);p.add_argument('--num-envs',type=int,default=32)
 p.add_argument('--seed',type=int,default=801);p.add_argument('--output',required=True);p.add_argument('--video',action='store_true')
+p.add_argument('--memory-lifetime',type=float,default=1.)
+p.add_argument('--diagnostic',action='store_true',help='Record pre-action foot/map coverage; no action correction.')
 AppLauncher.add_app_launcher_args(p);a=p.parse_args()
 if a.video:a.enable_cameras=True
 out=Path(a.output);out.mkdir(parents=True,exist_ok=False)
@@ -34,9 +36,11 @@ def capture(env):
 
 
 cfg=make_cfg(a.num_envs,a.seed,a.kind,True,a.difficulty);cfg.sim.device=a.device or 'cuda:0'
+cfg.moe_memory_lifetime=a.memory_lifetime
 cfg.terminations.capture=TerminationTermCfg(func=capture)
 from isaaclab.utils.io import dump_yaml
 dump_yaml(str(out/'env.yaml'),cfg)
+if a.memory_lifetime<=0:raise ValueError('Memory lifetime must be positive')
 env=ManagerBasedRLEnv(cfg=cfg,render_mode='rgb_array' if a.video else None)
 match_joint_limits(env.scene['robot']);wrapped=RslRlVecEnvWrapper(env,clip_actions=None)
 if a.video:
@@ -59,7 +63,7 @@ if a.checkpoint:
     checkpoint_sha=hashlib.sha256(Path(a.checkpoint).read_bytes()).hexdigest()
 env._moe_anchor=actor.anchor
 obs=wrapped.get_observations();done_first=torch.zeros(a.num_envs,device=env.device,dtype=torch.bool)
-records=[];trace=[];frames=0;writer=None;maximum_zero_error=0.
+records=[];trace=[];diagnostics=[];frames=0;writer=None;maximum_zero_error=0.
 if a.video:
     import imageio.v2 as imageio
     writer=imageio.get_writer(out/'episode_0.mp4',fps=25,macro_block_size=1)
@@ -70,6 +74,23 @@ try:
             if not a.checkpoint:
                 maximum_zero_error=max(maximum_zero_error,float((actor(policy_obs)-base).abs().max()))
             if not torch.isfinite(actions).all():raise FloatingPointError('Nonfinite policy')
+            if a.diagnostic and not done_first[0] and step%5==0:
+                # This is the observation used for the next action, before physics.
+                r=env.scene['robot'];q=r.data.root_quat_w[0]
+                yaw=torch.atan2(2*(q[0]*q[3]+q[1]*q[2]),1-2*(q[2]**2+q[3]**2))
+                ids=[r.body_names.index(n) for n in FEET]
+                feet=r.data.body_pos_w[0,ids]-r.data.root_pos_w[0]
+                x=feet[:,0]*yaw.cos()+feet[:,1]*yaw.sin()
+                y=-feet[:,0]*yaw.sin()+feet[:,1]*yaw.cos()
+                ix=((x+.55)/.05).round().long();iy=((y+.5)/.05).round().long()
+                inside=(ix>=0)&(ix<33)&(iy>=0)&(iy<21)
+                visible=policy_obs[0,225:].reshape(3,21,33)
+                known=visible[1,iy.clamp(0,20),ix.clamp(0,32)]*inside
+                diagnostics.append({'time':step*env.step_dt,'feet_order':FEET,
+                    'foot_xy_body_yaw':torch.stack((x,y),-1).cpu().tolist(),
+                    'foot_cell_known':known.cpu().tolist(),
+                    'position':(r.data.root_pos_w[0]-env.scene.env_origins[0]).cpu().tolist(),
+                    'visible_map':visible.cpu().tolist()})
             obs,_,done,_=wrapped.step(actions);state=env._eval_state
             ended=done.bool()&~done_first
             for i in ended.nonzero().flatten().tolist():
@@ -96,6 +117,7 @@ try:
         'note':'Shared fixed terrain difficulty/seed; reset XY +/-3 cm, yaw +/-0.04 rad. No physical sensor drivers.'}
     if a.video:result['render_note']='Only robot 0 is visible; all evaluation environments remain simulated.'
     (out/'summary.json').write_text(json.dumps(result,indent=2));(out/'trace.json').write_text(json.dumps(trace))
+    if a.diagnostic:(out/'map_diagnostic.json').write_text(json.dumps(diagnostics))
     torch.jit.script(actor.cpu()).save(str(out/'actor.pt'))
     print('EVALUATION',result['successes'],'/',result['total'],flush=True)
 finally:
