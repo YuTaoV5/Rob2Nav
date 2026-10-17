@@ -27,7 +27,7 @@ class ReactivePlanner:
             if score < corridor_score:
                 corridor_score, steering_goal = score, endpoint
         best_score, best = -np.inf, np.zeros(3)
-        for vx in (0., .2, .4, c["max_vx"]):
+        for vx in (0., c.get("creep_speed", .2), .2, .4, c["max_vx"]):
             for wz in np.linspace(-c["max_wz"], c["max_wz"], 13):
                 t = np.linspace(.15, 2., 12)
                 if abs(wz) < 1e-6:

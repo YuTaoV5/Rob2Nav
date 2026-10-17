@@ -6,6 +6,10 @@
 
 当前可用的是**反应式无地图导航基线**。同时提供 Gymnasium 环境、PPO 上层导航训练/评估入口和初始 checkpoint；初始 PPO 尚未达到可靠导航水平。
 
+**多地形扩展**：新增绕水坑、爬台阶、攀上垂直高台和腾空跨越深坑，提供 RoboGauge MoE 运控、关节跳跃技能及 12 维关节残差训练。见 [多地形使用说明](docs/TERRAIN.md)；多地形的训练对象和成功判定与旧版上层导航 PPO 分开。
+
+四个单项场景分别通过 **3/3**。24 cm 高台的同条件本体对照中，原 MLP 为 **0/3**、MoE 为 **3/3**。混合串联路线仍是实验功能，尚未稳定通过。见 [多地形评估](TERRAIN_VALIDATION.md)。
+
 ## 视频与传感器预览
 
 **[查看 / 下载交错障碍仿真视频（MP4）](artifacts/outputs/slalom_final/episode_0.mp4)** · [直接下载视频](https://raw.githubusercontent.com/YuTaoV5/Rob2Nav/main/artifacts/outputs/slalom_final/episode_0.mp4)
@@ -112,6 +116,36 @@ bash run.sh -m go2_nav.train --resume artifacts/outputs/ppo_initial/navigation.z
 ```
 
 可用 `--sensors depth`、`--sensors lidar` 或 `--sensors both` 做输入消融，训练和评估必须保持一致。消融仅屏蔽对应控制器输入，底层仍计算两路传感数据，不能用来比较单传感器计算耗时。
+
+## 多地形与本体越障
+
+| 场景 | 视频 | 结果 |
+|---|---|---|
+| 水坑绕行 | [MP4](artifacts/terrain/water/episode_0.mp4) | 3/3，无入水 |
+| 4×8 cm 台阶 | [MP4](artifacts/terrain/stairs/episode_0.mp4) | 3/3 |
+| 24 cm 垂直高台 | [MP4](artifacts/terrain/platform/episode_0.mp4) | 3/3 |
+| 30 cm 宽、80 cm 深坑 | [MP4](artifacts/terrain/gap/episode_0.mp4) | 3/3，腾空并落地 |
+
+![跨坑腾空帧](artifacts/terrain/gap/preview.png)
+
+```bash
+bash run.sh -m go2_nav.terrain_run --scene water --episodes 3 --video --output outputs/water
+bash run.sh -m go2_nav.terrain_run --scene stairs --height .08 --no-jump --episodes 3 --video --output outputs/stairs
+bash run.sh -m go2_nav.terrain_run --scene platform --height .24 --no-jump --episodes 3 --video --output outputs/platform
+bash run.sh -m go2_nav.terrain_run --scene gap --config configs/jump.json --episodes 3 --video --output outputs/gap
+```
+
+台阶是 4 级、每级 8 cm；高台为没有隐藏坡道的 24 cm 垂直台面；深坑默认宽 30 cm、深 80 cm，地面真实断开。水区采用理想蓝色观测与低摩擦风险区域，不是流体模型。
+
+多地形默认使用 RoboGauge MoE。跳跃通过受限关节目标和力矩执行，不通过改写根部位置或施加外部抬升力实现。导航保留少量传感器生成的绕行目标与短期坑沿记忆，处理相机近距离盲区。
+
+下层训练入口：
+
+```bash
+bash run.sh -m go2_nav.residual_train --scene platform --height .24 --steps 100000 --envs 4 --output outputs/residual
+```
+
+这里的动作是 12 维关节残差，原 RoboGauge 策略冻结；旧版 `go2_nav.train` 的动作仍为 3 维速度。不要混用两类 checkpoint。训练细节、对照方法和边界见 [TERRAIN.md](docs/TERRAIN.md)。
 
 ## 传感器配置与边界
 

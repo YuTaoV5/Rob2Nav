@@ -44,7 +44,12 @@ class Go2MaplessEnv(gym.Env):
         torch.set_num_threads(1)
         if logger.logger is None:
             logger.create("go2_mapless", "simulation", console_output=False)
-        self.robot = Go2(Go2Config())
+        if self.cfg.get("locomotion", "mlp") == "moe":
+            from robogauge.tasks.robots.go2.go2_moe import Go2MoE
+            from robogauge.tasks.robots.go2.go2_moe_config import Go2MoEConfig
+            self.robot = Go2MoE(Go2MoEConfig())
+        else:
+            self.robot = Go2(Go2Config())
         self.renderer = None
         self.model = None
         self.command = np.zeros(3)
@@ -97,10 +102,11 @@ class Go2MaplessEnv(gym.Env):
             self.obstacle_names.append(name)
             ET.SubElement(world, "geom", name=name, type="box", pos=f"{x} {y} {sz}", size=f"{sx} {sy} {sz}",
                           rgba="0.75 0.3 0.13 1", friction="0.8 0.02 0.01", group="0")
-        box("wall_left", 4, 3.0, 6, 0.1)
-        box("wall_right", 4, -3.0, 6, 0.1)
+        hall_end = 16. if self.scene == "mixed" else 10.
+        box("wall_left", (hall_end-2)/2, 3.0, (hall_end+2)/2, 0.1)
+        box("wall_right", (hall_end-2)/2, -3.0, (hall_end+2)/2, 0.1)
         box("wall_back", -2.0, 0, 0.1, 3)
-        box("wall_end", 10.0, 0, 0.1, 3)
+        box("wall_end", hall_end, 0, 0.1, 3)
         self.goal = np.array([8., 0.])
         if self.scene == "slalom":
             for i, (x, y) in enumerate([(2.4, -0.4), (4.4, 0.65), (6.3, -0.45)]):
@@ -110,9 +116,15 @@ class Go2MaplessEnv(gym.Env):
                 box(f"obstacle_{i}", x, self.np_random.uniform(-1.4, 1.4), 0.25, self.np_random.uniform(.25, .55))
         elif self.scene == "blocked":
             box("blocking_wall", 3, 0, .15, 3)
+        elif self.scene in ("water", "stairs", "platform", "gap", "mixed"):
+            from .terrains import populate
+            self.terrain_meta = populate(world, self.scene, self.cfg)
+            if "goal" in self.terrain_meta:
+                self.goal = np.asarray(self.terrain_meta["goal"], dtype=float)
         elif self.scene != "empty":
             raise ValueError(f"Unknown scene: {self.scene}")
-        ET.SubElement(world, "site", name="goal", type="sphere", pos="8 0 0.1", size="0.15", rgba="0.1 0.8 0.2 1")
+        goal_z = getattr(self, "terrain_meta", {}).get("goal_height", 0.)+.1
+        ET.SubElement(world, "site", name="goal", type="sphere", pos=f"{self.goal[0]} {self.goal[1]} {goal_z}", size="0.15", rgba="0.1 0.8 0.2 1")
         ET.SubElement(root, "visual")
         self.model = mujoco.MjModel.from_xml_string(ET.tostring(root, encoding="unicode"))
         self.data = mujoco.MjData(self.model)
@@ -139,10 +151,15 @@ class Go2MaplessEnv(gym.Env):
             obs = self.robot.build_observation(self._proprio(), goal)
             target, kp, kd, kind = self.robot.get_action(obs)
         assert kind == "P"
+        target, kp, kd = self.modify_targets(target, kp, kd, command)
         for _ in range(round(self.cfg["control_dt"] / self.cfg["physics_dt"])):
             torque = kp * (target - self.data.qpos[self.qids]) - kd * self.data.qvel[self.vids]
             self.data.ctrl[:] = np.clip(torque, self.model.actuator_ctrlrange[:, 0], self.model.actuator_ctrlrange[:, 1])
             mujoco.mj_step(self.model, self.data)
+
+    def modify_targets(self, target, kp, kd, command):
+        """Extension point for physical joint skills/residuals; no root-state edits."""
+        return target, kp, kd
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
