@@ -1,3 +1,13 @@
+# 用户暂停状态（2026-10-18）
+
+用户明确要求暂存并停止继续探索。自动化go2已核实为PAUSED；服务器未发现moe_perceptive训练、评估或trial进程。除非用户明确恢复，不启动任何实验。
+
+最新v7已结束：六组原桩0/32，dense平地/楼梯/高台32/30/26，宽双列0/32、交错15/32。权重/root/gpufree-data/MoE-runs/spatial_v7_probe/model_199.pt，完整原始输出/root/gpufree-data/Rob2Nav/outputs/moe_perceptive/spatial_v7_probe。该轮完整视频/权重尚未归档上传；不要删除服务器输出。此前v5/v6、消融及源码已发布5f5fc7f。
+
+恢复时先读V4_VALIDATION.md末尾的方法复核：原AME不要求注意力每头对应一腿，200轮短探针不充分证明结构不可行；后续计划尚未定稿，不应直接重启v7。核心原窄桩、机载学生、MuJoCo导航均未完成。
+
+---
+
 # Rob2Nav 项目交接文档
 
 > 最新状态（2026-10-18 21:56）：V3/V4、arrival和foothold训练均结束。空间注意力spatial_v7已完成200轮，strict六组原桩仍0/32，dense32/30/26，宽双列0/32，交错评估尚在进行。v5/v6完整归档见artifacts/perception_diagnostics_v6。先读V4_VALIDATION.md末尾，不重启旧任务。
@@ -429,6 +439,7 @@ Git写入/联网在当前Codex沙箱可能需要工具层提权，用户已授�
 ## 状态覆盖（2026-10-18 17:57）
 
 V4已完成2000轮并自动停在 `needs_diagnosis`，第五块没有启动。四次原桩六组始终0/32；宽交错前置从第三块22/32退化至第四块6/32。接手先读 V4_VALIDATION.md 最后更新及服务器 v4_plateau_diagnostic，不得按旧“活动控制器”描述重启V4或V3。下一步诊断与重设计；学生蒸馏、独立种子和MuJoCo仍未完成。
+
 
 
 

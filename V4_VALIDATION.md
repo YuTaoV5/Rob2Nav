@@ -188,3 +188,17 @@ TerrainAttention新增默认关闭的spatial_prior；四头名义中心FL(.25,.1
 完整评估、八段视频、两份选定权重、三种子地图消融、运动地图与注意力诊断见 [perception_diagnostics_v6](artifacts/perception_diagnostics_v6)。1314文件在服务器与本地SHA/大小一致，服务器另验证1125源码引用及八段视频帧数。复核 `python -m moe_perceptive.verify --root artifacts/perception_diagnostics_v6 --manifest-name archive_manifest.json`。它们均不是原窄桩成功证据。
 
 spatial_v7已完成200轮且无failed；九项strict已完成，原桩六组仍0/32，平地32/32、楼梯30/32、高台26/32；宽双列0/32，宽交错诊断仍在进行。暂无继续同配置训练的依据。
+
+补记：v7宽交错最终15/32，控制器evaluations_completed；宽双列0/32，相比v6的1/32、18/32未改善，dense也下降。停止追加该结构配置。v5/v6完整诊断和当前源码已发布5f5fc7f，v7完整归档尚待补充。
+
+## 2026-10-18 22:06：复查原论文，修正结构归因与训练预算判断
+
+复读已有deepxiv提取的AME方法原文：其query长度也是1，由本体embedding查询地图；h=16、d=64，并未要求每头对应一条腿。因此先前“没有明确每腿分工”只能作诊断现象，不能认定违反AME结构或为失败根因；v7空间先验不是论文原方法，未显示收益，应停止。
+
+原论文ANYmal训练为4096环境、stage1 18000轮＋stage2 3600轮（约6天A100）；这不是Go2保证，也不能直接搬其耗时。当前200轮×512环境探针仅约stage1环境轮积的1/720；即使V4 2000×512也约1/72（未在此比较每轮实际步数，不能直接称同精度sample ratio）。因此短探针失败不充分证明模型结构不可行，更不应每200轮更换结构导致反复fresh optimizer/课程。
+
+服务器AME-criticaldamped/go2/runner_cfg.py的Go2RunnerCfg是此前适配配置（3000轮），不是作者验证的Go2配方。后续需区分原论文、原仓库已有任务及本地Go2改造；检查阶段1基础速度训练是否足够、原AME两阶段与地形课程、actor/critic共享encoder和探索强度差异，形成固定配置的预算与验收门槛后再启动，不盲目延长失败v7。
+
+## 用户暂停（2026-10-18）
+
+用户要求暂存任务，停止继续探索。自动化go2核实PAUSED，服务器当前无moe_perceptive训练/评估/trial进程。不再启动实验，待用户明确恢复。当前权重、代码、原始输出均保留；v7完整归档上传仍待办，具体路径见handover.md顶部。
