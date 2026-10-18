@@ -52,12 +52,17 @@ def load_base(path):
 
 
 class TerrainAttention(nn.Module):
-    def __init__(self):
+    def __init__(self,spatial_prior=False):
         super().__init__()
         self.cnn=nn.Sequential(nn.Conv2d(3,32,3,padding=1),nn.GroupNorm(4,32),nn.ELU(),
                                nn.Conv2d(32,32,3,padding=1),nn.GroupNorm(4,32),nn.ELU())
         y,x=torch.meshgrid(torch.linspace(-.5,.5,21),torch.linspace(-.55,1.05,33),indexing='ij')
         self.register_buffer('xy',torch.stack((x.flatten(),y.flatten()),-1))
+        self.spatial_prior=spatial_prior
+        # FL, FR, RL, RR nominal stance neighborhoods, not predicted feet.
+        centres=torch.tensor([[.25,.15],[.25,-.15],[-.2,.15],[-.2,-.15]])
+        bias=-((self.xy[None]-centres[:,None]).square().sum(-1))/(2*.22**2)
+        self.register_buffer('spatial_bias',torch.cat((bias,torch.zeros(4,1)),1),persistent=False)
         self.key=nn.Linear(34,64);self.value=nn.Linear(34,64)
         self.query=nn.Sequential(nn.Linear(77,64),nn.ELU())
         self.null=nn.Parameter(torch.zeros(1,1,34))
@@ -74,16 +79,18 @@ class TerrainAttention(nn.Module):
         values=self.value(tokens).reshape(-1,694,4,16).transpose(1,2)
         query=self.query(query_input).reshape(-1,4,1,16)
         known=torch.cat((valid,torch.ones_like(valid[:,:1])),1)
-        weights=((query*keys).sum(-1)/4.).masked_fill(~known[:,None,:],-1e4).softmax(-1)
+        logits=(query*keys).sum(-1)/4.
+        if self.spatial_prior:logits=logits+self.spatial_bias[None]
+        weights=logits.masked_fill(~known[:,None,:],-1e4).softmax(-1)
         return (weights.unsqueeze(-1)*values).sum(2).reshape(-1,64)
 
 
 class PerceptiveActor(nn.Module):
-    def __init__(self,checkpoint,goal_conditioned=False):
+    def __init__(self,checkpoint,goal_conditioned=False,spatial_prior=False):
         super().__init__()
         self.base=load_base(checkpoint)
         self.anchor=copy.deepcopy(self.base)
-        self.terrain=TerrainAttention()
+        self.terrain=TerrainAttention(spatial_prior)
         self.fusion=nn.Sequential(nn.Linear(141,128),nn.ELU(),nn.Linear(128,12))
         self.goal_conditioned=goal_conditioned
         self.goal_projection=nn.Linear(4,77) if goal_conditioned else nn.Identity()
@@ -116,7 +123,7 @@ def register_policy():
     from rsl_rl.modules import ActorCritic
     import rsl_rl.runners.on_policy_runner as runner
     class MoEPerceptiveActorCritic(ActorCritic):
-        def __init__(self,*args,moe_checkpoint,goal_conditioned=False,**kwargs):
+        def __init__(self,*args,moe_checkpoint,goal_conditioned=False,spatial_prior=False,**kwargs):
             super().__init__(*args,**kwargs)
-            self.actor=PerceptiveActor(moe_checkpoint,goal_conditioned)
+            self.actor=PerceptiveActor(moe_checkpoint,goal_conditioned,spatial_prior)
     runner.MoEPerceptiveActorCritic=MoEPerceptiveActorCritic

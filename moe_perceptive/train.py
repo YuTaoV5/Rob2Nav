@@ -14,6 +14,8 @@ p.add_argument('--sensor-rig',choices=['original','near_down60','near_down60_fro
 p.add_argument('--course',choices=['original','wide_deep'],default='original')
 p.add_argument('--arrival-aware',action='store_true',help='Experimental distance-aware velocity and braking rewards; new runs only.')
 p.add_argument('--numeric-debug',action='store_true',help='Stop at the first nonfinite observation, rollout value or backward operation.')
+p.add_argument('--foothold-aware',action='store_true',help='Experimental privileged descending-foot support reward; no action correction.')
+p.add_argument('--spatial-attention',action='store_true',help='Soft nominal leg neighborhoods for the four terrain heads.')
 AppLauncher.add_app_launcher_args(p);a=p.parse_args();app=AppLauncher(a).app
 import numpy as np
 import torch
@@ -54,6 +56,10 @@ if a.arrival_aware:
     if not a.navigation:raise ValueError('Arrival-aware requires navigation')
     from .arrival import configure as configure_arrival
     configure_arrival(cfg)
+if a.foothold_aware:
+    if not (a.navigation and a.teacher_map):raise ValueError('Foothold probe requires explicit privileged teacher')
+    from .foothold import configure as configure_foothold
+    configure_foothold(cfg)
 if a.course=='wide_deep':
     meta['training_geometry']='Wide-support/small-gap precursor; real 2m pit at every level; final geometry delegates to original AME.'
     (out/'manifest.json').write_text(json.dumps(meta,indent=2))
@@ -69,6 +75,7 @@ agent.algorithm.learning_rate=2e-4;agent.algorithm.schedule='fixed'
 agent.algorithm.entropy_coef=.001;agent.algorithm.num_learning_epochs=4;agent.algorithm.num_mini_batches=4
 train_cfg=agent.to_dict();train_cfg['policy']['moe_checkpoint']=a.moe
 train_cfg['policy']['goal_conditioned']=a.navigation
+train_cfg['policy']['spatial_prior']=a.spatial_attention
 dump_yaml(str(out/'agent.yaml'),train_cfg);register_policy()
 runner=OnPolicyRunner(wrapped,train_cfg,log_dir=str(out),device=cfg.sim.device)
 policy=runner.alg.policy;actor=policy.actor;env._moe_anchor=actor.anchor
@@ -110,6 +117,8 @@ if a.resume:
     if old.get('sensor_rig','original')!=a.sensor_rig:raise ValueError('Resume changed sensor rig')
     if old.get('course','original')!=a.course:raise ValueError('Resume changed course')
     if old.get('arrival_aware',False)!=a.arrival_aware:raise ValueError('Resume changed arrival reward profile')
+    if old.get('foothold_aware',False)!=a.foothold_aware:raise ValueError('Resume changed foothold reward profile')
+    if old.get('spatial_attention',False)!=a.spatial_attention:raise ValueError('Resume changed spatial attention')
     runner.load(a.resume)
     levels=ck['terrain_levels'].to(env.device);t=env.scene.terrain
     t.terrain_levels[:]=levels;t.env_origins[:]=t.terrain_origins[levels,t.terrain_types]

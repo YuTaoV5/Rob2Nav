@@ -13,6 +13,8 @@ p.add_argument('--sensor-rig',choices=['original','near_down60','near_down60_fro
 p.add_argument('--shallow-probe',action='store_true',help='Diagnostic only: use v3 shallow floor; never a strict score.')
 p.add_argument('--check-map',action='store_true',help='Check native ideal scan XY/height against analytic original terrain.')
 p.add_argument('--course',choices=['original','wide_deep'],default='original')
+p.add_argument('--map-ablation',choices=['none','unknown'],default='none',help='Diagnostic only: hide actor terrain observations, retain proprioception/goal.')
+p.add_argument('--map-probe',action='store_true',help='Measure paired normal/unknown action sensitivity on visited states.')
 AppLauncher.add_app_launcher_args(p);a=p.parse_args()
 if a.video:a.enable_cameras=True
 out=Path(a.output);out.mkdir(parents=True,exist_ok=False)
@@ -73,6 +75,7 @@ actor=PerceptiveActor(a.moe,a.navigation).to(env.device).eval()
 phase='base';checkpoint_sha=None
 if a.checkpoint:
     checkpoint=torch.load(a.checkpoint,map_location=env.device,weights_only=False)
+    actor.terrain.spatial_prior=checkpoint['infos']['provenance']['args'].get('spatial_attention',False)
     if checkpoint['infos']['provenance']['args'].get('navigation',False)!=a.navigation:raise ValueError('Checkpoint goal interface mismatch')
     actor.load_state_dict({k.removeprefix('actor.'):v for k,v in checkpoint['model_state_dict'].items() if k.startswith('actor.')},strict=True)
     phase=checkpoint['infos']['phase'];actor.set_phase(phase)
@@ -104,13 +107,22 @@ if a.check_map:
     (out/'map_alignment.json').write_text(json.dumps(result,indent=2))
     if error>1e-4 or not checked.any() or result['height_correct_fraction']<.99:raise RuntimeError('Map alignment failed: '+str(result))
 records=[];trace=[];diagnostics=[];frames=0;writer=None;maximum_zero_error=0.
+map_delta_sum=0.;map_delta_max=0.;map_delta_count=0
 if a.video:
     import imageio.v2 as imageio
     writer=imageio.get_writer(out/'episode_0.mp4',fps=25,macro_block_size=1)
 try:
     with torch.inference_mode():
         for step in range(int(cfg.episode_length_s/env.step_dt)+5):
-            policy_obs=obs['policy'];base=actor.base(policy_obs[:,:225]);actions=actor(policy_obs) if a.checkpoint else base
+            policy_obs=obs['policy'];base=actor.base(policy_obs[:,:225])
+            if a.map_probe or a.map_ablation!='none':
+                hidden=policy_obs.clone();hidden[:,225:2304]=0.;hidden[:,225+2*693:2304]=1.
+                normal_action=actor(policy_obs);hidden_action=actor(hidden)
+                delta=(normal_action-hidden_action).abs()[~done_first]
+                if delta.numel():
+                    map_delta_sum+=float(delta.sum());map_delta_count+=delta.numel();map_delta_max=max(map_delta_max,float(delta.max()))
+                actions=hidden_action if a.map_ablation=='unknown' else normal_action
+            else:actions=actor(policy_obs) if a.checkpoint else base
             if not a.checkpoint:
                 maximum_zero_error=max(maximum_zero_error,float((actor(policy_obs)-base).abs().max()))
             if not torch.isfinite(actions).all():raise FloatingPointError('Nonfinite policy')
@@ -132,6 +144,8 @@ try:
                     'foot_cell_known':known.cpu().tolist(),
                     'position':(r.data.root_pos_w[0]-env.scene.env_origins[0]).cpu().tolist(),
                     'visible_map':visible.cpu().tolist()})
+                from .attention_diagnostic import describe
+                diagnostics[-1]['attention']=describe(actor,policy_obs[:1])
             obs,_,done,_=wrapped.step(actions);state=env._eval_state
             ended=done.bool()&~done_first
             for i in ended.nonzero().flatten().tolist():
@@ -157,6 +171,11 @@ try:
         'success_definition':'First episode: route >3.5 m, then >=0.3 s with >=2 support feet, upright >0.9 and speed <0.25 m/s; no failure termination.',
         'note':'Shared fixed terrain difficulty/seed; reset XY +/-3 cm, yaw +/-0.04 rad. No physical sensor drivers.'}
     result['geometry']='SHALLOW DIAGNOSTIC ONLY; not a strict traversal result' if a.shallow_probe else 'original terrain, original pit'
+    if a.map_probe or a.map_ablation!='none':
+        result['map_sensitivity']={'mean_abs_normalized_action_delta':map_delta_sum/max(map_delta_count,1),
+            'max_abs_normalized_action_delta':map_delta_max,'action_elements':map_delta_count,
+            'scope':'Paired counterfactual on visited first-episode states; not a causal success attribution.'}
+    if a.map_ablation!='none':result['diagnostic_only']='Actor terrain hidden; not deployable or standard evaluation.'
     if a.course=='wide_deep':result['geometry']='WIDE-DEEP TRAINING PRECURSOR; real 2m pit; only difficulty=1 matches original AME'
     if a.video:result['render_note']='Only robot 0 is visible; all evaluation environments remain simulated.'
     (out/'summary.json').write_text(json.dumps(result,indent=2));(out/'trace.json').write_text(json.dumps(trace))

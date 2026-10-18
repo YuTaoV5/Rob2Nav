@@ -1,6 +1,6 @@
 # Rob2Nav 项目交接文档
 
-> 最新状态（2026-10-18 18:52）：V3/V4均已停止，不得重启。V4完整评估已发布a85ca1c。arrival_v5_probe第54轮数值失败，其下游评估无效。numeric-debug另跑60轮未复现，当前从model59续跑140轮至总200轮（arrival_debug_cont140），尚无有效V5通过率。课程EMA/次数已通过非零原生恢复验证。先读V4_VALIDATION.md最后更新。
+> 最新状态（2026-10-18 21:56）：V3/V4、arrival和foothold训练均结束。空间注意力spatial_v7已完成200轮，strict六组原桩仍0/32，dense32/30/26，宽双列0/32，交错评估尚在进行。v5/v6完整归档见artifacts/perception_diagnostics_v6。先读V4_VALIDATION.md末尾，不重启旧任务。
 
 
 > 更新时间：2026-10-18 13:17（Asia/Shanghai）；服务器核查时间为 05:17 UTC。
@@ -429,5 +429,6 @@ Git写入/联网在当前Codex沙箱可能需要工具层提权，用户已授�
 ## 状态覆盖（2026-10-18 17:57）
 
 V4已完成2000轮并自动停在 `needs_diagnosis`，第五块没有启动。四次原桩六组始终0/32；宽交错前置从第三块22/32退化至第四块6/32。接手先读 V4_VALIDATION.md 最后更新及服务器 v4_plateau_diagnostic，不得按旧“活动控制器”描述重启V4或V3。下一步诊断与重设计；学生蒸馏、独立种子和MuJoCo仍未完成。
+
 
 

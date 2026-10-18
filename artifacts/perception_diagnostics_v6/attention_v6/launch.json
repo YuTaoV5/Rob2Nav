@@ -1,0 +1,27 @@
+{
+  "pid": 662093,
+  "command": [
+    "/root/isaacsim/python.sh",
+    "-m",
+    "moe_perceptive.evaluate",
+    "--headless",
+    "--moe",
+    "vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt",
+    "--checkpoint",
+    "/root/gpufree-data/MoE-runs/foothold_v6_probe/model_199.pt",
+    "--navigation",
+    "--teacher-map",
+    "--kind",
+    "ame_stakes",
+    "--difficulty",
+    "0",
+    "--course",
+    "wide_deep",
+    "--map-probe",
+    "--map-ablation",
+    "none",
+    "--output",
+    "outputs/moe_perceptive/attention_v6/wide_stakes",
+    "--diagnostic"
+  ]
+}
