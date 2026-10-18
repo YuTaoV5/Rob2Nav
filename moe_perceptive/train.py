@@ -12,6 +12,8 @@ p.add_argument('--memory-lifetime',type=float,default=1.)
 p.add_argument('--navigation',action='store_true');p.add_argument('--teacher-map',action='store_true')
 p.add_argument('--sensor-rig',choices=['original','near_down60','near_down60_front_lidar'],default='original')
 p.add_argument('--course',choices=['original','wide_deep'],default='original')
+p.add_argument('--arrival-aware',action='store_true',help='Experimental distance-aware velocity and braking rewards; new runs only.')
+p.add_argument('--numeric-debug',action='store_true',help='Stop at the first nonfinite observation, rollout value or backward operation.')
 AppLauncher.add_app_launcher_args(p);a=p.parse_args();app=AppLauncher(a).app
 import numpy as np
 import torch
@@ -26,6 +28,7 @@ from .mdp import match_joint_limits,JOINTS,DEFAULT
 from .provenance import capture
 
 torch.set_num_threads(4);torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False
+torch.autograd.set_detect_anomaly(a.numeric_debug)
 if a.memory_lifetime<=0:raise ValueError('Memory lifetime must be positive')
 if a.resume and a.initialize_from:raise ValueError('Choose resume or initialize-from')
 if a.teacher_map and not a.navigation:raise ValueError('Teacher map requires explicit navigation experiment')
@@ -47,6 +50,10 @@ if a.navigation:
     apply(cfg,a.teacher_map,training=True)
 from .sparse_course import configure as configure_course
 configure_course(cfg,a.course,training=True)
+if a.arrival_aware:
+    if not a.navigation:raise ValueError('Arrival-aware requires navigation')
+    from .arrival import configure as configure_arrival
+    configure_arrival(cfg)
 if a.course=='wide_deep':
     meta['training_geometry']='Wide-support/small-gap precursor; real 2m pit at every level; final geometry delegates to original AME.'
     (out/'manifest.json').write_text(json.dumps(meta,indent=2))
@@ -102,6 +109,7 @@ if a.resume:
         if old.get(key,False)!=vars(a)[key]:raise ValueError('Resume changed '+key)
     if old.get('sensor_rig','original')!=a.sensor_rig:raise ValueError('Resume changed sensor rig')
     if old.get('course','original')!=a.course:raise ValueError('Resume changed course')
+    if old.get('arrival_aware',False)!=a.arrival_aware:raise ValueError('Resume changed arrival reward profile')
     runner.load(a.resume)
     levels=ck['terrain_levels'].to(env.device);t=env.scene.terrain
     t.terrain_levels[:]=levels;t.env_origins[:]=t.terrain_origins[levels,t.terrain_types]
@@ -145,12 +153,20 @@ def act(obs):
         current_iteration=start_iteration+rollout_calls//agent.num_steps_per_env
         set_phase(phase_at(current_iteration))
     rollout_calls+=1
+    if a.numeric_debug:
+        for name,value in obs.items():
+            if not torch.isfinite(value).all():raise FloatingPointError('Nonfinite observation '+name)
     value=original_act(obs)
     if not torch.isfinite(value).all():raise FloatingPointError('Nonfinite action')
     return value
 runner.alg.act=act
 original_update=runner.alg.update
 def update():
+    if a.numeric_debug:
+        for name in ('rewards','returns','advantages','values','actions','actions_log_prob','mu','sigma'):
+            value=getattr(runner.alg.storage,name,None)
+            if isinstance(value,torch.Tensor) and not torch.isfinite(value).all():
+                raise FloatingPointError('Nonfinite rollout '+name)
     result=original_update()
     with torch.no_grad():policy.log_std.clamp_(math.log(.03),math.log(.5))
     for name,value in policy.named_parameters():

@@ -93,3 +93,21 @@ python3 -m moe_perceptive.deep_trial \
 四次严格评估、八组宽桩前置评估、十段完整robot0视频及第二/第四块权重已收集至 [artifacts/v4_completed](artifacts/v4_completed)。[归档清单](artifacts/v4_completed/archive_manifest.json)记录1569个文件的SHA256与大小；服务器同时核对1296条源码引用及十段视频帧数，本地再次校验全部1569个文件。它们是失败与退化证据，不是成功演示。
 
 复核命令：`python -m moe_perceptive.verify --root artifacts/v4_completed --manifest-name archive_manifest.json`（需numpy/torch及imageio/ffmpeg环境）。完整地图教师仍未通过原窄桩。
+
+## 2026-10-18 18:32：arrival_v5_probe 有界探针
+
+非零课程恢复原生验证通过：64环境，EMA注入0.37、次数7，恢复后两轮所有值保持一致；普通两轮+恢复两轮也完成。证据服务器 outputs/moe_perceptive/v4_resume_smoke/sentinel_check.json。
+
+新增可选 --arrival-aware（旧V4默认奖励不变）：目标速度在距目标0.8m内逐渐降低，最大0.6m/s；进度改为朝目标投影速度并在近处衰减。原成功标准未放宽。旧奖励固定支付全局前进，存在接近目标仍获推进奖励的冲突；robot0交错诊断在x>3.3m的33帧平均水平速度约0.76m/s，不能外推全部失败。
+
+已启动 moe_perceptive.arrival_trial，控制输出 outputs/moe_perceptive/arrival_v5_probe，训练 /root/gpufree-data/MoE-runs/arrival_v5_probe，512环境仅200轮，从V4 model1999初始化、全新优化器与课程。这是探索探针，并非严格隔离变量消融。完成后自动执行原九项严格suite、两类宽桩视频/落脚诊断，然后停止，不自动加轮数。仍为特权教师，不能计为原窄桩成功。
+
+## 2026-10-18 18:42：探针失败，进入数值诊断
+
+arrival_v5_probe在第54轮报 `normal expects all elements of std >= 0.0`，只有model0，未完成200轮。启动器异常返回0使控制器误进入缺失model199的评估；已停止进程组并写invalid_evaluation.json，所有这些下游尝试无效，不计通过率。arrival_trial新增完成标记、失败标记、指定权重和评估输出验证。不能把零退出码视为成功。
+
+新增 --numeric-debug：观察/rollout有限值检查与autograd异常追踪，不做NaN替换或强行续训。已从相同初始权重启动512环境最多60轮的数值复现，输出 /root/gpufree-data/MoE-runs/arrival_numeric_debug，日志 outputs/moe_perceptive/arrival_numeric_debug/driver.log。这只是故障定位，不是新一轮成功训练。当前没有有效V5通过率。
+
+## 2026-10-18 18:47：数值复现未复现原异常
+
+numeric-debug完整跑完60轮，有限值检查与autograd异常检测均未触发；这不证明原异常已修复。已从model59保存的优化器、课程、随机状态恢复，追加最多140轮至总200轮；活动路径 /root/gpufree-data/MoE-runs/arrival_debug_cont140，控制日志 outputs/moe_perceptive/arrival_debug_cont140/driver.log。不再使用失败arrival_v5_probe的评估。下一步仅在completed标记存在、failed不存在、model199确实存在后运行严格suite与宽桩诊断。
