@@ -10,7 +10,8 @@ import sys
 import time
 from urllib.parse import urlparse
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse, Response
+from .visuals import ROBOT_DIR,go2_urdf,terrain_data,terrain_svg
 from .catalog import Catalog,read_json,clean,normalize_evaluation
 from .config import RunConfig,REWARDS,command,simulation_command
 from .jobs import Jobs
@@ -22,6 +23,22 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
     mujoco_python=Path(mujoco_python or '/root/gpufree-data/envs/go2-mapless/bin/python')
     catalog=Catalog(root);jobs=Jobs(root)
     app=FastAPI(title='Rob2Nav Studio',version='0.1.0')
+
+    @app.get('/api/robot/go2.urdf')
+    def robot_definition():
+        return Response(go2_urdf(root),media_type='application/xml')
+
+    @app.get('/api/robot/assets/{name}')
+    def robot_asset(name:str):
+        assets=(root/ROBOT_DIR/'assets').resolve();p=(assets/name).resolve()
+        if p.parent!=assets or p.suffix.lower()!='.obj' or not p.is_file():raise HTTPException(404,'Robot asset not found')
+        return FileResponse(p,media_type='text/plain')
+
+    @app.get('/api/terrain-preview')
+    def terrain_preview(kind:str='ame_stakes',course:str='wide_deep',difficulty:float=0.,image:bool=False):
+        try:data=terrain_data(kind,course,difficulty)
+        except ValueError:raise HTTPException(422,'Invalid terrain preview parameters')
+        return Response(terrain_svg(data),media_type='image/svg+xml') if image else data
 
     @app.middleware('http')
     async def protection(request,call_next):

@@ -4,7 +4,6 @@ Intermediate layouts are explicitly training precursors. At difficulty 1 the
 geometry delegates to the original AME generator, including grid truncation.
 """
 import numpy as np
-import torch
 from perceptive_rl import ame_terrain as original
 
 
@@ -56,12 +55,14 @@ def lane(difficulty,cfg):
 
 
 def heading_cost(env):
+    import torch
     q=env.scene['robot'].data.root_quat_w
     yaw=torch.atan2(2*(q[:,0]*q[:,3]+q[:,1]*q[:,2]),1-2*(q[:,2]**2+q[:,3]**2))
     return 1-yaw.cos()
 
 
 def curriculum(env,env_ids):
+    import torch
     t=env.scene.terrain
     if not hasattr(env,'_deep_ema'):
         env._deep_ema=torch.zeros(env.num_envs,device=env.device)
