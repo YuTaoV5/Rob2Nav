@@ -1,78 +1,55 @@
-# 完整项目数据与恢复目录
+# 网站部署所需资料
 
-[完整归档下载](https://github.com/YuTaoV5/Rob2Nav/releases/tag/full-archive-2026-10-19) · [新环境部署步骤](DEPLOYMENT.md) · [机器可读摘要](release-summary.json)
+本次交付以Git主分支为准，不依赖全量Release，不再追加上传中间训练检查点、逐轮中间产物或完整历史目录。原服务器数据不删除。此前的全量归档只完成了服务器端准备，尚未作为公开Release发布。
 
-归档包含 **20,979个文件，7.24 GiB未压缩数据**，分为21个独立tar.gz包，压缩后共5.58 GiB。其中有616个PT文件、405个MP4文件，以及RL导航ZIP权重、TensorBoard、JSONL、评估记录和源码快照。
+[新环境部署步骤](DEPLOYMENT.md) · [网站资源校验摘要](site-data-summary.json) · [Git资料独立部署检查](site-deployment-check.json)
 
-**数量含重复快照、中间阶段与校验模型，不是独立实验数。原AME两类20cm窄桩目标仍未完成。**
+## 已随主仓库提交
 
-| --group | 恢复目录 | 文件数 | 未压缩MiB | PT | MP4 |
-|---|---|---:|---:|---:|---:|
-| `project-artifacts` | `Rob2Nav/artifacts` | 7,323 | 580.8 | 91 | 93 |
-| `project-outputs` | `Rob2Nav/outputs` | 7,981 | 2762.0 | 273 | 78 |
-| `moe-runs` | `MoE-runs` | 817 | 3268.9 | 105 | 0 |
-| `ame-runs` | `AME-runs` | 227 | 94.7 | 44 | 0 |
-| `ame-upstream` | `AME-criticaldamped` | 130 | 94.0 | 2 | 0 |
-| `moe-upstream` | `MoE-upstream` | 116 | 65.1 | 3 | 0 |
-| `legacy-initial` | `go2-mapless` | 262 | 55.1 | 4 | 7 |
-| `legacy-terrain` | `rob2nav-terrain` | 1,127 | 166.0 | 6 | 161 |
-| `legacy-perceptive` | `Rob2Nav-perceptive-63f5bcf` | 2,996 | 324.6 | 88 | 66 |
+| 资料 | 路径 | 用途 |
+|---|---|---|
+| 网页与锁定依赖 | studio/frontend/src、package.json、package-lock.json | 导航、训练配置、曲线、视频、URDF与地形预览 |
+| Web后端与依赖声明 | studio/*.py、studio/requirements.txt | 索引、资源遥测、任务队列、文件访问 |
+| Go2本体模型和原网格 | vendor/RoboGauge/resources/robots/go2 | 三维查看、碰撞几何与MuJoCo模型 |
+| MoE基座与NJU冻结模型 | vendor/RoboGauge/resources/models/go2、vendor/NJUAgility/models | 可选的仿真推理；来源与许可保持不变 |
+| 精选策略与实际评估 | artifacts/及各阶段VALIDATION.md | 模型证据、通过率、失败边界、诊断 |
+| 历史曲线和配置 | artifacts内的iterations.jsonl、TensorBoard事件、JSON/YAML | 页面真实训练曲线与来源追溯 |
+| 仿真视频与报告图片 | artifacts/、docs/assets/ | 包含93个已提交MP4文件；不是独立成功任务计数 |
+| 使用与部署文档 | docs/DEPLOYMENT.md、studio/README.md、README.md | Linux/Windows Web部署、可选MuJoCo/Isaac、SSH与排错 |
+| 环境观测与启动服务 | docs/environments/、deployment/rob2nav-studio.service | 依赖参考与新环境持久化启动 |
 
-## 下载、恢复与验证
+已有仓库资料约657.0 MiB（本次文档提交前统计），因此完整clone会下载一定量精选历史证据；本次不改写Git历史、不删除先前已提交的权重。用于查看Go2的16个OBJ及基础策略的摘要见site-data-summary.json。
 
-源码与精选资料已在Git主仓库；完整未筛选资料在同仓库Release，避免把数GB中间权重追加到普通Git历史。每个part均为可独立恢复的完整tar.gz，不能cat拼接。
+## 最小部署流程
 
 ```bash
-git clone https://github.com/YuTaoV5/Rob2Nav.git /srv/robotics/Rob2Nav
-cd /srv/robotics/Rob2Nav
-python3 scripts/restore_release.py --destination /srv/robotics --list
-python3 scripts/restore_release.py --destination /srv/robotics
-python3 scripts/restore_release.py --destination /srv/robotics --verify-restored
+git clone https://github.com/YuTaoV5/Rob2Nav.git
+cd Rob2Nav
+python3.11 -m venv ../envs/rob2nav-studio
+../envs/rob2nav-studio/bin/python -m pip install -r studio/requirements.txt
+cd studio/frontend
+npm ci
+npm run build
+cd ../..
+../envs/rob2nav-studio/bin/python scripts/deployment_check.py --mode web
+../envs/rob2nav-studio/bin/python -m studio.api --root "$PWD" --port 8765
 ```
 
-`--destination`是Rob2Nav克隆的父目录。可加`--group project-outputs --group moe-runs`按需恢复，`--download-dir`指定缓存。每个文件的路径、大小、SHA-256和所属分包在`data-manifest.json`，压缩包摘要在`SHA256SUMS`。下载器校验附件/分包/内部文件摘要，拒绝路径穿越、软链接和不同内容的意外覆盖；已通过校验的下载可复用。
+打开 http://127.0.0.1:8765 。默认只读执行模式；保存草稿不会启动训练。Windows命令与远程隧道详见部署步骤。
 
-## 寻找对应实验
+## 无需上传或恢复
 
-- 基座：`Rob2Nav/vendor/RoboGauge/resources/models/go2/`；NJU冻结技能：`Rob2Nav/vendor/NJUAgility/models/`。两者校验脚本在主仓库。
-- 网页直接索引的精选证据：`Rob2Nav/artifacts/`；服务器原始证据：`Rob2Nav/outputs/`。
-- MoE全部中间权重和训练记录：同级`MoE-runs/`与`Rob2Nav/outputs/moe_perceptive/`。
-- AME原生训练/诊断：`AME-runs/`、`AME-criticaldamped/`和`Rob2Nav/outputs/critical_repro/`。
-- 早期感知教师/学生/注意力：`outputs/perceptive/`、`outputs/ame/`及artifacts对应目录。
-- 历史初始、越障、感知快照：`go2-mapless/`、`rob2nav-terrain/`、`Rob2Nav-perceptive-63f5bcf/`。旧绝对路径只作来源，不直接执行旧command.json。
-- `artifacts/server_originals/`保留与Git最新版不同的服务器旧报告，原位置使用Git最新版，以免恢复冲突。
-- Studio SQLite使用在线备份，保留任务历史；不恢复旧worker/PID，也不自动执行任务。
+- node_modules、前端dist、Python虚拟环境：在新机器根据依赖文件重建。
+- 原服务器outputs、MoE-runs、AME-runs、旧项目快照：不是网站部署依赖；没有这些目录仍可查看Git内精选资料。
+- 旧SQLite队列、进程PID和SSH隧道状态：新环境创建空队列，不继承旧活动进程。
+- 密码、令牌、SSH私钥、完整Isaac安装与驱动：不提交；GPU训练为可选扩展，需按官方环境重装。
 
-## 范围与实测边界
+原服务器可能索引更多实时记录或重复历史副本，因此新环境条目数无需等于服务器。归档辅助工具保留供未来明确需要时使用，当前无需运行restore_release.py。docs/release-summary.json仅记录服务器已准备但未发布的历史归档，不代表下载可用。
 
-- [实际环境版本](environments/environment-observed.json)和Web/MuJoCo/Isaac的pip freeze均在主仓库与Release；新环境重建按部署文档，不直接重装跨平台freeze。
-- manifest的excluded记录缓存、node_modules、嵌入Git、虚拟环境、凭据文件、SQLite临时journal和软链接。项目旧传输tar包保留，避免遗漏历史包内资料。
-- NVIDIA完整安装二进制、驱动和远程机器人资产不打包，按上游安装与原条款获取。第三方代码/模型保留各自许可。
-- 打包与恢复/路径/校验测试和Studio后台合计22项通过；发布逐包核对GitHub size与digest。新GPU训练与泛化不在归档校验范围。
-- 详情见[第三方说明](../THIRD_PARTY_NOTICES.md)、[交接文档](../handover.md)及[V4后续诊断](../V4_VALIDATION.md)，区分基座/教师/学生/IK/NJU和原场景/前置。
+所有教师/学生、IK/NJU、前置/原尺寸成绩保持原标签；原AME20cm窄桩目标仍未完成，本次部署资料整理不代表能力突破。
 
-## 分包下载
+## 独立目录检查结果
 
-| 附件 | MiB | 文件数 | SHA-256 |
-|---|---:|---:|---|
-| [project-outputs.part001.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/project-outputs.part001.tar.gz) | 436.8 | 2111 | `51387442eea5aae1d0f4b3ba232553438470e7bee5d93cfba5c29decfbbcfe01` |
-| [project-outputs.part002.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/project-outputs.part002.tar.gz) | 442.9 | 1440 | `945e6bffaa689324624e6665d93053d30c7239bfcf445faf36cbf6f951fe2808` |
-| [project-outputs.part003.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/project-outputs.part003.tar.gz) | 456.9 | 1413 | `37625cfac996117c7c6b5ea8b846a68040180d8bfb39c8182ff0cf6913dc3138` |
-| [project-outputs.part004.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/project-outputs.part004.tar.gz) | 411.2 | 1075 | `7ef3f820128aa6ce02dc9ec060b5a7f8422677adf3c406960ca2237c287f25be` |
-| [project-outputs.part005.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/project-outputs.part005.tar.gz) | 467.0 | 1391 | `e0f79011a001973925565f028e1dd51e771479b75ce7310b9d710f0324e0a3e1` |
-| [project-outputs.part006.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/project-outputs.part006.tar.gz) | 202.7 | 551 | `3868d97df368bb5b36bcaf96bb0ea3a4b039ffbdce4364b60a77b554e9abac4a` |
-| [moe-runs.part001.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/moe-runs.part001.tar.gz) | 355.6 | 181 | `3e50ceb8d81c562f2bc16d6ae9e2c786ff60d47c44cab03ebe7969fed9c0c5e4` |
-| [moe-runs.part002.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/moe-runs.part002.tar.gz) | 361.6 | 84 | `cdbd0f6dbb282cc04cbd55141279cc10edd0f09b5a281fb98e9143a1313471bf` |
-| [moe-runs.part003.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/moe-runs.part003.tar.gz) | 359.0 | 110 | `4e3d7fea5ec9a7b831c37cf1b24fc3f890ecd412b12695e913111e2607c2cbad` |
-| [moe-runs.part004.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/moe-runs.part004.tar.gz) | 382.1 | 140 | `a90ff384db85833227568cfbb7b2667acb75cf25a2d881c49050bfd36361ac7d` |
-| [moe-runs.part005.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/moe-runs.part005.tar.gz) | 404.0 | 104 | `712678f74e33474258929319af47b1f7d3ff5255ecfa195352d7cbfba764702f` |
-| [moe-runs.part006.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/moe-runs.part006.tar.gz) | 361.1 | 126 | `9fab3ddd5095db0b71e090d36d9bffb68e2f210783d53d2344bc0312fa12799f` |
-| [moe-runs.part007.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/moe-runs.part007.tar.gz) | 155.1 | 72 | `a1f79fb127d0f0ee75e61ebcc3b2d1ac64fa0a30ac10c314381f328ee393b918` |
-| [ame-runs.part001.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/ame-runs.part001.tar.gz) | 78.8 | 227 | `6e7daaabd9bfab68a24d333731fa49aac7f0aa61382e25016f5a077deadc6871` |
-| [ame-upstream.part001.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/ame-upstream.part001.tar.gz) | 37.8 | 130 | `cc1843f8b5ff505d463cc3a667d3fa45cf511851dc1f4ca2122736ac9ecd873e` |
-| [moe-upstream.part001.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/moe-upstream.part001.tar.gz) | 24.4 | 116 | `dc7844e7030f689738847ed90d684baa88cf03756ca3d613efa88dcbc941310a` |
-| [legacy-initial.part001.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/legacy-initial.part001.tar.gz) | 29.3 | 262 | `00f983fa4dc72add7d2157bdec39974c8bf43272e1cde826230f85313999933f` |
-| [legacy-terrain.part001.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/legacy-terrain.part001.tar.gz) | 103.9 | 1127 | `607dc7c8c71c44a533dccf1dd159a1d069e18d0bb6a174bb6516e3acf087df89` |
-| [legacy-perceptive.part001.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/legacy-perceptive.part001.tar.gz) | 236.6 | 2996 | `909ee7b39928eeb7d60e2246f101bdf7086f897cc4a7076f0c828f36c6482182` |
-| [project-artifacts.part001.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/project-artifacts.part001.tar.gz) | 346.3 | 4797 | `d03070278f28b23c20d08ab658bfce6aec79a1b2b5953d8346f4202f535112c6` |
-| [project-artifacts.part002.tar.gz](https://github.com/YuTaoV5/Rob2Nav/releases/download/full-archive-2026-10-19/project-artifacts.part002.tar.gz) | 59.1 | 2526 | `38fa846e1399d7c362029ba9867de32e1d00c25ec104c984385b68c0e6ab0784` |
+仅使用Git已提交文件（没有原服务器outputs、MoE-runs或旧数据库）的目录可索引：18条训练记录、272组评估、93个视频、25个模型入口、28篇报告。数量为当前索引条目，不是独立实验数。曲线可读取；页面、URDF、OBJ和地形接口返回200，视频Range返回206。新任务队列为空，执行权限默认关闭。
+
+前端静态文件复用了已验证构建用于接口检查；新环境仍按部署步骤执行npm ci与npm run build。后台和归档安全测试22项通过；未运行新GPU训练。

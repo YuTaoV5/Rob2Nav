@@ -91,6 +91,8 @@ def main():
     values=dict(line.split('=',1) for line in credential.stdout.splitlines() if '=' in line);token=values.get('password')
     if not token:raise SystemExit('No GitHub credential available')
     release=api(a.repo,token,'/releases/tags/'+quote(a.tag))
+    if release is None:
+        release=next((r for r in api(a.repo,token,'/releases?per_page=100') if r['tag_name']==a.tag),None)
     if a.create and release is None:
         if not a.notes:raise SystemExit('--notes is required')
         release=api(a.repo,token,'/releases',{'tag_name':a.tag,'target_commitish':a.target,'name':'Rob2Nav 完整实验归档与迁移部署 · 2026-10-19','body':a.notes.read_text(encoding='utf-8'),'draft':True,'prerelease':False})

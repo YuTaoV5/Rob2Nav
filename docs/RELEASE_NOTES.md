@@ -1,8 +1,7 @@
-完整项目资料归档：20,979个文件、7.24 GiB未压缩数据，21个独立分包。包含全部中间权重、日志、TensorBoard、评估JSON、视频、历史项目与上游快照，以及三个环境的观测依赖记录。
+# 网站部署资料交付（2026-10-19）
 
-- [新环境部署](https://github.com/YuTaoV5/Rob2Nav/blob/main/docs/DEPLOYMENT.md)
-- [数据目录与按组恢复](https://github.com/YuTaoV5/Rob2Nav/blob/main/docs/DATA_CATALOG.md)
-- data-manifest.json：逐文件SHA-256与分包映射；SHA256SUMS：分包摘要。
-- 使用scripts/restore_release.py恢复；destination是Rob2Nav克隆父目录。各part为独立tar.gz，不能拼接。
+交付位置为Git主分支：网站源码、依赖声明及npm锁文件、部署文档、systemd示例、Go2模型网格/基座/NJU资源、精选评估/权重/视频/曲线、研究报告和实测环境记录。
 
-原AME20cm窄桩目标仍未完成，归档保留失败和停滞证据。恢复资料与打开网页不启动训练。环境二进制与NVIDIA资产按原条款另行安装。
+按用户最新要求，不再上传中间训练产物或完整历史快照。先前规划的 `full-archive-2026-10-19` 仍未发布，不得作为可下载交付物或网站部署依赖。服务器上的原始实验和已准备归档不删除。
+
+新环境以 [部署步骤](DEPLOYMENT.md) 为准，仅Web模式无需GPU或Isaac环境；本次未恢复训练。
