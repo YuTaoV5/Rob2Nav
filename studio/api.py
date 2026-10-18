@@ -109,7 +109,7 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
 
     @app.get('/api/resources')
     def resources():
-        d={'time':time.time(),'gpu':[],'training_enabled':allow_training,'simulator_available':sim_python.is_file(),'mujoco_available':mujoco_python.is_file()}
+        d={'time':time.time(),'gpu':[],'compute_processes':[],'training_enabled':allow_training,'simulator_available':sim_python.is_file(),'mujoco_available':mujoco_python.is_file()}
         try:
             import psutil
             disk=psutil.disk_usage(str(root));ram=psutil.virtual_memory()
@@ -119,6 +119,14 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
             p=subprocess.run(['nvidia-smi','--query-gpu=name,utilization.gpu,memory.used,memory.total','--format=csv,noheader,nounits'],capture_output=True,text=True,timeout=3)
             if p.returncode==0:
                 d['gpu']=[dict(zip(('name','utilization','used_mb','total_mb'),[s.strip() for s in line.split(',')])) for line in p.stdout.splitlines()]
+        except (OSError,subprocess.TimeoutExpired):pass
+        try:
+            p=subprocess.run(['nvidia-smi','--query-compute-apps=pid,process_name,used_gpu_memory','--format=csv,noheader,nounits'],capture_output=True,text=True,timeout=3)
+            if p.returncode==0:
+                for line in p.stdout.splitlines():
+                    parts=[s.strip() for s in line.split(',')]
+                    if len(parts)==3 and parts[0].isdigit():
+                        d['compute_processes'].append(dict(pid=int(parts[0]),name=Path(parts[1]).name,used_mb=parts[2]))
         except (OSError,subprocess.TimeoutExpired):pass
         return d
 
@@ -147,7 +155,11 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
     def get_jobs():
         result=jobs.all()
         for job in result:
-            folder=root/'outputs/studio/runs'/job['id'];job['progress']=read_json(folder/'status.json')
+            folder=root/'outputs/studio/runs'/job['id'];status=folder/'status.json';job['progress']=read_json(status)
+            try:job['progress_updated']=status.stat().st_mtime
+            except OSError:job['progress_updated']=None
+            if job['state']=='evaluating' and job['detail'].get('stage')=='evaluation':
+                job['evaluation_completed']=sum(bool(read_json(p)) for p in (jobs.directory/'jobs'/job['id']/'evaluation').glob('*/summary.json'))
         return clean(result)
 
     @app.post('/api/jobs')

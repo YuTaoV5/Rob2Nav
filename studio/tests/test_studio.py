@@ -16,6 +16,31 @@ def write(path,data):
     path.write_text(json.dumps(data),encoding='utf-8')
 
 
+def test_running_job_progress_and_evaluation_counter(tmp_path):
+    jobs=Jobs(tmp_path);j=jobs.create(RunConfig(name='Progress test').model_dump())
+    jobs.update(j['id'],'running',{'stage':'training'})
+    write(tmp_path/'outputs/studio/runs'/j['id']/'status.json',{'iteration':71,'phase':'joint','steps_per_s':3000})
+    with TestClient(create_app(tmp_path)) as c:
+        item=c.get('/api/jobs').json()[0]
+        assert item['progress']['iteration']==71 and item['progress_updated']>0
+        jobs.update(j['id'],'evaluating',{'stage':'evaluation'})
+        write(tmp_path/'outputs/studio/jobs'/j['id']/'evaluation/flat/summary.json',{'total':32})
+        bad=tmp_path/'outputs/studio/jobs'/j['id']/'evaluation/stairs/summary.json'
+        bad.parent.mkdir(parents=True);bad.write_text('{')
+        assert c.get('/api/jobs').json()[0]['evaluation_completed']==1
+
+
+def test_gpu_compute_process_telemetry(tmp_path,monkeypatch):
+    from types import SimpleNamespace
+    def query(args,**kwargs):
+        output='123, /usr/bin/python, 2048\n' if '--query-compute-apps=pid,process_name,used_gpu_memory' in args else 'GPU test, 55, 2048, 24000\n'
+        return SimpleNamespace(returncode=0,stdout=output)
+    monkeypatch.setattr('studio.api.subprocess.run',query)
+    with TestClient(create_app(tmp_path)) as c:
+        data=c.get('/api/resources').json()
+        assert data['compute_processes']==[{'pid':123,'name':'python','used_mb':'2048'}]
+
+
 @pytest.fixture
 def workspace(tmp_path):
     p=tmp_path/'artifacts'/'oracle'/'ame_stakes_1.00'
