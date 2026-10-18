@@ -254,3 +254,7 @@ setup.sh / run.sh        安装和运行脚本
 本项目的场景装配会显式为 actuator 设置上游 `go2` / `knee` 默认类，以获得有效扭矩范围；不修改上游运动策略和观测实现。
 
 原创代码采用 [MIT License](LICENSE)。第三方代码和资产的来源见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)；RoboGauge 原始许可见 [vendor/RoboGauge/LICENSE](vendor/RoboGauge/LICENSE)。
+
+### V4完整结果归档
+
+V4在2000轮触发平台期停训，原尺寸窄桩六组在四次评估中均0/32；当前继续诊断，尚未完成任务。四次评估、原始数据、十段视频和选定教师权重见 [完整归档](artifacts/v4_completed)，结果表与边界见 [V4报告](V4_VALIDATION.md)。

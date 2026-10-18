@@ -70,3 +70,26 @@ python3 -m moe_perceptive.deep_trial \
 教师真实深坑通过后，才继续可见D435i/Mid360学生蒸馏和PPO、安装/记忆误差验证、独立种子、MuJoCo以及目标点导航整合。当前阶段没有新增实机或学生成功结论。
 
 归档包含旧三次完整gate、停止权重、匹配诊断、V4原生短训练及启动元数据。见 [文件校验清单](artifacts/v4_redesign/archive_manifest.json)。
+
+## 2026-10-18 17:57 更新：V4 已触发平台期停训
+
+控制器实际状态为 `needs_diagnosis`，完成四块共2000轮，保留 `wide_deep_v4_chunk4/model_1999.pt`，没有启动第五块。四次原场景严格评估的六组桩均为0/32。
+
+| 块 | 平地 | 楼梯 | 高台 | 宽双列前置 | 宽交错前置 |
+|---|---:|---:|---:|---:|---:|
+| 1 | 32/32 | 32/32 | 27/32 | 3/32 | 17/32 |
+| 2 | 32/32 | 32/32 | 31/32 | 7/32 | 18/32 |
+| 3 | 32/32 | 29/32 | 28/32 | 5/32 | 22/32 |
+| 4 | 32/32 | 32/32 | 25/32 | 4/32 | 6/32 |
+
+第四块的独立视频/诊断重放为宽双列2/32、宽交错6/32；双列与普通评估有差异，不应假称严格确定性重放。两次初始地图对齐各632个非边界样本全部正确。robot0在平台边缘前偏航约−16.5°；双列最终机身位置约(1.84,−0.10,0.09)m，交错约(3.61,0.57,−0.13)m。仅这两个robot0轨迹均无足端低于平台0.1m的接触样本，不足以解释全部环境失败。
+
+下一步先分析支撑几何、脚位、奖励与课程晋级。现有checkpoint只保存地形等级，未保存本级EMA/尝试次数，分块恢复会重新积累晋级资格；这是需要处理的恢复语义问题，但尚不能断言是失败根因。当前没有继续训练，也没有进入学生阶段。
+
+服务器证据：`outputs/moe_perceptive/wide_deep_v4/`（四次gate与前置评估），`outputs/moe_perceptive/v4_plateau_diagnostic/`（视频、动作前地图、足力、analysis.json与contact_analysis.json）。这些新增完整V4结果尚未发布；公开的v4_redesign仍主要是V3停止、诊断和V4启动记录。
+
+## V4完整评估归档（2026-10-18 18:12）
+
+四次严格评估、八组宽桩前置评估、十段完整robot0视频及第二/第四块权重已收集至 [artifacts/v4_completed](artifacts/v4_completed)。[归档清单](artifacts/v4_completed/archive_manifest.json)记录1569个文件的SHA256与大小；服务器同时核对1296条源码引用及十段视频帧数，本地再次校验全部1569个文件。它们是失败与退化证据，不是成功演示。
+
+复核命令：`python -m moe_perceptive.verify --root artifacts/v4_completed --manifest-name archive_manifest.json`（需numpy/torch及imageio/ffmpeg环境）。完整地图教师仍未通过原窄桩。

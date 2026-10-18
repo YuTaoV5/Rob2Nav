@@ -106,6 +106,12 @@ if a.resume:
     levels=ck['terrain_levels'].to(env.device);t=env.scene.terrain
     t.terrain_levels[:]=levels;t.env_origins[:]=t.terrain_origins[levels,t.terrain_types]
     env.scene.env_origins[:]=t.env_origins;env.reset()
+    # Resume per-level qualification as well as terrain indices. Older files
+    # lack these fields and intentionally requalify from zero.
+    for name,value in ck.get('course_state',{}).items():
+        if name not in ('_deep_ema','_deep_attempts'):raise ValueError('Unknown course state '+name)
+        if value.shape!=(env.num_envs,):raise ValueError('Course state shape mismatch')
+        setattr(env,name,value.to(env.device).clone())
     random.setstate(ck['rng']['python']);np.random.set_state(ck['rng']['numpy'])
     torch.set_rng_state(ck['rng']['torch'].cpu());torch.cuda.set_rng_state_all([v.cpu() for v in ck['rng']['cuda']])
 start_iteration=runner.current_learning_iteration
@@ -163,6 +169,8 @@ def save(path,infos=None):
         'iter':runner.current_learning_iteration+1,'infos':{'provenance':meta,'phase':phase,
         'residual_bound':actor.residual_bound,'frozen_checks_passed':True},
         'terrain_levels':env.scene.terrain.terrain_levels.cpu(),
+        'course_state':{name:getattr(env,name).detach().cpu().clone()
+                        for name in ('_deep_ema','_deep_attempts') if hasattr(env,name)},
         'rng':{'python':random.getstate(),'numpy':np.random.get_state(),'torch':torch.get_rng_state(),'cuda':torch.cuda.get_rng_state_all()}}
     torch.save(payload,temporary);temporary.replace(path);print('CHECKPOINT',str(path),flush=True)
 runner.save=save
