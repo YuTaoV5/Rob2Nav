@@ -1,0 +1,556 @@
+{
+  "args": {
+    "moe": "vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt",
+    "checkpoint": "/root/gpufree-data/MoE-runs/nav_teacher_v3_chunk2/model_1999.pt",
+    "kind": "stairs",
+    "difficulty": 0.5,
+    "num_envs": 32,
+    "seed": 801,
+    "output": "outputs/moe_perceptive/nav_teacher_v3/gate_chunk2/stairs_0.50",
+    "video": false,
+    "memory_lifetime": 1.0,
+    "diagnostic": false,
+    "navigation": true,
+    "teacher_map": true,
+    "sensor_rig": "original",
+    "enable_cameras": false,
+    "xr": false,
+    "device": "cuda:0",
+    "cpu": false,
+    "verbose": false,
+    "info": false,
+    "rendering_mode": null,
+    "kit_args": "",
+    "anim_recording_enabled": false,
+    "anim_recording_start_time": 0,
+    "anim_recording_stop_time": 10,
+    "headless": true,
+    "hide_ui": true,
+    "create_new_stage": false,
+    "physics_gpu": 0,
+    "active_gpu": 0
+  },
+  "phase": "joint",
+  "checkpoint_sha256": "0c7eba64ffd423e2c4245ccc826718a33c50e3b5d4356eddd4af2986aba8a4ac",
+  "moe_sha256": "2206659a6a23886446dcfc05d86888d6cdc9b8a4e31f44cbbc4e2d17ba3d6ead",
+  "episodes": [
+    {
+      "env": 15,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        2.7423782348632812,
+        -1.0042181015014648,
+        0.6456015110015869
+      ],
+      "upright": 0.9823681712150574,
+      "seconds": 3.04,
+      "termination_terms": [
+        "route_departure"
+      ]
+    },
+    {
+      "env": 30,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.8314857482910156,
+        -0.24396514892578125,
+        0.7245808839797974
+      ],
+      "upright": 0.9743950366973877,
+      "seconds": 3.46,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 5,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.826587677001953,
+        -0.21041488647460938,
+        0.734714925289154
+      ],
+      "upright": 0.945769727230072,
+      "seconds": 3.52,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 14,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.9093894958496094,
+        -0.1840219497680664,
+        0.7319260239601135
+      ],
+      "upright": 0.9767550230026245,
+      "seconds": 3.54,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 3,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.9255905151367188,
+        -0.3123188018798828,
+        0.7129035592079163
+      ],
+      "upright": 0.959703266620636,
+      "seconds": 3.56,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 9,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.8357925415039062,
+        -0.38037586212158203,
+        0.7323382496833801
+      ],
+      "upright": 0.9564268589019775,
+      "seconds": 3.6,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 2,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.6845130920410156,
+        -0.17465972900390625,
+        0.7321292161941528
+      ],
+      "upright": 0.9541292786598206,
+      "seconds": 3.62,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 11,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.6487770080566406,
+        -0.3506765365600586,
+        0.7412936687469482
+      ],
+      "upright": 0.9593789577484131,
+      "seconds": 3.64,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 17,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.692646026611328,
+        -0.20567584037780762,
+        0.7299534678459167
+      ],
+      "upright": 0.9539292454719543,
+      "seconds": 3.64,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 16,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.8494415283203125,
+        -0.598677396774292,
+        0.7301251292228699
+      ],
+      "upright": 0.9844861030578613,
+      "seconds": 3.68,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 19,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.9816017150878906,
+        -0.701495885848999,
+        0.721405029296875
+      ],
+      "upright": 0.9884597063064575,
+      "seconds": 3.7,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 28,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.782733917236328,
+        -0.4348125457763672,
+        0.7294161915779114
+      ],
+      "upright": 0.9593971967697144,
+      "seconds": 3.7,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 24,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.7763137817382812,
+        -0.2721385955810547,
+        0.727545976638794
+      ],
+      "upright": 0.9820651412010193,
+      "seconds": 3.72,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 26,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.890094757080078,
+        -0.5375633239746094,
+        0.7173424363136292
+      ],
+      "upright": 0.9886283278465271,
+      "seconds": 3.74,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 1,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.8965835571289062,
+        -0.45215797424316406,
+        0.7235894799232483
+      ],
+      "upright": 0.9459426999092102,
+      "seconds": 3.8000000000000003,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 21,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.8106918334960938,
+        -0.5278139114379883,
+        0.7257259488105774
+      ],
+      "upright": 0.9518648982048035,
+      "seconds": 3.8000000000000003,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 6,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.8488998413085938,
+        -0.5357189178466797,
+        0.7384047508239746
+      ],
+      "upright": 0.9726732969284058,
+      "seconds": 3.8200000000000003,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 4,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.715850830078125,
+        -0.3066997528076172,
+        0.7389764785766602
+      ],
+      "upright": 0.9817358255386353,
+      "seconds": 3.84,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 18,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.751495361328125,
+        -0.48229098320007324,
+        0.7215515375137329
+      ],
+      "upright": 0.9716618657112122,
+      "seconds": 3.84,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 29,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.6545333862304688,
+        -0.18582534790039062,
+        0.7415511012077332
+      ],
+      "upright": 0.9531168937683105,
+      "seconds": 3.84,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 20,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.928497314453125,
+        -0.43338680267333984,
+        0.6762990951538086
+      ],
+      "upright": 0.9916454553604126,
+      "seconds": 3.9,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 22,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.6812210083007812,
+        -0.14670372009277344,
+        0.7197951674461365
+      ],
+      "upright": 0.9495711326599121,
+      "seconds": 3.92,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 25,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.8820571899414062,
+        -0.2636280059814453,
+        0.723251461982727
+      ],
+      "upright": 0.9464028477668762,
+      "seconds": 3.92,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 23,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.7551956176757812,
+        -0.2705965042114258,
+        0.7436215281486511
+      ],
+      "upright": 0.9654471278190613,
+      "seconds": 4.0200000000000005,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 31,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.8236236572265625,
+        -0.2796306610107422,
+        0.7180421948432922
+      ],
+      "upright": 0.9683600664138794,
+      "seconds": 4.04,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 12,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.76348876953125,
+        -0.36121559143066406,
+        0.7418555021286011
+      ],
+      "upright": 0.9715284109115601,
+      "seconds": 4.08,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 10,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.8066139221191406,
+        -0.7461576461791992,
+        0.7334076166152954
+      ],
+      "upright": 0.9804378747940063,
+      "seconds": 4.18,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 8,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.738616943359375,
+        -0.5959129333496094,
+        0.6888601183891296
+      ],
+      "upright": 0.9790340662002563,
+      "seconds": 4.2,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 13,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.776264190673828,
+        -0.25710248947143555,
+        0.7481300234794617
+      ],
+      "upright": 0.952768862247467,
+      "seconds": 4.2,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 7,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.8339004516601562,
+        -0.6451854705810547,
+        0.7097347378730774
+      ],
+      "upright": 0.9847614765167236,
+      "seconds": 4.44,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 27,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.9711837768554688,
+        -0.4380912780761719,
+        0.718946099281311
+      ],
+      "upright": 0.9745092391967773,
+      "seconds": 4.5,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 0,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.7420425415039062,
+        -0.11293601989746094,
+        0.7385121583938599
+      ],
+      "upright": 0.9483916163444519,
+      "seconds": 4.74,
+      "termination_terms": [
+        "route_complete"
+      ]
+    }
+  ],
+  "successes": 31,
+  "total": 32,
+  "max_zero_fusion_error": null,
+  "video_frames": 0,
+  "success_definition": "First episode: route >3.5 m, then >=0.3 s with >=2 support feet, upright >0.9 and speed <0.25 m/s; no failure termination.",
+  "note": "Shared fixed terrain difficulty/seed; reset XY +/-3 cm, yaw +/-0.04 rad. No physical sensor drivers."
+}

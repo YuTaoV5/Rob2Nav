@@ -11,6 +11,7 @@ p.add_argument('--initialize-from',help='Load policy/critic only into a new expe
 p.add_argument('--memory-lifetime',type=float,default=1.)
 p.add_argument('--navigation',action='store_true');p.add_argument('--teacher-map',action='store_true')
 p.add_argument('--sensor-rig',choices=['original','near_down60','near_down60_front_lidar'],default='original')
+p.add_argument('--course',choices=['original','wide_deep'],default='original')
 AppLauncher.add_app_launcher_args(p);a=p.parse_args();app=AppLauncher(a).app
 import numpy as np
 import torch
@@ -44,6 +45,11 @@ configure(cfg,a.sensor_rig)
 if a.navigation:
     from .navigation import apply
     apply(cfg,a.teacher_map,training=True)
+from .sparse_course import configure as configure_course
+configure_course(cfg,a.course,training=True)
+if a.course=='wide_deep':
+    meta['training_geometry']='Wide-support/small-gap precursor; real 2m pit at every level; final geometry delegates to original AME.'
+    (out/'manifest.json').write_text(json.dumps(meta,indent=2))
 dump_yaml(str(out/'env.yaml'),cfg)
 env=ManagerBasedRLEnv(cfg=cfg);match_joint_limits(env.scene['robot'])
 wrapped=RslRlVecEnvWrapper(env,clip_actions=None)
@@ -95,6 +101,7 @@ if a.resume:
     for key in ('navigation','teacher_map'):
         if old.get(key,False)!=vars(a)[key]:raise ValueError('Resume changed '+key)
     if old.get('sensor_rig','original')!=a.sensor_rig:raise ValueError('Resume changed sensor rig')
+    if old.get('course','original')!=a.course:raise ValueError('Resume changed course')
     runner.load(a.resume)
     levels=ck['terrain_levels'].to(env.device);t=env.scene.terrain
     t.terrain_levels[:]=levels;t.env_origins[:]=t.terrain_origins[levels,t.terrain_types]

@@ -1,0 +1,561 @@
+{
+  "args": {
+    "moe": "vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt",
+    "checkpoint": "/root/gpufree-data/MoE-runs/nav_teacher_v3_chunk3/model_2999.pt",
+    "kind": "ame_stakes",
+    "difficulty": 0.5,
+    "num_envs": 32,
+    "seed": 801,
+    "output": "outputs/moe_perceptive/v4_diagnosis/shallow05",
+    "video": false,
+    "memory_lifetime": 1.0,
+    "diagnostic": true,
+    "navigation": true,
+    "teacher_map": true,
+    "sensor_rig": "original",
+    "shallow_probe": true,
+    "check_map": false,
+    "enable_cameras": false,
+    "xr": false,
+    "device": "cuda:0",
+    "cpu": false,
+    "verbose": false,
+    "info": false,
+    "rendering_mode": null,
+    "kit_args": "",
+    "anim_recording_enabled": false,
+    "anim_recording_start_time": 0,
+    "anim_recording_stop_time": 10,
+    "headless": true,
+    "hide_ui": true,
+    "create_new_stage": false,
+    "physics_gpu": 0,
+    "active_gpu": 0
+  },
+  "phase": "joint",
+  "checkpoint_sha256": "bd7d7109791977f4ff3b9e8f1ee117ebc05a85f0e153e64ebb0f1038b13d8715",
+  "moe_sha256": "2206659a6a23886446dcfc05d86888d6cdc9b8a4e31f44cbbc4e2d17ba3d6ead",
+  "episodes": [
+    {
+      "env": 12,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.1487388610839844,
+        0.28376150131225586,
+        0.1631985753774643
+      ],
+      "upright": 0.504081130027771,
+      "seconds": 1.44,
+      "termination_terms": [
+        "base_contact",
+        "bad_orientation"
+      ]
+    },
+    {
+      "env": 23,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.3480873107910156,
+        0.3156394958496094,
+        0.16949106752872467
+      ],
+      "upright": 0.8749279975891113,
+      "seconds": 1.52,
+      "termination_terms": [
+        "base_contact"
+      ]
+    },
+    {
+      "env": 20,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.225616455078125,
+        0.40911388397216797,
+        0.0769510269165039
+      ],
+      "upright": 0.5214353799819946,
+      "seconds": 1.58,
+      "termination_terms": [
+        "bad_orientation"
+      ]
+    },
+    {
+      "env": 14,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.3176040649414062,
+        0.31282615661621094,
+        0.14802512526512146
+      ],
+      "upright": 0.9153260588645935,
+      "seconds": 1.62,
+      "termination_terms": [
+        "base_contact"
+      ]
+    },
+    {
+      "env": 18,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.2288246154785156,
+        0.4188246726989746,
+        0.15128193795681
+      ],
+      "upright": 0.5215569734573364,
+      "seconds": 1.68,
+      "termination_terms": [
+        "bad_orientation"
+      ]
+    },
+    {
+      "env": 29,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.3812713623046875,
+        0.5814666748046875,
+        -0.054902076721191406
+      ],
+      "upright": 0.4343228340148926,
+      "seconds": 1.68,
+      "termination_terms": [
+        "bad_orientation"
+      ]
+    },
+    {
+      "env": 27,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.2774085998535156,
+        0.41232872009277344,
+        0.04030905291438103
+      ],
+      "upright": 0.5335042476654053,
+      "seconds": 1.7,
+      "termination_terms": [
+        "bad_orientation"
+      ]
+    },
+    {
+      "env": 4,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.4514579772949219,
+        0.56195068359375,
+        -0.1273210346698761
+      ],
+      "upright": 0.5321249961853027,
+      "seconds": 1.72,
+      "termination_terms": [
+        "bad_orientation"
+      ]
+    },
+    {
+      "env": 30,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.2936172485351562,
+        0.39307594299316406,
+        0.07099857926368713
+      ],
+      "upright": 0.9180418252944946,
+      "seconds": 1.76,
+      "termination_terms": [
+        "base_contact"
+      ]
+    },
+    {
+      "env": 8,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.2726936340332031,
+        0.518916130065918,
+        0.03565938398241997
+      ],
+      "upright": 0.5302708148956299,
+      "seconds": 1.78,
+      "termination_terms": [
+        "bad_orientation"
+      ]
+    },
+    {
+      "env": 16,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.5666656494140625,
+        0.29383134841918945,
+        0.19088345766067505
+      ],
+      "upright": 0.7177213430404663,
+      "seconds": 1.78,
+      "termination_terms": [
+        "base_contact"
+      ]
+    },
+    {
+      "env": 0,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.4931793212890625,
+        0.5474262237548828,
+        -0.007596459239721298
+      ],
+      "upright": 0.5329056978225708,
+      "seconds": 1.8,
+      "termination_terms": [
+        "bad_orientation"
+      ]
+    },
+    {
+      "env": 26,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.2873764038085938,
+        0.18645668029785156,
+        0.09765295684337616
+      ],
+      "upright": 0.7950139045715332,
+      "seconds": 1.84,
+      "termination_terms": [
+        "base_contact"
+      ]
+    },
+    {
+      "env": 28,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.407073974609375,
+        0.5282039642333984,
+        0.030866777524352074
+      ],
+      "upright": 0.5162802934646606,
+      "seconds": 1.84,
+      "termination_terms": [
+        "bad_orientation"
+      ]
+    },
+    {
+      "env": 19,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.4020462036132812,
+        0.7024936676025391,
+        -0.20212721824645996
+      ],
+      "upright": 0.5223080515861511,
+      "seconds": 1.86,
+      "termination_terms": [
+        "bad_orientation"
+      ]
+    },
+    {
+      "env": 21,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.2652854919433594,
+        0.5777664184570312,
+        0.03885694965720177
+      ],
+      "upright": 0.5336880683898926,
+      "seconds": 1.86,
+      "termination_terms": [
+        "bad_orientation"
+      ]
+    },
+    {
+      "env": 10,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.4799995422363281,
+        0.32762813568115234,
+        0.17861656844615936
+      ],
+      "upright": 0.8420423269271851,
+      "seconds": 1.8800000000000001,
+      "termination_terms": [
+        "base_contact"
+      ]
+    },
+    {
+      "env": 17,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.423553466796875,
+        0.4892134666442871,
+        0.0818856954574585
+      ],
+      "upright": 0.5276734828948975,
+      "seconds": 1.9000000000000001,
+      "termination_terms": [
+        "bad_orientation"
+      ]
+    },
+    {
+      "env": 5,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.3255729675292969,
+        0.38545799255371094,
+        0.07179508358240128
+      ],
+      "upright": 0.8583770394325256,
+      "seconds": 2.0,
+      "termination_terms": [
+        "base_contact"
+      ]
+    },
+    {
+      "env": 3,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.4045295715332031,
+        0.6652469635009766,
+        -0.13225391507148743
+      ],
+      "upright": 0.5049933195114136,
+      "seconds": 2.1,
+      "termination_terms": [
+        "bad_orientation"
+      ]
+    },
+    {
+      "env": 9,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.3193550109863281,
+        0.5721712112426758,
+        -0.0798642486333847
+      ],
+      "upright": 0.5158387422561646,
+      "seconds": 2.12,
+      "termination_terms": [
+        "bad_orientation"
+      ]
+    },
+    {
+      "env": 1,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.4652824401855469,
+        1.006753921508789,
+        -0.19540973007678986
+      ],
+      "upright": 0.9874570965766907,
+      "seconds": 2.2600000000000002,
+      "termination_terms": [
+        "route_departure"
+      ]
+    },
+    {
+      "env": 15,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.2599906921386719,
+        0.2523458003997803,
+        0.1450756937265396
+      ],
+      "upright": 0.9201238751411438,
+      "seconds": 2.48,
+      "termination_terms": [
+        "base_contact"
+      ]
+    },
+    {
+      "env": 7,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.8527984619140625,
+        1.0013771057128906,
+        -0.16136988997459412
+      ],
+      "upright": 0.9672607183456421,
+      "seconds": 2.5,
+      "termination_terms": [
+        "route_departure"
+      ]
+    },
+    {
+      "env": 25,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.2979354858398438,
+        1.0055294036865234,
+        -0.2680782973766327
+      ],
+      "upright": 0.9838008880615234,
+      "seconds": 2.52,
+      "termination_terms": [
+        "route_departure"
+      ]
+    },
+    {
+      "env": 6,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.8967857360839844,
+        1.0026321411132812,
+        -0.164844810962677
+      ],
+      "upright": 0.9771252274513245,
+      "seconds": 2.66,
+      "termination_terms": [
+        "route_departure"
+      ]
+    },
+    {
+      "env": 22,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.6286544799804688,
+        1.009596824645996,
+        -0.13802438974380493
+      ],
+      "upright": 0.9580851197242737,
+      "seconds": 2.74,
+      "termination_terms": [
+        "route_departure"
+      ]
+    },
+    {
+      "env": 24,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.7386398315429688,
+        1.0017242431640625,
+        -0.16696883738040924
+      ],
+      "upright": 0.9679896235466003,
+      "seconds": 2.7600000000000002,
+      "termination_terms": [
+        "route_departure"
+      ]
+    },
+    {
+      "env": 2,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        2.684112548828125,
+        1.0031795501708984,
+        -0.18750862777233124
+      ],
+      "upright": 0.9843270182609558,
+      "seconds": 3.34,
+      "termination_terms": [
+        "route_departure"
+      ]
+    },
+    {
+      "env": 11,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.668109893798828,
+        0.6059646606445312,
+        -0.18954308331012726
+      ],
+      "upright": 0.9798081517219543,
+      "seconds": 5.04,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 13,
+      "success": true,
+      "route_complete": true,
+      "failure": false,
+      "position": [
+        3.7053794860839844,
+        0.5876367092132568,
+        -0.20421209931373596
+      ],
+      "upright": 0.9657113552093506,
+      "seconds": 5.5,
+      "termination_terms": [
+        "route_complete"
+      ]
+    },
+    {
+      "env": 31,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        3.4557723999023438,
+        0.5625495910644531,
+        -0.35140013694763184
+      ],
+      "upright": 0.44624900817871094,
+      "seconds": 6.140000000000001,
+      "termination_terms": [
+        "route_departure",
+        "bad_orientation"
+      ]
+    }
+  ],
+  "successes": 2,
+  "total": 32,
+  "max_zero_fusion_error": null,
+  "video_frames": 0,
+  "success_definition": "First episode: route >3.5 m, then >=0.3 s with >=2 support feet, upright >0.9 and speed <0.25 m/s; no failure termination.",
+  "note": "Shared fixed terrain difficulty/seed; reset XY +/-3 cm, yaw +/-0.04 rad. No physical sensor drivers.",
+  "geometry": "SHALLOW DIAGNOSTIC ONLY; not a strict traversal result"
+}

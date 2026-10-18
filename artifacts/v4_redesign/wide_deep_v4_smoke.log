@@ -1,0 +1,355 @@
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /workspace/isaaclab/apps/isaaclab.python.headless.kit
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-10-18_15-24-30.log[0m
+[36m======================================================================================[0m
+
+[33m15:24:30 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 42
+	Physics step-size     : 0.005
+	Rendering step-size   : 0.02
+	Environment step-size : 0.02
+[INFO] Generating terrains based on curriculum took : 0.857135 seconds
+[INFO]: Time taken for scene creation : 5.479349 seconds
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 32
+	Environment spacing   : 2.5
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : ['/World/ground']
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Time taken for simulation start : 0.920550 seconds
+[33m15:24:37 [velocity_command.py] WARNING: The velocity command has the 'ranges.heading' attribute set to '(-3.141592653589793, 3.141592653589793)' but the heading command is not active. Consider setting the flag for the heading command to True.[0m
+[INFO] Command Manager:  <CommandManager> contains 1 active terms.
++------------------------------------------------+
+|              Active Command Terms              |
++-------+---------------+------------------------+
+| Index | Name          |          Type          |
++-------+---------------+------------------------+
+|   0   | base_velocity | UniformVelocityCommand |
++-------+---------------+------------------------+
+
+[INFO] Event Manager:  <EventManager> contains 2 active terms.
++--------------------------------------+
+| Active Event Terms in Mode: 'startup' |
++----------+---------------------------+
+|  Index   | Name                      |
++----------+---------------------------+
+|    0     | physics_material          |
++----------+---------------------------+
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++---------+---------------------------+
+|  Index  | Name                      |
++---------+---------------------------+
+|    0    | reset_base                |
+|    1    | reset_robot_joints        |
+|    2    | moe_reset                 |
++---------+---------------------------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++---------------------+
+| Active Recorder Terms |
++-----------+---------+
+|   Index   | Name    |
++-----------+---------+
++-----------+---------+
+
+[INFO] Action Manager:  <ActionManager> contains 1 active terms.
++------------------------------------+
+|  Active Action Terms (shape: 12)   |
++--------+-------------+-------------+
+| Index  | Name        |   Dimension |
++--------+-------------+-------------+
+|   0    | joint_pos   |          12 |
++--------+-------------+-------------+
+
+[INFO] Observation Manager: <ObservationManager> contains 2 groups.
++---------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (2308,)) |
++-------------+-------------------------+-----------------+
+|    Index    | Name                    |      Shape      |
++-------------+-------------------------+-----------------+
+|      0      | history                 |      (225,)     |
+|      1      | visible_map             |     (2079,)     |
+|      2      | goal                    |       (4,)      |
++-------------+-------------------------+-----------------+
++---------------------------------------------------------+
+| Active Observation Terms in Group: 'critic' (shape: (3697,)) |
++-------------+-------------------------+-----------------+
+|    Index    | Name                    |      Shape      |
++-------------+-------------------------+-----------------+
+|      0      | history                 |      (225,)     |
+|      1      | visible_map             |     (2079,)     |
+|      2      | ideal_map               |     (1386,)     |
+|      3      | velocity                |       (3,)      |
+|      4      | goal                    |       (4,)      |
++-------------+-------------------------+-----------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 6 active terms.
++------------------------------------+
+|      Active Termination Terms      |
++-------+-----------------+----------+
+| Index | Name            | Time Out |
++-------+-----------------+----------+
+|   0   | time_out        |   True   |
+|   1   | base_contact    |  False   |
+|   2   | route_complete  |   True   |
+|   3   | route_departure |  False   |
+|   4   | bad_orientation |  False   |
+|   5   | stagnation      |  False   |
++-------+-----------------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 17 active terms.
++----------------------------------------+
+|          Active Reward Terms           |
++-------+---------------------+----------+
+| Index | Name                |   Weight |
++-------+---------------------+----------+
+|   0   | lin_vel_z_l2        |     -2.0 |
+|   1   | ang_vel_xy_l2       |    -0.05 |
+|   2   | dof_torques_l2      |  -0.0002 |
+|   3   | dof_acc_l2          | -2.5e-07 |
+|   4   | action_rate_l2      |    -0.01 |
+|   5   | undesired_contacts  |     -1.0 |
+|   6   | flat_orientation_l2 |      0.0 |
+|   7   | dof_pos_limits      |     -1.0 |
+|   8   | forward_progress    |      5.0 |
+|   9   | lane_center         |     -2.0 |
+|   10  | anchor_cost         |     -0.2 |
+|   11  | termination         |   -100.0 |
+|   12  | goal_motion         |      5.0 |
+|   13  | goal_position       |    100.0 |
+|   14  | route_bonus         |    500.0 |
+|   15  | supported_contact   |      1.0 |
+|   16  | heading_cost        |     -2.0 |
++-------+---------------------+----------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 1 active terms.
++---------------------------+
+|  Active Curriculum Terms  |
++--------+------------------+
+| Index  | Name             |
++--------+------------------+
+|   0    | terrain_levels   |
++--------+------------------+
+
+[INFO]: Completed setting up the environment...
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 policy :  ['policy']
+	 critic :  ['critic']
+--------------------------------------------------------------------------------
+Actor MLP: MLP(
+  (0): Linear(in_features=2308, out_features=512, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=512, out_features=256, bias=True)
+  (3): ELU(alpha=1.0)
+  (4): Linear(in_features=256, out_features=128, bias=True)
+  (5): ELU(alpha=1.0)
+  (6): Linear(in_features=128, out_features=12, bias=True)
+)
+Critic MLP: MLP(
+  (0): Linear(in_features=3697, out_features=256, bias=True)
+  (1): ELU(alpha=1.0)
+  (2): Linear(in_features=256, out_features=128, bias=True)
+  (3): ELU(alpha=1.0)
+  (4): Linear(in_features=128, out_features=64, bias=True)
+  (5): ELU(alpha=1.0)
+  (6): Linear(in_features=64, out_features=1, bias=True)
+)
+PHASE {'iteration': 0, 'phase': 'joint', 'residual_bound_rad': 0.3, 'trainable_parameters': 2321776}
+################################################################################
+                        [1m Learning iteration 0/4 [0m                        
+
+                       Computation: 400 steps/s (collection: 1.518s, learning 0.401s)
+             Mean action noise std: 0.14
+                    value_function: 0.8121
+                         surrogate: 0.0265
+                           entropy: -6.2363
+       Episode_Reward/lin_vel_z_l2: 0.0000
+      Episode_Reward/ang_vel_xy_l2: 0.0000
+     Episode_Reward/dof_torques_l2: 0.0000
+         Episode_Reward/dof_acc_l2: 0.0000
+     Episode_Reward/action_rate_l2: 0.0000
+ Episode_Reward/undesired_contacts: 0.0000
+Episode_Reward/flat_orientation_l2: 0.0000
+     Episode_Reward/dof_pos_limits: 0.0000
+   Episode_Reward/forward_progress: 0.0000
+        Episode_Reward/lane_center: 0.0000
+        Episode_Reward/anchor_cost: 0.0000
+        Episode_Reward/termination: 0.0000
+        Episode_Reward/goal_motion: 0.0000
+      Episode_Reward/goal_position: 0.0000
+        Episode_Reward/route_bonus: 0.0000
+  Episode_Reward/supported_contact: 0.0000
+       Episode_Reward/heading_cost: 0.0000
+         Curriculum/terrain_levels: 0.0000
+Metrics/base_velocity/error_vel_xy: 0.0000
+Metrics/base_velocity/error_vel_yaw: 0.0000
+      Episode_Termination/time_out: 0.0000
+  Episode_Termination/base_contact: 0.0000
+Episode_Termination/route_complete: 0.0000
+Episode_Termination/route_departure: 0.0000
+Episode_Termination/bad_orientation: 0.0000
+    Episode_Termination/stagnation: 0.0000
+--------------------------------------------------------------------------------
+                   Total timesteps: 768
+                    Iteration time: 1.92s
+                      Time elapsed: 00:00:01
+                               ETA: 00:00:07
+
+CHECKPOINT /root/gpufree-data/MoE-runs/wide_deep_v4_smoke/model_0.pt
+Could not find git repository in /root/isaacsim/kit/python/lib/python3.11/site-packages/rsl_rl/__init__.py. Skipping.
+################################################################################
+                        [1m Learning iteration 1/4 [0m                        
+
+                       Computation: 740 steps/s (collection: 0.865s, learning 0.173s)
+             Mean action noise std: 0.14
+                    value_function: 1.3584
+                         surrogate: -0.0147
+                           entropy: -6.2342
+       Episode_Reward/lin_vel_z_l2: 0.0000
+      Episode_Reward/ang_vel_xy_l2: 0.0000
+     Episode_Reward/dof_torques_l2: 0.0000
+         Episode_Reward/dof_acc_l2: 0.0000
+     Episode_Reward/action_rate_l2: 0.0000
+ Episode_Reward/undesired_contacts: 0.0000
+Episode_Reward/flat_orientation_l2: 0.0000
+     Episode_Reward/dof_pos_limits: 0.0000
+   Episode_Reward/forward_progress: 0.0000
+        Episode_Reward/lane_center: 0.0000
+        Episode_Reward/anchor_cost: 0.0000
+        Episode_Reward/termination: 0.0000
+        Episode_Reward/goal_motion: 0.0000
+      Episode_Reward/goal_position: 0.0000
+        Episode_Reward/route_bonus: 0.0000
+  Episode_Reward/supported_contact: 0.0000
+       Episode_Reward/heading_cost: 0.0000
+         Curriculum/terrain_levels: 0.0000
+Metrics/base_velocity/error_vel_xy: 0.0000
+Metrics/base_velocity/error_vel_yaw: 0.0000
+      Episode_Termination/time_out: 0.0000
+  Episode_Termination/base_contact: 0.0000
+Episode_Termination/route_complete: 0.0000
+Episode_Termination/route_departure: 0.0000
+Episode_Termination/bad_orientation: 0.0000
+    Episode_Termination/stagnation: 0.0000
+--------------------------------------------------------------------------------
+                   Total timesteps: 1536
+                    Iteration time: 1.04s
+                      Time elapsed: 00:00:02
+                               ETA: 00:00:04
+
+################################################################################
+                        [1m Learning iteration 2/4 [0m                        
+
+                       Computation: 730 steps/s (collection: 0.880s, learning 0.171s)
+             Mean action noise std: 0.14
+                    value_function: 1.3841
+                         surrogate: -0.0177
+                           entropy: -6.2349
+       Episode_Reward/lin_vel_z_l2: 0.0000
+      Episode_Reward/ang_vel_xy_l2: 0.0000
+     Episode_Reward/dof_torques_l2: 0.0000
+         Episode_Reward/dof_acc_l2: 0.0000
+     Episode_Reward/action_rate_l2: 0.0000
+ Episode_Reward/undesired_contacts: 0.0000
+Episode_Reward/flat_orientation_l2: 0.0000
+     Episode_Reward/dof_pos_limits: 0.0000
+   Episode_Reward/forward_progress: 0.0000
+        Episode_Reward/lane_center: 0.0000
+        Episode_Reward/anchor_cost: 0.0000
+        Episode_Reward/termination: 0.0000
+        Episode_Reward/goal_motion: 0.0000
+      Episode_Reward/goal_position: 0.0000
+        Episode_Reward/route_bonus: 0.0000
+  Episode_Reward/supported_contact: 0.0000
+       Episode_Reward/heading_cost: 0.0000
+         Curriculum/terrain_levels: 0.0000
+Metrics/base_velocity/error_vel_xy: 0.0000
+Metrics/base_velocity/error_vel_yaw: 0.0000
+      Episode_Termination/time_out: 0.0000
+  Episode_Termination/base_contact: 0.0000
+Episode_Termination/route_complete: 0.0000
+Episode_Termination/route_departure: 0.0000
+Episode_Termination/bad_orientation: 0.0000
+    Episode_Termination/stagnation: 0.0000
+--------------------------------------------------------------------------------
+                   Total timesteps: 2304
+                    Iteration time: 1.05s
+                      Time elapsed: 00:00:04
+                               ETA: 00:00:02
+
+################################################################################
+                        [1m Learning iteration 3/4 [0m                        
+
+                       Computation: 714 steps/s (collection: 0.906s, learning 0.169s)
+             Mean action noise std: 0.14
+                    value_function: 1.3110
+                         surrogate: -0.0323
+                           entropy: -6.2356
+       Episode_Reward/lin_vel_z_l2: 0.0000
+      Episode_Reward/ang_vel_xy_l2: 0.0000
+     Episode_Reward/dof_torques_l2: 0.0000
+         Episode_Reward/dof_acc_l2: 0.0000
+     Episode_Reward/action_rate_l2: 0.0000
+ Episode_Reward/undesired_contacts: 0.0000
+Episode_Reward/flat_orientation_l2: 0.0000
+     Episode_Reward/dof_pos_limits: 0.0000
+   Episode_Reward/forward_progress: 0.0000
+        Episode_Reward/lane_center: 0.0000
+        Episode_Reward/anchor_cost: 0.0000
+        Episode_Reward/termination: 0.0000
+        Episode_Reward/goal_motion: 0.0000
+      Episode_Reward/goal_position: 0.0000
+        Episode_Reward/route_bonus: 0.0000
+  Episode_Reward/supported_contact: 0.0000
+       Episode_Reward/heading_cost: 0.0000
+         Curriculum/terrain_levels: 0.0000
+Metrics/base_velocity/error_vel_xy: 0.0000
+Metrics/base_velocity/error_vel_yaw: 0.0000
+      Episode_Termination/time_out: 0.0000
+  Episode_Termination/base_contact: 0.0000
+Episode_Termination/route_complete: 0.0000
+Episode_Termination/route_departure: 0.0000
+Episode_Termination/bad_orientation: 0.0000
+    Episode_Termination/stagnation: 0.0000
+--------------------------------------------------------------------------------
+                   Total timesteps: 3072
+                    Iteration time: 1.07s
+                      Time elapsed: 00:00:05
+                               ETA: 00:00:01
+
+CHECKPOINT /root/gpufree-data/MoE-runs/wide_deep_v4_smoke/model_3.pt
+Loading user config located at: '/isaac-sim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /isaac-sim/kit/logs/Kit/Isaac-Sim/5.1/kit_20261018_152423.log
+2026-10-18T07:24:24Z [460ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2026-10-18T07:24:24Z [1,004ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
+2026-10-18T07:24:24Z [1,290ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+2026-10-18T07:24:28Z [4,848ms] [Warning] [carb.graphics-vulkan.plugin] Could not initialize nvperf_grfx_host library. PerfSDK disabled
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.126.09    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA L40                       | Yes: 0 |     | 46068   MB | 10de      | 0          |
+|     |                                  |        |     |            | 26b5      | b882e3b8.. |
+|     |                                  |        |     |            | 9c        |            |
+|=============================================================================================|
+| OS: 24.04.4 LTS (Noble Numbat) ubuntu, Version: 24.04.4, Kernel: 5.15.0-168-generic
+| XServer Vendor: The X.Org Foundation, XServer Version: 12101011 (1.21.1.11)
+| Processor: Intel(R) Xeon(R) Platinum 8358 CPU @ 2.60GHz
+| Bare Metal Cores: 64 | Bare Metal Logical Cores: 128
+| Core Usage Quota: 14
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 122880 | Free Memory: 117158
+| Total Page/Swap (MB): 0 | Free Page/Swap: 0
+|---------------------------------------------------------------------------------------------|
+2026-10-18T07:24:28Z [5,066ms] [Warning] [gpu.foundation.plugin] ECC is enabled on physical device 0

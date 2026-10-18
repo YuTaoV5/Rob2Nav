@@ -1,0 +1,80 @@
+[
+  {
+    "name": "deep05",
+    "command": [
+      "/root/isaacsim/python.sh",
+      "-m",
+      "moe_perceptive.evaluate",
+      "--headless",
+      "--moe",
+      "vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt",
+      "--checkpoint",
+      "/root/gpufree-data/MoE-runs/nav_teacher_v3_chunk3/model_2999.pt",
+      "--navigation",
+      "--teacher-map",
+      "--kind",
+      "ame_stakes",
+      "--num-envs",
+      "32",
+      "--diagnostic",
+      "--difficulty",
+      "0.5",
+      "--output",
+      "outputs/moe_perceptive/v4_diagnosis/deep05",
+      "--check-map"
+    ],
+    "returncode": 0
+  },
+  {
+    "name": "shallow05",
+    "command": [
+      "/root/isaacsim/python.sh",
+      "-m",
+      "moe_perceptive.evaluate",
+      "--headless",
+      "--moe",
+      "vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt",
+      "--checkpoint",
+      "/root/gpufree-data/MoE-runs/nav_teacher_v3_chunk3/model_2999.pt",
+      "--navigation",
+      "--teacher-map",
+      "--kind",
+      "ame_stakes",
+      "--num-envs",
+      "32",
+      "--diagnostic",
+      "--difficulty",
+      "0.5",
+      "--output",
+      "outputs/moe_perceptive/v4_diagnosis/shallow05",
+      "--shallow-probe"
+    ],
+    "returncode": 0
+  },
+  {
+    "name": "deep1",
+    "command": [
+      "/root/isaacsim/python.sh",
+      "-m",
+      "moe_perceptive.evaluate",
+      "--headless",
+      "--moe",
+      "vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt",
+      "--checkpoint",
+      "/root/gpufree-data/MoE-runs/nav_teacher_v3_chunk3/model_2999.pt",
+      "--navigation",
+      "--teacher-map",
+      "--kind",
+      "ame_stakes",
+      "--num-envs",
+      "32",
+      "--diagnostic",
+      "--difficulty",
+      "1.0",
+      "--output",
+      "outputs/moe_perceptive/v4_diagnosis/deep1",
+      "--check-map"
+    ],
+    "returncode": 0
+  }
+]

@@ -1,8 +1,9 @@
 """Read-only validation of exact snapshot bytes, sources, counts and videos."""
 import argparse,hashlib,json
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--root',default='artifacts/moe_perceptive');a=p.parse_args()
-root=Path(a.root);manifest=json.loads((root/'manifest.json').read_text());videos=[];sources=0
+p=argparse.ArgumentParser();p.add_argument('--root',default='artifacts/moe_perceptive')
+p.add_argument('--manifest-name',default='manifest.json');a=p.parse_args()
+root=Path(a.root);manifest=json.loads((root/a.manifest_name).read_text());videos=[];sources=0
 for name,record in manifest['files'].items():
     path=root/name;assert path.stat().st_size==record['bytes']
     assert hashlib.sha256(path.read_bytes()).hexdigest()==record['sha256']
@@ -21,4 +22,4 @@ for path in root.rglob('summary.json'):
         reader=imageio.get_reader(path.parent/'episode_0.mp4');n=reader.count_frames();reader.close()
         assert n==d['video_frames'];videos.append({'trial':str(path.parent.relative_to(root)),'frames':n})
 print(json.dumps({'files':len(manifest['files']),'source_references':sources,'videos':videos,
-    'selected_checkpoint':manifest['selected_checkpoint'],'run_completed':manifest['run_completed']},indent=2))
+    'selected_checkpoint':manifest.get('selected_checkpoint'),'run_completed':manifest.get('run_completed')},indent=2))

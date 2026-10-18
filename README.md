@@ -20,6 +20,11 @@ python -m go2_nav.active_run --scene course --goal 13 0 --jump-backend nju --con
 
 ![绕障、台阶、跳坑与到达目标的仿真片段](artifacts/active/mission_preview.png)
 
+## 最新执行：真实深坑宽桩到窄桩课程（V4）
+
+第三轮完整地图教师在原窄桩连续三个gate均0/32，已停止并保留检查点。已启动V4：所有等级保持2m深坑，从宽支撑/小间隙收窄，增加航向约束和基于本级完整成功的晋级。原生短训练通过；当前尚无新的窄桩通过结果。
+见 [诊断证据、执行方案与活动任务](V4_VALIDATION.md)。下方保留历史实验背景。
+
 ## 当前主线：预训练 MoE＋感知融合＋逐步解冻
 
 已复用 RoboGauge 原 MoE 的 actor 与历史编码器，加入 5 cm 可见局部地形注意力，完成 512 环境、1000 轮分阶段 PPO 和 9 项同条件评估。
