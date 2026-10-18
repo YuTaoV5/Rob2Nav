@@ -1,0 +1,15 @@
+[Unit]
+Description=Rob2Nav Studio (read-only execution by default)
+After=network.target
+
+[Service]
+Type=simple
+User=robotics
+WorkingDirectory=/srv/robotics/Rob2Nav
+ExecStart=/srv/robotics/envs/rob2nav-studio/bin/python -m studio.api --root /srv/robotics/Rob2Nav --port 8765
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target
