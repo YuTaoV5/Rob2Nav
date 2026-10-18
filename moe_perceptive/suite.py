@@ -4,7 +4,9 @@ from pathlib import Path
 p=argparse.ArgumentParser();p.add_argument('--moe',required=True);p.add_argument('--checkpoint')
 p.add_argument('--output',required=True);p.add_argument('--python',default='/root/isaacsim/python.sh')
 p.add_argument('--num-envs',type=int,default=32);p.add_argument('--video-narrow',action='store_true')
-p.add_argument('--memory-lifetime',type=float,default=1.);a=p.parse_args()
+p.add_argument('--memory-lifetime',type=float,default=1.)
+p.add_argument('--navigation',action='store_true');p.add_argument('--teacher-map',action='store_true')
+p.add_argument('--sensor-rig',choices=['original','near_down60','near_down60_front_lidar'],default='original');a=p.parse_args()
 out=Path(a.output);out.mkdir(parents=True,exist_ok=False);records=[]
 cases=[('flat',0.),('stairs',.5),('platform',.5)]+[(k,d) for k in ('ame_stakes','ame_alternate') for d in (0.,.5,1.)]
 for kind,difficulty in cases:
@@ -12,7 +14,10 @@ for kind,difficulty in cases:
     command=[a.python,'-m','moe_perceptive.evaluate','--headless','--moe',a.moe,'--kind',kind,
         '--difficulty',str(difficulty),'--num-envs',str(a.num_envs),'--output',str(target),
         '--memory-lifetime',str(a.memory_lifetime)]
+    command+=['--sensor-rig',a.sensor_rig]
     if a.checkpoint:command+=['--checkpoint',a.checkpoint]
+    if a.navigation:command+=['--navigation']
+    if a.teacher_map:command+=['--teacher-map']
     if a.video_narrow and kind.startswith('ame_') and difficulty==1.:command+=['--video']
     with (out/(name+'.log')).open('w') as log:result=subprocess.run(command,stdout=log,stderr=subprocess.STDOUT)
     record={'command':command,'returncode':result.returncode}

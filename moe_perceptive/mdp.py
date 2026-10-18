@@ -48,6 +48,8 @@ def measured_map(env):
     if frame:env._moe_map_frame=now
     fresh=(env.episode_length_buf==0)|frame
     hits=torch.cat([env.scene[n].data.ray_hits_w for n in ('depth_rays','lidar_rays')],1).clone()
+    from .rig import filter_hits
+    hits=filter_hits(env,hits)
     # No miss repair for outward-looking sensors: nonreturns are expected.
     if getattr(env.cfg,'moe_sensor_noise',False):
         hits[...,2]+=.005*torch.randn_like(hits[...,2])

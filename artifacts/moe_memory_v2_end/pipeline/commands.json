@@ -1,0 +1,76 @@
+[
+  {
+    "name": "smoke",
+    "command": [
+      "/root/isaacsim/python.sh",
+      "-m",
+      "moe_perceptive.train",
+      "--headless",
+      "--moe",
+      "vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt",
+      "--initialize-from",
+      "/root/gpufree-data/MoE-runs/visible_moe_v1_seed42/model_999.pt",
+      "--memory-lifetime",
+      "4",
+      "--warmup",
+      "0",
+      "--fusion",
+      "0",
+      "--actor",
+      "0",
+      "--num-envs",
+      "32",
+      "--iterations",
+      "2",
+      "--output",
+      "/root/gpufree-data/MoE-runs/visible_moe_memory4_v2_seed42_smoke"
+    ],
+    "returncode": 0
+  },
+  {
+    "name": "training",
+    "command": [
+      "/root/isaacsim/python.sh",
+      "-m",
+      "moe_perceptive.train",
+      "--headless",
+      "--moe",
+      "vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt",
+      "--initialize-from",
+      "/root/gpufree-data/MoE-runs/visible_moe_v1_seed42/model_999.pt",
+      "--memory-lifetime",
+      "4",
+      "--warmup",
+      "0",
+      "--fusion",
+      "0",
+      "--actor",
+      "0",
+      "--num-envs",
+      "512",
+      "--iterations",
+      "1000",
+      "--output",
+      "/root/gpufree-data/MoE-runs/visible_moe_memory4_v2_seed42"
+    ],
+    "returncode": 0
+  },
+  {
+    "name": "evaluation",
+    "command": [
+      "python3",
+      "-m",
+      "moe_perceptive.suite",
+      "--moe",
+      "vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt",
+      "--checkpoint",
+      "/root/gpufree-data/MoE-runs/visible_moe_memory4_v2_seed42/model_999.pt",
+      "--memory-lifetime",
+      "4",
+      "--video-narrow",
+      "--output",
+      "outputs/moe_perceptive/memory4_v2/trained"
+    ],
+    "returncode": 0
+  }
+]

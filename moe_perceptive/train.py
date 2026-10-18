@@ -9,6 +9,8 @@ p.add_argument('--actor',type=int,default=300);p.add_argument('--seed',type=int,
 p.add_argument('--resume');p.add_argument('--kind',default='mixed',choices=['mixed','flat','stairs','platform','ame_stakes','ame_alternate'])
 p.add_argument('--initialize-from',help='Load policy/critic only into a new experiment; do not restore optimizer or curriculum.')
 p.add_argument('--memory-lifetime',type=float,default=1.)
+p.add_argument('--navigation',action='store_true');p.add_argument('--teacher-map',action='store_true')
+p.add_argument('--sensor-rig',choices=['original','near_down60','near_down60_front_lidar'],default='original')
 AppLauncher.add_app_launcher_args(p);a=p.parse_args();app=AppLauncher(a).app
 import numpy as np
 import torch
@@ -25,13 +27,23 @@ from .provenance import capture
 torch.set_num_threads(4);torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False
 if a.memory_lifetime<=0:raise ValueError('Memory lifetime must be positive')
 if a.resume and a.initialize_from:raise ValueError('Choose resume or initialize-from')
+if a.teacher_map and not a.navigation:raise ValueError('Teacher map requires explicit navigation experiment')
 out=Path(a.output).resolve();out.mkdir(parents=True,exist_ok=False)
 meta={**capture(out,a),'torch':torch.__version__,'actor_observation':'5x45 history + 3x693 visible height/mask/age',
       'simulation_sensors':f'simplified depth/lidar rays, ideal odometry, {a.memory_lifetime:g} s observed-return memory',
       'protocol':'pretrained 137k MoE, new terrain attention, progressively unfrozen PPO; not AME scratch replication'}
+meta['perception_role']='privileged full-map teacher; not deployable sensor policy' if a.teacher_map else 'observed-return student'
+if a.navigation:
+    meta['actor_observation']+=' + clipped relative XY goal and sin/cos heading'
+    meta['training_geometry']='Explicit shallow-pit precursor; evaluation must use original AME pits.'
 (out/'manifest.json').write_text(json.dumps(meta,indent=2))
 cfg=make_cfg(a.num_envs,a.seed,a.kind);cfg.sim.device=a.device or 'cuda:0'
 cfg.moe_memory_lifetime=a.memory_lifetime
+from .rig import configure
+configure(cfg,a.sensor_rig)
+if a.navigation:
+    from .navigation import apply
+    apply(cfg,a.teacher_map,training=True)
 dump_yaml(str(out/'env.yaml'),cfg)
 env=ManagerBasedRLEnv(cfg=cfg);match_joint_limits(env.scene['robot'])
 wrapped=RslRlVecEnvWrapper(env,clip_actions=None)
@@ -43,6 +55,7 @@ agent.policy.critic_hidden_dims=[256,128,64]
 agent.algorithm.learning_rate=2e-4;agent.algorithm.schedule='fixed'
 agent.algorithm.entropy_coef=.001;agent.algorithm.num_learning_epochs=4;agent.algorithm.num_mini_batches=4
 train_cfg=agent.to_dict();train_cfg['policy']['moe_checkpoint']=a.moe
+train_cfg['policy']['goal_conditioned']=a.navigation
 dump_yaml(str(out/'agent.yaml'),train_cfg);register_policy()
 runner=OnPolicyRunner(wrapped,train_cfg,log_dir=str(out),device=cfg.sim.device)
 policy=runner.alg.policy;actor=policy.actor;env._moe_anchor=actor.anchor
@@ -56,7 +69,18 @@ runner.alg.optimizer=torch.optim.Adam([
 if a.initialize_from:
     ck=torch.load(a.initialize_from,map_location='cpu',weights_only=False)
     if ck['infos']['provenance']['moe_sha256']!=meta['moe_sha256']:raise ValueError('Initializer MoE mismatch')
-    policy.load_state_dict(ck['model_state_dict'],strict=True)
+    state=ck['model_state_dict']
+    if a.navigation and not ck['infos']['provenance']['args'].get('navigation',False):
+        old=state['critic.0.weight'];new=policy.state_dict()['critic.0.weight'].clone().zero_()
+        if new.shape[0]!=old.shape[0] or new.shape[1]!=old.shape[1]+4:raise ValueError('Unexpected critic resize')
+        new[:,:old.shape[1]]=old;state['critic.0.weight']=new
+        meta['critic_initialization']='Old critic input columns copied exactly; four new goal columns zero.'
+    # RSL's ActorCritic override returns bool. Use the PyTorch base method to
+    # inspect missing/unexpected keys explicitly during architecture migration.
+    missing,unexpected=torch.nn.Module.load_state_dict(policy,state,strict=False)
+    # Only the new zero-initialized goal adapter may be absent in a v1/v2 initializer.
+    if unexpected or set(missing)-{'actor.goal_projection.weight','actor.goal_projection.bias'}:
+        raise ValueError(f'Initializer state mismatch: {missing}, {unexpected}')
     meta['initialized_from_sha256']=hashlib.sha256(Path(a.initialize_from).read_bytes()).hexdigest()
     meta['initialization_note']='Policy and critic only; fresh Adam, RNG, episodes and curriculum.'
     (out/'manifest.json').write_text(json.dumps(meta,indent=2))
@@ -68,6 +92,9 @@ if a.resume:
     for key in ('seed','num_envs','kind','warmup','fusion','actor'):
         if old[key]!=vars(a)[key]:raise ValueError('Resume changed '+key)
     if old.get('memory_lifetime',1.)!=a.memory_lifetime:raise ValueError('Resume changed memory lifetime')
+    for key in ('navigation','teacher_map'):
+        if old.get(key,False)!=vars(a)[key]:raise ValueError('Resume changed '+key)
+    if old.get('sensor_rig','original')!=a.sensor_rig:raise ValueError('Resume changed sensor rig')
     runner.load(a.resume)
     levels=ck['terrain_levels'].to(env.device);t=env.scene.terrain
     t.terrain_levels[:]=levels;t.env_origins[:]=t.terrain_origins[levels,t.terrain_types]
@@ -149,7 +176,7 @@ actual=env.action_manager.get_term('joint_pos')
 assert actual._joint_names==JOINTS
 torch.testing.assert_close(actual._offset[0],torch.tensor(DEFAULT,device=env.device))
 (out/'io.json').write_text(json.dumps({'joints':JOINTS,'default':DEFAULT,'action_scale':.25,'control_dt':env.step_dt,
-    'policy_dim':2304,'critic_dim':3693,'kp':20.,'kd':.5,
+    'policy_dim':2308 if a.navigation else 2304,'critic_dim':3697 if a.navigation else 3693,'kp':20.,'kd':.5,
     'asset_joint_names':env.scene['robot'].joint_names,
     'joint_limits':env.scene['robot'].data.joint_pos_limits[0,[env.scene['robot'].joint_names.index(n) for n in JOINTS]].tolist()},indent=2))
 started=time.monotonic()

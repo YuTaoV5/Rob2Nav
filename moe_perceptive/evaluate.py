@@ -8,6 +8,8 @@ p.add_argument('--difficulty',type=float,default=0.);p.add_argument('--num-envs'
 p.add_argument('--seed',type=int,default=801);p.add_argument('--output',required=True);p.add_argument('--video',action='store_true')
 p.add_argument('--memory-lifetime',type=float,default=1.)
 p.add_argument('--diagnostic',action='store_true',help='Record pre-action foot/map coverage; no action correction.')
+p.add_argument('--navigation',action='store_true');p.add_argument('--teacher-map',action='store_true')
+p.add_argument('--sensor-rig',choices=['original','near_down60','near_down60_front_lidar'],default='original')
 AppLauncher.add_app_launcher_args(p);a=p.parse_args()
 if a.video:a.enable_cameras=True
 out=Path(a.output);out.mkdir(parents=True,exist_ok=False)
@@ -37,6 +39,12 @@ def capture(env):
 
 cfg=make_cfg(a.num_envs,a.seed,a.kind,True,a.difficulty);cfg.sim.device=a.device or 'cuda:0'
 cfg.moe_memory_lifetime=a.memory_lifetime
+from .rig import configure
+configure(cfg,a.sensor_rig)
+if a.teacher_map and not a.navigation:raise ValueError('Teacher map requires explicit navigation experiment')
+if a.navigation:
+    from .navigation import apply
+    apply(cfg,a.teacher_map,training=False)
 cfg.terminations.capture=TerminationTermCfg(func=capture)
 from isaaclab.utils.io import dump_yaml
 dump_yaml(str(out/'env.yaml'),cfg)
@@ -53,10 +61,11 @@ if a.video:
         prim=stage.GetPrimAtPath(f'/World/envs/env_{i}/Robot')
         if not prim.IsValid():raise RuntimeError('Missing video clone prim')
         UsdGeom.Imageable(prim).MakeInvisible()
-actor=PerceptiveActor(a.moe).to(env.device).eval()
+actor=PerceptiveActor(a.moe,a.navigation).to(env.device).eval()
 phase='base';checkpoint_sha=None
 if a.checkpoint:
     checkpoint=torch.load(a.checkpoint,map_location=env.device,weights_only=False)
+    if checkpoint['infos']['provenance']['args'].get('navigation',False)!=a.navigation:raise ValueError('Checkpoint goal interface mismatch')
     actor.load_state_dict({k.removeprefix('actor.'):v for k,v in checkpoint['model_state_dict'].items() if k.startswith('actor.')},strict=True)
     phase=checkpoint['infos']['phase'];actor.set_phase(phase)
     actor.residual_bound=checkpoint['infos']['residual_bound']
@@ -84,7 +93,7 @@ try:
                 y=-feet[:,0]*yaw.sin()+feet[:,1]*yaw.cos()
                 ix=((x+.55)/.05).round().long();iy=((y+.5)/.05).round().long()
                 inside=(ix>=0)&(ix<33)&(iy>=0)&(iy<21)
-                visible=policy_obs[0,225:].reshape(3,21,33)
+                visible=policy_obs[0,225:2304].reshape(3,21,33)
                 known=visible[1,iy.clamp(0,20),ix.clamp(0,32)]*inside
                 diagnostics.append({'time':step*env.step_dt,'feet_order':FEET,
                     'foot_xy_body_yaw':torch.stack((x,y),-1).cpu().tolist(),

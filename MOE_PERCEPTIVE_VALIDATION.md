@@ -77,6 +77,33 @@
 
 [诊断统计](artifacts/moe_memory_diagnostic/coverage_diagnostic/summary.json)、[1 秒完整记录](artifacts/moe_memory_diagnostic/diagnostic_v1_memory1/summary.json)、[4 秒完整记录](artifacts/moe_memory_diagnostic/diagnostic_v1_memory4/summary.json)、[校验清单](artifacts/moe_memory_diagnostic/manifest.json)。
 
-第二轮另存为 `visible_moe_memory4_v2_seed42`：从首轮最终 policy 与 critic 初始化，使用 4 秒可见观测记忆；新 Adam、新课程与回合，从第 0 轮开始 joint 训练 1000 轮。它不是原运行的精确续训，也不是单变量同预算从头对照。运行前先做 32 环境两轮原生短训练，失败则不启动正式训练；完成后自动执行相同 9 项评估及窄桩录像。[启动参数](artifacts/moe_memory_diagnostic/launch_memory4_v2.json)。第二轮尚无通过结果。
+第二轮另存为 `visible_moe_memory4_v2_seed42`：从首轮最终 policy 与 critic 初始化，使用 4 秒可见观测记忆；新 Adam、新课程与回合，从第 0 轮开始 joint 训练 1000 轮。它不是原运行的精确续训，也不是单变量同预算从头对照。运行前先做 32 环境两轮原生短训练，失败则不启动正式训练；完成后自动执行相同 9 项评估及窄桩录像。[启动参数](artifacts/moe_memory_diagnostic/launch_memory4_v2.json)。第二轮已完成，结果见下节。
 
-第二轮原生两轮短训练已通过，正式训练已确认进入 joint 阶段。[短训练完成记录](artifacts/moe_memory_v2_start/visible_moe_memory4_v2_seed42_smoke/completed.json)、[新实验精确源码和配置](artifacts/moe_memory_v2_start/visible_moe_memory4_v2_seed42/manifest.json)。该目录仅是启动快照，不是最终权重或评估。
+第二轮原生两轮短训练已通过，下列链接保留启动时状态；正式训练现已完成。[短训练完成记录](artifacts/moe_memory_v2_start/visible_moe_memory4_v2_seed42_smoke/completed.json)、[新实验精确源码和配置](artifacts/moe_memory_v2_start/visible_moe_memory4_v2_seed42/manifest.json)。该目录仅是启动快照，不是最终权重或评估。
+
+
+## 第二轮完整结果（4 秒记忆适配）
+
+512 环境、额外1000轮已完成；固定种子/布局、32个首回合，同一严格完成条件。
+
+| 地形 | difficulty | 完整通过 | 失败终止 | 平均终态前进 m |
+|---|---:|---:|---:|---:|
+| 平地 | 0 | 32/32 | 0/32 | 3.571 |
+| 台阶 | 0.5 | 32/32 | 0/32 | 3.566 |
+| 高台 | 0.5 | 32/32 | 0/32 | 3.571 |
+| 双列桩 | 0 | 0/32 | 4/32 | 1.199 |
+| 双列桩 | 0.5 | 0/32 | 2/32 | 0.653 |
+| 双列桩 | 1 | 0/32 | 1/32 | 0.435 |
+| 交错桩 | 0 | 0/32 | 0/32 | 0.827 |
+| 交错桩 | 0.5 | 0/32 | 0/32 | 0.546 |
+| 交错桩 | 1 | 0/32 | 1/32 | 0.433 |
+
+窄桩跌倒减少但主要停在起始平台超时，不能当作过桩能力提高。全部桩场景仍为0/32，当前策略不替换主控制器。
+
+[第二轮双列窄桩完整视频](artifacts/moe_memory_v2_end/trained/ame_stakes_1.00/episode_0.mp4)、[交错窄桩完整视频](artifacts/moe_memory_v2_end/trained/ame_alternate_1.00/episode_0.mp4)、[最终权重与校验清单](artifacts/moe_memory_v2_end/manifest.json)。
+
+## 第三轮：文献驱动的教师/感知分离
+
+第三轮不直接延长第二轮。增加明确目标输入、目标奖励、停滞终止和浅坑起步课程，先训练完整地图教师，再安排可见感知学生。第三轮原生四轮短训练已通过，1024 环境已启动，每1000轮在原始深坑/桩面评估。尚无第三轮过桩成绩。
+
+见 [论文、开源核对、安装候选、信息缺口与持续迭代说明](SENSOR_RESEARCH.md)。[第三轮启动](artifacts/sensor_research_v3/launch_nav_teacher_v3.json)、[原生短训练完成记录](artifacts/sensor_research_v3/nav_teacher_v3_smoke_v2/completed.json)。

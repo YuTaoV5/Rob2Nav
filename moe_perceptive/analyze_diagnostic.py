@@ -21,6 +21,7 @@ for col,path in enumerate(map(Path,a.trials)):
         nearby.append(coverage)
     edge=[i for i,row in enumerate(rows) if .5<row['position'][0]<1.5]
     report.append({'trial':str(path),'memory_lifetime':summary['args']['memory_lifetime'],
+        'sensor_rig':summary['args'].get('sensor_rig','original'),
         'successes':summary['successes'],'total':summary['total'],
         'failures':sum(e['failure'] for e in summary['episodes']),
         'mean_final_x':float(np.mean([e['position'][0] for e in summary['episodes']])),
@@ -33,6 +34,6 @@ for col,path in enumerate(map(Path,a.trials)):
     xy=np.asarray(row['foot_xy_body_yaw']);ax.scatter(xy[:,0],xy[:,1],c='red',marker='x')
     for name,(x,y) in zip(row['feet_order'],xy):ax.text(x,y,name[:2],fontsize=9)
     ax.set_facecolor('#cccccc');ax.set_xlabel('forward x (m)');ax.set_ylabel('left y (m)')
-    ax.set_title(f"Memory {summary['args']['memory_lifetime']} s; x={row['position'][0]:.2f} m\nGrey=unknown; red=feet; pre-action observation")
+    ax.set_title(f"{summary['args'].get('sensor_rig','original')}; memory {summary['args']['memory_lifetime']} s\nx={row['position'][0]:.2f} m; grey=unknown; red=feet",fontsize=10)
 fig.tight_layout();fig.savefig(out/'coverage.png',dpi=160);plt.close(fig)
 (out/'summary.json').write_text(json.dumps(report,indent=2));print(json.dumps(report,indent=2))

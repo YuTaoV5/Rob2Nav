@@ -79,12 +79,16 @@ class TerrainAttention(nn.Module):
 
 
 class PerceptiveActor(nn.Module):
-    def __init__(self,checkpoint):
+    def __init__(self,checkpoint,goal_conditioned=False):
         super().__init__()
         self.base=load_base(checkpoint)
         self.anchor=copy.deepcopy(self.base)
         self.terrain=TerrainAttention()
         self.fusion=nn.Sequential(nn.Linear(141,128),nn.ELU(),nn.Linear(128,12))
+        self.goal_conditioned=goal_conditioned
+        self.goal_projection=nn.Linear(4,77) if goal_conditioned else nn.Identity()
+        if goal_conditioned:
+            nn.init.zeros_(self.goal_projection.weight);nn.init.zeros_(self.goal_projection.bias)
         nn.init.zeros_(self.fusion[-1].weight);nn.init.zeros_(self.fusion[-1].bias)
         self.residual_bound=.4  # normalized action: .4 * .25 = .10 rad initially
         self.set_phase('fusion')
@@ -103,15 +107,16 @@ class PerceptiveActor(nn.Module):
         latent=self.base.student_moe_encoder(history)
         proprio=torch.cat((latent,current),-1)
         base=self.base.actor(proprio)
-        terrain=self.terrain(obs[:,225:],proprio)
-        return base+self.residual_bound*torch.tanh(self.fusion(torch.cat((proprio,terrain),-1)))
+        query=proprio+self.goal_projection(obs[:,2304:2308]) if self.goal_conditioned else proprio
+        terrain=self.terrain(obs[:,225:2304],query)
+        return base+self.residual_bound*torch.tanh(self.fusion(torch.cat((query,terrain),-1)))
 
 
 def register_policy():
     from rsl_rl.modules import ActorCritic
     import rsl_rl.runners.on_policy_runner as runner
     class MoEPerceptiveActorCritic(ActorCritic):
-        def __init__(self,*args,moe_checkpoint,**kwargs):
+        def __init__(self,*args,moe_checkpoint,goal_conditioned=False,**kwargs):
             super().__init__(*args,**kwargs)
-            self.actor=PerceptiveActor(moe_checkpoint)
+            self.actor=PerceptiveActor(moe_checkpoint,goal_conditioned)
     runner.MoEPerceptiveActorCritic=MoEPerceptiveActorCritic

@@ -20,12 +20,14 @@ def camera_pattern(cfg,device):
     v=(torch.arange(32,device=device)+.5-16)/16*math.tan(math.radians(29.))
     vv,uu=torch.meshgrid(v,u,indexing='ij')
     d=torch.stack((torch.ones_like(uu),-uu,-vv),-1).reshape(-1,3)
-    p=math.radians(20);rotation=torch.tensor([[math.cos(p),0,math.sin(p)],[0,1,0],[-math.sin(p),0,math.cos(p)]],device=device)
+    p=math.radians(getattr(cfg,'pitch_deg',20.));rotation=torch.tensor([[math.cos(p),0,math.sin(p)],[0,1,0],[-math.sin(p),0,math.cos(p)]],device=device)
     return torch.zeros_like(d),torch.nn.functional.normalize(d@rotation.T,dim=-1)
 
 
 @configclass
-class DenseCamera(CameraPattern):func=camera_pattern
+class DenseCamera(CameraPattern):
+    func=camera_pattern
+    pitch_deg:float=20.
 
 
 @configclass

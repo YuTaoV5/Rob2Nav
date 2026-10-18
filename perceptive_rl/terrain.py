@@ -9,6 +9,10 @@ from .geometry import lane_boxes
 def lane(difficulty, cfg):
     meshes = []
     for x0, x1, y0, y1, top, bottom in lane_boxes(difficulty, cfg.kind, cfg.size):
+        if getattr(cfg,'gentle_pit',False) and cfg.kind.startswith('ame_'):
+            floor=-.02-1.98*difficulty**2
+            if top==-2.:top=floor;bottom=floor-.2
+            else:bottom=min(bottom,floor-.2)
         mesh = trimesh.creation.box((x1-x0, y1-y0, top-bottom))
         mesh.apply_translation(((x0+x1)/2, (y0+y1)/2, (top+bottom)/2))
         meshes.append(mesh)
@@ -19,3 +23,4 @@ def lane(difficulty, cfg):
 class LaneCfg(SubTerrainBaseCfg):
     function = lane
     kind: str = "flat"
+    gentle_pit: bool = False
