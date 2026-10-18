@@ -1,5 +1,7 @@
 # 用户暂停状态（2026-10-18）
 
+> 新增工作台交付：用户随后要求实现Rob2Nav Studio，网页开发已进行；原机器人探索暂停仍有效。服务器Studio仅监听127.0.0.1:8765，本机SSH隧道访问127.0.0.1:8766。网页支持显式任务提交，但没有自动恢复训练。只运行了2秒MuJoCo网页链路验收，不进行新策略训练。使用见studio/README.md，验收边界见docs/STUDIO_VALIDATION.md。不要把网站交付当成原窄桩能力达成。
+
 用户明确要求暂存并停止继续探索。自动化go2已核实为PAUSED；服务器未发现moe_perceptive训练、评估或trial进程。除非用户明确恢复，不启动任何实验。
 
 最新v7已结束：六组原桩0/32，dense平地/楼梯/高台32/30/26，宽双列0/32、交错15/32。权重/root/gpufree-data/MoE-runs/spatial_v7_probe/model_199.pt，完整原始输出/root/gpufree-data/Rob2Nav/outputs/moe_perceptive/spatial_v7_probe。该轮完整视频/权重尚未归档上传；不要删除服务器输出。此前v5/v6、消融及源码已发布5f5fc7f。

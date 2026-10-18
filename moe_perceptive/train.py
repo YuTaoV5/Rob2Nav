@@ -16,6 +16,8 @@ p.add_argument('--arrival-aware',action='store_true',help='Experimental distance
 p.add_argument('--numeric-debug',action='store_true',help='Stop at the first nonfinite observation, rollout value or backward operation.')
 p.add_argument('--foothold-aware',action='store_true',help='Experimental privileged descending-foot support reward; no action correction.')
 p.add_argument('--spatial-attention',action='store_true',help='Soft nominal leg neighborhoods for the four terrain heads.')
+p.add_argument('--studio-config',help='Validated Studio JSON reward/PPO overrides; immutable within a resumed experiment.')
+p.add_argument('--stop-file',help='Studio-owned cancellation flag, checked before a new rollout; saves a boundary checkpoint.')
 AppLauncher.add_app_launcher_args(p);a=p.parse_args();app=AppLauncher(a).app
 import numpy as np
 import torch
@@ -28,6 +30,8 @@ from .model import register_policy
 from .task import make_cfg
 from .mdp import match_joint_limits,JOINTS,DEFAULT
 from .provenance import capture
+from .studio_overrides import load as load_studio,apply_rewards
+studio_config,studio_sha=load_studio(a.studio_config)
 
 torch.set_num_threads(4);torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False
 torch.autograd.set_detect_anomaly(a.numeric_debug)
@@ -39,6 +43,9 @@ meta={**capture(out,a),'torch':torch.__version__,'actor_observation':'5x45 histo
       'simulation_sensors':f'simplified depth/lidar rays, ideal odometry, {a.memory_lifetime:g} s observed-return memory',
       'protocol':'pretrained 137k MoE, new terrain attention, progressively unfrozen PPO; not AME scratch replication'}
 meta['perception_role']='privileged full-map teacher; not deployable sensor policy' if a.teacher_map else 'observed-return student'
+meta['studio_config_sha256']=studio_sha
+meta['studio_overrides']=studio_config
+(out/'studio_config.json').write_text(json.dumps(studio_config,indent=2))
 if a.navigation:
     meta['actor_observation']+=' + clipped relative XY goal and sin/cos heading'
     meta['training_geometry']='Explicit shallow-pit precursor; evaluation must use original AME pits.'
@@ -63,6 +70,7 @@ if a.foothold_aware:
 if a.course=='wide_deep':
     meta['training_geometry']='Wide-support/small-gap precursor; real 2m pit at every level; final geometry delegates to original AME.'
     (out/'manifest.json').write_text(json.dumps(meta,indent=2))
+apply_rewards(cfg,studio_config)
 dump_yaml(str(out/'env.yaml'),cfg)
 env=ManagerBasedRLEnv(cfg=cfg);match_joint_limits(env.scene['robot'])
 wrapped=RslRlVecEnvWrapper(env,clip_actions=None)
@@ -73,6 +81,9 @@ agent.policy.noise_std_type='log';agent.policy.actor_obs_normalization=False;age
 agent.policy.critic_hidden_dims=[256,128,64]
 agent.algorithm.learning_rate=2e-4;agent.algorithm.schedule='fixed'
 agent.algorithm.entropy_coef=.001;agent.algorithm.num_learning_epochs=4;agent.algorithm.num_mini_batches=4
+for key,value in studio_config['ppo'].items():
+    if key not in ('actor_learning_rate','encoder_learning_rate'):setattr(agent.algorithm,key,value)
+studio_rates=(studio_config['ppo'].get('learning_rate',2e-4),studio_config['ppo'].get('actor_learning_rate',2e-5),studio_config['ppo'].get('encoder_learning_rate',1e-5))
 train_cfg=agent.to_dict();train_cfg['policy']['moe_checkpoint']=a.moe
 train_cfg['policy']['goal_conditioned']=a.navigation
 train_cfg['policy']['spatial_prior']=a.spatial_attention
@@ -84,8 +95,8 @@ old_actor=list(actor.base.actor.parameters());old_encoder=list(actor.base.studen
 excluded={id(v) for v in old_actor+old_encoder+list(actor.anchor.parameters())}
 new=[v for v in policy.parameters() if id(v) not in excluded]
 runner.alg.optimizer=torch.optim.Adam([
-    {'params':new,'lr':2e-4,'name':'new'}, {'params':old_actor,'lr':2e-5,'name':'pretrained_actor'},
-    {'params':old_encoder,'lr':1e-5,'name':'pretrained_encoder'}])
+    {'params':new,'lr':studio_rates[0],'name':'new'}, {'params':old_actor,'lr':studio_rates[1],'name':'pretrained_actor'},
+    {'params':old_encoder,'lr':studio_rates[2],'name':'pretrained_encoder'}])
 if a.initialize_from:
     ck=torch.load(a.initialize_from,map_location='cpu',weights_only=False)
     if ck['infos']['provenance']['moe_sha256']!=meta['moe_sha256']:raise ValueError('Initializer MoE mismatch')
@@ -119,6 +130,7 @@ if a.resume:
     if old.get('arrival_aware',False)!=a.arrival_aware:raise ValueError('Resume changed arrival reward profile')
     if old.get('foothold_aware',False)!=a.foothold_aware:raise ValueError('Resume changed foothold reward profile')
     if old.get('spatial_attention',False)!=a.spatial_attention:raise ValueError('Resume changed spatial attention')
+    if ck['infos']['provenance'].get('studio_config_sha256')!=studio_sha:raise ValueError('Resume changed Studio reward/PPO configuration; use initialize-from for a new experiment')
     runner.load(a.resume)
     levels=ck['terrain_levels'].to(env.device);t=env.scene.terrain
     t.terrain_levels[:]=levels;t.env_origins[:]=t.terrain_origins[levels,t.terrain_types]
@@ -148,7 +160,7 @@ def set_phase(name):
     global phase
     if name==phase:return
     actor.set_phase(name);policy.log_std.requires_grad_(name!='value');phase=name
-    for g,rate in zip(runner.alg.optimizer.param_groups,(2e-4,2e-5,1e-5)):g['lr']=rate
+    for g,rate in zip(runner.alg.optimizer.param_groups,studio_rates):g['lr']=rate
     record={'iteration':current_iteration,'phase':name,'residual_bound_rad':actor.residual_bound*.25,
         'trainable_parameters':sum(v.numel() for v in policy.parameters() if v.requires_grad)}
     with (out/'phases.jsonl').open('a') as f:f.write(json.dumps(record)+'\n')
@@ -156,11 +168,20 @@ def set_phase(name):
 
 
 original_act=runner.alg.act
+class StudioStop(Exception):pass
 def act(obs):
     global rollout_calls,current_iteration
     if rollout_calls%agent.num_steps_per_env==0:
         current_iteration=start_iteration+rollout_calls//agent.num_steps_per_env
         set_phase(phase_at(current_iteration))
+        if a.stop_file and Path(a.stop_file).exists():
+            # At this point the previous PPO update completed. Encode the
+            # next iteration correctly, rather than claiming this rollout ran.
+            prior_iteration=runner.current_learning_iteration
+            runner.current_learning_iteration=current_iteration-1
+            try:runner.save(str(out/'studio_stop.pt'))
+            finally:runner.current_learning_iteration=prior_iteration
+            raise StudioStop('User stop saved before iteration '+str(current_iteration))
     rollout_calls+=1
     if a.numeric_debug:
         for name,value in obs.items():
@@ -224,6 +245,9 @@ try:
     runner.learn(a.iterations,init_at_random_ep_len=False)
     (out/'completed.json').write_text(json.dumps({'last_iteration':runner.current_learning_iteration,'additional_iterations':a.iterations,
         'elapsed_s':time.monotonic()-started,'phase':phase,'note':'Training completion is not a terrain success result'},indent=2))
+except StudioStop as error:
+    (out/'stopped.json').write_text(json.dumps({'reason':str(error),'next_iteration':current_iteration,'checkpoint':'studio_stop.pt',
+        'note':'Model/optimizer/curriculum/RNG saved; simulator physical state not saved.'},indent=2))
 except Exception as error:
     (out/'failed.json').write_text(json.dumps({'error':repr(error),'iteration':current_iteration,'phase':phase},indent=2));raise
 finally:wrapped.close();app.close()

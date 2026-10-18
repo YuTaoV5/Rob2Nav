@@ -1,5 +1,10 @@
 # Rob2Nav
 
+## Rob2Nav Studio 网页工作台
+
+训练配置、奖励/PPO调参、真实曲线、任务队列、MuJoCo/NJU仿真回合、视频/地图回放、基准对比、模型与报告浏览。使用方法和明确能力边界见 [Studio说明](studio/README.md)。本机证据模式 `python -m studio.api`；服务器通过SSH隧道访问，浏览网页不启动训练，原探索自动化保持暂停。
+
+
 接手开发请先读 [项目交接文档 handover.md](handover.md)：包含活动训练、真实评估、服务器位置、待办、自动化及接手检查命令。
 
 **Unitree Go2 无地图导航仿真：D435i 深度 + Mid-360 局部点云，基于 RoboGauge 本体运动控制。**
