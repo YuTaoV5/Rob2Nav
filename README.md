@@ -1,5 +1,7 @@
 # Rob2Nav
 
+接手开发请先读 [项目交接文档 handover.md](handover.md)：包含活动训练、真实评估、服务器位置、待办、自动化及接手检查命令。
+
 **Unitree Go2 无地图导航仿真：D435i 深度 + Mid-360 局部点云，基于 RoboGauge 本体运动控制。**
 
 本项目在 MuJoCo 中运行带真实关节与接触动力学的 Go2。导航层根据当前传感器观测和相对目标生成机体系速度指令，底层复用 [RoboGauge](https://github.com/wty-yy/RoboGauge) 的 Go2 预训练运动策略、观测构造、关节映射及 PD 控制接口。
