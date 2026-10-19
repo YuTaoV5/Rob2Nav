@@ -35,7 +35,9 @@ def execute(jobs,job,root,python,mujoco_python=None):
     config=RunConfig.model_validate(job['config']);run=root/'outputs/studio/runs'/key
     config_path=folder/'studio_config.json';config_path.write_text(json.dumps(config.overrides(),indent=2))
     (folder/'resolved_config.json').write_text(json.dumps(config.model_dump(),indent=2))
-    cmd=simulation_command(config,root,run,python if config.simulation_policy=='checkpoint' else mujoco_python) if config.task=='simulation' else command(config,root,run,config_path,python)
+    from .upstreams import pie_python
+    runtime=pie_python(root) if config.simulation_policy=='pie' else python if config.simulation_policy=='checkpoint' else mujoco_python
+    cmd=simulation_command(config,root,run,runtime) if config.task=='simulation' else command(config,root,run,config_path,python)
     (folder/'command.json').write_text(json.dumps(cmd,indent=2))
     detail={'stage':'training','run':str(run.relative_to(root)),
             'config_sha256':hashlib.sha256((folder/'resolved_config.json').read_bytes()).hexdigest(),
@@ -68,7 +70,8 @@ def execute(jobs,job,root,python,mujoco_python=None):
         result=read_json(run/'summary.json')
         total=result.get('total',result.get('episodes')) if result else None
         if total!=1 or not (run/'episode_0.mp4').exists():raise RuntimeError('Simulation output incomplete')
-        detail.update(result={'successes':result.get('successes'),'total':total},note='Native checkpoint inference; inspect checkpoint provenance.' if config.simulation_policy=='checkpoint' else 'Historical MoE/IK/NJU skill composition, not new learned perceptive policy.')
+        note='Native checkpoint inference; inspect checkpoint provenance.' if config.simulation_policy=='checkpoint' else 'Historical MoE/IK/NJU skill composition, not new learned perceptive policy.' if config.simulation_policy=='baseline' else 'Reviewed upstream policy inference; not independently validated skill performance.'
+        detail.update(result={'successes':result.get('successes'),'total':total},note=note)
         jobs.update(key,'succeeded',detail)
         return
     launch(cmd,'training')
@@ -77,9 +80,10 @@ def execute(jobs,job,root,python,mujoco_python=None):
     if config.auto_evaluate:
         output=folder/'evaluation'
         evaluate=[sys.executable,'-m','moe_perceptive.suite','--moe',str(root/'vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt'),
-                  '--checkpoint',str(ck),'--navigation','--memory-lifetime',str(config.memory_lifetime),'--sensor-rig',config.sensor_rig,
+                  '--checkpoint',str(ck),'--memory-lifetime',str(config.memory_lifetime),'--sensor-rig',config.sensor_rig,
                   '--video-narrow','--output',str(output)]
         if config.mode=='teacher':evaluate.append('--teacher-map')
+        if config.navigation:evaluate.append('--navigation')
         launch(evaluate,'evaluation')
         summaries=list(output.glob('*/summary.json'))
         if len(summaries)!=9:raise RuntimeError('Incomplete strict evaluation: expected nine summaries')

@@ -273,3 +273,6 @@ setup.sh / run.sh        安装和运行脚本
 ### V4完整结果归档
 
 V4在2000轮触发平台期停训，原尺寸窄桩六组在四次评估中均0/32；当前继续诊断，尚未完成任务。四次评估、原始数据、十段视频和选定教师权重见 [完整归档](artifacts/v4_completed)，结果表与边界见 [V4报告](V4_VALIDATION.md)。
+# Unified capability workspace
+
+The Studio **能力与方案** page now connects reviewed projects, robot/observation contracts, training recipes, jobs, checkpoints and videos. See [integration and deployment notes](docs/UNIFIED_CAPABILITIES.md) and [source audits](docs/project_audits/). Source demonstrations and local unscored inference are clearly separate from independent capability validation. External trainers marked as pending are not connected merely because their recipe is listed.

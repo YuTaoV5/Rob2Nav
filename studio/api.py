@@ -16,6 +16,7 @@ from .catalog import Catalog,read_json,clean,normalize_evaluation
 from .config import RunConfig,REWARDS,command,simulation_command
 from .jobs import Jobs
 from .telemetry import telemetry, checkpoints, replay
+from .registry import registry,capabilities
 
 
 def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None):
@@ -59,8 +60,11 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
     @app.get('/api/catalog')
     def get_catalog(refresh:bool=False):return catalog.get(refresh)
 
+    @app.get('/api/capabilities')
+    def get_capabilities():return capabilities(catalog.get(),jobs.all())
+
     @app.get('/api/schema')
-    def schema():return {'config':RunConfig.model_json_schema(),'defaults':RunConfig().model_dump(),'rewards':REWARDS,
+    def schema():return {'config':RunConfig.model_json_schema(),'defaults':RunConfig().model_dump(),'rewards':REWARDS,'registry':registry(),
         'adapters':[
             {'id':'moe','name':'RoboGauge MoE + 感知','training':True,'evaluation':True,'note':'已连接现有训练入口；执行需要Linux GPU worker。'},
             {'id':'ame','name':'AME / Go2复现','training':False,'evaluation':False,'note':'历史结果已导入；原训练控制适配器尚未接通。'},
@@ -134,7 +138,8 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
     def preflight(config):
         errors=[];warnings=[]
         output=root/'outputs/studio/runs/PREVIEW'
-        runtime=mujoco_python if config.task=='simulation' and config.simulation_policy=='baseline' else sim_python
+        from .upstreams import pie_python
+        runtime=pie_python(root) if config.simulation_policy=='pie' else mujoco_python if config.task=='simulation' and config.simulation_policy!='checkpoint' else sim_python
         try:cmd=simulation_command(config,root,output,runtime) if config.task=='simulation' else command(config,root,output,root/'outputs/studio/PREVIEW.json',runtime)
         except ValueError as e:cmd=[];errors.append(str(e))
         if not runtime.is_file():errors.append('当前主机没有所选任务的执行解释器；可保存草稿，在服务器运行。')
@@ -142,7 +147,7 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
             errors.append('缺少固定版本MoE基座权重；请先核对项目资源。')
         if os.name!='posix':errors.append('训练worker需要Linux主机；本地可浏览、编辑和保存配置。')
         if not allow_training:warnings.append('当前服务为只读训练模式，提交队列已关闭。')
-        if config.task=='simulation':warnings.append('选定权重在原生Isaac中推理，教师/学生身份以检查点来源为准。' if config.simulation_policy=='checkpoint' else '使用历史MoE/IK/NJU技能组合，仿真成绩不计入新感知MoE能力。')
+        if config.task=='simulation':warnings.append('选定权重在原生Isaac中推理，教师/学生身份以检查点来源为准。' if config.simulation_policy=='checkpoint' else '使用历史MoE/IK/NJU技能组合，仿真成绩不计入新感知MoE能力。' if config.simulation_policy=='baseline' else '上游策略本地推理，仅仿真；独立能力验收另行记录。')
         elif config.mode=='teacher':warnings.append('完整地图为特权教师输入，不能标为可部署相机/雷达策略。')
         if config.course=='wide_deep':warnings.append('训练前置几何与原AME严格评估分开，不计为原尺寸成功。')
         if config.initialization=='resume':warnings.append('恢复需匹配原参数；不恢复模拟器物理状态，不保证逐步确定性。')

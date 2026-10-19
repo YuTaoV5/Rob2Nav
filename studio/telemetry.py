@@ -79,7 +79,11 @@ def telemetry(root,jobs,key,tags=None):
         for name,value in row.get('loss',{}).items():row['loss/'+name]=value
     return clean({'job':job,'status':read_json(folder/'status.json',{}),'rows':series,'raw_count':count,
         'scalars':scalar,'note':note,'weights':checkpoints(root,job),'argv':argv,
-        'command':shlex.join(argv) if argv else None,'resolved':read_json(meta/'resolved_config.json',job['config'])})
+        'command':shlex.join(argv) if argv else None,'resolved':read_json(meta/'resolved_config.json',job['config']),
+        'skill_contract':{'robot':job['config'].get('robot_id','go2'),'algorithm':job['config'].get('algorithm_id','moe_terrain_ppo'),
+            'capability':job['config'].get('capability_id'),'recipe':job['config'].get('recipe_id'),
+            'io':read_json(folder/'io.json',{}),'deployment_ready':False,
+            'note':'统一清单不是实机部署许可；仍需归一化、关节/动作/PD合约及迁移验证。'}})
 
 
 def replay(folder, after=0):

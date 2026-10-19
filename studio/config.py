@@ -20,9 +20,13 @@ REWARDS = {
 class RunConfig(BaseModel):
     model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
     name:str=Field(default='Go2 感知实验',min_length=1,max_length=80)
-    adapter:Literal['moe','ame','nju','robogauge']='moe'
+    adapter:Literal['moe','ame','nju','robogauge','pie','him','wtw','wmp','mid360','leggedskilldeploy']='moe'
+    recipe_id:str=Field(default='',max_length=80)
+    capability_id:str=Field(default='',max_length=80)
+    robot_id:Literal['go2','go1','g1_29dof','custom_dog']='go2'
+    algorithm_id:str=Field(default='moe_terrain_ppo',max_length=80)
     task:Literal['train','simulation']='train'
-    simulation_policy:Literal['baseline','checkpoint']='baseline'
+    simulation_policy:Literal['baseline','checkpoint','pie','lsd_loco','lsd_jump','lsd_backflip','lsd_sideflip']='baseline'
     difficulty:float=Field(default=1.,ge=0,le=1)
     scene:Literal['empty','slalom','random','blocked','stairs','platform','gap','mixed','course']='course'
     jump_backend:Literal['disabled','nju','nju_runup','primitive']='nju'
@@ -33,6 +37,7 @@ class RunConfig(BaseModel):
     gap_width:float=Field(default=.3,ge=.05,le=1.)
     max_seconds:float=Field(default=45,ge=1,le=120)
     mode:Literal['teacher','student']='teacher'
+    navigation:bool=True
     course:Literal['original','wide_deep']='wide_deep'
     kind:Literal['mixed','flat','stairs','platform','ame_stakes','ame_alternate']='mixed'
     num_envs:int=Field(default=512,ge=8,le=4096)
@@ -71,12 +76,16 @@ class RunConfig(BaseModel):
 
     @model_validator(mode='after')
     def consistency(self):
+        from .registry import resolve_recipe
+        resolve_recipe(self)
         if self.task=='simulation':
             if self.simulation_policy=='checkpoint' and (not self.checkpoint or self.kind=='mixed'):raise ValueError('Checkpoint simulation requires a weight and a specific terrain')
             if (self.goal_x is None)!=(self.goal_y is None):raise ValueError('Both target coordinates must be provided')
-            if self.adapter not in ('moe','nju'):raise ValueError('Simulation supports MoE or NJU skill adapters')
+            if self.adapter not in ('moe','nju','pie','leggedskilldeploy'):raise ValueError('This simulation adapter is not connected')
             return self
         if self.num_envs%8:raise ValueError('Environment count must be a multiple of 8')
+        if not self.navigation and (self.arrival_aware or self.mode=='teacher' or self.foothold_aware):raise ValueError('Goal/teacher experiments require the navigation observation interface')
+        if not self.navigation and set(self.rewards)&{'goal_motion','goal_position','route_bonus'}:raise ValueError('Goal rewards require the navigation interface')
         if self.foothold_aware and self.mode!='teacher':raise ValueError('Foothold risk probe requires privileged teacher')
         if self.initialization!='base' and not self.checkpoint:raise ValueError('Select a checkpoint')
         if self.initialization=='base' and self.checkpoint:raise ValueError('Base initialization cannot select a checkpoint')
@@ -103,14 +112,17 @@ def resolve_checkpoint(root, value):
 
 
 def command(config,root,output,config_path,python):
+    from .registry import resolve_recipe
+    resolve_recipe(config,require_ready=True)
     if config.adapter!='moe':raise ValueError('This adapter is not enabled for training yet')
     root=Path(root)
     cmd=[str(python),'-m','moe_perceptive.train','--headless','--moe',str(root/'vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt'),
-         '--navigation','--course',config.course,'--kind',config.kind,'--num-envs',str(config.num_envs),
+         '--course',config.course,'--kind',config.kind,'--num-envs',str(config.num_envs),
          '--iterations',str(config.iterations),'--seed',str(config.seed),'--warmup',str(config.warmup),
          '--fusion',str(config.fusion),'--actor',str(config.actor),'--memory-lifetime',str(config.memory_lifetime),
          '--sensor-rig',config.sensor_rig,'--studio-config',str(config_path),'--output',str(output)]
     cmd.extend(['--stop-file',str(Path(config_path).parent/'cancel.flag')])
+    if config.navigation:cmd.append('--navigation')
     if config.mode=='teacher':cmd.append('--teacher-map')
     for name in ('arrival_aware','foothold_aware','spatial_attention','numeric_debug'):
         if getattr(config,name):cmd.append('--'+name.replace('_','-'))
@@ -119,7 +131,14 @@ def command(config,root,output,config_path,python):
 
 
 def simulation_command(config,root,output,python):
+    if config.robot_id!='go2':raise ValueError('Only the Go2 dynamics adapter is currently validated for Studio simulation')
     root=Path(root)
+    if config.simulation_policy in ('pie','lsd_loco','lsd_jump','lsd_backflip','lsd_sideflip'):
+        from .upstreams import source
+        source(root,'pie' if config.simulation_policy=='pie' else 'lsd')
+        if config.scene not in ('empty','stairs') or (config.simulation_policy.startswith('lsd_') and config.scene!='empty'):raise ValueError('This pinned inference adapter does not support the selected terrain')
+        return [str(python),'-m','studio.external_sim','--policy',config.simulation_policy,'--root',str(root),'--scene',config.scene,
+            '--seconds',str(config.max_seconds),'--seed',str(config.seed),'--output',str(output)]
     if config.simulation_policy=='checkpoint':
         return [str(python),'-m','studio.simulate','--checkpoint',str(resolve_checkpoint(root,config.checkpoint)),
             '--kind',config.kind,'--course',config.course,'--difficulty',str(config.difficulty),'--seed',str(config.seed),

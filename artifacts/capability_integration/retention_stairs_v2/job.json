@@ -1,0 +1,252 @@
+{
+  "id": "be9053facb374533",
+  "name": "CAPV2 frozen-observation stairs retention",
+  "state": "succeeded",
+  "config": {
+    "name": "CAPV2 frozen-observation stairs retention",
+    "adapter": "moe",
+    "recipe_id": "moe_stairs",
+    "capability_id": "stairs",
+    "robot_id": "go2",
+    "algorithm_id": "moe_terrain_ppo",
+    "task": "train",
+    "simulation_policy": "baseline",
+    "difficulty": 1.0,
+    "scene": "course",
+    "jump_backend": "nju",
+    "sensors": "both",
+    "goal_x": null,
+    "goal_y": null,
+    "terrain_height": 0.08,
+    "gap_width": 0.3,
+    "max_seconds": 45.0,
+    "mode": "student",
+    "navigation": false,
+    "course": "original",
+    "kind": "stairs",
+    "num_envs": 512,
+    "iterations": 200,
+    "seed": 71,
+    "warmup": 20,
+    "fusion": 180,
+    "actor": 0,
+    "memory_lifetime": 4.0,
+    "arrival_aware": false,
+    "foothold_aware": false,
+    "spatial_attention": false,
+    "numeric_debug": true,
+    "sensor_rig": "original",
+    "initialization": "initialize",
+    "checkpoint": "artifacts/moe_memory_v2_end/training/visible_moe_memory4_v2_seed42/model_999.pt",
+    "learning_rate": 1e-05,
+    "actor_learning_rate": 2e-05,
+    "encoder_learning_rate": 1e-05,
+    "entropy_coef": 0.001,
+    "gamma": 0.99,
+    "lam": 0.95,
+    "clip_param": 0.2,
+    "epochs": 4,
+    "minibatches": 4,
+    "max_grad_norm": 1.0,
+    "rewards": {},
+    "auto_evaluate": true
+  },
+  "created": 1792426220.5822177,
+  "updated": 1792427459.660133,
+  "detail": {
+    "stage": "evaluation",
+    "run": "outputs/studio/runs/be9053facb374533",
+    "config_sha256": "aa4d5d33f93fb8d266739a6af160ac5a477db65a937103bdeba0ff4147404a6c",
+    "override_sha256": "f0647b3707a13c78ae4a017902792d5df783cf4bf158b2378c63b3969130098f",
+    "pid": 61039,
+    "checkpoint": "outputs/studio/runs/be9053facb374533/model_199.pt",
+    "checkpoint_sha256": "bfee54b60826c2aff97c543f2d7ae84d21b5cea4236864148b244d886ff6ac38",
+    "evaluation": [
+      {
+        "case": "stairs_0.50",
+        "successes": 32,
+        "total": 32
+      },
+      {
+        "case": "ame_stakes_0.50",
+        "successes": 0,
+        "total": 32
+      },
+      {
+        "case": "ame_alternate_1.00",
+        "successes": 0,
+        "total": 32
+      },
+      {
+        "case": "platform_0.50",
+        "successes": 32,
+        "total": 32
+      },
+      {
+        "case": "flat_0.00",
+        "successes": 32,
+        "total": 32
+      },
+      {
+        "case": "ame_stakes_1.00",
+        "successes": 0,
+        "total": 32
+      },
+      {
+        "case": "ame_stakes_0.00",
+        "successes": 0,
+        "total": 32
+      },
+      {
+        "case": "ame_alternate_0.00",
+        "successes": 0,
+        "total": 32
+      },
+      {
+        "case": "ame_alternate_0.50",
+        "successes": 0,
+        "total": 32
+      }
+    ],
+    "note": "Execution completed; capability validation requires inspecting independent evaluation."
+  },
+  "weights": {
+    "candidates": [
+      {
+        "path": "outputs/studio/runs/be9053facb374533/model_0.pt",
+        "iteration": 0,
+        "bytes": 22417399
+      },
+      {
+        "path": "outputs/studio/runs/be9053facb374533/model_100.pt",
+        "iteration": 100,
+        "bytes": 22750859
+      },
+      {
+        "path": "outputs/studio/runs/be9053facb374533/model_199.pt",
+        "iteration": 199,
+        "bytes": 22750859
+      }
+    ],
+    "selected": {
+      "path": "outputs/studio/runs/be9053facb374533/model_100.pt",
+      "iteration": 100,
+      "bytes": 22750859,
+      "reward": 24.883682250976562
+    },
+    "criterion": "保存点训练平均奖励最高",
+    "validated_best": false,
+    "note": "尚无同协议多检查点排名；不将最新权重称为已验证最佳。"
+  },
+  "progress": {
+    "iteration": 199,
+    "phase": "fusion",
+    "steps_per_s": 3532.30206909219,
+    "std_min": 0.12008751928806305,
+    "std_max": 0.1427207887172699,
+    "loss": {
+      "value_function": 0.0026453531318111345,
+      "surrogate": -0.0004927916888846084,
+      "entropy": -7.218903183937073
+    },
+    "terrain_histograms": [
+      [
+        3,
+        4,
+        16,
+        22,
+        14,
+        5,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        3,
+        3,
+        12,
+        19,
+        22,
+        5,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        4,
+        5,
+        12,
+        20,
+        21,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        2,
+        11,
+        30,
+        17,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        3,
+        12,
+        28,
+        17,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        4,
+        17,
+        27,
+        14,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        3,
+        5,
+        16,
+        19,
+        17,
+        3,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        5,
+        9,
+        22,
+        18,
+        9,
+        0,
+        0,
+        0,
+        0
+      ]
+    ]
+  },
+  "progress_updated": 1792426945.393864
+}
