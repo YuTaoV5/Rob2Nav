@@ -6,6 +6,8 @@ p.add_argument('--output',required=True);p.add_argument('--python',default='/roo
 p.add_argument('--seed',type=int,default=801)
 p.add_argument('--num-envs',type=int,default=32);p.add_argument('--video-narrow',action='store_true')
 p.add_argument('--memory-lifetime',type=float,default=1.)
+p.add_argument('--gait-metrics',action='store_true',default=True)
+p.add_argument('--no-gait-metrics',action='store_false',dest='gait_metrics',help='Legacy matched protocol without diagnostic sampling.')
 p.add_argument('--navigation',action='store_true');p.add_argument('--teacher-map',action='store_true')
 p.add_argument('--sensor-rig',choices=['original','near_down60','near_down60_front_lidar'],default='original');a=p.parse_args()
 out=Path(a.output);out.mkdir(parents=True,exist_ok=False);records=[]
@@ -16,6 +18,7 @@ for kind,difficulty in cases:
         '--difficulty',str(difficulty),'--seed',str(a.seed),'--num-envs',str(a.num_envs),'--output',str(target),
         '--memory-lifetime',str(a.memory_lifetime)]
     command+=['--sensor-rig',a.sensor_rig]
+    if a.gait_metrics:command.append('--gait-metrics')
     if a.checkpoint:command+=['--checkpoint',a.checkpoint]
     if a.navigation:command+=['--navigation']
     if a.teacher_map:command+=['--teacher-map']

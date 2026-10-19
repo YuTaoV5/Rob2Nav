@@ -17,6 +17,7 @@ p.add_argument('--map-ablation',choices=['none','unknown'],default='none',help='
 p.add_argument('--map-probe',action='store_true',help='Measure paired normal/unknown action sensitivity on visited states.')
 p.add_argument('--studio-stream',action='store_true',help='Write real first-episode joint/root frames for browser viewing.')
 p.add_argument('--max-seconds',type=float,default=None)
+p.add_argument('--gait-metrics',action='store_true',help='Record first-episode stance-link slip and absolute mechanical joint work.')
 AppLauncher.add_app_launcher_args(p);a=p.parse_args()
 if a.video:a.enable_cameras=True
 out=Path(a.output);out.mkdir(parents=True,exist_ok=False)
@@ -43,6 +44,10 @@ def capture(env):
         'upright':-r.data.projected_gravity_b[:,2].clone(),
         'feet':(r.data.body_pos_w[:,ids]-env.scene.env_origins[:,None]).clone(),
         'forces':s.data.net_forces_w[:,cids].clone()}
+    if a.gait_metrics:
+        env._eval_state.update(foot_velocity=r.data.body_lin_vel_w[:,ids].clone(),
+            joint_velocity=r.data.joint_vel.clone(),applied_torque=r.data.applied_torque.clone(),
+            root_velocity=r.data.root_lin_vel_w.clone())
     return torch.zeros(env.num_envs,device=env.device,dtype=torch.bool)
 
 
@@ -114,6 +119,8 @@ if a.check_map:
     (out/'map_alignment.json').write_text(json.dumps(result,indent=2))
     if error>1e-4 or not checked.any() or result['height_correct_fraction']<.99:raise RuntimeError('Map alignment failed: '+str(result))
 records=[];trace=[];diagnostics=[];frames=0;writer=None;maximum_zero_error=0.
+from .gait_metrics import GaitMetrics
+gait=GaitMetrics(a.num_envs,env.step_dt) if a.gait_metrics else None
 stream=None
 if a.studio_stream:
     from studio.visuals import terrain_data
@@ -163,6 +170,9 @@ try:
                 from .attention_diagnostic import describe
                 diagnostics[-1]['attention']=describe(actor,policy_obs[:1])
             obs,_,done,_=wrapped.step(actions);state=env._eval_state
+            if gait:
+                values=[state[k].cpu().tolist() for k in ('foot_velocity','forces','joint_velocity','applied_torque','root_velocity','upright')]
+                gait.update((~done_first).cpu().tolist(),*values)
             ended=done.bool()&~done_first
             for i in ended.nonzero().flatten().tolist():
                 complete=bool(env.termination_manager.get_term('route_complete')[i]);failed=bool(env.termination_manager.terminated[i])
@@ -170,6 +180,7 @@ try:
                     'route_complete':complete,'failure':failed,'position':state['position'][i].cpu().tolist(),
                     'upright':float(state['upright'][i]),'seconds':(step+1)*env.step_dt,
                     'termination_terms':[n for n in env.termination_manager.active_terms if bool(env.termination_manager.get_term(n)[i])]})
+                if gait:records[-1]['gait_metrics']=gait.episode(i)
             if not done_first[0]:
                 trace.append({'time':(step+1)*env.step_dt,**{k:v[0].cpu().tolist() for k,v in state.items()},
                     'action':actions[0].cpu().tolist(),'base_action':base[0].cpu().tolist()})
@@ -188,6 +199,9 @@ try:
         'success_definition':'First episode: route >3.5 m, then >=0.3 s with >=2 support feet, upright >0.9 and speed <0.25 m/s; no failure termination.',
         'note':'Shared fixed terrain difficulty/seed; reset XY +/-3 cm, yaw +/-0.04 rad. No physical sensor drivers.'}
     result['geometry']='SHALLOW DIAGNOSTIC ONLY; not a strict traversal result' if a.shallow_probe else 'original terrain, original pit'
+    if gait:result['gait_metric_definition']=gait.definition()
+    if a.max_seconds is not None and a.max_seconds<5:
+        result['diagnostic_only']='Short-horizon integration smoke; not a matched task-success evaluation.'
     if a.map_probe or a.map_ablation!='none':
         result['map_sensitivity']={'mean_abs_normalized_action_delta':map_delta_sum/max(map_delta_count,1),
             'max_abs_normalized_action_delta':map_delta_max,'action_elements':map_delta_count,

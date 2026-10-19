@@ -100,6 +100,7 @@ class Catalog:
                        'kind':args.get('kind', d.get('kind', folder.name)), 'difficulty':args.get('difficulty'),
                        'successes':d['successes'],'total':d['total'],'seed':args.get('seed'),
                        'scored':not bool(d.get('diagnostic_only')),
+                       'has_gait_metrics':bool(d.get('gait_metric_definition')),
                        'interval95':None if d.get('diagnostic_only') else wilson(d['successes'],d['total']),
                        'role':role,'geometry':'训练前置' if precursor else ('原AME' if 'ame_' in folder.name else '标准/历史场景'),
                        'backend':d.get('backend','MuJoCo' if assisted or 'mujoco' in rel.lower() or 'results' in d else 'Isaac / 需核对'),
