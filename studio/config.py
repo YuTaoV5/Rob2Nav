@@ -22,6 +22,8 @@ class RunConfig(BaseModel):
     name:str=Field(default='Go2 感知实验',min_length=1,max_length=80)
     adapter:Literal['moe','ame','nju','robogauge']='moe'
     task:Literal['train','simulation']='train'
+    simulation_policy:Literal['baseline','checkpoint']='baseline'
+    difficulty:float=Field(default=1.,ge=0,le=1)
     scene:Literal['empty','slalom','random','blocked','stairs','platform','gap','mixed','course']='course'
     jump_backend:Literal['disabled','nju','nju_runup','primitive']='nju'
     sensors:Literal['both','depth','lidar']='both'
@@ -70,6 +72,7 @@ class RunConfig(BaseModel):
     @model_validator(mode='after')
     def consistency(self):
         if self.task=='simulation':
+            if self.simulation_policy=='checkpoint' and (not self.checkpoint or self.kind=='mixed'):raise ValueError('Checkpoint simulation requires a weight and a specific terrain')
             if (self.goal_x is None)!=(self.goal_y is None):raise ValueError('Both target coordinates must be provided')
             if self.adapter not in ('moe','nju'):raise ValueError('Simulation supports MoE or NJU skill adapters')
             return self
@@ -117,6 +120,10 @@ def command(config,root,output,config_path,python):
 
 def simulation_command(config,root,output,python):
     root=Path(root)
+    if config.simulation_policy=='checkpoint':
+        return [str(python),'-m','studio.simulate','--checkpoint',str(resolve_checkpoint(root,config.checkpoint)),
+            '--kind',config.kind,'--course',config.course,'--difficulty',str(config.difficulty),'--seed',str(config.seed),
+            '--max-seconds',str(config.max_seconds),'--output',str(output)]
     cmd=[str(python),'-m','go2_nav.active_run','--scene',config.scene,'--episodes','1','--seed',str(config.seed),
          '--height',str(config.terrain_height),'--gap-width',str(config.gap_width),
          '--max-seconds',str(config.max_seconds),'--jump-backend',config.jump_backend,

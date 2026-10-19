@@ -66,6 +66,17 @@ def main():
     try:
         for episode in range(args.episodes):
             _, info = env.reset(seed=args.seed+episode)
+            import mujoco
+            replay_start=float(env.data.time)
+            geometry=[]
+            for i in range(env.model.ngeom):
+                if env.model.geom_bodyid[i]!=0:continue
+                typ=int(env.model.geom_type[i]);size=env.model.geom_size[i].tolist()
+                if typ not in (0,5,6):continue
+                geometry.append(dict(type=typ,size=size,position=env.model.geom_pos[i].tolist(),quaternion=env.model.geom_quat[i].tolist()))
+            (out/'scene.json').write_text(json.dumps(dict(geometries=geometry,backend='MuJoCo',role='历史MoE / IK / NJU技能组合',
+                joint_names=[mujoco.mj_id2name(env.model,mujoco.mjtObj.mjOBJ_JOINT,int(i)) for i in env.joint_ids],quaternion_order='wxyz')))
+            stream=(out/'replay.jsonl').open('w',buffering=1)
             nav = TerrainNavigator(cfg)
             trace = []
             writer = imageio.get_writer(out/f"episode_{episode}.mp4", fps=10) if args.video else None
@@ -78,11 +89,14 @@ def main():
                         action = nav.act(env.points, env.level_water, env.data.qpos[:2], yaw, env.goal, env.command)
                     _, reward, terminated, truncated, info = env.step(action)
                     trace.append(dict(step=env.steps, reward=reward, **info))
+                    stream.write(json.dumps(dict(time=float(env.data.time)-replay_start,position=env.data.qpos[:3].tolist(),
+                        quaternion=env.data.qpos[3:7].tolist(),joints=env.data.qpos[env.qids].tolist()))+'\n')
                     if writer:
                         writer.append_data(video_frame(env, info))
                     if terminated or truncated:
                         break
             finally:
+                stream.close()
                 if writer:
                     writer.close()
             require_jump = any(env.goal[0] > right for _, right, _ in getattr(env, "terrain_meta", {}).get("gaps", []))

@@ -9,6 +9,9 @@ import json
 from pathlib import Path
 import sys
 import paramiko
+import socketserver
+import select
+import threading
 
 parser = argparse.ArgumentParser()
 parser.add_argument("host")
@@ -27,6 +30,30 @@ for line in sys.stdin:
         task = json.loads(line)
         if task["op"] == "exit":
             break
+        if task['op']=='tunnel':
+            transport=client.get_transport();remote_port=int(task.get('remote_port',8765))
+            class Forward(socketserver.BaseRequestHandler):
+                def handle(self):
+                    channel=None
+                    try:
+                        channel=transport.open_channel('direct-tcpip',('127.0.0.1',remote_port),self.request.getpeername())
+                        if channel is None:return
+                        while True:
+                            ready,_,_=select.select([self.request,channel],[],[],30)
+                            for source in ready:
+                                data=source.recv(65536)
+                                if not data:return
+                                (channel if source is self.request else self.request).sendall(data)
+                    except (OSError,EOFError,paramiko.SSHException):pass
+                    finally:
+                        if channel is not None:channel.close()
+            class Server(socketserver.ThreadingTCPServer):
+                allow_reuse_address=True
+                daemon_threads=True
+            server=Server(('127.0.0.1',int(task.get('local_port',8766))),Forward)
+            threading.Thread(target=server.serve_forever,daemon=True).start()
+            print('TUNNEL READY',flush=True)
+            continue
         if task["op"] == "run":
             _, stdout, stderr = client.exec_command(task["command"])
             print(stdout.read().decode(), end="", flush=True)

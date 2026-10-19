@@ -15,6 +15,7 @@ from .visuals import ROBOT_DIR,go2_urdf,terrain_data,terrain_svg
 from .catalog import Catalog,read_json,clean,normalize_evaluation
 from .config import RunConfig,REWARDS,command,simulation_command
 from .jobs import Jobs
+from .telemetry import telemetry, checkpoints, replay
 
 
 def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None):
@@ -133,7 +134,7 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
     def preflight(config):
         errors=[];warnings=[]
         output=root/'outputs/studio/runs/PREVIEW'
-        runtime=mujoco_python if config.task=='simulation' else sim_python
+        runtime=mujoco_python if config.task=='simulation' and config.simulation_policy=='baseline' else sim_python
         try:cmd=simulation_command(config,root,output,runtime) if config.task=='simulation' else command(config,root,output,root/'outputs/studio/PREVIEW.json',runtime)
         except ValueError as e:cmd=[];errors.append(str(e))
         if not runtime.is_file():errors.append('当前主机没有所选任务的执行解释器；可保存草稿，在服务器运行。')
@@ -141,7 +142,7 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
             errors.append('缺少固定版本MoE基座权重；请先核对项目资源。')
         if os.name!='posix':errors.append('训练worker需要Linux主机；本地可浏览、编辑和保存配置。')
         if not allow_training:warnings.append('当前服务为只读训练模式，提交队列已关闭。')
-        if config.task=='simulation':warnings.append('使用历史MoE/IK/NJU技能组合，仿真成绩不计入新感知MoE能力。')
+        if config.task=='simulation':warnings.append('选定权重在原生Isaac中推理，教师/学生身份以检查点来源为准。' if config.simulation_policy=='checkpoint' else '使用历史MoE/IK/NJU技能组合，仿真成绩不计入新感知MoE能力。')
         elif config.mode=='teacher':warnings.append('完整地图为特权教师输入，不能标为可部署相机/雷达策略。')
         if config.course=='wide_deep':warnings.append('训练前置几何与原AME严格评估分开，不计为原尺寸成功。')
         if config.initialization=='resume':warnings.append('恢复需匹配原参数；不恢复模拟器物理状态，不保证逐步确定性。')
@@ -155,12 +156,25 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
     def get_jobs():
         result=jobs.all()
         for job in result:
+            job['weights']=checkpoints(root,job)
             folder=root/'outputs/studio/runs'/job['id'];status=folder/'status.json';job['progress']=read_json(status)
             try:job['progress_updated']=status.stat().st_mtime
             except OSError:job['progress_updated']=None
             if job['state']=='evaluating' and job['detail'].get('stage')=='evaluation':
                 job['evaluation_completed']=sum(bool(read_json(p)) for p in (jobs.directory/'jobs'/job['id']/'evaluation').glob('*/summary.json'))
         return clean(result)
+
+    @app.get('/api/jobs/{key}/telemetry')
+    def job_telemetry(key:str,tags:str=''):
+        try:return telemetry(root,jobs,key,tags.split('|') if tags else [])
+        except KeyError:raise HTTPException(404,'Unknown job')
+
+    @app.get('/api/jobs/{key}/replay')
+    def job_replay(key:str,after:int=0):
+        try:jobs.get(key)
+        except KeyError:raise HTTPException(404,'Unknown job')
+        if after<0:raise HTTPException(422,'Invalid cursor')
+        return replay(root/'outputs/studio/runs'/key,after)
 
     @app.post('/api/jobs')
     def save(config:RunConfig):return jobs.create(config.model_dump())

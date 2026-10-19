@@ -113,3 +113,6 @@ cd studio/frontend && npm run build
 `/api/resources`补充nvidia-smi计算进程PID、程序名和显存；如检测到GPU占用但没有关联Studio执行任务，提示“未关联任务”，轮次无法确认并提供实验页入口。不启动额外训练来演示提示，UI验收使用隔离目录、明确标识的样例记录。
 
 ![GPU任务提示条界面验收示例，非真实训练](../docs/assets/studio-gpu-banner-example.png)
+
+
+在线权重推理、三维拖动回放、任务多指标遥测和权重候选选择见 [在线仿真说明](../docs/ONLINE_SIMULATION.md)。

@@ -15,6 +15,8 @@ p.add_argument('--check-map',action='store_true',help='Check native ideal scan X
 p.add_argument('--course',choices=['original','wide_deep'],default='original')
 p.add_argument('--map-ablation',choices=['none','unknown'],default='none',help='Diagnostic only: hide actor terrain observations, retain proprioception/goal.')
 p.add_argument('--map-probe',action='store_true',help='Measure paired normal/unknown action sensitivity on visited states.')
+p.add_argument('--studio-stream',action='store_true',help='Write real first-episode joint/root frames for browser viewing.')
+p.add_argument('--max-seconds',type=float,default=None)
 AppLauncher.add_app_launcher_args(p);a=p.parse_args()
 if a.video:a.enable_cameras=True
 out=Path(a.output);out.mkdir(parents=True,exist_ok=False)
@@ -28,7 +30,7 @@ from isaaclab.managers import TerminationTermCfg
 from isaaclab_rl.rsl_rl import RslRlVecEnvWrapper
 from .task import make_cfg
 from .model import PerceptiveActor
-from .mdp import match_joint_limits,FEET
+from .mdp import match_joint_limits,FEET,JOINTS
 torch.set_num_threads(4);torch.backends.cuda.matmul.allow_tf32=False;torch.backends.cudnn.allow_tf32=False
 
 
@@ -36,6 +38,8 @@ def capture(env):
     r=env.scene['robot'];s=env.scene['contact_forces'];ids=[r.body_names.index(n) for n in FEET]
     cids=[s.body_names.index(n) for n in FEET]
     env._eval_state={'position':(r.data.root_pos_w-env.scene.env_origins).clone(),
+        'quaternion':r.data.root_quat_w.clone(),
+        'joints':r.data.joint_pos[:,[r.joint_names.index(n) for n in JOINTS]].clone(),
         'upright':-r.data.projected_gravity_b[:,2].clone(),
         'feet':(r.data.body_pos_w[:,ids]-env.scene.env_origins[:,None]).clone(),
         'forces':s.data.net_forces_w[:,cids].clone()}
@@ -43,6 +47,9 @@ def capture(env):
 
 
 cfg=make_cfg(a.num_envs,a.seed,a.kind,True,a.difficulty);cfg.sim.device=a.device or 'cuda:0'
+if a.max_seconds is not None:
+    if not 1<=a.max_seconds<=120:raise ValueError('Invalid simulation duration')
+    cfg.episode_length_s=a.max_seconds
 cfg.moe_memory_lifetime=a.memory_lifetime
 from .rig import configure
 configure(cfg,a.sensor_rig)
@@ -107,6 +114,15 @@ if a.check_map:
     (out/'map_alignment.json').write_text(json.dumps(result,indent=2))
     if error>1e-4 or not checked.any() or result['height_correct_fraction']<.99:raise RuntimeError('Map alignment failed: '+str(result))
 records=[];trace=[];diagnostics=[];frames=0;writer=None;maximum_zero_error=0.
+stream=None
+if a.studio_stream:
+    from studio.visuals import terrain_data
+    scene=terrain_data(a.kind,a.course,a.difficulty)
+    # Sparse origins are [4,4,0]; dense lanes start at [1,4,0].
+    scene.update(offset=[-4. if a.kind.startswith('ame_') else -1.,-4.,0.],joint_names=JOINTS,backend='Isaac Sim',
+        role='特权完整地图教师' if a.teacher_map else '观测策略 / 以检查点来源为准',quaternion_order='wxyz')
+    (out/'scene.json').write_text(json.dumps(scene))
+    stream=(out/'replay.jsonl').open('w',buffering=1)
 map_delta_sum=0.;map_delta_max=0.;map_delta_count=0
 if a.video:
     import imageio.v2 as imageio
@@ -158,6 +174,7 @@ try:
                 trace.append({'time':(step+1)*env.step_dt,**{k:v[0].cpu().tolist() for k,v in state.items()},
                     'action':actions[0].cpu().tolist(),'base_action':base[0].cpu().tolist()})
                 trace[-1]['known_fraction']=float((policy_obs[0,225+693:225+2*693]>.5).float().mean())
+                if stream and (step%2==0 or ended[0]):stream.write(json.dumps({k:trace[-1][k] for k in ('time','position','quaternion','joints')})+'\n')
                 if writer and step%2==0 and not ended[0]:
                     pos=env.scene['robot'].data.root_pos_w[0].cpu().numpy()
                     env.sim.set_camera_view(pos+np.array([2.3,2.5,1.7]),pos+np.array([.5,0.,0.]))
@@ -183,5 +200,6 @@ try:
     torch.jit.script(actor.cpu()).save(str(out/'actor.pt'))
     print('EVALUATION',result['successes'],'/',result['total'],flush=True)
 finally:
+    if stream:stream.close()
     if writer:writer.close()
     wrapped.close();app.close()
