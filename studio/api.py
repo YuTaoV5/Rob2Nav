@@ -26,6 +26,41 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
     catalog=Catalog(root);jobs=Jobs(root)
     app=FastAPI(title='Rob2Nav Studio',version='0.1.0')
 
+    @app.get('/api/deployment')
+    def deployment_framework():
+        from rob2nav.contracts import profiles
+        from rob2nav import __version__
+        return {'version':__version__,'profiles':profiles(),'states':['standby','armed','active','fault','stopped'],
+            'backends':[{'id':'mujoco','status':'source-policy inference connected'},
+                        {'id':'isaac','status':'MoE training/checkpoint inference connected'},
+                        {'id':'ros','status':'adapter pending'}, {'id':'unitree_dds','status':'not implemented / no hardware control'}],
+            'layers':['robot/policy contracts','asset integrity','lifecycle and command gate','inference backends','navigation adapters','recording / evidence','Studio API / UI'],
+            'hardware_enabled':False}
+
+    @app.get('/api/navigation')
+    def navigation_sources():
+        from rob2nav.navigation import integrations,SCENES
+        return {'integrations':integrations(),'scenes':list(SCENES),'native_connected':False}
+
+    from pydantic import BaseModel,Field
+    class NavigationProbe(BaseModel):
+        scene:str='clutter'
+        length:float=Field(default=.6,ge=.3,le=1.2)
+        width:float=Field(default=.3,ge=.15,le=.6)
+        margin:float=Field(default=.05,ge=0,le=.3)
+        body_z:float=Field(default=.32,ge=.2,le=.8)
+        alpha:float=Field(default=2,ge=.1,le=10)
+
+    @app.post('/api/navigation/probe')
+    def navigation_probe(config:NavigationProbe):
+        from rob2nav.navigation import plan,shield
+        try:
+            result=plan(**config.model_dump(exclude={'alpha'}))
+            result['shield']=dict(raw=[1.,.2],position=[2.7,3.3],obstacles=[[3.4,3.3,.25]],
+                **shield([1.,.2],[2.7,3.3],[[3.4,3.3,.25]],alpha=config.alpha))
+            return result
+        except ValueError as error:raise HTTPException(422,str(error))
+
     @app.get('/api/robot/go2.urdf')
     def robot_definition():
         return Response(go2_urdf(root),media_type='application/xml')

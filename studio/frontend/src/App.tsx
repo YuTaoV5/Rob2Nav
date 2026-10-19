@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {Bot,Activity,ArrowDownToLine,ArrowRight,ArrowUpRight,BookOpen,Boxes,Check,CheckCircle2,ChevronDown,ChevronRight,Clock3,Copy,Cpu,Database,FileText,FlaskConical,Gauge,GitBranch,Layers3,LayoutDashboard,Loader2,Map,Menu,Pause,Play,Plus,Radio,RefreshCw,Search,Settings2,ShieldCheck,SlidersHorizontal,Square,Terminal,Video,X,AlertTriangle} from 'lucide-react';
 
+import {Deployment,Navigation} from './Framework';
 import CapabilityHub,{CapabilityOverview} from './CapabilityHub';
 import JobTelemetry from './JobTelemetry';
 import OnlineSimulation from './OnlineSimulation';
@@ -16,7 +17,7 @@ const TerrainPreview=lazy(()=>import('./RobotViewer').then(m=>({default:m.Terrai
 type Obj=Record<string,any>;
 type Catalog={evaluations:Obj[];runs:Obj[];reports:Obj[];videos:Obj[];models:Obj[];indexed_at:number};
 const empty:Catalog={evaluations:[],runs:[],reports:[],videos:[],models:[],indexed_at:0};
-const pages=[['overview','工作台',LayoutDashboard],['capabilities','能力与方案',Boxes],['experiments','实验与曲线',Activity],['configure','创建实验',SlidersHorizontal],['simulation','仿真回放',Video],['compare','基准对比',Layers3],['robot','机器人与感知',Bot],['sensors','传感器实验室',Radio],['models','模型与证据',Boxes],['reports','研究报告',BookOpen],['jobs','任务队列',Terminal]] as const;
+const pages=[['overview','工作台',LayoutDashboard],['capabilities','能力与方案',Boxes],['experiments','实验与曲线',Activity],['configure','创建实验',SlidersHorizontal],['simulation','仿真回放',Video],['deployment','部署框架',ShieldCheck],['navigation','导航',Map],['compare','基准对比',Layers3],['robot','机器人与感知',Bot],['sensors','传感器实验室',Radio],['models','模型与证据',Boxes],['reports','研究报告',BookOpen],['jobs','任务队列',Terminal]] as const;
 async function api(path:string,body?:unknown){const r=await fetch('/api/'+path,body!==undefined?{method:'POST',headers:{'Content-Type':'application/json','X-Studio-Request':'1'},body:JSON.stringify(body)}:undefined);const d=await r.json();if(!r.ok)throw new Error(typeof d.detail==='string'?d.detail:JSON.stringify(d.detail));return d;}
 const file=(path:string)=>'/api/files/'+path.split('/').map(encodeURIComponent).join('/');
 const num=(v:any,d=0)=>v===null||v===undefined?'—':Number(v).toLocaleString('zh-CN',{maximumFractionDigits:d});
@@ -50,7 +51,7 @@ export default function App(){
    <button className="project-switch" disabled title="当前仅配置Go2工作区"><span className="project-avatar">G2</span><span><b>Go2 感知运动控制</b><small>Rob2Nav workspace</small></span><ChevronDown size={14}/></button>
    <button className="button primary sidebar-create" onClick={()=>navigate('configure')}><Plus size={17}/>创建实验</button>
    <div className="nav-label">工作空间</div>
-   <nav aria-label="主导航">{pages.filter(p=>['overview','capabilities','experiments','simulation','robot'].includes(p[0])).map(([id,label,Icon])=><button key={id} className={(page===id||(id==='experiments'&&page==='jobs')||(id==='robot'&&page==='sensors'))?'active':''} onClick={()=>navigate(id)}><Icon size={18}/><span>{label}</span>{id==='experiments'&&running>0&&<em>{running}</em>}</button>)}</nav>
+   <nav aria-label="主导航">{pages.filter(p=>['overview','capabilities','experiments','deployment','simulation','navigation','robot'].includes(p[0])).map(([id,label,Icon])=><button key={id} className={(page===id||(id==='experiments'&&page==='jobs')||(id==='robot'&&page==='sensors'))?'active':''} onClick={()=>navigate(id)}><Icon size={18}/><span>{label}</span>{id==='experiments'&&running>0&&<em>{running}</em>}</button>)}</nav>
    <div className="sidebar-bottom"><nav className="utility-nav" aria-label="研究与证据快捷入口">{pages.filter(p=>['compare','models','reports'].includes(p[0])).map(([id,label,Icon])=><button key={id} className={page===id?'active':''} onClick={()=>navigate(id)} title={label} aria-label={label}><Icon size={19}/><span className="utility-tooltip">{label}</span></button>)}</nav><div className="system-state"><span className="status-dot"/><b>旧窄桩探索已暂停</b></div><div className="sidebar-user"><span>YT</span><div><b>Robotics workspace</b><small>Go2 · 私有实验空间</small></div></div></div>
   </aside>
   <div className="workspace">
@@ -68,6 +69,8 @@ export default function App(){
      {['experiments','jobs'].includes(page)&&<div className="section-tabs"><button className={page==='experiments'?'active':''} onClick={()=>navigate('experiments')}><Activity size={16}/>实验与曲线</button><button className={page==='jobs'?'active':''} onClick={()=>navigate('jobs')}><Terminal size={16}/>任务队列{running>0&&<Badge>{running}</Badge>}</button></div>}
      {['compare','models','reports'].includes(page)&&<><div className="hub-heading"><div><span className="eyebrow">RESEARCH LIBRARY</span><h1>研究与证据中心</h1><p>从基准结果追溯策略权重、方法报告与仿真回放。</p></div></div><div className="section-tabs">{pages.filter(p=>['compare','models','reports'].includes(p[0])).map(([id,label,Icon])=><button key={id} className={page===id?'active':''} onClick={()=>navigate(id)}><Icon size={16}/>{label}</button>)}</div></>}
      {['robot','sensors'].includes(page)&&<><div className="page-heading"><div><div className="eyebrow">ROBOT WORKSPACE</div><h1>机器人与感知</h1><p>查看Go2结构、检查关节姿态与传感器安装几何。</p></div></div><div className="section-tabs"><button className={page==='robot'?'active':''} onClick={()=>navigate('robot')}><Boxes size={16}/>机器人模型</button><button className={page==='sensors'?'active':''} onClick={()=>navigate('sensors')}><Radio size={16}/>传感器安装</button></div>{page==='robot'&&<Suspense fallback={<div className="loading">加载三维查看器…</div>}><RobotViewer/></Suspense>}</>}
+     {page==='deployment'&&<Deployment onSimulate={()=>navigate('simulation')}/>}
+     {page==='navigation'&&<Navigation/>}
      {page==='capabilities'&&<CapabilityHub data={capabilityData} focus={focusSkill} onRecipe={openRecipe} onEvaluation={id=>{const e=catalog.evaluations.find(e=>e.id===id);if(e)openEvaluation(e)}} onJob={id=>{setSelectedJobId(id);navigate('jobs')}}/>}
      {page==='experiments'&&<Experiments runs={catalog.runs}/>}
      {page==='configure'&&<ActiveGpuTasks jobs={jobs} resources={resources} onOpen={id=>{setSelectedJobId(id);navigate('jobs')}} onRuns={()=>navigate('experiments')}/>}
