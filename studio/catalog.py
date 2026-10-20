@@ -128,7 +128,7 @@ class Catalog:
                     if path.name=='actor.pt' or 'source' in path.parts: continue
                     key=ident(path); records[key]=path
                     models.append({'id':key,'name':path.name,'group':path.parent.name,'path':self.relative(path),'bytes':path.stat().st_size})
-        report_paths=list(self.root.glob('*.md'))+list((self.root/'docs').rglob('*.md'))
+        report_paths=list(self.root.glob('*.md'))+list((self.root/'docs').rglob('*.md'))+list((self.root/'skills').rglob('*.md'))
         if (self.root/'studio/README.md').exists():report_paths.append(self.root/'studio/README.md')
         for path in sorted(report_paths):
             key=ident(path); records[key]=path

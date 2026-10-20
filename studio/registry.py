@@ -1,4 +1,5 @@
 """Reviewed capability and recipe contracts; executable adapters stay allowlisted."""
+from urllib.parse import quote
 import copy
 import json
 from pathlib import Path
@@ -31,6 +32,9 @@ def resolve_recipe(config,require_ready=False):
 def capabilities(catalog,jobs):
     data=registry();result=copy.deepcopy(data)
     for skill in result['capabilities']:
+        skill['manuals']=[dict(kind=kind,label=label,path=path,url='#reports?path='+quote(path,safe=''))
+            for kind,label in [('training','训练手册'),('simulation','仿真手册'),('deployment','部署手册')]
+            for path in [f"skills/{skill['id']}/{kind.upper()}.md"] if any(r['path']==path for r in catalog.get('reports',[]))]
         selector=skill.get('evidence',{})
         related=[j for j in jobs if j['config'].get('capability_id')==skill['id']]
         prefixes=selector.get('prefixes',[])+[f"outputs/studio/jobs/{j['id']}/evaluation/" for j in related]

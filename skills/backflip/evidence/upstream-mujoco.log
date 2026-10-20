@@ -1,0 +1,52 @@
+[0;93m2026-10-21 00:05:40.508155259 [W:onnxruntime:Default, onnxruntime_pybind_module.cc:44 CreateOrtEnv] Init provider bridge failed.[m
+========================================================================
+ONNX           : /root/gpufree-data/Rob2Nav-upstreams/GO2_backflip/model_6000_actor.onnx
+MJCF           : /root/gpufree-data/Rob2Nav-upstreams/GO2_backflip/mujoco/go2/go2_isaac.xml
+Policy input   : observation[60]
+Control        : 50 Hz, Kp/Kd=40/1, scale=0.5
+Action latency : one policy step (20 ms)
+Joint target margin: 0 rad
+Joint dynamics : damping=0, frictionloss=0, armature=0
+Contact friction: 1
+Controls       : SPACE backflip | R physical reset | ESC quit
+No automatic physical reset: RL controls takeoff, landing and recovery.
+========================================================================
+[START] backflip triggered
+step      0 | FLIP | phase 0.02s | base_z 0.318m | pitch_rate +0.042rad/s
+step     10 | FLIP | phase 0.22s | base_z 0.291m | pitch_rate +1.200rad/s
+step     20 | FLIP | phase 0.42s | base_z 0.204m | pitch_rate +1.217rad/s
+step     30 | FLIP | phase 0.62s | base_z 0.519m | pitch_rate -12.433rad/s
+step     40 | FLIP | phase 0.82s | base_z 0.665m | pitch_rate -9.910rad/s
+step     50 | FLIP | phase 1.02s | base_z 0.460m | pitch_rate -9.433rad/s
+step     60 | FLIP | phase 1.22s | base_z 0.287m | pitch_rate +1.025rad/s
+step     70 | FLIP | phase 1.42s | base_z 0.326m | pitch_rate +0.055rad/s
+step     80 | FLIP | phase 1.62s | base_z 0.320m | pitch_rate +0.053rad/s
+step     90 | FLIP | phase 1.82s | base_z 0.320m | pitch_rate -0.009rad/s
+[BACKFLIP] phase complete; actor remains in control for landing/recovery
+step    100 | WAIT | phase 2.00s | base_z 0.319m | pitch_rate -0.004rad/s
+step    110 | WAIT | phase 2.00s | base_z 0.318m | pitch_rate +0.010rad/s
+step    120 | WAIT | phase 2.00s | base_z 0.318m | pitch_rate +0.029rad/s
+step    130 | WAIT | phase 2.00s | base_z 0.318m | pitch_rate +0.013rad/s
+step    140 | WAIT | phase 2.00s | base_z 0.317m | pitch_rate -0.002rad/s
+step    150 | WAIT | phase 2.00s | base_z 0.317m | pitch_rate +0.000rad/s
+step    160 | WAIT | phase 2.00s | base_z 0.317m | pitch_rate +0.007rad/s
+step    170 | WAIT | phase 2.00s | base_z 0.317m | pitch_rate +0.007rad/s
+step    180 | WAIT | phase 2.00s | base_z 0.317m | pitch_rate +0.003rad/s
+step    190 | WAIT | phase 2.00s | base_z 0.317m | pitch_rate +0.001rad/s
+step    200 | WAIT | phase 2.00s | base_z 0.316m | pitch_rate +0.002rad/s
+step    210 | WAIT | phase 2.00s | base_z 0.316m | pitch_rate +0.003rad/s
+step    220 | WAIT | phase 2.00s | base_z 0.316m | pitch_rate +0.002rad/s
+step    230 | WAIT | phase 2.00s | base_z 0.316m | pitch_rate +0.001rad/s
+step    240 | WAIT | phase 2.00s | base_z 0.316m | pitch_rate +0.001rad/s
+step    250 | WAIT | phase 2.00s | base_z 0.316m | pitch_rate +0.001rad/s
+step    260 | WAIT | phase 2.00s | base_z 0.316m | pitch_rate +0.001rad/s
+step    270 | WAIT | phase 2.00s | base_z 0.316m | pitch_rate +0.001rad/s
+step    280 | WAIT | phase 2.00s | base_z 0.316m | pitch_rate +0.000rad/s
+step    290 | WAIT | phase 2.00s | base_z 0.316m | pitch_rate +0.000rad/s
+step    300 | WAIT | phase 2.00s | base_z 0.316m | pitch_rate +0.000rad/s
+结束：仿真 6.02s，墙钟 0.15s，机身高度 0.316m
+诊断：累计俯仰 -6.270 rad | 机身高度 0.185--0.668 m | 最终倾角 0.002 rad
+诊断：最大关节速度 39.10 rad/s (FR_calf_joint) | 最大限位超出 0.1077 rad (FL_calf_joint: -0.7301, 边界 -0.8378) | 头部接触 否
+任务验证：PASS
+硬件安全验证：FAIL
+总体验证：FAIL

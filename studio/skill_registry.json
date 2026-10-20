@@ -439,6 +439,25 @@
       "source_commands": [
         "./go2_rl_lab.sh --train --task go2-mixed-moe-cts"
       ]
+    },
+    {
+      "id": "go2_backflip_native",
+      "name": "Go2 Backflip / 原生IsaacLab PPO",
+      "url": "https://github.com/Robot-Nav/GO2_backflip",
+      "branch": "PPO-backflip",
+      "commit": "954aa61ceb62c515689677f44a21e32109f6b62d",
+      "summary": "Go2非对称PPO训练、MuJoCo和SDK2部署源码；本次完整重训进行中。",
+      "runtime": "Isaac Sim5.1 / IsaacLab2.3 / MuJoCo3.2.3",
+      "license": "MIT",
+      "media": [],
+      "contracts": [
+        "actor60 / critic165 / action12 / 50Hz",
+        "已实际完成2次PPO更新；5000更新独立重训进行中",
+        "上游模型单次翻转落稳，但速度/限位约束失败"
+      ],
+      "source_commands": [
+        "见能力卡片三份逐步复现手册"
+      ]
     }
   ],
   "robots": [
@@ -791,12 +810,13 @@
       "name": "后空翻",
       "category": "敏捷技能",
       "projects": [
+        "go2_backflip_native",
         "lsd"
       ],
-      "description": "跟踪上游Go2动作参考的独立技能；不代表自主感知障碍决策。",
-      "acceptance": "核对参考相位与本体合约，量化离地/旋转、落地稳定性和多种初始条件。",
+      "description": "原生IsaacLab后空翻PPO已完成训练接口验证并启动完整重训；上游ONNX在MuJoCo完成约2π翻转，但关节速度和限位检查失败。",
+      "acceptance": "本次训练模型需独立完成完整俯仰翻转、稳定落地、多条件重复及关节/力矩/速度约束；实机仅方案。",
       "recipe": "lsd_backflip",
-      "local_status": "单次直立落地，待复测",
+      "local_status": "翻转落稳；硬件约束失败；独立重训中",
       "evidence": {
         "prefixes": [
           "artifacts/capability_campaign/backflip"
@@ -809,7 +829,8 @@
           "title": "Go2 / lsd_backflip / pinned source inference",
           "label": "Unscored source-policy inference; independent repeats pending"
         }
-      ]
+      ],
+      "training_entry": "manual"
     },
     {
       "id": "sideflip",

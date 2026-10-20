@@ -25,6 +25,8 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
     mujoco_python=Path(mujoco_python or '/root/gpufree-data/envs/go2-mapless/bin/python')
     catalog=Catalog(root);jobs=Jobs(root)
     app=FastAPI(title='Rob2Nav Studio',version='0.1.0')
+    from .paw_routes import mount_handshake
+    mount_handshake(app, root)
 
     @app.get('/api/deployment')
     def deployment_framework():

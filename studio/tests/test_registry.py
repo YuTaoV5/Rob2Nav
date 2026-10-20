@@ -54,3 +54,16 @@ def test_registry_and_schema_route_serve_without_starting_tasks(tmp_path):
         assert len(d['capabilities'])>=16 and len(d['projects'])>=14
         assert c.get('/api/schema').json()['registry']['version']==1
         assert c.get('/api/jobs').json()==[]
+
+def test_skill_manual_links_resolve_only_indexed_reports(tmp_path):
+    folder=tmp_path/'skills/backflip';folder.mkdir(parents=True)
+    (folder/'TRAINING.md').write_text('# Backflip training\nVerified command record.',encoding='utf-8')
+    (folder/'DEPLOYMENT.md').write_text('# SDK2 deployment plan\nNo hardware validation.',encoding='utf-8')
+    with TestClient(create_app(tmp_path)) as c:
+        skill=next(s for s in c.get('/api/capabilities').json()['capabilities'] if s['id']=='backflip')
+        assert {m['kind'] for m in skill['manuals']}=={'training','deployment'}
+        reports=c.get('/api/catalog').json()['reports']
+        for manual in skill['manuals']:
+            report=next(r for r in reports if r['path']==manual['path'])
+            assert c.get('/api/reports/'+report['id']).json()['path']==manual['path']
+        assert c.get('/api/jobs').json()==[]
