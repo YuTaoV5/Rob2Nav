@@ -1,0 +1,46 @@
+{
+  "source_commit": "954aa61ceb62c515689677f44a21e32109f6b62d",
+  "training": {
+    "smoke_updates": 2,
+    "num_envs": 32,
+    "checkpoint_names": [
+      "model_0.pt",
+      "model_1.pt"
+    ],
+    "exported": [
+      "policy.pt",
+      "policy.onnx"
+    ],
+    "full_run": {
+      "state_at_observation": "running",
+      "num_envs": 4096,
+      "requested_updates": 5000,
+      "seed": 1,
+      "observed_timesteps": 44236800,
+      "pid": 73119,
+      "log": "/root/gpufree-data/capability-work/backflip-full.log"
+    },
+    "convergence_verified": false
+  },
+  "upstream_mujoco": {
+    "model": "model_6000_actor.onnx",
+    "seconds": 6.02,
+    "cumulative_pitch_rad": -6.27,
+    "max_base_height_m": 0.668,
+    "terminal_tilt_rad": 0.002,
+    "head_contact": false,
+    "max_joint_speed_rad_s": 39.1,
+    "max_joint_limit_excess_rad": 0.1077,
+    "task_pass": true,
+    "hardware_constraints_pass": false,
+    "overall_pass": false,
+    "independent_repeats_verified": false
+  },
+  "studio": {
+    "tests_passed": 21,
+    "frontend_build_pass": true,
+    "manuals_browser_click_pass": true,
+    "deep_link_reload_pass": true
+  },
+  "hardware_connected": false
+}
