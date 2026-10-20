@@ -856,6 +856,26 @@
           "label": "Landing failed: terminal upside down"
         }
       ]
+    },
+    {
+      "id": "navigation",
+      "name": "实时目标点导航",
+      "category": "目标导航",
+      "projects": [
+        "robogauge"
+      ],
+      "description": "网页点击目标，MuJoCo持续物理闭环执行。本次PPO速度头完成100352步训练、8回合独立到达/稳定停止，以及网页两目标和断线停止；规则导航保留为对照。",
+      "acceptance": "指定目标到达后持续站立2秒，无碰撞/跌倒；最终距离<0.55m、水平速度<0.20m/s；断线退出。",
+      "recipe": "navigation_ppo",
+      "training_entry": "manual",
+      "local_status": "PPO训练完成；8回合与网页点击通过",
+      "evidence": {
+        "prefixes": [
+          "outputs/navigation_ppo_eval_empty_20261021",
+          "outputs/navigation_ppo_eval_slalom_20261021"
+        ],
+        "kinds": []
+      }
     }
   ],
   "recipes": [
@@ -1423,6 +1443,39 @@
       },
       "parameters": [],
       "note": "仅模拟器技能，无实机动作授权。"
+    },
+    {
+      "id": "navigation_ppo",
+      "name": "Go2导航PPO速度头",
+      "project": "robogauge",
+      "adapter": "robogauge",
+      "algorithm": "navigation_ppo",
+      "robot": "go2",
+      "execution": "manual_cli",
+      "manual_url": "#reports?path=skills%2Fnavigation%2FTRAINING.md",
+      "capabilities": [
+        "navigation"
+      ],
+      "runtime": "MuJoCo3.2.3 / SB3 2.6 CPU",
+      "blocker": "使用专用CLI训练手册；不复用IsaacLab地形PPO配置器。",
+      "observation": "273维雷达/深度槽位、目标与本体状态；lidar模式保持相同屏蔽",
+      "action": "3维归一化vx/vy/wz；底层MoE137k不更新",
+      "defaults": {
+        "recipe_id": "navigation_ppo",
+        "capability_id": "navigation",
+        "adapter": "robogauge",
+        "algorithm_id": "navigation_ppo",
+        "robot_id": "go2",
+        "initialization": "base",
+        "checkpoint": ""
+      },
+      "parameters": [
+        "--config skills/navigation/config.json",
+        "--sensors lidar",
+        "--steps 100000",
+        "--envs 4"
+      ],
+      "note": "已实际完成100352步训练；8回合独立物理验证与网页交互通过。SDK实机仅方案，未验证。"
     }
   ]
 }

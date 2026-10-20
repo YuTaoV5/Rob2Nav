@@ -1,0 +1,114 @@
+{
+  "training": {
+    "requested_steps": 100000,
+    "actual_steps": 100352,
+    "seed": 42,
+    "envs": 4,
+    "scene": "random",
+    "policy_sha256": "078c784513ea7076b1d5b0306a2b609ce67a5670d8831107501497d780786f31"
+  },
+  "rule_physics": {
+    "empty": {
+      "successes": 4,
+      "total": 4,
+      "seeds": [
+        300,
+        301,
+        302,
+        303
+      ]
+    },
+    "slalom": {
+      "successes": 4,
+      "total": 4,
+      "seeds": [
+        400,
+        401,
+        402,
+        403
+      ]
+    }
+  },
+  "ppo_physics": {
+    "empty": {
+      "successes": 4,
+      "total": 4,
+      "seeds": [
+        1300,
+        1301,
+        1302,
+        1303
+      ]
+    },
+    "slalom": {
+      "successes": 4,
+      "total": 4,
+      "seeds": [
+        1400,
+        1401,
+        1402,
+        1403
+      ]
+    }
+  },
+  "studio_tests_passed": 49,
+  "hardware_connected": false,
+  "web_browser": {
+    "cases": [
+      {
+        "policy_sha256": "078c784513ea7076b1d5b0306a2b609ce67a5670d8831107501497d780786f31",
+        "backend": "MuJoCo / RoboGauge MoE / PPO navigation",
+        "scene": "empty",
+        "goal": [
+          2.0,
+          0.5
+        ],
+        "initial_position": [
+          -0.003915179340561957,
+          -0.007879252175528893,
+          0.36096291355777943
+        ],
+        "phase": "ARRIVED",
+        "distance": 0.3824828510956484,
+        "position": [
+          2.3536055165855587,
+          0.37870232931706704,
+          0.3565174008175602
+        ],
+        "collision": false,
+        "fallen": false,
+        "realtime_factor": 1.0044898825386899,
+        "path_samples": 184,
+        "passed": true
+      },
+      {
+        "policy_sha256": "078c784513ea7076b1d5b0306a2b609ce67a5670d8831107501497d780786f31",
+        "backend": "MuJoCo / RoboGauge MoE / PPO navigation",
+        "scene": "slalom",
+        "goal": [
+          7.5,
+          1.6
+        ],
+        "initial_position": [
+          -0.0038506840532621664,
+          -0.009149223680981353,
+          0.360743024094484
+        ],
+        "phase": "ARRIVED",
+        "distance": 0.3885818885262169,
+        "position": [
+          7.227844521134834,
+          1.3298166225855703,
+          0.35677605412695124
+        ],
+        "collision": false,
+        "fallen": false,
+        "realtime_factor": 1.0056141558319298,
+        "path_samples": 143,
+        "passed": true
+      }
+    ],
+    "console_errors": [],
+    "watchdog_passed": true
+  }
+}

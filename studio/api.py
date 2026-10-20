@@ -27,6 +27,8 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
     app=FastAPI(title='Rob2Nav Studio',version='0.1.0')
     from .paw_routes import mount_handshake
     mount_handshake(app, root)
+    from .navigation_live_routes import mount_navigation_live
+    mount_navigation_live(app, root)
 
     @app.get('/api/deployment')
     def deployment_framework():
