@@ -488,3 +488,6 @@ Git资料独立目录检查通过：18条训练记录、272组评估、93视频�
 
 ## 2026-10-20 08:27 独立种子802完成
 18项匹配评估完成。平台对照平地/阶梯/高台32/32各；混合500平地31/32、阶梯高台32/32各，双方六窄桩均0/32。共同成功回合支撑足链速度代理混合增16–22%、机械功率略低；尚不推荐替代对照。报告docs/RETENTION_SEED802.md，原始artifacts/retention_seed802。已启动seed803仅密集三场景×两权重共6项复核，outputs/moe_perceptive/retention_dense_803，PID290987。先查日志和各summary及controller_completed，勿重复；无新训练。
+
+## 2026-10-20 08:48 支撑脚运动实验
+seed803六项密集复评双方均32/32，但混合足链运动代理增19–26%，方向与802一致。docs/RETENTION_SEED802.md追加复核、artifacts/retention_seed803归档。新stance_foot_motion显式可选奖励默认不启用，公式mean(I(Fz>5N)*vxy²)，候选权重-0.5；39项测试通过，原生8env2iter完成且model1存在/无failed。新Studio job4549d2b29e744c95已启动并核实iteration4/fusion，512env500iter、seed75、initialize平台model199、学习率1e-5、冻结本体、原安装/记忆4，结束自动九项严格评估。勿重复启动，勿将训练奖励或单滑移代理当晋级标准；后续需独立802/803复核，训练种子变化不支持单因素因果结论。未恢复旧V3/V4/V7。

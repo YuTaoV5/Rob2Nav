@@ -35,3 +35,9 @@ def test_invalid_targets_and_unavailable_rewards():
                    {'rewards':{'body_height_error':-1}},
                    {'task':'simulation','body_height_target_m':.32}):
         with pytest.raises(ValueError):RunConfig(**kwargs)
+
+
+def test_stance_motion_is_opt_in():
+    assert 'stance_foot_motion' not in RunConfig().overrides()['rewards']
+    cfg=RunConfig(rewards={'stance_foot_motion':-.5})
+    assert reward_schema(cfg)['stance_foot_motion']['effective_weight']==-.5

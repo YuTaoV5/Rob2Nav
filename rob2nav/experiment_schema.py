@@ -6,6 +6,7 @@ def term(label,weight,category,unit,formula,description,risk,requires='always'):
 
 
 REWARDS={
+ 'stance_foot_motion':term('支撑脚水平运动代理',0.,'步态','(m/s)²','mean(I(Fz>5N)*||v_foot_world_xy||²)','默认不添加；显式覆盖后启用，用于支撑脚运动惩罚实验。','足链速度不是鞋底接触点滑移；可能抑制脚部滚动，需同时验证通过率。'),
  'track_lin_vel_xy_exp':term('平面速度跟踪',1.5,'任务','无量纲','exp(-||v_xy-command_xy||² / σ²)','本体坐标速度指令跟踪；σ等参数以env.yaml为准。','过强可能追速度而忽略落脚。','locomotion'),
  'track_ang_vel_z_exp':term('偏航速度跟踪',.75,'任务','无量纲','exp(-(ω_z-command_z)² / σ²)','跟踪偏航角速度。','不是绝对航向误差。','locomotion'),
  'forward_progress':term('前进/目标方向进度',1.,'任务','m/s','clip(v_world_x,-1,1.2)','导航模式改用目标奖励模板；减速实验在近目标处衰减进度。','高权重可能导致冲过目标或冒险。'),

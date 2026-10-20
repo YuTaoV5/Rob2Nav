@@ -3,6 +3,16 @@ import torch
 from .mdp import FEET
 
 
+def stance_foot_motion(env):
+    """Squared horizontal foot-link velocity under vertical contact; a proxy."""
+    robot=env.scene['robot'];sensor=env.scene['contact_forces']
+    ids=[robot.body_names.index(n) for n in FEET]
+    contact_ids=[sensor.body_names.index(n) for n in FEET]
+    contact=sensor.data.net_forces_w[:,contact_ids,2]>5.
+    speed2=robot.data.body_lin_vel_w[:,ids,:2].square().sum(-1)
+    return (speed2*contact).mean(-1)
+
+
 def body_height_error(env,target):
     robot=env.scene['robot'];root=robot.data.root_pos_w
     hits=env.scene['height_scanner'].data.ray_hits_w

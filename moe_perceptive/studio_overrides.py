@@ -37,6 +37,10 @@ def load(path):
 
 
 def apply_rewards(cfg,overrides):
+    if 'stance_foot_motion' in overrides['rewards']:
+        from isaaclab.managers import RewardTermCfg
+        from .motion_targets import stance_foot_motion
+        cfg.rewards.stance_foot_motion=RewardTermCfg(func=stance_foot_motion,weight=0.)
     if overrides.get('motion'):
         from .motion_targets import configure
         configure(cfg,overrides['motion'])
