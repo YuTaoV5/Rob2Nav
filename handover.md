@@ -476,3 +476,6 @@ Studio主入口已重组，研究基准/模型/报告集中到左下图标对应
 用户允许不上传中间训练产物，当前交付改为Git主仓库所需源码/依赖/部署文档及既有精选模型、曲线、评估和视频。先前准备的full-archive-2026-10-19没有发布，Release草稿没有附件，服务器准备好的分包不删除、不继续上传，也不作为网站依赖。README、DEPLOYMENT和DATA_CATALOG已纠正相关说明；docs/release-summary.json明确标记server_archive_only_not_published。
 
 Git资料独立目录检查通过：18条训练记录、272组评估、93视频、25模型入口、28报告；页面/模型/地形接口200、视频Range206、真实曲线可读、空任务队列、只读执行模式。核对记录见docs/site-deployment-check.json与site-data-summary.json。前端dist需新环境npm ci/npm run build重建。训练探索继续暂停。本次不改写Git历史、不删除已提交精选资料。
+
+## 2026-10-20 实验设计页改造
+新增 docs/EXPERIMENT_DESIGNER.md：完整奖励解释、模式有效权重、方法路线及接入边界、阶段预设，以及可选固定机身/摆腿高度训练目标。已通过38项测试和Isaac 8环境2迭代执行短测；这是功能验证而非能力提升。不要把固定目标当成已有权重运行时指令。旧worker 250737已退出，原72f9bb2d17384900完成499轮并已有评估目录；本轮未重启该训练。后续研究按真实评估继续。

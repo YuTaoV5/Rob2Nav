@@ -13,6 +13,10 @@ def capture(out,args):
     for name in ('terrain.py','geometry.py','ame_terrain.py','sensors.py'):
         path=Path(__file__).parents[1]/'perceptive_rl'/name;data=path.read_bytes()
         (depdir/name).write_bytes(data);dependencies[name]=hashlib.sha256(data).hexdigest()
+    shared=source/'rob2nav';shared.mkdir(exist_ok=True)
+    for name in ('__init__.py','experiment_schema.py'):
+        data=(Path(__file__).parents[1]/'rob2nav'/name).read_bytes()
+        (shared/name).write_bytes(data);dependencies['rob2nav/'+name]=hashlib.sha256(data).hexdigest()
     packages={}
     for name in ('torch','rsl-rl','isaaclab','isaaclab-rl','isaacsim'):
         try:packages[name]=version(name)

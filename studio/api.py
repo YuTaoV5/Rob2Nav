@@ -98,8 +98,13 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
     @app.get('/api/capabilities')
     def get_capabilities():return capabilities(catalog.get(),jobs.all())
 
+    from rob2nav.experiment_schema import METHODS, reward_schema
+
+    @app.post('/api/experiment-preview')
+    def experiment_preview(config:RunConfig):return {'rewards':reward_schema(config),'overrides':config.overrides()}
+
     @app.get('/api/schema')
-    def schema():return {'config':RunConfig.model_json_schema(),'defaults':RunConfig().model_dump(),'rewards':REWARDS,'registry':registry(),
+    def schema():return {'config':RunConfig.model_json_schema(),'defaults':RunConfig().model_dump(),'rewards':REWARDS,'methods':METHODS,'registry':registry(),
         'adapters':[
             {'id':'moe','name':'RoboGauge MoE + 感知','training':True,'evaluation':True,'note':'已连接现有训练入口；执行需要Linux GPU worker。'},
             {'id':'ame','name':'AME / Go2复现','training':False,'evaluation':False,'note':'历史结果已导入；原训练控制适配器尚未接通。'},
@@ -185,9 +190,12 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
         if config.task=='simulation':warnings.append('选定权重在原生Isaac中推理，教师/学生身份以检查点来源为准。' if config.simulation_policy=='checkpoint' else '使用历史MoE/IK/NJU技能组合，仿真成绩不计入新感知MoE能力。' if config.simulation_policy=='baseline' else '上游策略本地推理，仅仿真；独立能力验收另行记录。')
         elif config.mode=='teacher':warnings.append('完整地图为特权教师输入，不能标为可部署相机/雷达策略。')
         if config.course=='wide_deep':warnings.append('训练前置几何与原AME严格评估分开，不计为原尺寸成功。')
+        if config.body_height_target_m is not None or config.swing_clearance_target_m is not None:
+            warnings.append('高度是固定训练奖励目标，不是已有策略的运行指令；需要微调与独立验收。')
+        if config.warmup+config.fusion+config.actor>config.iterations:warnings.append('阶段总轮数超过本次预算，后续阶段本次可能不会执行；恢复时按全局轮次计算。')
         if config.initialization=='resume':warnings.append('恢复需匹配原参数；不恢复模拟器物理状态，不保证逐步确定性。')
         return {'valid':not errors,'errors':errors,'warnings':warnings,'command':cmd,'resolved':config.model_dump(),
-                'environment_steps':config.num_envs*24*config.iterations,'estimated_hours':None}
+                'environment_steps':config.num_envs*24*config.iterations,'estimated_hours':None,'rewards':reward_schema(config)}
 
     @app.post('/api/preflight')
     def validate(config:RunConfig):return preflight(config)
@@ -217,7 +225,7 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
         return replay(root/'outputs/studio/runs'/key,after)
 
     @app.post('/api/jobs')
-    def save(config:RunConfig):return jobs.create(config.model_dump())
+    def save(config:RunConfig):return jobs.create(config.model_dump(exclude_none=True))
 
     @app.post('/api/jobs/{key}/submit')
     def submit(key:str):

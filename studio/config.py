@@ -4,18 +4,7 @@ from pathlib import Path
 from typing import Literal
 from pydantic import BaseModel, Field, ConfigDict, model_validator, field_validator
 
-REWARDS = {
-    'forward_progress':{'label':'目标方向进度','weight':5.,'unit':'m/s','description':'速度或朝目标投影；具体公式随训练模板。'},
-    'goal_motion':{'label':'目标速度跟踪','weight':5.,'unit':'无量纲','description':'目标运动奖励；减速模板在目标附近降低期望速度。'},
-    'goal_position':{'label':'目标位置','weight':100.,'unit':'无量纲','description':'回合末段目标接近奖励。'},
-    'route_bonus':{'label':'完整通过','weight':500.,'unit':'事件','description':'达到严格完整通过条件的终止奖励。'},
-    'termination':{'label':'失败终止','weight':-100.,'unit':'事件','description':'失败终止惩罚。'},
-    'lane_center':{'label':'横向偏移','weight':-2.,'unit':'m²','description':'机身相对路线中心的横向偏差平方。'},
-    'anchor_cost':{'label':'原MoE保持','weight':-.2,'unit':'rad²','description':'策略动作相对冻结原MoE的偏差。'},
-    'supported_contact':{'label':'落脚支撑','weight':1.,'unit':'比例','description':'首次接触时足下局部支撑比例。'},
-    'heading_cost':{'label':'航向偏差','weight':-2.,'unit':'无量纲','description':'1-cos(yaw)，仅wide_deep配置存在。'},
-    'descending_foot_risk':{'label':'下降脚风险','weight':-2.,'unit':'比例','description':'下降低脚下方缺失支撑；仅风险实验模板存在。'},
-}
+from rob2nav.experiment_schema import REWARDS, reward_schema
 
 class RunConfig(BaseModel):
     model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
@@ -64,6 +53,8 @@ class RunConfig(BaseModel):
     epochs:int=Field(default=4,ge=1,le=20)
     minibatches:int=Field(default=4,ge=1,le=64)
     max_grad_norm:float=Field(default=1.,gt=0,le=10)
+    body_height_target_m:float|None=Field(default=None,ge=.18,le=.5)
+    swing_clearance_target_m:float|None=Field(default=None,ge=.04,le=.25)
     rewards:dict[str,float]=Field(default_factory=dict)
     auto_evaluate:bool=True
 
@@ -78,6 +69,7 @@ class RunConfig(BaseModel):
     def consistency(self):
         from .registry import resolve_recipe
         resolve_recipe(self)
+        if self.task=='simulation' and (self.body_height_target_m is not None or self.swing_clearance_target_m is not None):raise ValueError('Height targets are training objectives, not runtime simulation commands')
         if self.task=='simulation':
             if self.simulation_policy=='checkpoint' and (not self.checkpoint or self.kind=='mixed'):raise ValueError('Checkpoint simulation requires a weight and a specific terrain')
             if (self.goal_x is None)!=(self.goal_y is None):raise ValueError('Both target coordinates must be provided')
@@ -91,14 +83,19 @@ class RunConfig(BaseModel):
         if self.initialization=='base' and self.checkpoint:raise ValueError('Base initialization cannot select a checkpoint')
         if 'descending_foot_risk' in self.rewards and not self.foothold_aware:raise ValueError('Risk reward requires foothold-aware mode')
         if 'heading_cost' in self.rewards and self.course!='wide_deep':raise ValueError('Heading reward requires wide_deep')
+        for name in self.rewards:
+            if not reward_schema(self)[name]['available']:raise ValueError('Reward not available in this mode: '+name)
         return self
 
     def overrides(self):
-        return {'rewards':self.rewards,'ppo':{
+        result={'rewards':self.rewards,'ppo':{
             'learning_rate':self.learning_rate,'actor_learning_rate':self.actor_learning_rate,
             'encoder_learning_rate':self.encoder_learning_rate,'entropy_coef':self.entropy_coef,
             'gamma':self.gamma,'lam':self.lam,'clip_param':self.clip_param,
             'num_learning_epochs':self.epochs,'num_mini_batches':self.minibatches,'max_grad_norm':self.max_grad_norm}}
+        motion={k:getattr(self,k) for k in ('body_height_target_m','swing_clearance_target_m') if getattr(self,k) is not None}
+        if motion:result['motion']=motion
+        return result
 
 
 def resolve_checkpoint(root, value):
