@@ -494,3 +494,6 @@ seed803六项密集复评双方均32/32，但混合足链运动代理增19–26%
 
 ## 2026-10-20 09:08 SEA射线接口独立回归
 stance任务4549d2b29e744c95仍正常运行，核实iteration258/fusion无数值异常；勿重复启动。CPU侧新增rob2nav/sea_contract.py，仅加载SHA核验外部SEA原生CBF层并显式41束240度；加载state_dict后需再次validate_geometry，测试证实旧buffer可覆盖角度。scripts/validate_sea_cbf.py原生CPU16样本前向/梯度/yaw透传通过，180度和恢复buffer错配被拒绝。原生actor没有被修改，导航checkpoint/训练和动态Go2仍未接通。41测试通过，外部无许可证源文件只在私有缓存，不能上传。证据artifacts/framework_navigation/sea_cbf_contract/validation.json，说明docs/FRAMEWORK_NAVIGATION.md。
+
+## 2026-10-20 09:28 stance训练结束、严格评估中
+4549d2b29e744c95已完成500轮，model499 SHA448b60e8836343dd66cf984430c1bc4344bd0742e7653ed353e532d029d35aa91，自动严格suite正在执行；已核实前三密集场景32/32各，首个窄桩0/32，不能提前称九项完成。seed801足链运动代理候选平地0.1463/阶梯0.1094/高台0.1305，高于旧混合0.1228/0.0990/0.1185，未见目标改善；末轮训练奖励stance项-0.01029、速度跟踪0.6337，仅幅值诊断，非贡献因果解释。暂不追加训练。已安排同候选seed802/803三密集场景共6次原生复核，目录outputs/moe_perceptive/stance_independent_802_803，等待控制器PID317368，先等九项completed+九份32回合summary+model499+无trainfailed才执行；勿重复启动。下次比较已存baseline802/803，不把单一代理或更低机械功当成功。
