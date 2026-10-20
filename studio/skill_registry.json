@@ -458,6 +458,25 @@
       "source_commands": [
         "见能力卡片三份逐步复现手册"
       ]
+    },
+    {
+      "id": "unitree_mimic_go2",
+      "name": "Unitree RL Lab / Go2适配基础",
+      "url": "https://github.com/unitreerobotics/unitree_rl_lab",
+      "branch": "main",
+      "commit": "4960b84732b0c2ec593dccbfe963fda1bcd7b1e3",
+      "summary": "官方mimic MDP及PPO配置参考；Go2特技由Rob2Nav新增适配，公开原配置主要为G1。",
+      "runtime": "IsaacSim5.1 / IsaacLab2.3 / RSL-RL3.1.2",
+      "license": "Apache-2.0；本体资产来源另列MIT",
+      "media": [],
+      "contracts": [
+        "Go2侧空翻69维actor；站立行走48维actor，均为12动作",
+        "两项均已实际完成短程PPO和MuJoCo执行链；完整训练进行中",
+        "SDK2实机仅方案，未连接硬件"
+      ],
+      "source_commands": [
+        "见技能独立目录的训练、仿真和SDK部署手册"
+      ]
     }
   ],
   "robots": [
@@ -813,49 +832,40 @@
         "go2_backflip_native",
         "lsd"
       ],
-      "description": "原生IsaacLab后空翻PPO已完成训练接口验证并启动完整重训；上游ONNX在MuJoCo完成约2π翻转，但关节速度和限位检查失败。",
+      "description": "Own final model completes a -6.151 rad backflip and settles in MuJoCo. Peak joint speed 77.96 rad/s and joint-limit excess 0.5146 rad fail hardware constraints; overall acceptance FAIL.",
       "acceptance": "本次训练模型需独立完成完整俯仰翻转、稳定落地、多条件重复及关节/力矩/速度约束；实机仅方案。",
       "recipe": "lsd_backflip",
-      "local_status": "翻转落稳；硬件约束失败；独立重训中",
+      "local_status": "5000 updates complete; MuJoCo task PASS, hardware constraints FAIL",
       "evidence": {
         "prefixes": [
           "artifacts/capability_campaign/backflip"
         ],
         "kinds": []
       },
-      "curated_media": [
-        {
-          "path": "artifacts/capability_integration/lsd_backflip/episode_0.mp4",
-          "title": "Go2 / lsd_backflip / pinned source inference",
-          "label": "Unscored source-policy inference; independent repeats pending"
-        }
-      ],
+      "curated_media": [],
       "training_entry": "manual"
     },
     {
       "id": "sideflip",
-      "name": "侧空翻",
-      "category": "敏捷技能",
+      "name": "Go2 侧空翻",
+      "category": "本体特技",
       "projects": [
+        "unitree_mimic_go2",
+        "go2_backflip_native",
         "lsd"
       ],
-      "description": "跟踪上游Go2动作参考的独立技能；不代表自主感知障碍决策。",
-      "acceptance": "核对参考相位与本体合约，量化离地/旋转、落地稳定性和多种初始条件。",
-      "recipe": "lsd_sideflip",
-      "local_status": "本地推理落地失败",
+      "description": "Native Go2 motion-imitation PPO training completed. Final 69-input policy was exported and tested in free-base MuJoCo: 0/1, fell after rotation and exceeded joint constraints. Cross-simulator diagnosis remains open.",
+      "acceptance": "完整约2π侧向旋转、真实腾空、无机身触地且稳定落地；逐物理步另查关节速度/限位。",
+      "recipe": "sideflip_native_ppo",
+      "local_status": "5000 updates complete; final MuJoCo evaluation FAIL (0/1)",
       "evidence": {
         "prefixes": [
-          "artifacts/capability_campaign/sideflip"
+          "outputs/sideflip_native_"
         ],
         "kinds": []
       },
-      "curated_media": [
-        {
-          "path": "artifacts/capability_integration/lsd_sideflip/episode_0.mp4",
-          "title": "Go2 / lsd_sideflip / pinned source inference",
-          "label": "Landing failed: terminal upside down"
-        }
-      ]
+      "curated_media": [],
+      "training_entry": "manual"
     },
     {
       "id": "navigation",
@@ -873,6 +883,26 @@
         "prefixes": [
           "outputs/navigation_ppo_eval_empty_20261021",
           "outputs/navigation_ppo_eval_slalom_20261021"
+        ],
+        "kinds": []
+      }
+    },
+    {
+      "id": "upright_walk",
+      "name": "Go2 站立行走",
+      "category": "本体特技",
+      "projects": [
+        "unitree_mimic_go2",
+        "go2_backflip_native"
+      ],
+      "description": "混合四足起立与双足平衡/速度跟踪PPO，48维actor。短程模型已实际导出并执行MuJoCo但未起立；完整训练进行中。",
+      "acceptance": "从四足站姿真实起立；末2秒保持双足姿态、后足支撑且移动>0.20m，无机身触地；实机仅方案。",
+      "recipe": "upright_walk_ppo",
+      "training_entry": "manual",
+      "local_status": "完整训练中；短程模型未通过",
+      "evidence": {
+        "prefixes": [
+          "outputs/upright_walk_"
         ],
         "kinds": []
       }
@@ -1418,33 +1448,6 @@
       "note": "仅模拟器技能，无实机动作授权。"
     },
     {
-      "id": "lsd_sideflip",
-      "name": "Go2 · 侧空翻动作跟踪",
-      "project": "lsd",
-      "adapter": "leggedskilldeploy",
-      "algorithm": "motion_tracking",
-      "robot": "go2",
-      "execution": "adapter_required",
-      "capabilities": [
-        "sideflip"
-      ],
-      "runtime": "MuJoCo / TorchScript",
-      "blocker": "部署仓库提供权重但未给出每个动作对应的完整训练复现链；先验证本地推理，不伪装成已接通训练。",
-      "observation": "69维：参考关节位置/速度、anchor姿态、本体角速度、关节与上次动作",
-      "action": "12关节偏移，50Hz；按源CSV和joint_mapping",
-      "defaults": {
-        "recipe_id": "lsd_sideflip",
-        "capability_id": "sideflip",
-        "adapter": "leggedskilldeploy",
-        "algorithm_id": "motion_tracking",
-        "robot_id": "go2",
-        "initialization": "base",
-        "checkpoint": ""
-      },
-      "parameters": [],
-      "note": "仅模拟器技能，无实机动作授权。"
-    },
-    {
       "id": "navigation_ppo",
       "name": "Go2导航PPO速度头",
       "project": "robogauge",
@@ -1476,6 +1479,102 @@
         "--envs 4"
       ],
       "note": "已实际完成100352步训练；8回合独立物理验证与网页交互通过。SDK实机仅方案，未验证。"
+    },
+    {
+      "id": "sideflip_native_ppo",
+      "name": "Go2侧空翻 · 原生动作模仿PPO",
+      "project": "unitree_mimic_go2",
+      "adapter": "robogauge",
+      "algorithm": "motion_imitation_ppo",
+      "robot": "go2",
+      "execution": "manual_cli",
+      "manual_url": "#reports?path=skills%2Fsideflip%2FTRAINING.md",
+      "capabilities": [
+        "sideflip"
+      ],
+      "runtime": "IsaacSim5.1 / IsaacLab2.3 / MuJoCo3.2.3",
+      "blocker": "使用已执行验证的专用CLI；不复用地形MoE实验配置器。",
+      "observation": "69维：参考q/dq、anchor方向、本体角速度、相对关节与前一动作",
+      "action": "12维关节偏移×0.5；PD40/1，50Hz策略、200Hz物理",
+      "defaults": {
+        "recipe_id": "sideflip_native_ppo",
+        "capability_id": "sideflip",
+        "adapter": "robogauge",
+        "algorithm_id": "motion_imitation_ppo",
+        "robot_id": "go2",
+        "initialization": "base",
+        "checkpoint": ""
+      },
+      "parameters": [
+        "--num-envs 4096",
+        "--iterations 5000",
+        "--headless",
+        "--device cuda:0"
+      ],
+      "note": "短程PPO与MuJoCo执行链已运行，完整训练进行中；任务与硬件模型约束分开计分。"
+    },
+    {
+      "id": "upright_walk_ppo",
+      "name": "Go2站立行走 · 起立与双足PPO",
+      "project": "unitree_mimic_go2",
+      "adapter": "robogauge",
+      "algorithm": "upright_velocity_ppo",
+      "robot": "go2",
+      "execution": "manual_cli",
+      "manual_url": "#reports?path=skills%2Fupright_walk%2FTRAINING.md",
+      "capabilities": [
+        "upright_walk"
+      ],
+      "runtime": "IsaacSim5.1 / IsaacLab2.3 / MuJoCo3.2.3",
+      "blocker": "使用已执行验证的专用CLI；不复用地形MoE实验配置器。",
+      "observation": "48维本体状态、水平速度命令与前一动作",
+      "action": "12维关节偏移×0.5；PD40/1，50Hz策略、200Hz物理",
+      "defaults": {
+        "recipe_id": "upright_walk_ppo",
+        "capability_id": "upright_walk",
+        "adapter": "robogauge",
+        "algorithm_id": "upright_velocity_ppo",
+        "robot_id": "go2",
+        "initialization": "base",
+        "checkpoint": ""
+      },
+      "parameters": [
+        "--num-envs 4096",
+        "--iterations 5000",
+        "--headless",
+        "--device cuda:0"
+      ],
+      "note": "短程PPO与MuJoCo执行链已运行，完整训练进行中；任务与硬件模型约束分开计分。"
+    }
+  ],
+  "archived_recipes": [
+    {
+      "id": "lsd_sideflip",
+      "name": "Go2 · 侧空翻动作跟踪",
+      "project": "lsd",
+      "adapter": "leggedskilldeploy",
+      "algorithm": "motion_tracking",
+      "robot": "go2",
+      "execution": "adapter_required",
+      "capabilities": [
+        "sideflip"
+      ],
+      "runtime": "MuJoCo / TorchScript",
+      "blocker": "部署仓库提供权重但未给出每个动作对应的完整训练复现链；先验证本地推理，不伪装成已接通训练。",
+      "observation": "69维：参考关节位置/速度、anchor姿态、本体角速度、关节与上次动作",
+      "action": "12关节偏移，50Hz；按源CSV和joint_mapping",
+      "defaults": {
+        "recipe_id": "lsd_sideflip",
+        "capability_id": "sideflip",
+        "adapter": "leggedskilldeploy",
+        "algorithm_id": "motion_tracking",
+        "robot_id": "go2",
+        "initialization": "base",
+        "checkpoint": ""
+      },
+      "parameters": [],
+      "note": "仅模拟器技能，无实机动作授权。",
+      "archive_reason": "由可执行Go2原生训练链替代；旧推理源保留在研究记录。"
     }
   ]
 }
