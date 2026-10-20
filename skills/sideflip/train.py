@@ -14,6 +14,7 @@ p.add_argument('--num-envs', type=int, default=4096)
 p.add_argument('--iterations', type=int, default=5000)
 p.add_argument('--seed', type=int, default=43)
 p.add_argument('--resume', type=Path)
+p.add_argument('--transfer-motors',action='store_true',help='Experimental explicit DC motor envelope without PhysX hard speed clamp')
 AppLauncher.add_app_launcher_args(p)
 args = p.parse_args()
 args.kit_args = (args.kit_args+' --enable isaacsim.asset.importer.urdf').strip()
@@ -40,37 +41,15 @@ def main():
     contract = json.loads(args.motion.with_suffix('.json').read_text())
     if contract['npz_sha256'] != sha(args.motion) or contract['asset_commit'] != BACKFLIP_COMMIT:
         raise RuntimeError('Reference/asset hash mismatch')
-    cfg = RobotEnvCfg()
-    cfg.seed = args.seed
-    cfg.sim.device = args.device or 'cuda:0'
-    cfg.scene.num_envs = args.num_envs
-    cfg.scene.robot = robot_config(source)
-    cfg.scene.terrain.visual_material = None
-    cfg.scene.contact_forces.debug_vis = False
+    from .task import make_cfg
+    cfg = make_cfg(source,args.motion,contract,args.num_envs,args.seed,args.device or 'cuda:0')
+    if args.transfer_motors:
+        from .common import enable_transfer_motors
+        enable_transfer_motors(cfg,source)
+        cfg.rewards.undesired_contacts.weight=-10.
     bodies = contract['body_names']
-    anchor = 'base' if 'base' in bodies else 'base_link'
-    feet = []
-    for leg in ('FL','FR','RL','RR'):
-        candidates = [n for n in bodies if n.startswith(leg+'_') and ('foot' in n.lower() or 'calf' in n.lower())]
-        if not candidates:
-            raise RuntimeError('No Go2 distal leg body for '+leg)
-        feet.append(candidates[-1])
-    cfg.commands.motion.motion_file = str(args.motion.resolve())
-    cfg.commands.motion.anchor_body_name = anchor
-    cfg.commands.motion.body_names = bodies
-    cfg.commands.motion.debug_vis = False
-    cfg.actions.JointPositionAction.scale = .5
-    cfg.actions.JointPositionAction.joint_names = contract['joint_names']
-    cfg.actions.JointPositionAction.preserve_order = True
-    cfg.events.base_com.params['asset_cfg'] = SceneEntityCfg('robot', body_names=anchor)
-    cfg.events.base_com.params['com_range'] = {axis:(-.015,.015) for axis in ('x','y','z')}
-    cfg.events.physics_material.params['restitution_range'] = (0., .05)
-    cfg.events.push_robot = None
-    cfg.rewards.undesired_contacts.params['sensor_cfg'] = SceneEntityCfg('contact_forces',
-        body_names=['^(?!(?:'+'|'.join(map(re.escape,feet))+')$).+$'])
-    cfg.terminations.ee_body_pos.params['body_names'] = feet
-    cfg.terminations.motion_end = TerminationTermCfg(func=motion_finished, time_out=True)
-    cfg.episode_length_s = 4.
+    anchor = cfg.commands.motion.anchor_body_name
+    feet = cfg.terminations.ee_body_pos.params['body_names']
     agent = BasePPORunnerCfg()
     agent.seed = args.seed
     agent.device = cfg.sim.device
@@ -85,7 +64,8 @@ def main():
         reference_sha256=sha(args.motion), source_sha256={f.name:sha(f) for f in Path(__file__).parent.glob('*.py')},
         joint_names=contract['joint_names'], body_names=bodies, anchor=anchor, distal_bodies=feet,
         action_scale=.5, kp=40, kd=1, actor_observations=69, action_dim=12,
-        policy_hz=50, physics_hz=200, seed=args.seed, requested_iterations=args.iterations,
+        policy_hz=round(1/(cfg.sim.dt*cfg.decimation)), physics_hz=round(1/cfg.sim.dt),
+        motor_model='dc_linear_v1' if args.transfer_motors else 'ideal_pd', seed=args.seed, requested_iterations=args.iterations,
         num_envs=args.num_envs, hardware_connected=False))
     torch.set_num_threads(4)
     env = ManagerBasedRLEnv(cfg=cfg)

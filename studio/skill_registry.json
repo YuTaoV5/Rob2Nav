@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "reviewed_at": "2026-10-19",
+  "reviewed_at": "2026-10-21",
   "projects": [
     {
       "id": "robogauge",
@@ -36,104 +36,6 @@
       ]
     },
     {
-      "id": "nju",
-      "name": "NJU Agility",
-      "url": "https://github.com/NJU-RLC/quadrupedal-agility",
-      "branch": "main",
-      "summary": "BBC自然运动技能、TSC深度地形决策和恢复；分层策略。",
-      "adapter": "nju",
-      "commit": "15d16ea99bc23e5d401b0b0e3b88a8edcc28f0ed",
-      "license": "MIT，部分继承BSD文件",
-      "runtime": "IsaacGym Preview4 / Python3.8 / Torch2.3.1 cu118",
-      "status": "reviewed_reference",
-      "media": [
-        {
-          "url": "https://nju-rlc.github.io/quadrupedal_agility/static/videos/follow_mid.mp4",
-          "title": "NJU完整挑战",
-          "type": "video",
-          "origin": "upstream",
-          "label": "上游作者演示，非Rob2Nav独立验证",
-          "capabilities": [
-            "stairs",
-            "multiterrain"
-          ]
-        },
-        {
-          "url": "https://nju-rlc.github.io/quadrupedal_agility/static/videos/behaviors.mp4",
-          "title": "NJU自然步态与动作",
-          "type": "video",
-          "origin": "upstream",
-          "label": "上游作者演示，非Rob2Nav独立验证",
-          "capabilities": [
-            "locomotion",
-            "gait",
-            "recovery",
-            "multiterrain"
-          ]
-        },
-        {
-          "url": "https://nju-rlc.github.io/quadrupedal_agility/static/videos/hurdling.mp4",
-          "title": "NJU越栏",
-          "type": "video",
-          "origin": "upstream",
-          "label": "上游作者演示，非Rob2Nav独立验证",
-          "capabilities": [
-            "gap_jump",
-            "motion_jump"
-          ]
-        },
-        {
-          "url": "https://nju-rlc.github.io/quadrupedal_agility/static/videos/box.mp4",
-          "title": "NJU高台作者演示",
-          "type": "video",
-          "origin": "upstream",
-          "label": "上游作者演示，非Rob2Nav独立验证",
-          "capabilities": [
-            "platform"
-          ]
-        }
-      ],
-      "contracts": [
-        "BBC：12关节动作；2/3/5模式独立策略",
-        "TSC教师特权地形，学生87×58深度、2帧缓冲、每5步更新",
-        "go2_deploy已发布低层、深度高层与恢复权重；box入口仍缺匹配模型"
-      ],
-      "source_files": [
-        "bbc/legged_gym/scripts/train.py",
-        "tsc/legged_gym/scripts/train.py",
-        "go2_deploy/scripts/"
-      ],
-      "source_commands": [
-        "python bbc/legged_gym/scripts/train.py --task go2_locomotion --experiment_idx 0 --device_id 0 --headless True",
-        "python tsc/legged_gym/scripts/train.py --proj_name agility --exptid base --device_id 0 --randomize_start --randomize_base_mass --randomize_base_com --push_robots",
-        "python tsc/legged_gym/scripts/train.py --proj_name agility --exptid dist --device_id 0 --resume --resumeid base --use_camera"
-      ]
-    },
-    {
-      "id": "ame",
-      "name": "AME · SII-FUSC",
-      "url": "https://github.com/SII-FUSC/AME_Locomotion",
-      "branch": "main",
-      "summary": "G1高程图注意力编码参考；不能直接作为Go2权重。",
-      "adapter": "ame",
-      "commit": "1d3519ee946c846c1c89dd660539a224f99972b5",
-      "license": "未发现根许可证；RSL-RL组件有单独许可",
-      "runtime": "IsaacLab2.3 / Isaac Sim5.x；上游版本说明有差异",
-      "status": "reviewed_reference",
-      "media": [],
-      "contracts": [
-        "G1 29DoF；33×21 XYZ高程图 + 本体状态",
-        "仿真理想地形输入，不等于机载深度/雷达部署"
-      ],
-      "source_files": [
-        "rsl_rl/rsl_rl/modules/actor_critic_encoder.py"
-      ],
-      "source_commands": [
-        "bash run_train.sh",
-        "bash run_play.sh"
-      ]
-    },
-    {
       "id": "ame_go2",
       "name": "AME · criticaldamped",
       "url": "https://github.com/criticaldamped/AME_Locomotion",
@@ -156,145 +58,6 @@
       "source_commands": [
         "python scripts/go2/run.py --mode train --stage stage1 --headless",
         "python scripts/go2/run.py --mode train --stage stage2 --warm_start <stage1-checkpoint> --headless"
-      ]
-    },
-    {
-      "id": "pie",
-      "name": "Go2 PIE",
-      "url": "https://github.com/WwWv0v/go2_PIE",
-      "branch": "main",
-      "summary": "MJLab下Go2视觉隐式—显式估计；论文平台与Go2复现分开。",
-      "adapter": "pie",
-      "commit": "fb0db87924a9731913ad1011381c01db6945a9c8",
-      "license": "未发现根目录许可证，暂不再分发源码或权重",
-      "runtime": "MJLab 1.2.0 / MuJoCo 3.5.0 / Python 3.11",
-      "status": "reviewed_reference",
-      "media": [
-        {
-          "type": "image",
-          "url": "https://raw.githubusercontent.com/WwWv0v/go2_PIE/fb0db87924a9731913ad1011381c01db6945a9c8/docs/go2_demo.gif",
-          "origin": "upstream",
-          "title": "作者Go2视觉策略演示",
-          "label": "上游演示，非Rob2Nav验证"
-        }
-      ],
-      "contracts": [
-        "Go2 · 12 actions · 50 Hz",
-        "45维本体 + 450历史 + 2×60×86深度 + 128循环状态",
-        "深度10Hz，策略50Hz；KP20/20/40、KD1/1/2",
-        "当前代码地形为平地、上楼梯、下楼梯；不等同原论文全跑酷任务"
-      ],
-      "source_files": [
-        "deploy/pie/sim2sim/contract.py",
-        "src/parkour/tasks/",
-        "scripts/train.py"
-      ],
-      "source_commands": [
-        "python scripts/train.py Unitree-Go2-PIE --env.scene.num-envs 16 --agent.max-iterations 2 --agent.run-name rob2nav_smoke",
-        "python deploy/pie/sim2sim/go2_pie_sim2sim.py --checkpoint-file logs/rsl_rl/go2_pie/policy.onnx --provider cpu --terrain stairs --headless --duration 10"
-      ]
-    },
-    {
-      "id": "him_high",
-      "name": "HIM · high",
-      "url": "https://github.com/uwvwko-zzz/uw-himloco",
-      "branch": "high",
-      "summary": "自定义Dog平台的高台策略；不是Go2已验证能力。",
-      "adapter": "him",
-      "commit": "360f05c72783363e37abc3ecee95a568fb21a94a",
-      "license": "BSD-3-Clause",
-      "runtime": "IsaacGym Preview4 + rsl_rl",
-      "status": "reviewed_reference",
-      "media": [],
-      "contracts": [
-        "custom Dog · 46×6=276输入 · 12输出",
-        "目录没有Go2模型，README模型路径不是已发布权重",
-        "46×6历史，12偏移动作，50Hz，KP40/KD1，action_scale.25"
-      ],
-      "source_files": [
-        "legged_gym/envs/dog/dog_high_config.py",
-        "mujoco/dog/play_onnx_46.py"
-      ],
-      "source_commands": [
-        "python legged_gym/scripts/train.py --task=dog --headless"
-      ]
-    },
-    {
-      "id": "him_recovery",
-      "name": "HIM · hop恢复",
-      "url": "https://github.com/uwvwko-zzz/uw-himloco",
-      "branch": "hop",
-      "summary": "hop分支为倒地恢复；不按分支名字推断为跳跃。",
-      "adapter": "him",
-      "commit": "04e50c0173469f4b0766725c76dda549701dbd20",
-      "license": "BSD-3-Clause",
-      "runtime": "IsaacGym Preview4 + 外部rsl_rl",
-      "status": "reviewed_reference",
-      "media": [],
-      "contracts": [
-        "自定义Dog；46×6历史，12动作，50Hz，action_scale.5",
-        "未入库预训练.pt/.onnx，需训练与Go2迁移"
-      ],
-      "source_files": [
-        "legged_gym/envs/dog/dog_recovery_config.py"
-      ],
-      "source_commands": [
-        "python legged_gym/scripts/train.py --task=dog_recovery --headless",
-        "python legged_gym/scripts/play_recovery.py --task=dog_recovery"
-      ]
-    },
-    {
-      "id": "himdog",
-      "name": "himdog部署",
-      "url": "https://github.com/uwvwko-zzz/himdog",
-      "branch": "main",
-      "summary": "dog_policy_test / dog_control部署接口与sim2real适配参考。",
-      "adapter": "him",
-      "commit": "f7ce8161a0c8458994aee4673eed36fa274ab33f",
-      "license": "根许可证缺失；各ROS包分别审查",
-      "runtime": "ROS2 + ONNXRuntime + 自定义电机通信",
-      "status": "reviewed_reference",
-      "media": [],
-      "contracts": [
-        "45/46每步×6历史，策略50Hz、电机发布200Hz",
-        "实际有ONNX，但推荐YAML引用部分缺失模型，且本体不是Go2"
-      ],
-      "source_files": [],
-      "source_commands": [
-        "ros2 run dog_policy_test dog_policy_test_12 --ros-args --params-file ./src/dog_policy_test/config/policy_params_12.yaml"
-      ]
-    },
-    {
-      "id": "wmp",
-      "name": "WMP Go1",
-      "url": "https://github.com/haozhang04/wmp_go1",
-      "branch": "main",
-      "summary": "深度世界模型与运动控制，Go1合约独立。",
-      "adapter": "wmp",
-      "commit": "65cf1afd13e4792bce7b9def6f44372ecbb3cdf0",
-      "license": "Apache-2.0根许可证及licenses分项许可",
-      "runtime": "Isaac Gym Preview 3 / Python 3.8",
-      "status": "reviewed_reference",
-      "media": [
-        {
-          "url": "https://www.bilibili.com/video/BV1fHut6PE1j",
-          "title": "WMP作者部署演示",
-          "type": "bilibili",
-          "origin": "upstream",
-          "label": "上游作者演示，非Rob2Nav独立验证"
-        }
-      ],
-      "contracts": [
-        "Go1 · actor70 → 12",
-        "世界模型：33本体 + 64×64深度 + 5×12动作历史"
-      ],
-      "source_files": [
-        "legged_gym/envs/go1/go1_config.py",
-        "legged_gym/scripts/train.py"
-      ],
-      "source_commands": [
-        "CUDA_VISIBLE_DEVICES=0 ./bash/leggedskill.sh -t",
-        "CUDA_VISIBLE_DEVICES=0 ./bash/leggedskill.sh -p --terrain climb --path <checkpoint> --headless"
       ]
     },
     {
@@ -329,115 +92,6 @@
       ],
       "source_commands": [
         "python src/rl_mujoco.py  # 源码默认G1；需先显式配置Go2"
-      ]
-    },
-    {
-      "id": "lsd_wmp",
-      "name": "LeggedSkillDeploy · WMP",
-      "url": "https://github.com/haozhang04/LeggedSkillDeploy",
-      "branch": "wmp_parkour",
-      "summary": "WMP推理合约及部署链路。",
-      "adapter": "leggedskilldeploy",
-      "commit": "9bc7329f14ee3b9f7d0c5bd66b15b91c8c099bb9",
-      "license": "未发现LICENSE；不再分发权重",
-      "runtime": "WMP部署独立分支 / MuJoCo / Torch",
-      "status": "reviewed_reference",
-      "media": [],
-      "contracts": [
-        "Go1外部45观测，内部封装历史与世界模型；12动作",
-        "KP40/KD1，.005×4=50Hz；joint_mapping=[3,4,5,0,1,2,9,10,11,6,7,8]",
-        "实际入库65k、100k Go1 WMP权重"
-      ],
-      "source_files": [
-        "policy/issacgym/go1/go1wmp/config.yaml"
-      ]
-    },
-    {
-      "id": "wtw",
-      "name": "Walk These Ways · Go2",
-      "url": "https://github.com/Teddy-Liao/walk-these-ways-go2",
-      "branch": "main",
-      "summary": "条件化步态、速度、机身姿态与步频控制。",
-      "adapter": "wtw",
-      "commit": "d00320778c61567379b4a304047955c0c0dcae43",
-      "license": "MIT及第三方组件许可",
-      "runtime": "IsaacGym / Torch1.10 cu113 / LCM+SDK2部署",
-      "status": "reviewed_reference",
-      "media": [
-        {
-          "url": "https://www.bilibili.com/video/BV1tQ4y1c7ZG",
-          "title": "WTW Go2作者演示",
-          "type": "bilibili",
-          "origin": "upstream",
-          "label": "上游作者演示，非Rob2Nav独立验证"
-        }
-      ],
-      "contracts": [
-        "Go2条件化步态；预训练模型目录实际声明",
-        "现有播放依赖IsaacGym，尚无本项目MuJoCo合约"
-      ],
-      "source_files": [
-        "scripts/train.py",
-        "scripts/play.py",
-        "runs/gait-conditioned-agility/pretrain-go2/train"
-      ],
-      "source_commands": [
-        "python scripts/train.py",
-        "cd scripts && python play.py"
-      ]
-    },
-    {
-      "id": "mid360",
-      "name": "Go2 MID-360 Navigation",
-      "url": "https://github.com/max-niuniu/go2-mid360-navigation",
-      "branch": "main",
-      "summary": "雷达导航仿真参考；是否建图按实际代码标识，不能自动称无地图。",
-      "adapter": "mid360",
-      "commit": "5e45b10a167b9519364279e4ff08ee8516dd571b",
-      "license": "BSD-3-Clause原创部分，模型各保留许可",
-      "runtime": "Ubuntu22.04 / ROS2 Humble / GazeboClassic11 / CHAMP",
-      "status": "reviewed_reference",
-      "media": [
-        {
-          "url": "https://raw.githubusercontent.com/max-niuniu/go2-mid360-navigation/5e45b10a167b9519364279e4ff08ee8516dd571b/media/demo.mp4",
-          "title": "MID360 Gazebo导航作者演示",
-          "type": "video",
-          "origin": "upstream",
-          "label": "上游作者演示，非Rob2Nav独立验证"
-        }
-      ],
-      "contracts": [
-        "FAST-LIO + ICP + Nav2，有建图/地图定位依赖",
-        "MID360 + D435i；CHAMP步态，不是RL权重"
-      ],
-      "source_files": [
-        "src/go2-mid360-navigation/scripts/run_navigation.bash"
-      ],
-      "source_commands": [
-        "bash src/go2-mid360-navigation/scripts/run_navigation.bash gui:=true show_rviz:=true"
-      ]
-    },
-    {
-      "id": "moe_cts",
-      "name": "MoE-CTS原训练项目",
-      "url": "https://github.com/wty-yy/go2_rl_lab",
-      "branch": "main",
-      "commit": "5702ff7704c53e0b92e69876dc8da25153d36a25",
-      "license": "MIT，继承Unitree RL Lab Apache-2.0等许可",
-      "runtime": "新上游：IsaacLab3.0 EA / Isaac Sim6.1 / Python3.12 / Newton MJWarp",
-      "summary": "原MoE训练算法。与RoboGauge评估器分开；本项目基座锁定历史137k导出合约。",
-      "adapter": "moe",
-      "status": "reviewed_reference",
-      "media": [],
-      "contracts": [
-        "新上游与历史137k权重版本不能直接互换",
-        "教师/学生环境3:1；MoE-CTS动态隐变量估计"
-      ],
-      "source_files": [
-        "source/rsl_rl/rsl_rl/moe_cts/algorithm.py"
-      ],
-      "source_commands": [
-        "./go2_rl_lab.sh --train --task go2-mixed-moe-cts"
       ]
     },
     {
@@ -501,65 +155,18 @@
         "RR_calf_joint"
       ],
       "note": "现有原生感知MoE：50Hz，动作偏移0.25rad，KP20/KD0.5；其他算法必须自带合约。"
-    },
-    {
-      "id": "go1",
-      "name": "Unitree Go1",
-      "dof": 12,
-      "status": "参考合约，动力学待接入",
-      "viewer": false,
-      "note": "WMP本体；与Go2关节限位、惯性和观测不能混用。"
-    },
-    {
-      "id": "custom_dog",
-      "name": "HIM custom Dog",
-      "dof": 12,
-      "status": "参考本体，待Go2迁移",
-      "viewer": false,
-      "note": "high / hop使用的自定义模型不等于Go2。"
-    },
-    {
-      "id": "g1_29dof",
-      "name": "Unitree G1 29DoF",
-      "dof": 29,
-      "status": "AME参考，非四足策略",
-      "viewer": false,
-      "note": "保留注意力编码算法参考，不能加载到12DoF Go2。"
     }
   ],
   "capabilities": [
-    {
-      "id": "locomotion",
-      "name": "稳定运动与速度跟踪",
-      "category": "本体运动",
-      "projects": [
-        "robogauge",
-        "wtw"
-      ],
-      "description": "保留MoE基础稳定性，同时测试速度误差、能耗和跌倒。",
-      "acceptance": "独立速度指令种子；跟踪误差、接触与关节限位均合格。",
-      "recipe": "moe_mixed",
-      "local_status": "已有历史仿真",
-      "evidence": {
-        "prefixes": [
-          "artifacts/moe_perceptive",
-          "artifacts/v4_completed"
-        ],
-        "kinds": [
-          "flat"
-        ]
-      }
-    },
     {
       "id": "stairs",
       "name": "感知阶梯 / 提前抬腿",
       "category": "感知越障",
       "projects": [
-        "pie",
-        "nju",
+        "robogauge",
         "ame_go2"
       ],
-      "description": "使用深度/雷达可见返回训练，统计小腿碰撞而非仅身体前进。",
+      "description": "Native Go2 MoE sensor-policy PPO training and PhysX terrain evaluation. Dedicated train, simulation and SDK-plan manuals are linked below; historical scores remain tied to their checkpoint hashes.",
       "acceptance": "独立台阶高度/种子，完整上落阶梯；小腿碰撞率和基础能力保留。",
       "recipe": "moe_stairs",
       "local_status": "已有历史仿真",
@@ -579,12 +186,10 @@
       "name": "高台攀爬",
       "category": "感知越障",
       "projects": [
-        "him_high",
-        "pie",
-        "nju",
-        "lsd"
+        "robogauge",
+        "ame_go2"
       ],
-      "description": "区分感知关节策略、盲走控制和IK辅助结果。",
+      "description": "Native Go2 MoE sensor-policy PPO training and PhysX terrain evaluation. Dedicated train, simulation and SDK-plan manuals are linked below; historical scores remain tied to their checkpoint hashes.",
       "acceptance": "指定高台高度、完整上台/下台、无外力；跨种子评估。",
       "recipe": "moe_platform",
       "local_status": "已有历史仿真",
@@ -600,176 +205,14 @@
       }
     },
     {
-      "id": "narrow_stakes",
-      "name": "原AME 20cm窄梅花桩",
-      "category": "精准落脚",
-      "projects": [
-        "ame_go2",
-        "ame"
-      ],
-      "description": "双排与交错原尺寸支撑面、真实2米深坑。",
-      "acceptance": "两类原桩、多重置与布局种子稳定完整通过；前置宽桩不计。",
-      "recipe": "ame_original",
-      "local_status": "原尺寸尚未通过",
-      "evidence": {
-        "prefixes": [
-          "artifacts/v4_completed",
-          "artifacts/perception_diagnostics_v6",
-          "artifacts/moe_perceptive"
-        ],
-        "kinds": [
-          "ame_stakes",
-          "ame_alternate"
-        ]
-      }
-    },
-    {
-      "id": "water_avoid",
-      "name": "水坑识别与绕行",
-      "category": "目标导航",
-      "projects": [
-        "mid360",
-        "robogauge"
-      ],
-      "description": "结合观测局部规划；历史IK/规则导航与新策略分开。",
-      "acceptance": "多个目标与障碍布局，抵达目标且不进入水坑。",
-      "recipe": "navigation_sensor",
-      "local_status": "历史辅助原型",
-      "evidence": {
-        "prefixes": [
-          "artifacts/active",
-          "artifacts/terrain"
-        ],
-        "kinds": [
-          "course",
-          "water"
-        ]
-      }
-    },
-    {
-      "id": "gap_jump",
-      "name": "深坑跳跃 / 落地恢复",
-      "category": "敏捷技能",
-      "projects": [
-        "nju",
-        "pie",
-        "wmp"
-      ],
-      "description": "冻结BBC跳跃、感知起跳决策和自主落地各自验证。",
-      "acceptance": "真实无支撑间隙，四足离地且到达对侧；跨坑宽/种子。",
-      "recipe": "nju_jump",
-      "local_status": "历史技能组合",
-      "evidence": {
-        "prefixes": [
-          "artifacts/active"
-        ],
-        "kinds": [
-          "nju_gap",
-          "gap",
-          "course"
-        ]
-      }
-    },
-    {
-      "id": "recovery",
-      "name": "倾倒自主恢复",
-      "category": "恢复技能",
-      "projects": [
-        "him_recovery",
-        "nju"
-      ],
-      "description": "随机侧卧/仰卧/俯卧启动，识别恢复切换条件。",
-      "acceptance": "独立初始姿态恢复站立并持续稳定；不靠重置或外力。",
-      "recipe": "him_recovery",
-      "local_status": "待接入验证",
-      "evidence": {
-        "prefixes": [],
-        "kinds": []
-      }
-    },
-    {
-      "id": "gait",
-      "name": "可调步态 / 步频 / 机身姿态",
-      "category": "本体运动",
-      "projects": [
-        "wtw"
-      ],
-      "description": "条件化控制步态、落脚相位、抬脚高度和机身姿态。",
-      "acceptance": "指令切换跟踪、速度误差、足端接触相位与稳定性。",
-      "recipe": "wtw_gait",
-      "local_status": "待接入验证",
-      "evidence": {
-        "prefixes": [],
-        "kinds": []
-      }
-    },
-    {
-      "id": "visual_parkour",
-      "name": "PIE视觉跑酷",
-      "category": "视觉策略",
-      "projects": [
-        "pie"
-      ],
-      "description": "双层隐式—显式估计、带时序深度输入的Go2策略。",
-      "acceptance": "真实深度观测、不读取理想地图；跨布局及延迟测试。",
-      "recipe": "pie_parkour",
-      "local_status": "深度推理已跑通，待验收",
-      "evidence": {
-        "prefixes": [],
-        "kinds": []
-      },
-      "curated_media": [
-        {
-          "path": "artifacts/capability_integration/pie_source_inference/episode_0.mp4",
-          "title": "PIE Go2 / MuJoCo stairs / pinned source checkpoint",
-          "label": "Unscored inference, not independent skill validation"
-        }
-      ]
-    },
-    {
-      "id": "world_model",
-      "name": "世界模型预判越障",
-      "category": "视觉策略",
-      "projects": [
-        "wmp",
-        "lsd_wmp"
-      ],
-      "description": "时序世界模型支撑长程动作预判，保留Go1本体合约。",
-      "acceptance": "世界模型误差与实际通过率分别评估；Go2迁移另验。",
-      "recipe": "wmp_parkour",
-      "local_status": "待接入验证",
-      "evidence": {
-        "prefixes": [],
-        "kinds": []
-      }
-    },
-    {
-      "id": "lidar_nav",
-      "name": "MID-360建图 / 定位导航",
-      "category": "目标导航",
-      "projects": [
-        "mid360"
-      ],
-      "description": "FAST-LIO、ICP、Nav2与CHAMP的有图导航参考；与无提前建图目标分别验证。",
-      "acceptance": "目标到达、碰撞率和规划时延；明确有图/局部图/无提前图。",
-      "recipe": "mid360_nav",
-      "local_status": "待接入验证",
-      "evidence": {
-        "prefixes": [],
-        "kinds": []
-      }
-    },
-    {
       "id": "multiterrain",
       "name": "多技能保持与地形切换",
       "category": "综合能力",
       "projects": [
         "robogauge",
-        "pie",
-        "ame_go2",
-        "nju"
+        "ame_go2"
       ],
-      "description": "混合训练同时保留平地、阶梯、高台，不用单一示范掩盖遗忘。",
+      "description": "Native Go2 MoE sensor-policy PPO training and PhysX terrain evaluation. Dedicated train, simulation and SDK-plan manuals are linked below; historical scores remain tied to their checkpoint hashes.",
       "acceptance": "同协议多技能评估矩阵、失败视频与基座退化量。",
       "recipe": "moe_mixed",
       "local_status": "已有失败与保持对照",
@@ -782,60 +225,16 @@
       }
     },
     {
-      "id": "deployment",
-      "name": "统一部署合约与Sim2Sim",
-      "category": "部署验证",
-      "projects": [
-        "lsd",
-        "lsd_wmp",
-        "himdog"
-      ],
-      "description": "统一关节顺序、归一化、动作语义、PD与时序，不统一不兼容权重。",
-      "acceptance": "每模型合约完整且原生→MuJoCo验证；实机另授权。",
-      "recipe": "deployment_contract",
-      "local_status": "待接入验证",
-      "evidence": {
-        "prefixes": [],
-        "kinds": []
-      }
-    },
-    {
-      "id": "motion_jump",
-      "name": "动作参考跳跃",
-      "category": "敏捷技能",
-      "projects": [
-        "lsd"
-      ],
-      "description": "跟踪上游Go2动作参考的独立技能；不代表自主感知障碍决策。",
-      "acceptance": "核对参考相位与本体合约，量化离地/旋转、落地稳定性和多种初始条件。",
-      "recipe": "lsd_motion_jump",
-      "local_status": "源权重推理，待独立评估",
-      "evidence": {
-        "prefixes": [
-          "artifacts/capability_campaign/motion_jump"
-        ],
-        "kinds": []
-      },
-      "curated_media": [
-        {
-          "path": "artifacts/capability_integration/lsd_jump/episode_0.mp4",
-          "title": "Go2 / lsd_jump / pinned source inference",
-          "label": "Unscored source-policy inference; independent repeats pending"
-        }
-      ]
-    },
-    {
       "id": "backflip",
       "name": "后空翻",
       "category": "敏捷技能",
       "projects": [
-        "go2_backflip_native",
-        "lsd"
+        "go2_backflip_native"
       ],
       "description": "Own final model completes a -6.151 rad backflip and settles in MuJoCo. Peak joint speed 77.96 rad/s and joint-limit excess 0.5146 rad fail hardware constraints; overall acceptance FAIL.",
       "acceptance": "本次训练模型需独立完成完整俯仰翻转、稳定落地、多条件重复及关节/力矩/速度约束；实机仅方案。",
-      "recipe": "lsd_backflip",
-      "local_status": "5000 updates complete; MuJoCo task PASS, hardware constraints FAIL",
+      "recipe": "backflip_native_ppo",
+      "local_status": "动作通过；关节约束未通过",
       "evidence": {
         "prefixes": [
           "artifacts/capability_campaign/backflip"
@@ -854,13 +253,14 @@
         "go2_backflip_native",
         "lsd"
       ],
-      "description": "Native Go2 motion-imitation PPO training completed. Final 69-input policy was exported and tested in free-base MuJoCo: 0/1, fell after rotation and exceeded joint constraints. Cross-simulator diagnosis remains open.",
+      "description": "Go2原生PPO训练已完成；原引擎转轴旋转−6.347rad并落稳，但有一次大腿接触。MuJoCo迁移未通过；保留全部失败证据，不以训练完成代替验收。",
       "acceptance": "完整约2π侧向旋转、真实腾空、无机身触地且稳定落地；逐物理步另查关节速度/限位。",
       "recipe": "sideflip_native_ppo",
-      "local_status": "5000 updates complete; final MuJoCo evaluation FAIL (0/1)",
+      "local_status": "5000轮完成；严格验收未通过",
       "evidence": {
         "prefixes": [
-          "outputs/sideflip_native_"
+          "outputs/sideflip_native_",
+          "outputs/sideflip_final_"
         ],
         "kinds": []
       },
@@ -895,14 +295,15 @@
         "unitree_mimic_go2",
         "go2_backflip_native"
       ],
-      "description": "混合四足起立与双足平衡/速度跟踪PPO，48维actor。短程模型已实际导出并执行MuJoCo但未起立；完整训练进行中。",
+      "description": "5000轮训练已完成。原引擎从四足自行起立，直立7.64秒、末两秒前进0.40米；MuJoCo迁移失败，原生步态接触与鲁棒性还需补验。",
       "acceptance": "从四足站姿真实起立；末2秒保持双足姿态、后足支撑且移动>0.20m，无机身触地；实机仅方案。",
       "recipe": "upright_walk_ppo",
       "training_entry": "manual",
-      "local_status": "完整训练中；短程模型未通过",
+      "local_status": "原生起立前进；MuJoCo未通过",
       "evidence": {
         "prefixes": [
-          "outputs/upright_walk_"
+          "outputs/upright_walk_",
+          "outputs/upright_final_"
         ],
         "kinds": []
       }
@@ -1091,6 +492,168 @@
         "max_grad_norm"
       ],
       "note": "在V2既有观测/安装下做冻结本体的小步感知分支微调；新目标接口试验退化已归档，不冒称已解决。"
+    },
+    {
+      "id": "navigation_ppo",
+      "name": "Go2导航PPO速度头",
+      "project": "robogauge",
+      "adapter": "robogauge",
+      "algorithm": "navigation_ppo",
+      "robot": "go2",
+      "execution": "manual_cli",
+      "manual_url": "#reports?path=skills%2Fnavigation%2FTRAINING.md",
+      "capabilities": [
+        "navigation"
+      ],
+      "runtime": "MuJoCo3.2.3 / SB3 2.6 CPU",
+      "blocker": "使用专用CLI训练手册；不复用IsaacLab地形PPO配置器。",
+      "observation": "273维雷达/深度槽位、目标与本体状态；lidar模式保持相同屏蔽",
+      "action": "3维归一化vx/vy/wz；底层MoE137k不更新",
+      "defaults": {
+        "recipe_id": "navigation_ppo",
+        "capability_id": "navigation",
+        "adapter": "robogauge",
+        "algorithm_id": "navigation_ppo",
+        "robot_id": "go2",
+        "initialization": "base",
+        "checkpoint": ""
+      },
+      "parameters": [
+        "--config skills/navigation/config.json",
+        "--sensors lidar",
+        "--steps 100000",
+        "--envs 4"
+      ],
+      "note": "已实际完成100352步训练；8回合独立物理验证与网页交互通过。SDK实机仅方案，未验证。"
+    },
+    {
+      "id": "sideflip_native_ppo",
+      "name": "Go2侧空翻 · 原生动作模仿PPO",
+      "project": "unitree_mimic_go2",
+      "adapter": "robogauge",
+      "algorithm": "motion_imitation_ppo",
+      "robot": "go2",
+      "execution": "manual_cli",
+      "manual_url": "#reports?path=skills%2Fsideflip%2FTRAINING.md",
+      "capabilities": [
+        "sideflip"
+      ],
+      "runtime": "IsaacSim5.1 / IsaacLab2.3 / MuJoCo3.2.3",
+      "blocker": "使用已执行验证的专用CLI；不复用地形MoE实验配置器。",
+      "observation": "69维：参考q/dq、anchor方向、本体角速度、相对关节与前一动作",
+      "action": "12维关节偏移×0.5；PD40/1，50Hz策略、200Hz物理",
+      "defaults": {
+        "recipe_id": "sideflip_native_ppo",
+        "capability_id": "sideflip",
+        "adapter": "robogauge",
+        "algorithm_id": "motion_imitation_ppo",
+        "robot_id": "go2",
+        "initialization": "base",
+        "checkpoint": ""
+      },
+      "parameters": [
+        "--num-envs 4096",
+        "--iterations 5000",
+        "--headless",
+        "--device cuda:0"
+      ],
+      "note": "短程PPO与MuJoCo执行链已运行，完整训练进行中；任务与硬件模型约束分开计分。"
+    },
+    {
+      "id": "upright_walk_ppo",
+      "name": "Go2站立行走 · 起立与双足PPO",
+      "project": "unitree_mimic_go2",
+      "adapter": "robogauge",
+      "algorithm": "upright_velocity_ppo",
+      "robot": "go2",
+      "execution": "manual_cli",
+      "manual_url": "#reports?path=skills%2Fupright_walk%2FTRAINING.md",
+      "capabilities": [
+        "upright_walk"
+      ],
+      "runtime": "IsaacSim5.1 / IsaacLab2.3 / MuJoCo3.2.3",
+      "blocker": "使用已执行验证的专用CLI；不复用地形MoE实验配置器。",
+      "observation": "48维本体状态、水平速度命令与前一动作",
+      "action": "12维关节偏移×0.5；PD40/1，50Hz策略、200Hz物理",
+      "defaults": {
+        "recipe_id": "upright_walk_ppo",
+        "capability_id": "upright_walk",
+        "adapter": "robogauge",
+        "algorithm_id": "upright_velocity_ppo",
+        "robot_id": "go2",
+        "initialization": "base",
+        "checkpoint": ""
+      },
+      "parameters": [
+        "--num-envs 4096",
+        "--iterations 5000",
+        "--headless",
+        "--device cuda:0"
+      ],
+      "note": "短程PPO与MuJoCo执行链已运行，完整训练进行中；任务与硬件模型约束分开计分。"
+    },
+    {
+      "id": "backflip_native_ppo",
+      "name": "Go2 · 原生后空翻PPO",
+      "project": "go2_backflip_native",
+      "adapter": "robogauge",
+      "algorithm": "backflip_ppo",
+      "robot": "go2",
+      "execution": "manual_cli",
+      "manual_url": "#reports?path=skills%2Fbackflip%2FTRAINING.md",
+      "capabilities": [
+        "backflip"
+      ],
+      "runtime": "IsaacSim5.1 / IsaacLab2.3 / MuJoCo3.2.3",
+      "blocker": "使用已执行验证的专用CLI；不复用地形MoE实验配置器。",
+      "observation": "60维actor、165维特权critic；由固定原生源码定义，不复用69维LSD接口",
+      "action": "12关节偏移；50Hz，KP40/KD1，scale0.5；5000轮已完成，关节约束仍失败",
+      "defaults": {
+        "recipe_id": "backflip_native_ppo",
+        "capability_id": "backflip",
+        "adapter": "robogauge",
+        "algorithm_id": "backflip_ppo",
+        "robot_id": "go2",
+        "initialization": "base",
+        "checkpoint": ""
+      },
+      "parameters": [
+        "--num-envs 4096",
+        "--iterations 5000",
+        "--headless",
+        "--device cuda:0"
+      ],
+      "note": "短程PPO与MuJoCo执行链已运行，完整训练进行中；任务与硬件模型约束分开计分。"
+    }
+  ],
+  "archived_recipes": [
+    {
+      "id": "lsd_sideflip",
+      "name": "Go2 · 侧空翻动作跟踪",
+      "project": "lsd",
+      "adapter": "leggedskilldeploy",
+      "algorithm": "motion_tracking",
+      "robot": "go2",
+      "execution": "adapter_required",
+      "capabilities": [
+        "sideflip"
+      ],
+      "runtime": "MuJoCo / TorchScript",
+      "blocker": "部署仓库提供权重但未给出每个动作对应的完整训练复现链；先验证本地推理，不伪装成已接通训练。",
+      "observation": "69维：参考关节位置/速度、anchor姿态、本体角速度、关节与上次动作",
+      "action": "12关节偏移，50Hz；按源CSV和joint_mapping",
+      "defaults": {
+        "recipe_id": "lsd_sideflip",
+        "capability_id": "sideflip",
+        "adapter": "leggedskilldeploy",
+        "algorithm_id": "motion_tracking",
+        "robot_id": "go2",
+        "initialization": "base",
+        "checkpoint": ""
+      },
+      "parameters": [],
+      "note": "仅模拟器技能，无实机动作授权。",
+      "archive_reason": "由可执行Go2原生训练链替代；旧推理源保留在研究记录。"
     },
     {
       "id": "ame_original",
@@ -1446,135 +1009,618 @@
       },
       "parameters": [],
       "note": "仅模拟器技能，无实机动作授权。"
-    },
-    {
-      "id": "navigation_ppo",
-      "name": "Go2导航PPO速度头",
-      "project": "robogauge",
-      "adapter": "robogauge",
-      "algorithm": "navigation_ppo",
-      "robot": "go2",
-      "execution": "manual_cli",
-      "manual_url": "#reports?path=skills%2Fnavigation%2FTRAINING.md",
-      "capabilities": [
-        "navigation"
-      ],
-      "runtime": "MuJoCo3.2.3 / SB3 2.6 CPU",
-      "blocker": "使用专用CLI训练手册；不复用IsaacLab地形PPO配置器。",
-      "observation": "273维雷达/深度槽位、目标与本体状态；lidar模式保持相同屏蔽",
-      "action": "3维归一化vx/vy/wz；底层MoE137k不更新",
-      "defaults": {
-        "recipe_id": "navigation_ppo",
-        "capability_id": "navigation",
-        "adapter": "robogauge",
-        "algorithm_id": "navigation_ppo",
-        "robot_id": "go2",
-        "initialization": "base",
-        "checkpoint": ""
-      },
-      "parameters": [
-        "--config skills/navigation/config.json",
-        "--sensors lidar",
-        "--steps 100000",
-        "--envs 4"
-      ],
-      "note": "已实际完成100352步训练；8回合独立物理验证与网页交互通过。SDK实机仅方案，未验证。"
-    },
-    {
-      "id": "sideflip_native_ppo",
-      "name": "Go2侧空翻 · 原生动作模仿PPO",
-      "project": "unitree_mimic_go2",
-      "adapter": "robogauge",
-      "algorithm": "motion_imitation_ppo",
-      "robot": "go2",
-      "execution": "manual_cli",
-      "manual_url": "#reports?path=skills%2Fsideflip%2FTRAINING.md",
-      "capabilities": [
-        "sideflip"
-      ],
-      "runtime": "IsaacSim5.1 / IsaacLab2.3 / MuJoCo3.2.3",
-      "blocker": "使用已执行验证的专用CLI；不复用地形MoE实验配置器。",
-      "observation": "69维：参考q/dq、anchor方向、本体角速度、相对关节与前一动作",
-      "action": "12维关节偏移×0.5；PD40/1，50Hz策略、200Hz物理",
-      "defaults": {
-        "recipe_id": "sideflip_native_ppo",
-        "capability_id": "sideflip",
-        "adapter": "robogauge",
-        "algorithm_id": "motion_imitation_ppo",
-        "robot_id": "go2",
-        "initialization": "base",
-        "checkpoint": ""
-      },
-      "parameters": [
-        "--num-envs 4096",
-        "--iterations 5000",
-        "--headless",
-        "--device cuda:0"
-      ],
-      "note": "短程PPO与MuJoCo执行链已运行，完整训练进行中；任务与硬件模型约束分开计分。"
-    },
-    {
-      "id": "upright_walk_ppo",
-      "name": "Go2站立行走 · 起立与双足PPO",
-      "project": "unitree_mimic_go2",
-      "adapter": "robogauge",
-      "algorithm": "upright_velocity_ppo",
-      "robot": "go2",
-      "execution": "manual_cli",
-      "manual_url": "#reports?path=skills%2Fupright_walk%2FTRAINING.md",
-      "capabilities": [
-        "upright_walk"
-      ],
-      "runtime": "IsaacSim5.1 / IsaacLab2.3 / MuJoCo3.2.3",
-      "blocker": "使用已执行验证的专用CLI；不复用地形MoE实验配置器。",
-      "observation": "48维本体状态、水平速度命令与前一动作",
-      "action": "12维关节偏移×0.5；PD40/1，50Hz策略、200Hz物理",
-      "defaults": {
-        "recipe_id": "upright_walk_ppo",
-        "capability_id": "upright_walk",
-        "adapter": "robogauge",
-        "algorithm_id": "upright_velocity_ppo",
-        "robot_id": "go2",
-        "initialization": "base",
-        "checkpoint": ""
-      },
-      "parameters": [
-        "--num-envs 4096",
-        "--iterations 5000",
-        "--headless",
-        "--device cuda:0"
-      ],
-      "note": "短程PPO与MuJoCo执行链已运行，完整训练进行中；任务与硬件模型约束分开计分。"
     }
   ],
-  "archived_recipes": [
+  "archived_capabilities": [
     {
-      "id": "lsd_sideflip",
-      "name": "Go2 · 侧空翻动作跟踪",
-      "project": "lsd",
-      "adapter": "leggedskilldeploy",
-      "algorithm": "motion_tracking",
-      "robot": "go2",
-      "execution": "adapter_required",
-      "capabilities": [
-        "sideflip"
+      "id": "locomotion",
+      "name": "稳定运动与速度跟踪",
+      "category": "本体运动",
+      "projects": [
+        "robogauge",
+        "wtw"
       ],
-      "runtime": "MuJoCo / TorchScript",
-      "blocker": "部署仓库提供权重但未给出每个动作对应的完整训练复现链；先验证本地推理，不伪装成已接通训练。",
-      "observation": "69维：参考关节位置/速度、anchor姿态、本体角速度、关节与上次动作",
-      "action": "12关节偏移，50Hz；按源CSV和joint_mapping",
-      "defaults": {
-        "recipe_id": "lsd_sideflip",
-        "capability_id": "sideflip",
-        "adapter": "leggedskilldeploy",
-        "algorithm_id": "motion_tracking",
-        "robot_id": "go2",
-        "initialization": "base",
-        "checkpoint": ""
+      "description": "保留MoE基础稳定性，同时测试速度误差、能耗和跌倒。",
+      "acceptance": "独立速度指令种子；跟踪误差、接触与关节限位均合格。",
+      "recipe": "moe_mixed",
+      "local_status": "已有历史仿真",
+      "evidence": {
+        "prefixes": [
+          "artifacts/moe_perceptive",
+          "artifacts/v4_completed"
+        ],
+        "kinds": [
+          "flat"
+        ]
       },
-      "parameters": [],
-      "note": "仅模拟器技能，无实机动作授权。",
-      "archive_reason": "由可执行Go2原生训练链替代；旧推理源保留在研究记录。"
+      "archive_reason": "Duplicate of the mixed-terrain MoE retention recipe; that recipe did not list locomotion as an executable capability."
+    },
+    {
+      "id": "narrow_stakes",
+      "name": "原AME 20cm窄梅花桩",
+      "category": "精准落脚",
+      "projects": [
+        "ame_go2",
+        "ame"
+      ],
+      "description": "双排与交错原尺寸支撑面、真实2米深坑。",
+      "acceptance": "两类原桩、多重置与布局种子稳定完整通过；前置宽桩不计。",
+      "recipe": "ame_original",
+      "local_status": "原尺寸尚未通过",
+      "evidence": {
+        "prefixes": [
+          "artifacts/v4_completed",
+          "artifacts/perception_diagnostics_v6",
+          "artifacts/moe_perceptive"
+        ],
+        "kinds": [
+          "ame_stakes",
+          "ame_alternate"
+        ]
+      },
+      "archive_reason": "Repeated native training and strict original-dimension evaluations failed; widened/shallow precursor scores do not establish this ability."
+    },
+    {
+      "id": "water_avoid",
+      "name": "水坑识别与绕行",
+      "category": "目标导航",
+      "projects": [
+        "mid360",
+        "robogauge"
+      ],
+      "description": "结合观测局部规划；历史IK/规则导航与新策略分开。",
+      "acceptance": "多个目标与障碍布局，抵达目标且不进入水坑。",
+      "recipe": "navigation_sensor",
+      "local_status": "历史辅助原型",
+      "evidence": {
+        "prefixes": [
+          "artifacts/active",
+          "artifacts/terrain"
+        ],
+        "kinds": [
+          "course",
+          "water"
+        ]
+      },
+      "archive_reason": "Historical helper prototype, no independent trained sensor-policy and SDK chain."
+    },
+    {
+      "id": "gap_jump",
+      "name": "深坑跳跃 / 落地恢复",
+      "category": "敏捷技能",
+      "projects": [
+        "nju",
+        "pie",
+        "wmp"
+      ],
+      "description": "冻结BBC跳跃、感知起跳决策和自主落地各自验证。",
+      "acceptance": "真实无支撑间隙，四足离地且到达对侧；跨坑宽/种子。",
+      "recipe": "nju_jump",
+      "local_status": "历史技能组合",
+      "evidence": {
+        "prefixes": [
+          "artifacts/active"
+        ],
+        "kinds": [
+          "nju_gap",
+          "gap",
+          "course"
+        ]
+      },
+      "archive_reason": "Historical skill composition with external jump dependency; no complete native Go2 train/sim/SDK chain."
+    },
+    {
+      "id": "recovery",
+      "name": "倾倒自主恢复",
+      "category": "恢复技能",
+      "projects": [
+        "him_recovery",
+        "nju"
+      ],
+      "description": "随机侧卧/仰卧/俯卧启动，识别恢复切换条件。",
+      "acceptance": "独立初始姿态恢复站立并持续稳定；不靠重置或外力。",
+      "recipe": "him_recovery",
+      "local_status": "待接入验证",
+      "evidence": {
+        "prefixes": [],
+        "kinds": []
+      },
+      "archive_reason": "External reference not integrated into the installed native training runtime."
+    },
+    {
+      "id": "gait",
+      "name": "可调步态 / 步频 / 机身姿态",
+      "category": "本体运动",
+      "projects": [
+        "wtw"
+      ],
+      "description": "条件化控制步态、落脚相位、抬脚高度和机身姿态。",
+      "acceptance": "指令切换跟踪、速度误差、足端接触相位与稳定性。",
+      "recipe": "wtw_gait",
+      "local_status": "待接入验证",
+      "evidence": {
+        "prefixes": [],
+        "kinds": []
+      },
+      "archive_reason": "External IsaacGym policy not integrated into the installed native training runtime."
+    },
+    {
+      "id": "visual_parkour",
+      "name": "PIE视觉跑酷",
+      "category": "视觉策略",
+      "projects": [
+        "pie"
+      ],
+      "description": "双层隐式—显式估计、带时序深度输入的Go2策略。",
+      "acceptance": "真实深度观测、不读取理想地图；跨布局及延迟测试。",
+      "recipe": "pie_parkour",
+      "local_status": "深度推理已跑通，待验收",
+      "evidence": {
+        "prefixes": [],
+        "kinds": []
+      },
+      "curated_media": [
+        {
+          "path": "artifacts/capability_integration/pie_source_inference/episode_0.mp4",
+          "title": "PIE Go2 / MuJoCo stairs / pinned source checkpoint",
+          "label": "Unscored inference, not independent skill validation"
+        }
+      ],
+      "archive_reason": "Source inference only; native training and strict independent Go2 evaluations not established."
+    },
+    {
+      "id": "world_model",
+      "name": "世界模型预判越障",
+      "category": "视觉策略",
+      "projects": [
+        "wmp",
+        "lsd_wmp"
+      ],
+      "description": "时序世界模型支撑长程动作预判，保留Go1本体合约。",
+      "acceptance": "世界模型误差与实际通过率分别评估；Go2迁移另验。",
+      "recipe": "wmp_parkour",
+      "local_status": "待接入验证",
+      "evidence": {
+        "prefixes": [],
+        "kinds": []
+      },
+      "archive_reason": "External IsaacGym world-model project not integrated; no runnable native recipe."
+    },
+    {
+      "id": "lidar_nav",
+      "name": "MID-360建图 / 定位导航",
+      "category": "目标导航",
+      "projects": [
+        "mid360"
+      ],
+      "description": "FAST-LIO、ICP、Nav2与CHAMP的有图导航参考；与无提前建图目标分别验证。",
+      "acceptance": "目标到达、碰撞率和规划时延；明确有图/局部图/无提前图。",
+      "recipe": "mid360_nav",
+      "local_status": "待接入验证",
+      "evidence": {
+        "prefixes": [],
+        "kinds": []
+      },
+      "archive_reason": "FAST-LIO/local-planner references do not supply the requested native Go2 training chain; goal navigation is a separate retained skill."
+    },
+    {
+      "id": "deployment",
+      "name": "统一部署合约与Sim2Sim",
+      "category": "部署验证",
+      "projects": [
+        "lsd",
+        "lsd_wmp",
+        "himdog"
+      ],
+      "description": "统一关节顺序、归一化、动作语义、PD与时序，不统一不兼容权重。",
+      "acceptance": "每模型合约完整且原生→MuJoCo验证；实机另授权。",
+      "recipe": "deployment_contract",
+      "local_status": "待接入验证",
+      "evidence": {
+        "prefixes": [],
+        "kinds": []
+      },
+      "archive_reason": "A deployment contract is a cross-cutting plan, not a separately trainable motor skill."
+    },
+    {
+      "id": "motion_jump",
+      "name": "动作参考跳跃",
+      "category": "敏捷技能",
+      "projects": [
+        "lsd"
+      ],
+      "description": "跟踪上游Go2动作参考的独立技能；不代表自主感知障碍决策。",
+      "acceptance": "核对参考相位与本体合约，量化离地/旋转、落地稳定性和多种初始条件。",
+      "recipe": "lsd_motion_jump",
+      "local_status": "源权重推理，待独立评估",
+      "evidence": {
+        "prefixes": [
+          "artifacts/capability_campaign/motion_jump"
+        ],
+        "kinds": []
+      },
+      "curated_media": [
+        {
+          "path": "artifacts/capability_integration/lsd_jump/episode_0.mp4",
+          "title": "Go2 / lsd_jump / pinned source inference",
+          "label": "Unscored source-policy inference; independent repeats pending"
+        }
+      ],
+      "archive_reason": "Source weights/inference only; no verified native retraining and independent evaluation chain."
+    }
+  ],
+  "archived_projects": [
+    {
+      "id": "nju",
+      "name": "NJU Agility",
+      "url": "https://github.com/NJU-RLC/quadrupedal-agility",
+      "branch": "main",
+      "summary": "BBC自然运动技能、TSC深度地形决策和恢复；分层策略。",
+      "adapter": "nju",
+      "commit": "15d16ea99bc23e5d401b0b0e3b88a8edcc28f0ed",
+      "license": "MIT，部分继承BSD文件",
+      "runtime": "IsaacGym Preview4 / Python3.8 / Torch2.3.1 cu118",
+      "status": "reviewed_reference",
+      "media": [
+        {
+          "url": "https://nju-rlc.github.io/quadrupedal_agility/static/videos/follow_mid.mp4",
+          "title": "NJU完整挑战",
+          "type": "video",
+          "origin": "upstream",
+          "label": "上游作者演示，非Rob2Nav独立验证",
+          "capabilities": [
+            "stairs",
+            "multiterrain"
+          ]
+        },
+        {
+          "url": "https://nju-rlc.github.io/quadrupedal_agility/static/videos/behaviors.mp4",
+          "title": "NJU自然步态与动作",
+          "type": "video",
+          "origin": "upstream",
+          "label": "上游作者演示，非Rob2Nav独立验证",
+          "capabilities": [
+            "locomotion",
+            "gait",
+            "recovery",
+            "multiterrain"
+          ]
+        },
+        {
+          "url": "https://nju-rlc.github.io/quadrupedal_agility/static/videos/hurdling.mp4",
+          "title": "NJU越栏",
+          "type": "video",
+          "origin": "upstream",
+          "label": "上游作者演示，非Rob2Nav独立验证",
+          "capabilities": [
+            "gap_jump",
+            "motion_jump"
+          ]
+        },
+        {
+          "url": "https://nju-rlc.github.io/quadrupedal_agility/static/videos/box.mp4",
+          "title": "NJU高台作者演示",
+          "type": "video",
+          "origin": "upstream",
+          "label": "上游作者演示，非Rob2Nav独立验证",
+          "capabilities": [
+            "platform"
+          ]
+        }
+      ],
+      "contracts": [
+        "BBC：12关节动作；2/3/5模式独立策略",
+        "TSC教师特权地形，学生87×58深度、2帧缓冲、每5步更新",
+        "go2_deploy已发布低层、深度高层与恢复权重；box入口仍缺匹配模型"
+      ],
+      "source_files": [
+        "bbc/legged_gym/scripts/train.py",
+        "tsc/legged_gym/scripts/train.py",
+        "go2_deploy/scripts/"
+      ],
+      "source_commands": [
+        "python bbc/legged_gym/scripts/train.py --task go2_locomotion --experiment_idx 0 --device_id 0 --headless True",
+        "python tsc/legged_gym/scripts/train.py --proj_name agility --exptid base --device_id 0 --randomize_start --randomize_base_mass --randomize_base_com --push_robots",
+        "python tsc/legged_gym/scripts/train.py --proj_name agility --exptid dist --device_id 0 --resume --resumeid base --use_camera"
+      ]
+    },
+    {
+      "id": "ame",
+      "name": "AME · SII-FUSC",
+      "url": "https://github.com/SII-FUSC/AME_Locomotion",
+      "branch": "main",
+      "summary": "G1高程图注意力编码参考；不能直接作为Go2权重。",
+      "adapter": "ame",
+      "commit": "1d3519ee946c846c1c89dd660539a224f99972b5",
+      "license": "未发现根许可证；RSL-RL组件有单独许可",
+      "runtime": "IsaacLab2.3 / Isaac Sim5.x；上游版本说明有差异",
+      "status": "reviewed_reference",
+      "media": [],
+      "contracts": [
+        "G1 29DoF；33×21 XYZ高程图 + 本体状态",
+        "仿真理想地形输入，不等于机载深度/雷达部署"
+      ],
+      "source_files": [
+        "rsl_rl/rsl_rl/modules/actor_critic_encoder.py"
+      ],
+      "source_commands": [
+        "bash run_train.sh",
+        "bash run_play.sh"
+      ]
+    },
+    {
+      "id": "pie",
+      "name": "Go2 PIE",
+      "url": "https://github.com/WwWv0v/go2_PIE",
+      "branch": "main",
+      "summary": "MJLab下Go2视觉隐式—显式估计；论文平台与Go2复现分开。",
+      "adapter": "pie",
+      "commit": "fb0db87924a9731913ad1011381c01db6945a9c8",
+      "license": "未发现根目录许可证，暂不再分发源码或权重",
+      "runtime": "MJLab 1.2.0 / MuJoCo 3.5.0 / Python 3.11",
+      "status": "reviewed_reference",
+      "media": [
+        {
+          "type": "image",
+          "url": "https://raw.githubusercontent.com/WwWv0v/go2_PIE/fb0db87924a9731913ad1011381c01db6945a9c8/docs/go2_demo.gif",
+          "origin": "upstream",
+          "title": "作者Go2视觉策略演示",
+          "label": "上游演示，非Rob2Nav验证"
+        }
+      ],
+      "contracts": [
+        "Go2 · 12 actions · 50 Hz",
+        "45维本体 + 450历史 + 2×60×86深度 + 128循环状态",
+        "深度10Hz，策略50Hz；KP20/20/40、KD1/1/2",
+        "当前代码地形为平地、上楼梯、下楼梯；不等同原论文全跑酷任务"
+      ],
+      "source_files": [
+        "deploy/pie/sim2sim/contract.py",
+        "src/parkour/tasks/",
+        "scripts/train.py"
+      ],
+      "source_commands": [
+        "python scripts/train.py Unitree-Go2-PIE --env.scene.num-envs 16 --agent.max-iterations 2 --agent.run-name rob2nav_smoke",
+        "python deploy/pie/sim2sim/go2_pie_sim2sim.py --checkpoint-file logs/rsl_rl/go2_pie/policy.onnx --provider cpu --terrain stairs --headless --duration 10"
+      ]
+    },
+    {
+      "id": "him_high",
+      "name": "HIM · high",
+      "url": "https://github.com/uwvwko-zzz/uw-himloco",
+      "branch": "high",
+      "summary": "自定义Dog平台的高台策略；不是Go2已验证能力。",
+      "adapter": "him",
+      "commit": "360f05c72783363e37abc3ecee95a568fb21a94a",
+      "license": "BSD-3-Clause",
+      "runtime": "IsaacGym Preview4 + rsl_rl",
+      "status": "reviewed_reference",
+      "media": [],
+      "contracts": [
+        "custom Dog · 46×6=276输入 · 12输出",
+        "目录没有Go2模型，README模型路径不是已发布权重",
+        "46×6历史，12偏移动作，50Hz，KP40/KD1，action_scale.25"
+      ],
+      "source_files": [
+        "legged_gym/envs/dog/dog_high_config.py",
+        "mujoco/dog/play_onnx_46.py"
+      ],
+      "source_commands": [
+        "python legged_gym/scripts/train.py --task=dog --headless"
+      ]
+    },
+    {
+      "id": "him_recovery",
+      "name": "HIM · hop恢复",
+      "url": "https://github.com/uwvwko-zzz/uw-himloco",
+      "branch": "hop",
+      "summary": "hop分支为倒地恢复；不按分支名字推断为跳跃。",
+      "adapter": "him",
+      "commit": "04e50c0173469f4b0766725c76dda549701dbd20",
+      "license": "BSD-3-Clause",
+      "runtime": "IsaacGym Preview4 + 外部rsl_rl",
+      "status": "reviewed_reference",
+      "media": [],
+      "contracts": [
+        "自定义Dog；46×6历史，12动作，50Hz，action_scale.5",
+        "未入库预训练.pt/.onnx，需训练与Go2迁移"
+      ],
+      "source_files": [
+        "legged_gym/envs/dog/dog_recovery_config.py"
+      ],
+      "source_commands": [
+        "python legged_gym/scripts/train.py --task=dog_recovery --headless",
+        "python legged_gym/scripts/play_recovery.py --task=dog_recovery"
+      ]
+    },
+    {
+      "id": "himdog",
+      "name": "himdog部署",
+      "url": "https://github.com/uwvwko-zzz/himdog",
+      "branch": "main",
+      "summary": "dog_policy_test / dog_control部署接口与sim2real适配参考。",
+      "adapter": "him",
+      "commit": "f7ce8161a0c8458994aee4673eed36fa274ab33f",
+      "license": "根许可证缺失；各ROS包分别审查",
+      "runtime": "ROS2 + ONNXRuntime + 自定义电机通信",
+      "status": "reviewed_reference",
+      "media": [],
+      "contracts": [
+        "45/46每步×6历史，策略50Hz、电机发布200Hz",
+        "实际有ONNX，但推荐YAML引用部分缺失模型，且本体不是Go2"
+      ],
+      "source_files": [],
+      "source_commands": [
+        "ros2 run dog_policy_test dog_policy_test_12 --ros-args --params-file ./src/dog_policy_test/config/policy_params_12.yaml"
+      ]
+    },
+    {
+      "id": "wmp",
+      "name": "WMP Go1",
+      "url": "https://github.com/haozhang04/wmp_go1",
+      "branch": "main",
+      "summary": "深度世界模型与运动控制，Go1合约独立。",
+      "adapter": "wmp",
+      "commit": "65cf1afd13e4792bce7b9def6f44372ecbb3cdf0",
+      "license": "Apache-2.0根许可证及licenses分项许可",
+      "runtime": "Isaac Gym Preview 3 / Python 3.8",
+      "status": "reviewed_reference",
+      "media": [
+        {
+          "url": "https://www.bilibili.com/video/BV1fHut6PE1j",
+          "title": "WMP作者部署演示",
+          "type": "bilibili",
+          "origin": "upstream",
+          "label": "上游作者演示，非Rob2Nav独立验证"
+        }
+      ],
+      "contracts": [
+        "Go1 · actor70 → 12",
+        "世界模型：33本体 + 64×64深度 + 5×12动作历史"
+      ],
+      "source_files": [
+        "legged_gym/envs/go1/go1_config.py",
+        "legged_gym/scripts/train.py"
+      ],
+      "source_commands": [
+        "CUDA_VISIBLE_DEVICES=0 ./bash/leggedskill.sh -t",
+        "CUDA_VISIBLE_DEVICES=0 ./bash/leggedskill.sh -p --terrain climb --path <checkpoint> --headless"
+      ]
+    },
+    {
+      "id": "lsd_wmp",
+      "name": "LeggedSkillDeploy · WMP",
+      "url": "https://github.com/haozhang04/LeggedSkillDeploy",
+      "branch": "wmp_parkour",
+      "summary": "WMP推理合约及部署链路。",
+      "adapter": "leggedskilldeploy",
+      "commit": "9bc7329f14ee3b9f7d0c5bd66b15b91c8c099bb9",
+      "license": "未发现LICENSE；不再分发权重",
+      "runtime": "WMP部署独立分支 / MuJoCo / Torch",
+      "status": "reviewed_reference",
+      "media": [],
+      "contracts": [
+        "Go1外部45观测，内部封装历史与世界模型；12动作",
+        "KP40/KD1，.005×4=50Hz；joint_mapping=[3,4,5,0,1,2,9,10,11,6,7,8]",
+        "实际入库65k、100k Go1 WMP权重"
+      ],
+      "source_files": [
+        "policy/issacgym/go1/go1wmp/config.yaml"
+      ]
+    },
+    {
+      "id": "wtw",
+      "name": "Walk These Ways · Go2",
+      "url": "https://github.com/Teddy-Liao/walk-these-ways-go2",
+      "branch": "main",
+      "summary": "条件化步态、速度、机身姿态与步频控制。",
+      "adapter": "wtw",
+      "commit": "d00320778c61567379b4a304047955c0c0dcae43",
+      "license": "MIT及第三方组件许可",
+      "runtime": "IsaacGym / Torch1.10 cu113 / LCM+SDK2部署",
+      "status": "reviewed_reference",
+      "media": [
+        {
+          "url": "https://www.bilibili.com/video/BV1tQ4y1c7ZG",
+          "title": "WTW Go2作者演示",
+          "type": "bilibili",
+          "origin": "upstream",
+          "label": "上游作者演示，非Rob2Nav独立验证"
+        }
+      ],
+      "contracts": [
+        "Go2条件化步态；预训练模型目录实际声明",
+        "现有播放依赖IsaacGym，尚无本项目MuJoCo合约"
+      ],
+      "source_files": [
+        "scripts/train.py",
+        "scripts/play.py",
+        "runs/gait-conditioned-agility/pretrain-go2/train"
+      ],
+      "source_commands": [
+        "python scripts/train.py",
+        "cd scripts && python play.py"
+      ]
+    },
+    {
+      "id": "mid360",
+      "name": "Go2 MID-360 Navigation",
+      "url": "https://github.com/max-niuniu/go2-mid360-navigation",
+      "branch": "main",
+      "summary": "雷达导航仿真参考；是否建图按实际代码标识，不能自动称无地图。",
+      "adapter": "mid360",
+      "commit": "5e45b10a167b9519364279e4ff08ee8516dd571b",
+      "license": "BSD-3-Clause原创部分，模型各保留许可",
+      "runtime": "Ubuntu22.04 / ROS2 Humble / GazeboClassic11 / CHAMP",
+      "status": "reviewed_reference",
+      "media": [
+        {
+          "url": "https://raw.githubusercontent.com/max-niuniu/go2-mid360-navigation/5e45b10a167b9519364279e4ff08ee8516dd571b/media/demo.mp4",
+          "title": "MID360 Gazebo导航作者演示",
+          "type": "video",
+          "origin": "upstream",
+          "label": "上游作者演示，非Rob2Nav独立验证"
+        }
+      ],
+      "contracts": [
+        "FAST-LIO + ICP + Nav2，有建图/地图定位依赖",
+        "MID360 + D435i；CHAMP步态，不是RL权重"
+      ],
+      "source_files": [
+        "src/go2-mid360-navigation/scripts/run_navigation.bash"
+      ],
+      "source_commands": [
+        "bash src/go2-mid360-navigation/scripts/run_navigation.bash gui:=true show_rviz:=true"
+      ]
+    },
+    {
+      "id": "moe_cts",
+      "name": "MoE-CTS原训练项目",
+      "url": "https://github.com/wty-yy/go2_rl_lab",
+      "branch": "main",
+      "commit": "5702ff7704c53e0b92e69876dc8da25153d36a25",
+      "license": "MIT，继承Unitree RL Lab Apache-2.0等许可",
+      "runtime": "新上游：IsaacLab3.0 EA / Isaac Sim6.1 / Python3.12 / Newton MJWarp",
+      "summary": "原MoE训练算法。与RoboGauge评估器分开；本项目基座锁定历史137k导出合约。",
+      "adapter": "moe",
+      "status": "reviewed_reference",
+      "media": [],
+      "contracts": [
+        "新上游与历史137k权重版本不能直接互换",
+        "教师/学生环境3:1；MoE-CTS动态隐变量估计"
+      ],
+      "source_files": [
+        "source/rsl_rl/rsl_rl/moe_cts/algorithm.py"
+      ],
+      "source_commands": [
+        "./go2_rl_lab.sh --train --task go2-mixed-moe-cts"
+      ]
+    }
+  ],
+  "archived_robots": [
+    {
+      "id": "go1",
+      "name": "Unitree Go1",
+      "dof": 12,
+      "status": "参考合约，动力学待接入",
+      "viewer": false,
+      "note": "WMP本体；与Go2关节限位、惯性和观测不能混用。"
+    },
+    {
+      "id": "custom_dog",
+      "name": "HIM custom Dog",
+      "dof": 12,
+      "status": "参考本体，待Go2迁移",
+      "viewer": false,
+      "note": "high / hop使用的自定义模型不等于Go2。"
+    },
+    {
+      "id": "g1_29dof",
+      "name": "Unitree G1 29DoF",
+      "dof": 29,
+      "status": "AME参考，非四足策略",
+      "viewer": false,
+      "note": "保留注意力编码算法参考，不能加载到12DoF Go2。"
     }
   ]
 }

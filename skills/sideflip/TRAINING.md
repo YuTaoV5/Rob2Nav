@@ -44,3 +44,18 @@ ls outputs/sideflip_interface_new/model_*.pt outputs/sideflip_interface_new/comp
 本次相同参数完整任务已在outputs/sideflip_native_full_20261021运行，不要重复启动。日志capability-work/sideflip/full.log；checkpoint每100更新及末次保存。恢复可增加--resume旧检查点并选择新--output；--iterations表示继续的更新数。Actor69维、12动作、50Hz，物理200Hz、PD40/1、动作缩放0.5；力矩及速度限制按URDF逐关节读取。训练中的动作参考相位重采样属于episode reset；独立MuJoCo评估仅初始化时设置根状态。
 
 下一步：[仿真手册](SIMULATION.md)、[SDK方案](DEPLOYMENT.md)。奖励上升和训练结束均不等于侧空翻通过。
+
+## 显式DC执行器迁移对照（实验）
+
+旧5000轮结果保留，不覆盖。新增 `--transfer-motors` 将PhysX硬限速替换为显式线性力矩—速度包络，物理步长2ms、策略50Hz；两引擎使用相同包络。参数取URDF额定边界，仅为仿真模型，不代表已辨识的真实Go2电机。该对照不自动证明跨仿真成功。
+
+```bash
+cd /root/gpufree-data/Rob2Nav
+/isaac-sim/python.sh -m skills.sideflip.train --headless --device cuda:0 \
+  --backflip-source /root/gpufree-data/Rob2Nav-upstreams/GO2_backflip \
+  --unitree-source /root/gpufree-data/Rob2Nav-upstreams/unitree_rl_lab --motion /root/gpufree-data/capability-work/sideflip/reference.npz \
+  --resume outputs/sideflip_native_full_20261021/model_4999.pt --transfer-motors \
+  --num-envs 2048 --iterations 1000 --output outputs/sideflip_dc_review
+```
+
+完整检查点含优化器和迭代数；恢复后文件编号继续沿用原编号，不应假定最终文件名为model_999.pt。按目录实际编号选择最高检查点，使用CPU导出器保存新目录；policy.json中的motor_model应为dc_linear_v1。评估时不应把DC模型权重套到旧理想PD执行器上。侧空翻适配同时将非足端接触惩罚设为−10，必须重新评估接触和落稳，不能借用旧模型成绩。

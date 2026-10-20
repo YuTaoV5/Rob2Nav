@@ -11,6 +11,7 @@ p.add_argument('--num-envs', type=int, default=4096)
 p.add_argument('--iterations', type=int, default=5000)
 p.add_argument('--seed', type=int, default=44)
 p.add_argument('--resume', type=Path)
+p.add_argument('--transfer-motors',action='store_true')
 AppLauncher.add_app_launcher_args(p)
 args = p.parse_args()
 args.kit_args = (args.kit_args+' --enable isaacsim.asset.importer.urdf').strip()
@@ -29,6 +30,10 @@ def main():
     source = setup_sources(args.backflip_source, args.unitree_source)
     from unitree_rl_lab.tasks.mimic.agents.rsl_rl_ppo_cfg import BasePPORunnerCfg
     cfg = make_cfg(source,args.num_envs,args.seed,args.device or 'cuda:0')
+    if args.transfer_motors:
+        from skills.sideflip.common import enable_transfer_motors
+        enable_transfer_motors(cfg,source)
+        cfg.commands.base_velocity.debug_vis=False
     agent = BasePPORunnerCfg()
     agent.seed,agent.device = args.seed,cfg.sim.device
     agent.max_iterations,agent.save_interval = args.iterations,100
@@ -46,9 +51,11 @@ def main():
             command_frame='horizontal forward is projected negative body Z when upright',
             target_projected_gravity=[-1,0,0],actor_observations=int(wrapped.get_observations()['policy'].shape[-1]),action_dim=12,
             joint_names=env.scene['robot'].joint_names,default_joint_pos=env.scene['robot'].data.default_joint_pos[0].tolist(),
-            action_scale=.5,kp=40,kd=1,policy_hz=50,physics_hz=200,seed=args.seed,
+            action_scale=.5,kp=40,kd=1,policy_hz=round(1/(cfg.sim.dt*cfg.decimation)),physics_hz=round(1/cfg.sim.dt),
+            motor_model='dc_linear_v1' if args.transfer_motors else 'ideal_pd',seed=args.seed,
             num_envs=args.num_envs,requested_iterations=args.iterations,
-            source_sha256={f.name:sha(f) for f in Path(__file__).parent.glob('*.py')},hardware_connected=False))
+            source_sha256={f.name:sha(f) for f in Path(__file__).parent.glob('*.py')},
+            shared_asset_source_sha256=sha(Path(__file__).parents[1]/'sideflip'/'common.py'),hardware_connected=False))
         runner_cfg = agent.to_dict()
         runner_cfg['obs_groups'] = {'policy':['policy'],'critic':['policy']}
         runner = OnPolicyRunner(wrapped,runner_cfg,log_dir=str(args.output),device=cfg.sim.device)

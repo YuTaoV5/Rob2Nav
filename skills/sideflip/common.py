@@ -64,3 +64,18 @@ def sha(path):
 
 def write_json(path, data):
     Path(path).write_text(json.dumps(data, indent=2, ensure_ascii=False)+'\n')
+
+
+def enable_transfer_motors(cfg, source):
+    """Explicit DC envelope, no PhysX joint-speed clamp; experimental transfer revision."""
+    from isaaclab.actuators import DCMotorCfg
+    limits={j.attrib['name']:j.find('limit').attrib for j in ET.parse(Path(source)/'resources/robots/go2/urdf/go2_description.urdf').getroot().findall('joint') if j.attrib['name'] in CSV_JOINTS}
+    cfg.scene.robot.actuators={name:DCMotorCfg(joint_names_expr=[name],stiffness=40.,damping=1.,
+        effort_limit=float(v['effort']),effort_limit_sim=float(v['effort']),
+        velocity_limit=float(v['velocity']),velocity_limit_sim=1.e6,saturation_effort=float(v['effort']))
+        for name,v in limits.items()}
+    cfg.sim.dt=.002
+    cfg.decimation=10
+    cfg.sim.render_interval=10
+    cfg.scene.robot.spawn.articulation_props.solver_position_iteration_count=8
+    cfg.scene.robot.spawn.articulation_props.solver_velocity_iteration_count=2

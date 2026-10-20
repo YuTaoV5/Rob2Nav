@@ -1,0 +1,39 @@
+{
+  "observed_at_utc": "2026-10-20T22:11:50.984568+00:00",
+  "observation": "ps confirmed both native training PIDs alive; terrain batch log progressed; not a future liveness guarantee",
+  "jobs": [
+    {
+      "skill": "sideflip",
+      "pid": 274597,
+      "output": "outputs/sideflip_dc_adapt_20261021",
+      "log": "/root/gpufree-data/capability-work/sideflip/dc-adapt.log",
+      "terminal_file": "/root/gpufree-data/capability-work/sideflip/dc-adapt.exit",
+      "additional_iterations": 1000,
+      "motor_model": "dc_linear_v1"
+    },
+    {
+      "skill": "upright_walk",
+      "pid": 276211,
+      "output": "outputs/upright_dc_adapt_20261021",
+      "log": "/root/gpufree-data/capability-work/upright_walk/dc-adapt.log",
+      "terminal_file": "/root/gpufree-data/capability-work/upright_walk/dc-adapt.exit",
+      "additional_iterations": 1000,
+      "motor_model": "dc_linear_v1"
+    },
+    {
+      "skill": "terrain_manual_reproduction",
+      "batch_pid": 280074,
+      "log": "/root/gpufree-data/capability-work/terrain-manuals.log",
+      "terminal_file": "/root/gpufree-data/capability-work/terrain-manuals.exit",
+      "entry": "bash scripts/verify_terrain_manuals.sh"
+    }
+  ],
+  "verification": {
+    "studio_tests_passed": 50,
+    "stunt_frame_and_motor_tests_passed": 2,
+    "manual_browser_links_passed": 21,
+    "frontend_build_passed": true,
+    "hardware_connected": false,
+    "github_pushed": false
+  }
+}

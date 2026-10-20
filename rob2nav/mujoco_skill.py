@@ -11,6 +11,25 @@ import mujoco
 import torch
 
 
+def base_link_velocity(model,data,base,out):
+    """Angular and COM linear velocity in link axes, independent of inertia axes."""
+    mujoco.mj_objectVelocity(model,data,mujoco.mjtObj.mjOBJ_BODY,base,out,0)
+    rot=data.xmat[base].reshape(3,3)
+    out[:3]=rot.T@out[:3]
+    out[3:]=rot.T@out[3:]
+    return out
+
+
+def motor_torque(target,q,dq,effort,velocity_limit,motor_model='ideal_pd'):
+    raw=40*(target-q)-dq
+    if motor_model=='ideal_pd':return np.clip(raw,-effort,effort)
+    if motor_model!='dc_linear_v1':raise ValueError('Unknown motor contract')
+    speed=np.clip(dq,-2*velocity_limit,2*velocity_limit)
+    maximum=np.minimum(effort*(1-speed/velocity_limit),effort)
+    minimum=np.maximum(effort*(-1-speed/velocity_limit),-effort)
+    return np.clip(raw,minimum,maximum)
+
+
 def main():
     p=argparse.ArgumentParser()
     p.add_argument('--kind',choices=['sideflip','upright_walk'],required=True)
@@ -18,9 +37,12 @@ def main():
     p.add_argument('--backflip-source',required=True,type=Path)
     p.add_argument('--motion',type=Path)
     p.add_argument('--seconds',type=float,default=6.)
+    p.add_argument('--physics-hz',type=int,choices=[200,500,1000,2000],default=200)
     p.add_argument('--seed',type=int,default=1000)
     p.add_argument('--command',type=float,nargs=3,default=[.2,0.,0.])
     p.add_argument('--video',action='store_true')
+    p.add_argument('--initialization',choices=['settled','reference_state'],default='settled',
+        help='reference_state is an explicit training-reset parity diagnostic, not standing-start acceptance')
     p.add_argument('--output',required=True,type=Path)
     args=p.parse_args()
     if not 0<args.seconds<=60:
@@ -32,7 +54,7 @@ def main():
     torch.set_num_threads(1)
     actor=torch.jit.load(str(args.policy),map_location='cpu').eval()
     model=mujoco.MjModel.from_xml_path(str(args.backflip_source/'mujoco/go2/go2_isaac.xml'))
-    model.opt.timestep=.005
+    model.opt.timestep=1./args.physics_hz
     data=mujoco.MjData(model)
     names=meta['joint_names']
     jids=np.array([model.joint(n).id for n in names])
@@ -65,8 +87,15 @@ def main():
     # Small initial joint uncertainty, never an in-flight state reset.
     data.qpos[qids]+=rng.uniform(-.002,.002,12)
     target=data.qpos[qids].copy()
-    for _ in range(100):
-        data.ctrl[aids]=np.clip(40*(target-data.qpos[qids])-data.qvel[vids],-effort,effort)
+    if args.initialization=='reference_state':
+        if reference is None:raise ValueError('reference_state initialization requires sideflip reference')
+        data.qvel[:3]=reference['body_lin_vel_w'][0,anchor]
+        initial_rot=data.xmat[base].reshape(3,3)
+        data.qvel[3:6]=initial_rot.T@reference['body_ang_vel_w'][0,anchor]
+        data.qvel[vids]=reference['joint_vel'][0]
+        mujoco.mj_forward(model,data)
+    for _ in range(round(.5*args.physics_hz) if args.initialization=='settled' else 0):
+        data.ctrl[aids]=motor_torque(target,data.qpos[qids],data.qvel[vids],effort,velocity_limits,meta.get('motor_model','ideal_pd'))
         mujoco.mj_step(model,data)
     start=float(data.time)
     last=np.zeros(12,dtype=np.float32)
@@ -90,7 +119,7 @@ def main():
             now=float(data.time)-start
             rot=data.xmat[base].reshape(3,3)
             gravity=rot.T@np.array([0.,0.,-1.])
-            mujoco.mj_objectVelocity(model,data,mujoco.mjtObj.mjOBJ_BODY,base,body_velocity,1)
+            base_link_velocity(model,data,base,body_velocity)
             q=data.qpos[qids]-default
             dq=data.qvel[vids]
             if reference is not None:
@@ -120,12 +149,12 @@ def main():
                 raise FloatingPointError('Nonfinite actor output')
             last=np.clip(action,-100,100)
             target=default+float(meta['action_scale'])*last
-            for _ in range(4):
-                data.ctrl[aids]=np.clip(40*(target-data.qpos[qids])-data.qvel[vids],-effort,effort)
+            for _ in range(args.physics_hz//50):
+                data.ctrl[aids]=motor_torque(target,data.qpos[qids],data.qvel[vids],effort,velocity_limits,meta.get('motor_model','ideal_pd'))
                 mujoco.mj_step(model,data)
                 if not np.isfinite(data.qpos).all() or not np.isfinite(data.qvel).all():
                     raise FloatingPointError('Nonfinite MuJoCo state')
-                mujoco.mj_objectVelocity(model,data,mujoco.mjtObj.mjOBJ_BODY,base,velocity_buffer,1)
+                base_link_velocity(model,data,base,velocity_buffer)
                 signed_x_rotation+=float(velocity_buffer[0])*model.opt.timestep
                 angular_travel+=float(np.linalg.norm(velocity_buffer[:3]))*model.opt.timestep
                 max_speed_ratio=max(max_speed_ratio,float(np.max(np.abs(data.qvel[vids])/velocity_limits)))
@@ -143,7 +172,7 @@ def main():
             raw_roll.append(float(np.arctan2(-rot[1,2],rot[2,2])))
             up_error=float(np.linalg.norm(rot.T@np.array([0.,0.,-1.])-[-1,0,0]))
             over=np.maximum(data.qpos[qids]-model.jnt_range[jids,1],model.jnt_range[jids,0]-data.qpos[qids])
-            trace.append(dict(time=float(data.time)-start,position=data.qpos[:3].tolist(),quaternion=data.qpos[3:7].tolist(),
+            trace.append(dict(observation=obs.tolist(),action=action.tolist(),time=float(data.time)-start,position=data.qpos[:3].tolist(),quaternion=data.qpos[3:7].tolist(),
                 joints=data.qpos[qids].tolist(),upright=float(rot[2,2]),upright_walk_error=up_error,
                 front_ground=any(n.startswith(('FL_','FR_')) for n in ground_bodies),
                 rear_ground=any(n.startswith(('RL_','RR_')) for n in ground_bodies),
@@ -179,11 +208,11 @@ def main():
     metrics.update(max_joint_speed_ratio=max_speed_ratio,max_joint_limit_excess_rad=max_limit_excess,
         unexpected_body_ground_contact=bad_floor_contact)
     (args.output/'trace.json').write_text(json.dumps(trace))
-    summary=dict(args=dict(kind=args.kind,seed=args.seed),backend='MuJoCo',successes=int(success),total=1,
+    summary=dict(args=dict(kind=args.kind,seed=args.seed,initialization=args.initialization,physics_hz=args.physics_hz),backend='MuJoCo',successes=int(success),total=1,
         evaluator_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         episodes=[dict(success=success,**metrics)],metrics=metrics,policy_sha256=meta['policy_sha256'],
         root_state_writes='initialization only; no root stabilization/weld/teleport during evaluation',hardware_connected=False,
-        hardware_constraints_pass=metrics['max_joint_speed_ratio']<=1. and metrics['max_joint_limit_excess_rad']<=.001)
+        motor_model=meta.get('motor_model','ideal_pd'),hardware_constraints_pass=metrics['max_joint_speed_ratio']<=1. and metrics['max_joint_limit_excess_rad']<=.001)
     (args.output/'summary.json').write_text(json.dumps(summary,indent=2))
     print(json.dumps(summary),flush=True)
 

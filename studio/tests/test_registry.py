@@ -11,10 +11,9 @@ def test_recipe_robot_algorithm_contract_and_external_gate(tmp_path):
     cfg=RunConfig(**native['defaults'])
     with pytest.raises(ValueError,match='Robot / algorithm'):
         RunConfig(**{**native['defaults'],'robot_id':'go1'})
-    external=next(r for r in data['recipes'] if r['id']=='wmp_parkour')
-    cfg=RunConfig(**external['defaults'])
-    with pytest.raises(ValueError,match='IsaacGym'):
-        command(cfg,tmp_path,tmp_path/'out',tmp_path/'cfg','python')
+    external=next(r for r in data['archived_recipes'] if r['id']=='wmp_parkour')
+    with pytest.raises(ValueError,match='Unknown reviewed training recipe'):
+        RunConfig(**external['defaults'])
 
 
 def test_retention_recipe_preserves_observation_contract(tmp_path):
@@ -45,13 +44,14 @@ def test_registry_references_are_complete_and_pinned():
         assert set(skill['projects'])<=projects and skill['recipe'] in recipes
     for r in d['recipes']:assert r['robot'] in robots
     assert all(len(p['commit'])==40 for p in d['projects'])
-    assert next(p for p in d['projects'] if p['id']=='mid360')['contracts'][0].startswith('FAST-LIO')
+    assert next(p for p in d['projects']+d['archived_projects'] if p['id']=='mid360')['contracts'][0].startswith('FAST-LIO')
 
 
 def test_registry_and_schema_route_serve_without_starting_tasks(tmp_path):
     with TestClient(create_app(tmp_path)) as c:
         d=c.get('/api/capabilities').json()
-        assert len(d['capabilities'])>=16 and len(d['projects'])>=14
+        assert {'backflip','sideflip','upright_walk','navigation'} <= {s['id'] for s in d['capabilities']}
+        assert not ({s['id'] for s in d['capabilities']} & {s['id'] for s in d['archived_capabilities']})
         assert c.get('/api/schema').json()['registry']['version']==1
         assert c.get('/api/jobs').json()==[]
 
@@ -67,3 +67,17 @@ def test_skill_manual_links_resolve_only_indexed_reports(tmp_path):
             report=next(r for r in reports if r['path']==manual['path'])
             assert c.get('/api/reports/'+report['id']).json()['path']==manual['path']
         assert c.get('/api/jobs').json()==[]
+
+
+def test_retained_capabilities_have_three_real_manuals_and_no_archived_recipe():
+    from pathlib import Path
+    from studio.registry import REGISTRY
+    root=REGISTRY.parent.parent
+    data=registry()
+    archived={r['id'] for r in data.get('archived_recipes',[])}
+    for skill in data['capabilities']:
+        assert skill['recipe'] not in archived
+        folder=root/'skills'/skill['id']
+        for name in ('TRAINING.md','SIMULATION.md','DEPLOYMENT.md'):
+            source=(folder/name).read_text(encoding='utf-8')
+            assert len(source)>200, (skill['id'],name)

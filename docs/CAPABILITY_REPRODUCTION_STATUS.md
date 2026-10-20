@@ -1,26 +1,20 @@
 # Go2 能力复现交付进度
 
-更新于2026-10-21。本页记录已执行证据和剩余工作，不能替代逐项验收。
+更新于2026-10-21。以下为实际执行结果；任务仍未整体完成。实机仅SDK方案，无硬件连接或命令发送。
 
-| 用户要求 | 当前证据 | 尚需完成 |
+| 要求 | 当前证据 | 剩余工作 |
 |---|---|---|
-| Go2后空翻训练 | Robot-Nav/GO2_backflip固定954aa61；32环境2次PPO更新及检查点；4096环境5000更新重训已完成（exit 0）；最终4999检查点已导出 | 多回合与硬件约束验收 |
-| Go2后空翻仿真 | 自身最终60维模型在MuJoCo翻转−6.151rad并落稳，末态倾角0.012rad | 任务PASS，硬件约束FAIL：速度77.96rad/s、越限0.5146rad；总体验收FAIL |
-| Go2侧空翻 | 新Go2 mimic适配已完成FK、短程PPO、CPU导出和MuJoCo；4096环境5000更新已完成（exit 0）；最终模型已导出并进行独立MuJoCo验收 | 最终模型0/1，翻倒并超限，尚未复现成功；需定位跨仿真差异 |
-| Go2站立行走 | 新48维Go2起立/双足PPO已完成短程训练、导出和MuJoCo；完整4096环境5000更新运行中 | 短程模型未起立；需从四足开始验证完整模型 |
-| 三份手册及研究报告链接 | 后空翻、侧空翻、站立行走及实时导航均有三份手册；报告索引支持skills独立目录；网页跳转与刷新验收通过 | 扩展到所有最终保留能力；删除难以补齐的工作台能力，历史证据保留 |
-| 网页实时目标点导航 | 已部署持续MuJoCo窗口，PPO100352步训练及8回合独立评估；网页两目标、断线停止、策略SHA一致性通过；三份手册已链接 | 扩大目标/布局覆盖；非SCAN/SEA原生策略，实机仅方案 |
-| 实机SDK方案 | 四项技能及握手方案已有，无硬件连接或发送 | 为每个保留能力给出固定合约与逐步部署；按用户要求不做实机验证 |
-| 网站去冗余、上传GitHub | 后空翻手册交互已发布到服务器，握手入口保留 | 完整工作台能力审计、导航、最终构建/验收和GitHub上传尚未完成 |
+| 后空翻训练/仿真 | 4096环境5000轮已完成；自身最终模型MuJoCo翻转−6.151rad、落稳 | 最大关节速度77.96rad/s、越限0.5146rad；动作通过，总体验收失败 |
+| 侧空翻训练/仿真 | 4096环境5000轮已完成；原引擎完整侧翻−6.347rad并落稳，腾空0.34秒 | 一次FR_thigh接触导致严格0/1；MuJoCo迁移仍失败，1ms积分亦未解决 |
+| 站立行走训练/仿真 | 4096环境5000轮已完成；原引擎四足起立、直立7.64秒，末两秒前进0.402米 | 原生逐足步态/滑移、重复测试；MuJoCo最终模型0/1 |
+| 独立技能目录与三份手册 | 保留7项：楼梯、高台、混合地形、后空翻、侧空翻、实时导航、站立行走；均有独立skills目录、训练/仿真/SDK手册 | 新增地形手册的命令仍需按新输出目录完整复跑；历史结果仅属于原哈希模型 |
+| 手册链接与报告页 | 真实浏览器逐一点击21链接并刷新深链接，无JS错误；50项Studio测试通过 | 最终整体交互验收 |
+| 网页实时导航 | 持续MuJoCo，PPO100352步、8回合评估；网页选择两个目标、断线停止与SHA一致性通过 | 扩大覆盖；不是SCAN/SEA原生策略 |
+| 删除未完成技能和冗余入口 | 11张未完成/重复卡片及无关训练方案移出工作台，保留历史研究；本体入口仅Go2 | 最终页面与旧任务兼容性复核 |
+| 上传GitHub | 本地已有提交与新增证据 | 修复未通过动作、完成交互清理后推送 |
 
-后空翻手册：[训练](../skills/backflip/TRAINING.md)、[仿真](../skills/backflip/SIMULATION.md)、[SDK部署方案](../skills/backflip/DEPLOYMENT.md)。
+[完整能力审计](WORKBENCH_CAPABILITY_AUDIT.md)。手册位于skills/<能力ID>/TRAINING.md、SIMULATION.md、DEPLOYMENT.md，可从能力卡片与研究报告页打开。真实浏览器检查在docs/evidence/retained_skills_manual_browser.json。
 
-原始证据在服务器capability-work/backflip-smoke-v3.log、backflip-full.log、backflip-pretrained-mujoco.log；模型在Rob2Nav-upstreams/GO2_backflip/logs/rsl_rl/go2_backflip。网站手册浏览器验收在outputs/manuals_validation/browser.json，测试重现三份链接与刷新后的深链接。训练进程应通过ps与新日志/检查点核验，不依据本页推断仍在运行。
+后空翻证据见skills/backflip/evidence/final_mujoco.log；侧空翻与直立行走的原生和MuJoCo原始摘要位于各自evidence目录。引擎、策略SHA、初始状态和测试范围须分别核对，不合并原生/MuJoCo分数，不用训练完成推断能力通过。
 
-来源：[原生后空翻](https://github.com/Robot-Nav/GO2_backflip/tree/954aa61ceb62c515689677f44a21e32109f6b62d)、[站立行走候选源码](https://github.com/zihanwang0422/legged_rl_lab/tree/386ee24bc62c8033641d65b940dc2cf1dec56545)。
-
-导航手册：[训练](../skills/navigation/TRAINING.md)、[仿真](../skills/navigation/SIMULATION.md)、[SDK方案](../skills/navigation/DEPLOYMENT.md)。默认模型078c7845…786f31；规则导航与PPO各有8回合原始摘要，不混用成绩。
-
-已实现的源码适配来源：官方unitree_rl_lab提交4960b84732b0c2ec593dccbfe963fda1bcd7b1e3包含通用mimic/MDP与G1配置，actor结构可提供Go2动作模仿适配的基础，但没有直接可执行的Go2侧空翻注册。本仓库已显式实现Go2资产/关节映射、动作CSV到NPZ转换、训练与独立动力学验证，不把G1任务称为Go2特技。
-
-新技能手册：[侧空翻训练](../skills/sideflip/TRAINING.md)、[仿真](../skills/sideflip/SIMULATION.md)、[SDK方案](../skills/sideflip/DEPLOYMENT.md)；[站立行走训练](../skills/upright_walk/TRAINING.md)、[仿真](../skills/upright_walk/SIMULATION.md)、[SDK方案](../skills/upright_walk/DEPLOYMENT.md)。FK预处理、训练完成、动作成功和硬件约束分别保留证据，互不替代。
+正在处理的关键差异：已修正MuJoCo惯性轴/机身轴角速度接口错误（独立刚体回归测试通过），但跨引擎迁移仍失败。原训练引擎使用PhysX关节速度约束，与真实电机/无硬速度钳位的MuJoCo动力学存在差异，需要继续检查执行器及接触模型。

@@ -23,3 +23,18 @@ ls outputs/upright_interface_new/model_*.pt outputs/upright_interface_new/comple
 合约：48维actor，包含机身线/角速度、投影重力、3维速度命令、关节状态与前一动作；12关节位置偏移，scale0.5，PD40/1，50Hz策略、200Hz物理。动作和传感缩放从导出policy.json逐项复用。双足站立时机身X轴指向上，水平行走前向取机身-Z在水平面的投影；奖励用水平世界速度与世界竖直yaw速率，避免把机身竖直轴误当平面前进方向。目标投影重力[-1,0,0]。
 
 奖励包含姿态、前足抬高、后足支撑、速度/yaw跟踪、机身高度及力矩/动作变化/关节限位惩罚。混合重置仅用于训练探索，不构成起立成功证据。必须按[仿真手册](SIMULATION.md)从四足开始评价。
+
+## 显式DC执行器迁移对照（实验）
+
+旧5000轮结果保留，不覆盖。新增 `--transfer-motors` 将PhysX硬限速替换为显式线性力矩—速度包络，物理步长2ms、策略50Hz；两引擎使用相同包络。参数取URDF额定边界，仅为仿真模型，不代表已辨识的真实Go2电机。该对照不自动证明跨仿真成功。
+
+```bash
+cd /root/gpufree-data/Rob2Nav
+/isaac-sim/python.sh -m skills.upright_walk.train --headless --device cuda:0 \
+  --backflip-source /root/gpufree-data/Rob2Nav-upstreams/GO2_backflip \
+  --unitree-source /root/gpufree-data/Rob2Nav-upstreams/unitree_rl_lab \
+  --resume outputs/upright_walk_full_20261021/model_4999.pt --transfer-motors \
+  --num-envs 2048 --iterations 1000 --output outputs/upright_walk_dc_review
+```
+
+完整检查点含优化器和迭代数；恢复后文件编号继续沿用原编号，不应假定最终文件名为model_999.pt。按目录实际编号选择最高检查点，使用CPU导出器保存新目录；policy.json中的motor_model应为dc_linear_v1。评估时不应把DC模型权重套到旧理想PD执行器上。侧空翻适配同时将非足端接触惩罚设为−10，必须重新评估接触和落稳，不能借用旧模型成绩。
