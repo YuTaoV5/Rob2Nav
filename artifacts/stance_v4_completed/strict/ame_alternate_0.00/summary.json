@@ -1,0 +1,993 @@
+{
+  "args": {
+    "moe": "/root/gpufree-data/Rob2Nav/vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt",
+    "checkpoint": "/root/gpufree-data/Rob2Nav/outputs/studio/runs/4549d2b29e744c95/model_499.pt",
+    "kind": "ame_alternate",
+    "difficulty": 0.0,
+    "num_envs": 32,
+    "seed": 801,
+    "output": "/root/gpufree-data/Rob2Nav/outputs/studio/jobs/4549d2b29e744c95/evaluation/ame_alternate_0.00",
+    "video": false,
+    "memory_lifetime": 4.0,
+    "diagnostic": false,
+    "navigation": false,
+    "teacher_map": false,
+    "sensor_rig": "original",
+    "shallow_probe": false,
+    "check_map": false,
+    "course": "original",
+    "map_ablation": "none",
+    "map_probe": false,
+    "studio_stream": false,
+    "max_seconds": null,
+    "gait_metrics": true,
+    "enable_cameras": false,
+    "xr": false,
+    "device": "cuda:0",
+    "cpu": false,
+    "verbose": false,
+    "info": false,
+    "rendering_mode": null,
+    "kit_args": "",
+    "anim_recording_enabled": false,
+    "anim_recording_start_time": 0,
+    "anim_recording_stop_time": 10,
+    "headless": true,
+    "hide_ui": true,
+    "create_new_stage": false,
+    "physics_gpu": 0,
+    "active_gpu": 0
+  },
+  "phase": "fusion",
+  "checkpoint_sha256": "448b60e8836343dd6cf984430c1bc4344bd0742e7653ed353e532d029d35aa91",
+  "moe_sha256": "2206659a6a23886446dcfc05d86888d6cdc9b8a4e31f44cbbc4e2d17ba3d6ead",
+  "episodes": [
+    {
+      "env": 10,
+      "success": false,
+      "route_complete": false,
+      "failure": true,
+      "position": [
+        1.0198860168457031,
+        -0.2008504867553711,
+        0.17358088493347168
+      ],
+      "upright": 0.7394698858261108,
+      "seconds": 17.98,
+      "termination_terms": [
+        "base_contact"
+      ],
+      "gait_metrics": {
+        "samples": 899,
+        "seconds": 17.979999999999706,
+        "stance_foot_seconds": 67.5800000000037,
+        "slip_distance_m": 3.8151619927921185,
+        "absolute_joint_work_J": 240.2593045154897,
+        "speed_integral_m": 1.6984345056500265,
+        "upright_integral_s": 17.364464943408972,
+        "minimum_upright": 0.7394698858261108,
+        "mean_stance_foot_speed_m_s": 0.05645400995548846,
+        "mean_planar_speed_m_s": 0.0944624307925503,
+        "mean_upright": 0.9657655697113046
+      }
+    },
+    {
+      "env": 0,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.3537635803222656,
+        -0.014295578002929688,
+        0.3707371652126312
+      ],
+      "upright": 0.9513524174690247,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.22000000000138,
+        "slip_distance_m": 1.2996102879159959,
+        "absolute_joint_work_J": 55.65939006112944,
+        "speed_integral_m": 0.46766140729044275,
+        "upright_integral_s": 19.11725431680678,
+        "minimum_upright": 0.9502265453338623,
+        "mean_stance_foot_speed_m_s": 0.016405078110527306,
+        "mean_planar_speed_m_s": 0.023383070364522533,
+        "mean_upright": 0.9558627158403551
+      }
+    },
+    {
+      "env": 1,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.425872802734375,
+        0.01282501220703125,
+        0.3708552122116089
+      ],
+      "upright": 0.9521528482437134,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 78.98000000000143,
+        "slip_distance_m": 1.4890844511347852,
+        "absolute_joint_work_J": 59.99276357259368,
+        "speed_integral_m": 0.536418231707475,
+        "upright_integral_s": 19.105348204374327,
+        "minimum_upright": 0.9492082595825195,
+        "mean_stance_foot_speed_m_s": 0.01885394341776093,
+        "mean_planar_speed_m_s": 0.026820911585374203,
+        "mean_upright": 0.9552674102187324
+      }
+    },
+    {
+      "env": 2,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.5546760559082031,
+        0.03244590759277344,
+        0.3730441629886627
+      ],
+      "upright": 0.9508762359619141,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 78.94000000000143,
+        "slip_distance_m": 2.0289547578721363,
+        "absolute_joint_work_J": 88.36184893834317,
+        "speed_integral_m": 0.7912699821418442,
+        "upright_integral_s": 19.127708977460852,
+        "minimum_upright": 0.9486401677131653,
+        "mean_stance_foot_speed_m_s": 0.025702492499013168,
+        "mean_planar_speed_m_s": 0.03956349910709288,
+        "mean_upright": 0.9563854488730588
+      }
+    },
+    {
+      "env": 3,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.392303466796875,
+        0.00412750244140625,
+        0.37029972672462463
+      ],
+      "upright": 0.9512377977371216,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.26000000000137,
+        "slip_distance_m": 1.4769122649416846,
+        "absolute_joint_work_J": 59.299261678964776,
+        "speed_integral_m": 0.5333504186597617,
+        "upright_integral_s": 19.116523900032035,
+        "minimum_upright": 0.9497215747833252,
+        "mean_stance_foot_speed_m_s": 0.01863376564397753,
+        "mean_planar_speed_m_s": 0.026667520932988537,
+        "mean_upright": 0.9558261950016179
+      }
+    },
+    {
+      "env": 4,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.4250450134277344,
+        -0.0153350830078125,
+        0.3721889853477478
+      ],
+      "upright": 0.9523627758026123,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 78.88000000000144,
+        "slip_distance_m": 1.4143286436396942,
+        "absolute_joint_work_J": 60.584494004677104,
+        "speed_integral_m": 0.590604140935887,
+        "upright_integral_s": 19.118716953992823,
+        "minimum_upright": 0.9496074914932251,
+        "mean_stance_foot_speed_m_s": 0.01793012986358606,
+        "mean_planar_speed_m_s": 0.02953020704679485,
+        "mean_upright": 0.9559358476996573
+      }
+    },
+    {
+      "env": 5,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.37872314453125,
+        0.0072154998779296875,
+        0.37308040261268616
+      ],
+      "upright": 0.9510680437088013,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.1200000000014,
+        "slip_distance_m": 1.3882568393013428,
+        "absolute_joint_work_J": 66.19107722877837,
+        "speed_integral_m": 0.6307701368142868,
+        "upright_integral_s": 19.117352907657637,
+        "minimum_upright": 0.9490852355957031,
+        "mean_stance_foot_speed_m_s": 0.01754621889915721,
+        "mean_planar_speed_m_s": 0.031538506840714874,
+        "mean_upright": 0.9558676453828979
+      }
+    },
+    {
+      "env": 6,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.3669242858886719,
+        -0.03500938415527344,
+        0.3716057240962982
+      ],
+      "upright": 0.9509875774383545,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.16000000000139,
+        "slip_distance_m": 1.2898630734370433,
+        "absolute_joint_work_J": 53.187807581611935,
+        "speed_integral_m": 0.4734362355442986,
+        "upright_integral_s": 19.097637542486222,
+        "minimum_upright": 0.9495325088500977,
+        "mean_stance_foot_speed_m_s": 0.016294379401680402,
+        "mean_planar_speed_m_s": 0.023671811777215328,
+        "mean_upright": 0.9548818771243273
+      }
+    },
+    {
+      "env": 7,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.3080291748046875,
+        0.020002365112304688,
+        0.3709430992603302
+      ],
+      "upright": 0.9522868394851685,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.20000000000138,
+        "slip_distance_m": 1.0806753982180335,
+        "absolute_joint_work_J": 52.50880331623591,
+        "speed_integral_m": 0.40562415539702035,
+        "upright_integral_s": 19.112434751987447,
+        "minimum_upright": 0.9485882520675659,
+        "mean_stance_foot_speed_m_s": 0.013644891391641599,
+        "mean_planar_speed_m_s": 0.02028120776985136,
+        "mean_upright": 0.9556217375993885
+      }
+    },
+    {
+      "env": 8,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.38417816162109375,
+        0.008826255798339844,
+        0.3712230324745178
+      ],
+      "upright": 0.9509996771812439,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.0800000000014,
+        "slip_distance_m": 1.4102581909657226,
+        "absolute_joint_work_J": 58.54503925743995,
+        "speed_integral_m": 0.5292002046301236,
+        "upright_integral_s": 19.105384703874567,
+        "minimum_upright": 0.9495219588279724,
+        "mean_stance_foot_speed_m_s": 0.01783331045733052,
+        "mean_planar_speed_m_s": 0.02646001023150663,
+        "mean_upright": 0.9552692351937444
+      }
+    },
+    {
+      "env": 9,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.4254035949707031,
+        -0.017864227294921875,
+        0.37317928671836853
+      ],
+      "upright": 0.9507993459701538,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 78.96000000000143,
+        "slip_distance_m": 1.5507741468904992,
+        "absolute_joint_work_J": 66.4768475249281,
+        "speed_integral_m": 0.5620307113423906,
+        "upright_integral_s": 19.097126334905603,
+        "minimum_upright": 0.9486212730407715,
+        "mean_stance_foot_speed_m_s": 0.019639996794458853,
+        "mean_planar_speed_m_s": 0.028101535567120004,
+        "mean_upright": 0.9548563167452963
+      }
+    },
+    {
+      "env": 11,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.4282569885253906,
+        0.011906623840332031,
+        0.37221482396125793
+      ],
+      "upright": 0.9518808722496033,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 78.98000000000143,
+        "slip_distance_m": 1.2991078489140846,
+        "absolute_joint_work_J": 63.3180524205695,
+        "speed_integral_m": 0.5569615144769328,
+        "upright_integral_s": 19.109821102619144,
+        "minimum_upright": 0.9496886730194092,
+        "mean_stance_foot_speed_m_s": 0.016448567345075476,
+        "mean_planar_speed_m_s": 0.027848075723847107,
+        "mean_upright": 0.9554910551309733
+      }
+    },
+    {
+      "env": 12,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.5750885009765625,
+        -0.02366018295288086,
+        0.36429545283317566
+      ],
+      "upright": 0.9669430255889893,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 78.86000000000145,
+        "slip_distance_m": 2.093058036553154,
+        "absolute_joint_work_J": 118.07732023052287,
+        "speed_integral_m": 1.5162606620892665,
+        "upright_integral_s": 19.293003734350222,
+        "minimum_upright": 0.955470085144043,
+        "mean_stance_foot_speed_m_s": 0.02654144099103621,
+        "mean_planar_speed_m_s": 0.0758130331044646,
+        "mean_upright": 0.9646501867175273
+      }
+    },
+    {
+      "env": 13,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.391265869140625,
+        0.0061686038970947266,
+        0.36923083662986755
+      ],
+      "upright": 0.9503738284111023,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.06000000000141,
+        "slip_distance_m": 1.4839689170407526,
+        "absolute_joint_work_J": 63.19078837951529,
+        "speed_integral_m": 0.5510849787746719,
+        "upright_integral_s": 19.11413136363031,
+        "minimum_upright": 0.9497493505477905,
+        "mean_stance_foot_speed_m_s": 0.018770160853032205,
+        "mean_planar_speed_m_s": 0.02755424893873406,
+        "mean_upright": 0.9557065681815317
+      }
+    },
+    {
+      "env": 14,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        1.1188888549804688,
+        -0.0782938003540039,
+        0.3874766528606415
+      ],
+      "upright": 0.9598982930183411,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 75.98000000000202,
+        "slip_distance_m": 3.8735858293138548,
+        "absolute_joint_work_J": 246.51098751120873,
+        "speed_integral_m": 1.9050187326533279,
+        "upright_integral_s": 19.313376032113997,
+        "minimum_upright": 0.9511662125587463,
+        "mean_stance_foot_speed_m_s": 0.05098165082013361,
+        "mean_planar_speed_m_s": 0.095250936632668,
+        "mean_upright": 0.9656688016057161
+      }
+    },
+    {
+      "env": 15,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.39186859130859375,
+        -0.03882741928100586,
+        0.3694519102573395
+      ],
+      "upright": 0.951419472694397,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.06000000000141,
+        "slip_distance_m": 1.538366872453338,
+        "absolute_joint_work_J": 69.21461365839022,
+        "speed_integral_m": 0.6461261257943377,
+        "upright_integral_s": 19.130518721342124,
+        "minimum_upright": 0.9499712586402893,
+        "mean_stance_foot_speed_m_s": 0.019458219990555407,
+        "mean_planar_speed_m_s": 0.03230630628971743,
+        "mean_upright": 0.9565259360671223
+      }
+    },
+    {
+      "env": 16,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.359649658203125,
+        0.012076377868652344,
+        0.3713642954826355
+      ],
+      "upright": 0.951087474822998,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.1400000000014,
+        "slip_distance_m": 1.3809638938321371,
+        "absolute_joint_work_J": 57.73754804229244,
+        "speed_integral_m": 0.5315417240495139,
+        "upright_integral_s": 19.106727179288896,
+        "minimum_upright": 0.9489026069641113,
+        "mean_stance_foot_speed_m_s": 0.017449632219258437,
+        "mean_planar_speed_m_s": 0.026577086202476147,
+        "mean_upright": 0.9553363589644609
+      }
+    },
+    {
+      "env": 17,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.5474166870117188,
+        -0.007518291473388672,
+        0.3706071376800537
+      ],
+      "upright": 0.9498289823532104,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 78.70000000000148,
+        "slip_distance_m": 1.7706556235172894,
+        "absolute_joint_work_J": 71.47312517884266,
+        "speed_integral_m": 0.7519030301336589,
+        "upright_integral_s": 19.114184944629702,
+        "minimum_upright": 0.9487541913986206,
+        "mean_stance_foot_speed_m_s": 0.022498800807080763,
+        "mean_planar_speed_m_s": 0.03759515150668358,
+        "mean_upright": 0.9557092472315012
+      }
+    },
+    {
+      "env": 18,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.363494873046875,
+        0.012752532958984375,
+        0.3734550476074219
+      ],
+      "upright": 0.9497145414352417,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.24000000000137,
+        "slip_distance_m": 1.556229356546544,
+        "absolute_joint_work_J": 65.59947320747364,
+        "speed_integral_m": 0.5335319822066299,
+        "upright_integral_s": 19.102524602413155,
+        "minimum_upright": 0.948691189289093,
+        "mean_stance_foot_speed_m_s": 0.019639441652530502,
+        "mean_planar_speed_m_s": 0.026676599110331944,
+        "mean_upright": 0.9551262301206739
+      }
+    },
+    {
+      "env": 19,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.3525886535644531,
+        0.012279033660888672,
+        0.37320131063461304
+      ],
+      "upright": 0.9508782029151917,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.1000000000014,
+        "slip_distance_m": 1.4671479064130168,
+        "absolute_joint_work_J": 57.93286106705143,
+        "speed_integral_m": 0.5032276185751872,
+        "upright_integral_s": 19.10442832469939,
+        "minimum_upright": 0.9479468464851379,
+        "mean_stance_foot_speed_m_s": 0.018548013987522007,
+        "mean_planar_speed_m_s": 0.02516138092875978,
+        "mean_upright": 0.9552214162349857
+      }
+    },
+    {
+      "env": 20,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.434417724609375,
+        -0.024530410766601562,
+        0.37170448899269104
+      ],
+      "upright": 0.9494990706443787,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.1200000000014,
+        "slip_distance_m": 1.726175425993581,
+        "absolute_joint_work_J": 69.25387684738119,
+        "speed_integral_m": 0.6648999109802067,
+        "upright_integral_s": 19.11358380079271,
+        "minimum_upright": 0.949444055557251,
+        "mean_stance_foot_speed_m_s": 0.02181718182499432,
+        "mean_planar_speed_m_s": 0.0332449955490109,
+        "mean_upright": 0.9556791900396516
+      }
+    },
+    {
+      "env": 21,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.37441253662109375,
+        -0.041316986083984375,
+        0.37040144205093384
+      ],
+      "upright": 0.9500102400779724,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.16000000000139,
+        "slip_distance_m": 1.3274620568061497,
+        "absolute_joint_work_J": 63.50187916251387,
+        "speed_integral_m": 0.590841897649106,
+        "upright_integral_s": 19.119960333108903,
+        "minimum_upright": 0.9492689967155457,
+        "mean_stance_foot_speed_m_s": 0.016769353926302757,
+        "mean_planar_speed_m_s": 0.029542094882455797,
+        "mean_upright": 0.9559980166554612
+      }
+    },
+    {
+      "env": 22,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.5554847717285156,
+        0.049736976623535156,
+        0.36343926191329956
+      ],
+      "upright": 0.9701586365699768,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 78.82000000000146,
+        "slip_distance_m": 2.1945401648297493,
+        "absolute_joint_work_J": 106.8235396890527,
+        "speed_integral_m": 1.0784873699550515,
+        "upright_integral_s": 19.2364876818657,
+        "minimum_upright": 0.9505746364593506,
+        "mean_stance_foot_speed_m_s": 0.027842427871475624,
+        "mean_planar_speed_m_s": 0.053924368497753485,
+        "mean_upright": 0.9618243840933013
+      }
+    },
+    {
+      "env": 23,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.37973785400390625,
+        0.019765853881835938,
+        0.37108704447746277
+      ],
+      "upright": 0.9497281908988953,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.32000000000136,
+        "slip_distance_m": 1.5526958267225845,
+        "absolute_joint_work_J": 61.244832833980894,
+        "speed_integral_m": 0.5180766055133447,
+        "upright_integral_s": 19.09262994527819,
+        "minimum_upright": 0.948981761932373,
+        "mean_stance_foot_speed_m_s": 0.019575086065589484,
+        "mean_planar_speed_m_s": 0.025903830275667672,
+        "mean_upright": 0.9546314972639256
+      }
+    },
+    {
+      "env": 24,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.4065361022949219,
+        -0.018617630004882812,
+        0.3702087104320526
+      ],
+      "upright": 0.9505042433738708,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.18000000000139,
+        "slip_distance_m": 1.4707297029348136,
+        "absolute_joint_work_J": 57.51473540694697,
+        "speed_integral_m": 0.5021331229575867,
+        "upright_integral_s": 19.108425794839892,
+        "minimum_upright": 0.9494041204452515,
+        "mean_stance_foot_speed_m_s": 0.01857451001433175,
+        "mean_planar_speed_m_s": 0.02510665614787976,
+        "mean_upright": 0.9554212897420107
+      }
+    },
+    {
+      "env": 25,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.43121337890625,
+        -0.026063919067382812,
+        0.37241438031196594
+      ],
+      "upright": 0.9505815505981445,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 78.98000000000143,
+        "slip_distance_m": 1.558568510404022,
+        "absolute_joint_work_J": 70.31045847606912,
+        "speed_integral_m": 0.603620591728306,
+        "upright_integral_s": 19.11036897778512,
+        "minimum_upright": 0.9493722319602966,
+        "mean_stance_foot_speed_m_s": 0.019733711197822155,
+        "mean_planar_speed_m_s": 0.030181029586415806,
+        "mean_upright": 0.9555184488892722
+      }
+    },
+    {
+      "env": 26,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.4392814636230469,
+        -0.01355743408203125,
+        0.3725544810295105
+      ],
+      "upright": 0.9502714276313782,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.04000000000141,
+        "slip_distance_m": 1.3679720790948844,
+        "absolute_joint_work_J": 61.51495626931892,
+        "speed_integral_m": 0.5861484077081711,
+        "upright_integral_s": 19.108809581995004,
+        "minimum_upright": 0.9488223791122437,
+        "mean_stance_foot_speed_m_s": 0.01730733905737424,
+        "mean_planar_speed_m_s": 0.02930742038540905,
+        "mean_upright": 0.9554404790997664
+      }
+    },
+    {
+      "env": 27,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.4571266174316406,
+        0.0316925048828125,
+        0.3713163137435913
+      ],
+      "upright": 0.9507630467414856,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 78.86000000000145,
+        "slip_distance_m": 1.4983080179642503,
+        "absolute_joint_work_J": 63.46738761435442,
+        "speed_integral_m": 0.6027513353851023,
+        "upright_integral_s": 19.112007292509066,
+        "minimum_upright": 0.94941645860672,
+        "mean_stance_foot_speed_m_s": 0.01899959444539973,
+        "mean_planar_speed_m_s": 0.030137566769255622,
+        "mean_upright": 0.9556003646254694
+      }
+    },
+    {
+      "env": 28,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.7958450317382812,
+        -0.061199188232421875,
+        0.3682088851928711
+      ],
+      "upright": 0.9626625776290894,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 77.98000000000162,
+        "slip_distance_m": 3.108281769503373,
+        "absolute_joint_work_J": 157.4960133140332,
+        "speed_integral_m": 1.7320930011739863,
+        "upright_integral_s": 19.286930183172235,
+        "minimum_upright": 0.9540280699729919,
+        "mean_stance_foot_speed_m_s": 0.03985998678511552,
+        "mean_planar_speed_m_s": 0.08660465005870079,
+        "mean_upright": 0.964346509158628
+      }
+    },
+    {
+      "env": 29,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.8903617858886719,
+        -0.028247833251953125,
+        0.3684282600879669
+      ],
+      "upright": 0.9650181531906128,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 77.32000000000176,
+        "slip_distance_m": 3.4669817536258054,
+        "absolute_joint_work_J": 176.54055872839913,
+        "speed_integral_m": 1.6367874393321022,
+        "upright_integral_s": 19.315026481151552,
+        "minimum_upright": 0.9536285400390625,
+        "mean_stance_foot_speed_m_s": 0.04483939153680454,
+        "mean_planar_speed_m_s": 0.0818393719666065,
+        "mean_upright": 0.9657513240575939
+      }
+    },
+    {
+      "env": 30,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.321624755859375,
+        -0.023504257202148438,
+        0.3708403408527374
+      ],
+      "upright": 0.9513798952102661,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.1200000000014,
+        "slip_distance_m": 1.1961575274320284,
+        "absolute_joint_work_J": 56.128256854940815,
+        "speed_integral_m": 0.5374339309516963,
+        "upright_integral_s": 19.11706890702245,
+        "minimum_upright": 0.9499176144599915,
+        "mean_stance_foot_speed_m_s": 0.015118270063599688,
+        "mean_planar_speed_m_s": 0.02687169654758527,
+        "mean_upright": 0.9558534453511386
+      }
+    },
+    {
+      "env": 31,
+      "success": false,
+      "route_complete": false,
+      "failure": false,
+      "position": [
+        0.3614044189453125,
+        -0.0045986175537109375,
+        0.3723929524421692
+      ],
+      "upright": 0.9506394863128662,
+      "seconds": 20.0,
+      "termination_terms": [
+        "time_out"
+      ],
+      "gait_metrics": {
+        "samples": 1000,
+        "seconds": 19.999999999999662,
+        "stance_foot_seconds": 79.18000000000139,
+        "slip_distance_m": 1.2591758950672467,
+        "absolute_joint_work_J": 53.80202739975911,
+        "speed_integral_m": 0.45389765624244993,
+        "upright_integral_s": 19.093751003742227,
+        "minimum_upright": 0.9486798644065857,
+        "mean_stance_foot_speed_m_s": 0.015902701377459267,
+        "mean_planar_speed_m_s": 0.02269488281212288,
+        "mean_upright": 0.9546875501871275
+      }
+    }
+  ],
+  "successes": 0,
+  "total": 32,
+  "max_zero_fusion_error": null,
+  "video_frames": 0,
+  "success_definition": "First episode: route >3.5 m, then >=0.3 s with >=2 support feet, upright >0.9 and speed <0.25 m/s; no failure termination.",
+  "note": "Shared fixed terrain difficulty/seed; reset XY +/-3 cm, yaw +/-0.04 rad. No physical sensor drivers.",
+  "geometry": "original terrain, original pit",
+  "gait_metric_definition": {
+    "contact_threshold_N": 5.0,
+    "stance_slip": "World horizontal link velocity while vertical net contact force >5N; not sole contact-point slip",
+    "joint_work": "Integral sum |applied_torque * joint_velocity| dt; mechanical diagnostic, not battery energy or COT",
+    "scope": "Each first episode only, including failures; do not compare different termination horizons without stratifying success/time",
+    "not_measured": [
+      "foot clearance collisions",
+      "command tracking error",
+      "gait aesthetics",
+      "battery energy"
+    ]
+  }
+}
