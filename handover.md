@@ -491,3 +491,6 @@ Git资料独立目录检查通过：18条训练记录、272组评估、93视频�
 
 ## 2026-10-20 08:48 支撑脚运动实验
 seed803六项密集复评双方均32/32，但混合足链运动代理增19–26%，方向与802一致。docs/RETENTION_SEED802.md追加复核、artifacts/retention_seed803归档。新stance_foot_motion显式可选奖励默认不启用，公式mean(I(Fz>5N)*vxy²)，候选权重-0.5；39项测试通过，原生8env2iter完成且model1存在/无failed。新Studio job4549d2b29e744c95已启动并核实iteration4/fusion，512env500iter、seed75、initialize平台model199、学习率1e-5、冻结本体、原安装/记忆4，结束自动九项严格评估。勿重复启动，勿将训练奖励或单滑移代理当晋级标准；后续需独立802/803复核，训练种子变化不支持单因素因果结论。未恢复旧V3/V4/V7。
+
+## 2026-10-20 09:08 SEA射线接口独立回归
+stance任务4549d2b29e744c95仍正常运行，核实iteration258/fusion无数值异常；勿重复启动。CPU侧新增rob2nav/sea_contract.py，仅加载SHA核验外部SEA原生CBF层并显式41束240度；加载state_dict后需再次validate_geometry，测试证实旧buffer可覆盖角度。scripts/validate_sea_cbf.py原生CPU16样本前向/梯度/yaw透传通过，180度和恢复buffer错配被拒绝。原生actor没有被修改，导航checkpoint/训练和动态Go2仍未接通。41测试通过，外部无许可证源文件只在私有缓存，不能上传。证据artifacts/framework_navigation/sea_cbf_contract/validation.json，说明docs/FRAMEWORK_NAVIGATION.md。
