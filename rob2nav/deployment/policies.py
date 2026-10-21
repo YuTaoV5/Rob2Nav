@@ -43,14 +43,14 @@ def action_target(skill,raw,phase=0.,reference=None):
     elif mode in ('upright_endpoint_v2','upright_endpoint_v3'):
         weight=max(1.-_smooth((phase-1.)/.5),_smooth((phase-5.)/1.5))
         target=(1.-weight)*target+weight*(vector(skill.default)+skill.endpoint_residual_limit_rad*np.tanh(raw))
-    elif mode in ('reference_residual_v2','reference_residual_v3'):
+    elif mode in ('reference_residual_v2','reference_residual_v3','reference_residual_v4'):
         if reference is None:raise ValueError('Sideflip residual requires the pinned reference')
         if 'frame' in reference:
             frame=int(reference['frame']);count=int(reference['count']);nominal=reference['joint_pos']
         else:
             frame_data=reference_action_frame(reference,phase)
             frame=frame_data['frame'];count=frame_data['count'];nominal=frame_data['joint_pos']
-        if frame<90 or frame>=count-90:
+        if frame<90 or frame>=count-90 or skill.boundary_blend_frames:
             distance=min(frame,count-1-frame)
             blend=_smooth((distance-50.)/40.)
             limit=skill.residual_limit_rad+(skill.bridge_residual_limit_rad-skill.residual_limit_rad)*blend
@@ -58,7 +58,15 @@ def action_target(skill,raw,phase=0.,reference=None):
             if skill.terminal_hip_taper_frames:
                 taper=_smooth((count-1-frame)/(skill.terminal_hip_taper_frames-1))
                 residual=np.where([name.endswith('_hip_joint') for name in skill.joints],residual*taper,residual)
-            target=vector(nominal)+residual
+            bounded=vector(nominal)+residual
+            if skill.boundary_blend_frames:
+                width=skill.boundary_blend_frames
+                def quintic(x):
+                    x=np.clip(x,0.,1.)
+                    return x*x*x*(10.+x*(-15.+6.*x))
+                weight=quintic((frame-(90-width))/(2.*width))*quintic(((count-90+width)-frame)/(2.*width))
+                target=(1.-weight)*bounded+weight*target
+            else:target=bounded
     return skill.to_sdk(target)
 
 

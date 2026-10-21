@@ -67,7 +67,7 @@ class UnifiedRuntime:
                     while worker.inflight and time.monotonic()<deadline:worker.poll();time.sleep(.002)
                     if worker.inflight:raise ValueError('Cached worker did not drain its previous output')
                     obs=observation(skill,snapshot,[0,0,0],action,action,reference=reference,reference_yaw=yaw)
-                    nominal=reference_action_frame(reference,0.) if skill.action_parameterization in ('reference_residual_v2','reference_residual_v3') else None
+                    nominal=reference_action_frame(reference,0.) if skill.action_parameterization in ('reference_residual_v2','reference_residual_v3','reference_residual_v4') else None
                     if not worker.submit(obs,-1,0.,phase=0.,reference=nominal):raise ValueError('Candidate probe could not be submitted')
                     deadline=time.monotonic()+3;result=None
                     while time.monotonic()<deadline:
@@ -150,7 +150,7 @@ class UnifiedRuntime:
                         if skill.atomic and c.phase!='ACTIVE' and skill.action_parameterization!='joint_offset_v1':
                             history=np.zeros(12);previous=np.zeros(12)
                         obs=observation(skill,snapshot,c.command,history,previous,phase=elapsed,reference=candidate.reference,reference_yaw=candidate.reference_yaw)
-                        nominal=reference_action_frame(candidate.reference,elapsed) if skill.action_parameterization in ('reference_residual_v2','reference_residual_v3') else None
+                        nominal=reference_action_frame(candidate.reference,elapsed) if skill.action_parameterization in ('reference_residual_v2','reference_residual_v3','reference_residual_v4') else None
                         if candidate.worker.submit(obs,c.epoch,now,phase=elapsed,reference=nominal):
                             if skill.action_parameterization=='joint_offset_v1':
                                 candidate.previous=candidate.last.copy();candidate.last=effective.copy()

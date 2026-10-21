@@ -12,6 +12,7 @@ class StartAtStand(MotionCommand):
 class FixstandReferenceAction(JointPositionAction):
     """Bounded learned residual in padded stance/bridge regions; original actor in the action."""
     def process_actions(self,actions):
+        previous=self._processed_actions.clone()
         super().process_actions(actions)
         command=self._env.command_manager.get_term('motion')
         frames=command.motion.time_step_total
@@ -28,4 +29,11 @@ class FixstandReferenceAction(JointPositionAction):
             factor=terminal_hip_weight(command.time_steps,frames,taper).unsqueeze(-1)
             residual=torch.where(hip,residual*factor,residual)
         target=command.joint_pos+residual
-        self._processed_actions[boundary]=target[boundary]
+        blend=getattr(self.cfg,'boundary_blend_frames',0)
+        if blend:
+            from skills.fixstand import sideflip_native_weight
+            weight=sideflip_native_weight(command.time_steps,frames,blend).unsqueeze(-1)
+            self._processed_actions[:]=torch.lerp(target,self._processed_actions,weight)
+        else:self._processed_actions[boundary]=target[boundary]
+        self.target_step_delta=self._processed_actions-previous
+        self.target_step_delta[command.time_steps==0]=0.

@@ -69,6 +69,22 @@ class FixstandDeploymentTests(unittest.TestCase):
         with self.assertRaises(ValueError):skill('upright_endpoint_v2','upright48')
         with self.assertRaises(ValueError):replace(skill('joint_offset_v1','backflip60'),residual_limit_rad=.2).checked()
         with self.assertRaises(ValueError):replace(skill('reference_residual_v2','mimic69'),terminal_hip_taper_frames=50).checked()
+        with self.assertRaises(ValueError):replace(skill('reference_residual_v3','mimic69'),boundary_blend_frames=10).checked()
+
+    def test_continuous_reference_boundary_matches_training_and_keeps_midair_raw(self):
+        from skills.fixstand import sideflip_native_weight,sideflip_boundary_limit,terminal_hip_weight
+        s=replace(skill('reference_residual_v3','mimic69'),action_parameterization='reference_residual_v4',boundary_blend_frames=10).checked()
+        raw=np.linspace(-1.,1.,12)
+        hip=np.array([n.endswith('_hip_joint') for n in s.joints])
+        for frame in [0,79,80,89,90,91,100,150,200,209,210,211,220,299]:
+            reference=dict(frame=frame,count=300,joint_pos=(NEUTRAL+.1).tolist())
+            weight=float(sideflip_native_weight(frame,300,10))
+            res=float(sideflip_boundary_limit(frame,300,.2,.05))*np.tanh(raw)
+            res[hip]*=float(terminal_hip_weight(frame,300,50))
+            expected=(1.-weight)*(NEUTRAL+.1+res)+weight*(NEUTRAL+.5*raw)
+            np.testing.assert_allclose(action_target(s,raw,frame/50,reference),expected,atol=1e-7)
+        self.assertEqual(float(sideflip_native_weight(150,300,10)),1.)
+        self.assertEqual(float(sideflip_native_weight(0,300,10)),0.)
 
     def test_keyboard_commands(self):
         self.assertEqual(key_request('3'),{'switch':'sideflip69'})

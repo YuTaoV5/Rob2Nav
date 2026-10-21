@@ -51,6 +51,7 @@ def main():
     p.add_argument('--command',type=float,nargs=3,default=[.2,0.,0.])
     p.add_argument('--video',action='store_true')
     p.add_argument('--fixstand-roundtrip',action='store_true')
+    p.add_argument('--diagnostics',action='store_true',help='Record read-only per-substep failure diagnostics')
     p.add_argument('--initialization',choices=['settled','reference_state','standing_reset'],default='settled',
         help='reference_state is an explicit training-reset parity diagnostic, not standing-start acceptance')
     p.add_argument('--output',required=True,type=Path)
@@ -130,7 +131,11 @@ def main():
     next_frame=0.
     max_speed_ratio=0.;max_limit_excess=0.;max_airtime=0.;airtime=0.;bad_floor_contact=False
     signed_x_rotation=0.;angular_travel=0.;velocity_buffer=np.zeros(6)
+    preparation=dict(end_s=2.4,max_target_step_rad=0.,max_joint_speed_rad_s=0.,max_body_angular_speed_rad_s=0.)
+    previous_target=None
     floor_ids={i for i in range(model.ngeom) if model.geom_bodyid[i]==0}
+    from .motion_diagnostics import MotionDiagnostics
+    diagnostics=MotionDiagnostics(names,velocity_limits,0) if args.diagnostics else None
     try:
         while float(data.time)-start<args.seconds-1e-6:
             now=float(data.time)-start
@@ -175,10 +180,12 @@ def main():
                 weight=float(upright_endpoint_weight(now))
                 endpoint=np.asarray([POSE[n] for n in names])+boundary['residual_limit_rad']*np.tanh(last)
                 target=(1.-weight)*target+weight*endpoint
-            if boundary.get('action_parameterization') in ('reference_residual_v2','reference_residual_v3'):
+            if boundary.get('action_parameterization') in ('reference_residual_v2','reference_residual_v3','reference_residual_v4'):
                 if reference is None:raise ValueError('Reference residual policy requires its motion reference')
                 padding=boundary['padded_region_frames']
-                if index<padding or index>=len(reference['joint_pos'])-padding:
+                blend_frames=boundary.get('boundary_blend_frames',0)
+                if boundary['action_parameterization']=='reference_residual_v4' and not 2<=blend_frames<=20:raise ValueError('Invalid continuous boundary contract')
+                if index<padding or index>=len(reference['joint_pos'])-padding or blend_frames:
                     from skills.fixstand import sideflip_boundary_limit
                     hold=boundary['residual_limit_rad'];bridge=boundary.get('bridge_residual_limit_rad',hold)
                     limit=float(sideflip_boundary_limit(index,len(reference['joint_pos']),hold,bridge))
@@ -188,7 +195,15 @@ def main():
                         from skills.fixstand import terminal_hip_weight
                         hip=np.array([name.endswith('_hip_joint') for name in names])
                         residual[hip]*=float(terminal_hip_weight(index,len(reference['joint_pos']),taper))
-                    target=reference['joint_pos'][index]+residual
+                    bounded=reference['joint_pos'][index]+residual
+                    if blend_frames:
+                        from skills.fixstand import sideflip_native_weight
+                        weight=float(sideflip_native_weight(index,len(reference['joint_pos']),blend_frames))
+                        target=(1.-weight)*bounded+weight*target
+                    else:target=bounded
+            if now<preparation['end_s'] and previous_target is not None:
+                preparation['max_target_step_rad']=max(preparation['max_target_step_rad'],float(np.max(abs(target-previous_target))))
+            previous_target=target.copy()
             for _ in range(args.physics_hz//50):
                 data.ctrl[aids]=motor_torque(target,data.qpos[qids],data.qvel[vids],effort,velocity_limits,meta.get('motor_model','ideal_pd'))
                 before_step=float(data.time)
@@ -197,6 +212,10 @@ def main():
                 if not np.isfinite(data.qpos).all() or not np.isfinite(data.qvel).all():
                     raise FloatingPointError('Nonfinite MuJoCo state')
                 base_link_velocity(model,data,base,velocity_buffer)
+                if float(data.time)-start<=preparation['end_s']:
+                    preparation['max_joint_speed_rad_s']=max(preparation['max_joint_speed_rad_s'],float(np.max(abs(data.qvel[vids]))))
+                    preparation['max_body_angular_speed_rad_s']=max(preparation['max_body_angular_speed_rad_s'],float(np.linalg.norm(velocity_buffer[:3])))
+                if diagnostics is not None:diagnostics.sample(model,data,float(data.time)-start,vids,velocity_buffer[:3])
                 signed_x_rotation+=float(velocity_buffer[0])*model.opt.timestep
                 angular_travel+=float(np.linalg.norm(velocity_buffer[:3]))*model.opt.timestep
                 max_speed_ratio=max(max_speed_ratio,float(np.max(np.abs(data.qvel[vids])/velocity_limits)))
@@ -215,7 +234,7 @@ def main():
             up_error=float(np.linalg.norm(rot.T@np.array([0.,0.,-1.])-[-1,0,0]))
             over=np.maximum(data.qpos[qids]-model.jnt_range[jids,1],model.jnt_range[jids,0]-data.qpos[qids])
             trace.append(dict(observation=obs.tolist(),action=action.tolist(),time=float(data.time)-start,position=data.qpos[:3].tolist(),quaternion=data.qpos[3:7].tolist(),
-                joints=data.qpos[qids].tolist(),upright=float(rot[2,2]),upright_walk_error=up_error,
+                joints=data.qpos[qids].tolist(),target=target.tolist(),upright=float(rot[2,2]),upright_walk_error=up_error,
                 front_ground=any(n.startswith(('FL_','FR_')) for n in ground_bodies),
                 rear_ground=any(n.startswith(('RL_','RR_')) for n in ground_bodies),
                 speed=float(np.linalg.norm(data.qvel[:2])),joint_speed_ratio=float(np.max(np.abs(data.qvel[vids])/velocity_limits)),
@@ -272,7 +291,14 @@ def main():
             success=bool(metrics['walking']['passed'] and not bad_floor_contact)
         metrics['action_completed']=bool(success)
         metrics['fixstand']=endpoints;success=bool(success and endpoints['passed'])
+    if args.kind=='sideflip':
+        preparation['limits']=dict(max_target_step_rad=.08,max_joint_speed_rad_s=3.,max_body_angular_speed_rad_s=1.)
+        preparation['passed']=all(preparation[k]<=v for k,v in preparation['limits'].items())
+        metrics['preparation']=preparation
+        if meta.get('fixstand_roundtrip',{}).get('quiet_preparation_seconds'):
+            success=bool(success and preparation['passed'])
     (args.output/'trace.json').write_text(json.dumps(trace))
+    if diagnostics is not None:(args.output/'diagnostics.json').write_text(json.dumps(diagnostics.report(),indent=2)+'\n')
     summary=dict(args=dict(kind=args.kind,seed=args.seed,initialization=args.initialization,physics_hz=args.physics_hz,joint_limit_time_constant=args.joint_limit_time_constant),backend='MuJoCo',successes=int(success),total=1,
         evaluator_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         episodes=[dict(success=success,**metrics)],metrics=metrics,policy_sha256=meta['policy_sha256'],

@@ -27,6 +27,7 @@ def main():
     p.add_argument('--initial-joint-noise',type=float,default=.002)
     p.add_argument('--video',action='store_true')
     p.add_argument('--fixstand-roundtrip',action='store_true')
+    p.add_argument('--diagnostics',action='store_true',help='Record read-only per-substep failure diagnostics')
     p.add_argument('--output',required=True,type=Path)
     a=p.parse_args()
     if not 0<a.seconds<=60 or not 0<=a.initial_joint_noise<=.05:raise ValueError('Invalid evaluation duration/noise')
@@ -73,6 +74,8 @@ def main():
         module.load_onnx=load
     a.output.mkdir(parents=True,exist_ok=False)
     limits={j.attrib['name']:j.find('limit').attrib for j in ET.parse(source/'resources/robots/go2/urdf/go2_description.urdf').getroot().findall('joint') if j.attrib['name'] in module.JOINT_NAMES}
+    from rob2nav.motion_diagnostics import MotionDiagnostics
+    diagnostics=MotionDiagnostics(module.JOINT_NAMES,[float(limits[n]['velocity']) for n in module.JOINT_NAMES],1) if a.diagnostics else None
     rng=np.random.default_rng(a.seed);resets=0;trace=[];rotation=0.;angular_travel=0.
     max_speed=0.;max_excess=0.;air=0.;max_air=0.;bad=False;minimum_up=1.;max_height=0.
     original_reset=module.reset_robot;original_step=mujoco.mj_step
@@ -90,6 +93,7 @@ def main():
         result=original_step(model,data,*args,**kwargs)
         assert_physics_step(data,before_step,model.opt.timestep)
         qids,dids=module.joint_addresses(model)
+        if diagnostics is not None:diagnostics.sample(model,data,float(data.time),dids,data.qvel[3:6])
         velocity=np.array([float(limits[n]['velocity']) for n in module.JOINT_NAMES])
         rotation+=float(data.qvel[4])*model.opt.timestep
         angular_travel+=float(np.linalg.norm(data.qvel[3:6]))*model.opt.timestep
@@ -154,6 +158,7 @@ def main():
         hardware_constraints_pass=max_speed<=1. and max_excess<=.001,hardware_connected=False,
         control_contract=controller,control_parameter_source='exported_training_config' if controller else 'legacy_pinned_native_defaults')
     (a.output/'trace.json').write_text(json.dumps(trace))
+    if diagnostics is not None:(a.output/'diagnostics.json').write_text(json.dumps(diagnostics.report(),indent=2)+'\n')
     (a.output/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
     print(json.dumps(summary),flush=True)
 

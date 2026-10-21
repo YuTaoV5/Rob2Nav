@@ -51,6 +51,18 @@ class FixstandTests(unittest.TestCase):
         data.joint_vel[0,0]=11.
         self.assertAlmostEqual(float(urdf_speed_penalty(env,limits)[0]),.04,places=5)
 
+    def test_preparation_penalty_does_not_suppress_flight(self):
+        from skills.fixstand import quiet_preparation_penalty,sideflip_native_weight
+        data=SimpleNamespace(joint_vel=torch.ones(3,12)*5.,root_ang_vel_b=torch.ones(3,3))
+        term=SimpleNamespace(target_step_delta=torch.ones(3,12)*.2)
+        env=SimpleNamespace(scene={'robot':SimpleNamespace(data=data)},episode_length_buf=torch.tensor([50,100,150]),step_dt=.02,
+            action_manager=SimpleNamespace(get_term=lambda name:term))
+        values=quiet_preparation_penalty(env)
+        self.assertGreater(float(values[0]),0.)
+        self.assertGreater(float(values[1]),0.)
+        self.assertEqual(float(values[2]),0.)
+        with self.assertRaises(ValueError):sideflip_native_weight(90,298,0)
+
     def test_phase_is_observable_for_start_action_and_return(self):
         env=SimpleNamespace(episode_length_buf=torch.tensor([0,100,300]),step_dt=.02)
         result=upright_phase(env)

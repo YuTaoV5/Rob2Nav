@@ -29,6 +29,18 @@ def terminal_hip_weight(frame,total,frames=50):
     return x*x*(3.-2.*x)
 
 
+def sideflip_native_weight(frame,total,blend_frames):
+    """C2-continuous transition across both reference/raw action boundaries."""
+    import torch
+    if type(blend_frames) is not int or not 2<=blend_frames<=20:
+        raise ValueError('Boundary blend half-width must be 2..20 frames')
+    index=torch.as_tensor(frame)
+    def smooth(x):
+        x=torch.clamp(x,0.,1.)
+        return x*x*x*(10.+x*(-15.+6.*x))
+    return smooth((index-(90-blend_frames))/(2.*blend_frames))*smooth(((total-90+blend_frames)-index)/(2.*blend_frames))
+
+
 def stance_score(robot):
     import torch
     q=target_pose(robot)
@@ -68,6 +80,27 @@ def configure_sideflip_peak_objective(cfg,source,duration):
     cfg.rewards.fixstand_peak_pose=RewardTermCfg(func=endpoint_peak_reward,weight=25.,params={'start':1.,'end':duration-1.})
     cfg.rewards.fixstand_speed_margin=RewardTermCfg(func=urdf_speed_penalty,weight=-10.,params={'limits':limits})
     cfg.rewards.fixstand_joint_limits=RewardTermCfg(func=mdp.joint_pos_limits,weight=-20.)
+
+
+def quiet_preparation_penalty(env,end=2.4):
+    """Discourage pre-takeoff target snaps and physical oscillation, not flight motion."""
+    import torch
+    robot=env.scene['robot']
+    time=phase_time(env)
+    gate=torch.clamp((end-time)/.2,0.,1.)
+    term=env.action_manager.get_term('JointPositionAction')
+    change=torch.max(torch.abs(term.target_step_delta),dim=-1).values
+    velocity=torch.max(torch.abs(robot.data.joint_vel),dim=-1).values
+    omega=torch.linalg.vector_norm(robot.data.root_ang_vel_b,dim=-1)
+    return gate*((torch.clamp(change-.04,min=0.)/.04)**2+
+                 torch.clamp(velocity-1.5,min=0.)**2+
+                 4.*torch.clamp(omega-.35,min=0.)**2)
+
+
+def configure_quiet_preparation(cfg,end=2.4):
+    from isaaclab.managers import RewardTermCfg
+    if not 2.<=end<=2.4:raise ValueError('Quiet preparation must end before takeoff')
+    cfg.rewards.quiet_preparation=RewardTermCfg(func=quiet_preparation_penalty,weight=-5.,params={'end':end})
 
 
 def four_feet(env):
@@ -180,7 +213,7 @@ def configure_upright(cfg,endpoint_residual=False,endpoint_limit=.2,upright_rese
         cfg.commands.base_velocity.rel_standing_envs=0.
 
 
-def configure_sideflip(cfg,contract,boundary_residual=False,residual_limit=.05,bridge_limit=None,terminal_hip_taper_frames=0):
+def configure_sideflip(cfg,contract,boundary_residual=False,residual_limit=.05,bridge_limit=None,terminal_hip_taper_frames=0,boundary_blend_frames=0):
     from isaaclab.managers import RewardTermCfg
     from skills.fixstand_motion import StartAtStand
     cfg.commands.motion.class_type=StartAtStand
@@ -198,6 +231,7 @@ def configure_sideflip(cfg,contract,boundary_residual=False,residual_limit=.05,b
         cfg.actions.JointPositionAction.residual_limit_rad=residual_limit
         cfg.actions.JointPositionAction.bridge_residual_limit_rad=residual_limit if bridge_limit is None else bridge_limit
         cfg.actions.JointPositionAction.terminal_hip_taper_frames=terminal_hip_taper_frames
+        cfg.actions.JointPositionAction.boundary_blend_frames=boundary_blend_frames
 
 
 def initialize_expanded_policy(runner,checkpoint):
