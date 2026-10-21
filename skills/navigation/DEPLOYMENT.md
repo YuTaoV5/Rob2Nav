@@ -1,5 +1,7 @@
 # Go2 导航 SDK2 部署手册（方案）
 
+SCAN 导航请使用[专用实机部署手册](SCAN_DEPLOYMENT.md)与[仿真手册](SCAN_SIMULATION.md)。本页 PPO 观测与归一化参数不用于 SCAN。
+
 本次未接机器人、未发送SDK命令、未做实机验证。网页MuJoCo worker不是硬件驱动。仅Go2本体，不依赖机械臂；真实导航还需要本体传感器或经标定的雷达/相机与里程计来源。
 
 先完成[仿真验收](SIMULATION.md)并固定[训练配置](TRAINING.md)。规则导航与PPO头都输出3维归一化动作，转换为米/秒与弧度/秒：vx=action[0]×0.65，vy=action[1]×0.25，wz=action[2]×1.2。规则控制器内部输出物理速度，接口统一归一化一次，不能在SDK端再次缩放。

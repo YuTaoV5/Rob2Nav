@@ -1,5 +1,9 @@
 # 最新交接：2026-10-21（本节优先于下方历史记录）
 
+## SCAN 导航手册补充（2026-10-21）
+
+新增 [SCAN仿真操作与复现](skills/navigation/SCAN_SIMULATION.md)和[Go2完整导航实机部署方案](skills/navigation/SCAN_DEPLOYMENT.md)，导航页和工作台手册入口已接入。明确区分运动学模拟、MuJoCo真接触仿真与实机；覆盖传感器/LIO、坐标时间契约、SCAN启动、全局路线、Sport SDK速度安全门、分阶段验收、运维与网页硬件接入。当前实机传感器适配、LIO和速度执行桥仍待实现/联调；没有执行机器人通信或运动，不把此方案标为已通过实机部署。
+
 ## 本次发布与网站
 
 用户要求启动网站、更新handover，并将现有代码、成果、特技选定权重、文档和数据上传到 https://github.com/YuTaoV5/Rob2Nav 。发布仓库为本目录；上层X:/Items/data_fusion不是该Git仓库。所有验证与权重按各自哈希记录，不把完成训练等同于技能或实机通过。

@@ -1,5 +1,7 @@
 # SCAN 网页实时 MuJoCo 仿真
 
+完整操作/环境恢复见[SCAN仿真手册](../skills/navigation/SCAN_SIMULATION.md)，硬件导航集成见[SCAN实机部署手册](../skills/navigation/SCAN_DEPLOYMENT.md)。
+
 网页入口：导航页选择「SCAN 原生规划器 + MuJoCo」，或在线仿真选择「SCAN 原生规划仿真」。独立窗口为 `/scan-live`。点击地图空地设置目标，再点击开始。左键拖动画面旋转、右键拖动平移、滚轮缩放。停止与重置只影响仿真。
 
 ## 实际执行链
@@ -60,4 +62,4 @@ cd /root/gpufree-data/Rob2Nav
 python3 scripts/verify_scan_mujoco_web.py --output outputs/scan_web_check_new
 ```
 
-SCAN 是经典规划器，没有神经网络训练阶段。MoE是独立的低层运动策略。实机只保留[SDK部署方案](../skills/navigation/DEPLOYMENT.md)，未执行机器人通信或电机指令。
+SCAN 是经典规划器，没有神经网络训练阶段。MoE是独立的低层运动策略。实机只保留[SCAN实机完整部署手册](../skills/navigation/SCAN_DEPLOYMENT.md)，未执行机器人通信或电机指令。

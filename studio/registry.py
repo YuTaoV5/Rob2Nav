@@ -35,6 +35,11 @@ def capabilities(catalog,jobs):
         skill['manuals']=[dict(kind=kind,label=label,path=path,url='#reports?path='+quote(path,safe=''))
             for kind,label in [('training','训练手册'),('simulation','仿真手册'),('deployment','部署手册')]
             for path in [f"skills/{skill['id']}/{kind.upper()}.md"] if any(r['path']==path for r in catalog.get('reports',[]))]
+        if skill['id']=='navigation':
+            skill['manuals'] += [dict(kind=kind,label=label,path=path,url='#reports?path='+quote(path,safe=''))
+                for kind,label,path in [('scan_simulation','SCAN仿真手册','skills/navigation/SCAN_SIMULATION.md'),
+                                        ('scan_deployment','SCAN实机部署手册','skills/navigation/SCAN_DEPLOYMENT.md')]
+                if any(r['path']==path for r in catalog.get('reports',[]))]
         selector=skill.get('evidence',{})
         related=[j for j in jobs if j['config'].get('capability_id')==skill['id']]
         prefixes=selector.get('prefixes',[])+[f"outputs/studio/jobs/{j['id']}/evaluation/" for j in related]
