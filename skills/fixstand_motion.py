@@ -16,5 +16,9 @@ class FixstandReferenceAction(JointPositionAction):
         command=self._env.command_manager.get_term('motion')
         frames=command.motion.time_step_total
         boundary=(command.time_steps<90)|(command.time_steps>=frames-90)
-        target=command.joint_pos+getattr(self.cfg,'residual_limit_rad',.05)*torch.tanh(self._raw_actions)
+        from skills.fixstand import sideflip_boundary_limit
+        hold=getattr(self.cfg,'residual_limit_rad',.05)
+        bridge=getattr(self.cfg,'bridge_residual_limit_rad',hold)
+        limit=sideflip_boundary_limit(command.time_steps,frames,hold,bridge).unsqueeze(-1)
+        target=command.joint_pos+limit*torch.tanh(self._raw_actions)
         self._processed_actions[boundary]=target[boundary]

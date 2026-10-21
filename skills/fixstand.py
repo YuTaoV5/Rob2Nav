@@ -11,6 +11,16 @@ def target_pose(robot):
     return torch.tensor([POSE[name] for name in robot.joint_names],device=robot.device)
 
 
+def sideflip_boundary_limit(frame,total,hold_limit,bridge_limit,hold_frames=50,region_frames=90):
+    """Blend stance compensation back to the original action near takeoff/landing."""
+    import torch
+    index=torch.as_tensor(frame)
+    distance=torch.minimum(index,total-1-index)
+    progress=torch.clamp((distance-hold_frames)/(region_frames-hold_frames),0.,1.)
+    smooth=progress*progress*(3.-2.*progress)
+    return hold_limit+(bridge_limit-hold_limit)*smooth
+
+
 def stance_score(robot):
     import torch
     q=target_pose(robot)
@@ -108,7 +118,7 @@ def configure_upright(cfg,endpoint_residual=False):
         cfg.commands.base_velocity.rel_standing_envs=0.
 
 
-def configure_sideflip(cfg,contract,boundary_residual=False,residual_limit=.05):
+def configure_sideflip(cfg,contract,boundary_residual=False,residual_limit=.05,bridge_limit=None):
     from isaaclab.managers import RewardTermCfg
     from skills.fixstand_motion import StartAtStand
     cfg.commands.motion.class_type=StartAtStand
@@ -124,6 +134,7 @@ def configure_sideflip(cfg,contract,boundary_residual=False,residual_limit=.05):
         from skills.fixstand_motion import FixstandReferenceAction
         cfg.actions.JointPositionAction.class_type=FixstandReferenceAction
         cfg.actions.JointPositionAction.residual_limit_rad=residual_limit
+        cfg.actions.JointPositionAction.bridge_residual_limit_rad=residual_limit if bridge_limit is None else bridge_limit
 
 
 def initialize_expanded_policy(runner,checkpoint):

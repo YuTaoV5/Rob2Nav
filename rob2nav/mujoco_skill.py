@@ -179,7 +179,10 @@ def main():
                 if reference is None:raise ValueError('Reference residual policy requires its motion reference')
                 padding=boundary['padded_region_frames']
                 if index<padding or index>=len(reference['joint_pos'])-padding:
-                    target=reference['joint_pos'][index]+boundary['residual_limit_rad']*np.tanh(last)
+                    from skills.fixstand import sideflip_boundary_limit
+                    hold=boundary['residual_limit_rad'];bridge=boundary.get('bridge_residual_limit_rad',hold)
+                    limit=float(sideflip_boundary_limit(index,len(reference['joint_pos']),hold,bridge))
+                    target=reference['joint_pos'][index]+limit*np.tanh(last)
             for _ in range(args.physics_hz//50):
                 data.ctrl[aids]=motor_torque(target,data.qpos[qids],data.qvel[vids],effort,velocity_limits,meta.get('motor_model','ideal_pd'))
                 before_step=float(data.time)

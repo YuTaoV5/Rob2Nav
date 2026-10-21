@@ -18,10 +18,13 @@ p.add_argument('--transfer-motors',action='store_true',help='Experimental explic
 p.add_argument('--fixstand-roundtrip',action='store_true')
 p.add_argument('--boundary-residual',action='store_true')
 p.add_argument('--boundary-residual-limit',type=float,default=.05)
+p.add_argument('--boundary-bridge-limit',type=float)
 AppLauncher.add_app_launcher_args(p)
 args = p.parse_args()
 if args.boundary_residual and not args.fixstand_roundtrip:p.error('--boundary-residual requires --fixstand-roundtrip')
 if not .01<=args.boundary_residual_limit<=.3:p.error('Boundary residual limit must be in [.01,.3] rad')
+if args.boundary_bridge_limit is not None and (not args.boundary_residual or not .01<=args.boundary_bridge_limit<=args.boundary_residual_limit):
+    p.error('Boundary bridge limit requires residual mode and value in [.01, hold limit]')
 args.kit_args = (args.kit_args+' --enable isaacsim.asset.importer.urdf').strip()
 app = AppLauncher(args).app
 
@@ -54,7 +57,7 @@ def main():
         cfg.rewards.undesired_contacts.weight=-10.
     if args.fixstand_roundtrip:
         from skills.fixstand import configure_sideflip
-        configure_sideflip(cfg,contract,args.boundary_residual,args.boundary_residual_limit)
+        configure_sideflip(cfg,contract,args.boundary_residual,args.boundary_residual_limit,args.boundary_bridge_limit)
     bodies = contract['body_names']
     anchor = cfg.commands.motion.anchor_body_name
     feet = cfg.terminations.ee_body_pos.params['body_names']
@@ -69,7 +72,8 @@ def main():
         from skills.fixstand import write_contract
         write_contract(args.output/'fixstand.json','sideflip',reference_sha256=sha(args.motion),actor_observations=69,
             action_parameterization='reference_residual_v2' if args.boundary_residual else 'joint_offset_v1',
-            padded_region_frames=90,residual_limit_rad=args.boundary_residual_limit)
+            padded_region_frames=90,residual_limit_rad=args.boundary_residual_limit,
+            bridge_residual_limit_rad=args.boundary_bridge_limit if args.boundary_bridge_limit is not None else args.boundary_residual_limit)
     dump_yaml(str(args.output/'env.yaml'), cfg)
     dump_yaml(str(args.output/'agent.yaml'), agent)
     write_json(args.output/'contract.json', dict(robot='Go2', role='real PhysX PPO training, not FK replay',
