@@ -38,4 +38,4 @@ SDK依赖CycloneDDS0.10.2。若安装时找不到DDS，先在~/src克隆eclipse-
 
 官方接口依据：[Go2低层LowState/LowCmd与CRC示例](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/example/go2/low_level/go2_stand_example.py)。该示例本身会控制电机，不能当作只读采集程序。实机策略加载前必须通过本次模型的MuJoCo任务与约束检查；仿真通过仍不等于硬件通过。
 
-本次方案的官方SDK源码固定为 `814556d15970dd2ecf1c9984e845ca02ab07e206`；仅作源码核对，未安装SDK、未打开DDS、未连接机器人。实机型号/固件兼容性仍按各技能方案在后续实施时审查。
+本次方案的官方SDK源码固定为 `814556d15970dd2ecf1c9984e845ca02ab07e206`；初次为源码核对，随后已在独立go2-sdk-check环境验证真实SDK消息与CRC；未初始化DDS、未连接机器人。统一部署框架仍在物理验证中，见最新handover及docs/UNIFIED_GO2_DEPLOYMENT.md。实机型号/固件兼容性仍按各技能方案在后续实施时审查。

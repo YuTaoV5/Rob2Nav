@@ -46,4 +46,4 @@ python deploy_real/deploy_real_backflip.py enp5s0 deploy_real/configs/go2_backfl
 
 依据：[固定版本部署说明](https://github.com/Robot-Nav/GO2_backflip/blob/954aa61ceb62c515689677f44a21e32109f6b62d/deploy_real/README.md)、[Unitree SDK2 Python](https://github.com/unitreerobotics/unitree_sdk2_python)。
 
-本次方案的官方SDK源码固定为 `814556d15970dd2ecf1c9984e845ca02ab07e206`；仅作源码核对，未安装SDK、未打开DDS、未连接机器人。实机型号/固件兼容性仍按各技能方案在后续实施时审查。
+本次方案的官方SDK源码固定为 `814556d15970dd2ecf1c9984e845ca02ab07e206`；初次为源码核对，随后已在独立go2-sdk-check环境验证真实SDK消息与CRC；未初始化DDS、未连接机器人。统一部署框架仍在物理验证中，见最新handover及docs/UNIFIED_GO2_DEPLOYMENT.md。实机型号/固件兼容性仍按各技能方案在后续实施时审查。
