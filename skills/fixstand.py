@@ -49,20 +49,20 @@ def four_feet(env):
 
 
 def endpoint_reward(env, start=1., end=5.):
-    t=env.episode_length_buf*env.step_dt
+    t=phase_time(env)
     mask=(t<start)|(t>=end)
     return mask*(stance_score(env.scene['robot'])+.25*four_feet(env))
 
 
 def upright_phase(env):
     import torch
-    t=env.episode_length_buf*env.step_dt
+    t=phase_time(env)
     # Hold / rise-and-upright / recover. Recovery command remains observable at t>=7.
     return torch.stack([(t<1.).float(),((t>=1.)&(t<5.)).float(),(t>=5.).float(),torch.clamp(t/8.,0.,1.)],dim=-1)
 
 
 def upright_active(env):
-    t=env.episode_length_buf*env.step_dt
+    t=phase_time(env)
     return ((t>=1.)&(t<5.)).float()
 
 
@@ -76,7 +76,7 @@ def gated_upright_reward(env,original,parameters):
 
 def upright_recovery_reward(env):
     import torch
-    robot=env.scene['robot'];t=env.episode_length_buf*env.step_dt
+    robot=env.scene['robot'];t=phase_time(env)
     pose=torch.exp(-((robot.data.joint_pos-target_pose(robot))**2).mean(-1)/.15)
     error=robot.data.projected_gravity_b-torch.tensor([0.,0.,-1.],device=robot.device)
     gravity=torch.exp(-(error**2).sum(-1)/.3)
@@ -93,6 +93,25 @@ def reset_standard(env,env_ids):
     robot.write_joint_state_to_sim(q,torch.zeros_like(q),env_ids=env_ids)
 
 
+def phase_time(env):
+    return env.episode_length_buf*env.step_dt+getattr(env,'_upright_phase_offset',0.)
+
+
+def reset_upright_curriculum(env,env_ids,upright_fraction=.25):
+    """Some training resets start balanced in the action phase; eval remains four-foot only."""
+    import torch
+    if not 0.<upright_fraction<=.5:raise ValueError('Upright curriculum fraction must be in (0, .5]')
+    reset_standard(env,env_ids)
+    if not hasattr(env,'_upright_phase_offset'):
+        env._upright_phase_offset=torch.zeros(env.num_envs,device=env.device)
+    env._upright_phase_offset[env_ids]=0.
+    chosen=env_ids[torch.rand(len(env_ids),device=env.device)<upright_fraction]
+    if len(chosen):
+        from skills.upright_walk.task import reset_mixed
+        reset_mixed(env,chosen,upright_fraction=1.)
+        env._upright_phase_offset[chosen]=1.5
+
+
 def upright_endpoint_weight(time):
     import torch
     t=torch.as_tensor(time)
@@ -102,10 +121,13 @@ def upright_endpoint_weight(time):
     return torch.maximum(1.-smooth(release),smooth(recover))
 
 
-def configure_upright(cfg,endpoint_residual=False,endpoint_limit=.2):
+def configure_upright(cfg,endpoint_residual=False,endpoint_limit=.2,upright_reset_fraction=0.):
     from isaaclab.managers import ObservationTermCfg,RewardTermCfg,EventTermCfg
     cfg.episode_length_s=8.
     cfg.events.reset_base=EventTermCfg(func=reset_standard,mode='reset')
+    if upright_reset_fraction:
+        if not 0.<upright_reset_fraction<=.5:raise ValueError('Upright reset fraction must be in (0, .5]')
+        cfg.events.reset_base=EventTermCfg(func=reset_upright_curriculum,mode='reset',params={'upright_fraction':upright_reset_fraction})
     cfg.observations.policy.fixstand_phase=ObservationTermCfg(func=upright_phase)
     # Gate only task incentives; safety penalties remain active in all phases.
     for name in ('orientation','front_height','rear_support','front_contact','velocity','yaw','height',

@@ -17,6 +17,7 @@ p.add_argument('--reset-std',type=float)
 p.add_argument('--fixstand-roundtrip',action='store_true')
 p.add_argument('--endpoint-residual',action='store_true')
 p.add_argument('--endpoint-residual-limit',type=float,default=.2)
+p.add_argument('--upright-reset-fraction',type=float,default=0.)
 AppLauncher.add_app_launcher_args(p)
 args = p.parse_args()
 if args.endpoint_residual and not (args.fixstand_roundtrip and args.stepping_gait):
@@ -25,6 +26,8 @@ if not .01<=args.endpoint_residual_limit<=.2 or (args.endpoint_residual_limit!=.
     p.error('--endpoint-residual-limit requires endpoint residual and a value in [0.01, 0.2]')
 if args.stepping_gait and not args.transfer_motors:p.error('--stepping-gait requires --transfer-motors')
 if args.reset_std is not None and not .01<=args.reset_std<=1.:p.error('--reset-std must be in [0.01,1]')
+if args.upright_reset_fraction and (not args.fixstand_roundtrip or not 0.<args.upright_reset_fraction<=.5):
+    p.error('--upright-reset-fraction requires FIXSTAND and a value in (0, .5]')
 args.kit_args = (args.kit_args+' --enable isaacsim.asset.importer.urdf').strip()
 app = AppLauncher(args).app
 
@@ -50,7 +53,7 @@ def main():
         enable_stepping_rewards(cfg)
     if args.fixstand_roundtrip:
         from skills.fixstand import configure_upright
-        configure_upright(cfg,args.endpoint_residual,args.endpoint_residual_limit)
+        configure_upright(cfg,args.endpoint_residual,args.endpoint_residual_limit,args.upright_reset_fraction)
     agent = BasePPORunnerCfg()
     agent.seed,agent.device = args.seed,cfg.sim.device
     agent.max_iterations,agent.save_interval = args.iterations,100
@@ -61,7 +64,8 @@ def main():
         from skills.fixstand import write_contract
         write_contract(args.output/'fixstand.json','upright',actor_observations=52,phase_seconds=[1.,5.,6.5,8.],
             action_parameterization=('upright_endpoint_v2' if args.endpoint_residual_limit==.2 else 'upright_endpoint_v3') if args.endpoint_residual else 'joint_offset_v1',
-            residual_limit_rad=args.endpoint_residual_limit,release_seconds=[1.,1.5],recovery_seconds=[5.,6.5])
+            residual_limit_rad=args.endpoint_residual_limit,release_seconds=[1.,1.5],recovery_seconds=[5.,6.5],
+            upright_reset_fraction=args.upright_reset_fraction)
     dump_yaml(str(args.output/'env.yaml'),cfg)
     dump_yaml(str(args.output/'agent.yaml'),agent)
     torch.set_num_threads(4)
@@ -70,7 +74,8 @@ def main():
         wrapped = RslRlVecEnvWrapper(env,clip_actions=100.)
         write_json(args.output/'contract.json',dict(robot='Go2',asset_commit=BACKFLIP_COMMIT,
             runner_source_commit=UNITREE_COMMIT,role='real PhysX PPO training, no root stabilization force',
-            reset_distribution='100% shared standard four-foot stance' if args.fixstand_roundtrip else '50% four feet, 50% balanced upright; skill validation must start on four feet',
+            reset_distribution=(f'{1.-args.upright_reset_fraction:.0%} standard four-foot, {args.upright_reset_fraction:.0%} balanced upright action-phase'
+                if args.fixstand_roundtrip else '50% four feet, 50% balanced upright; skill validation must start on four feet'),
             command_frame='horizontal forward is projected negative body Z when upright',
             target_projected_gravity=[-1,0,0],actor_observations=int(wrapped.get_observations()['policy'].shape[-1]),action_dim=12,
             joint_names=env.scene['robot'].joint_names,default_joint_pos=env.scene['robot'].data.default_joint_pos[0].tolist(),

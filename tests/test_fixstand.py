@@ -44,6 +44,14 @@ class FixstandTests(unittest.TestCase):
         result=upright_phase(env)
         torch.testing.assert_close(result[:,:3],torch.eye(3))
 
+    def test_upright_curriculum_phase_offset_only_changes_training_phase(self):
+        from skills.fixstand import phase_time,upright_active
+        env=SimpleNamespace(episode_length_buf=torch.tensor([0,0,0]),step_dt=.02,
+            _upright_phase_offset=torch.tensor([0.,1.5,5.]))
+        torch.testing.assert_close(phase_time(env),torch.tensor([0.,1.5,5.]))
+        torch.testing.assert_close(upright_active(env),torch.tensor([0.,1.,0.]))
+        torch.testing.assert_close(upright_phase(env)[:,:3],torch.eye(3))
+
     def test_upright_endpoint_schedule(self):
         from skills.fixstand import upright_endpoint_weight
         values=upright_endpoint_weight(torch.tensor([0.,.8,1.,1.25,1.5,4.9,5.,5.75,6.5,8.]))
