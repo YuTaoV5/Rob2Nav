@@ -23,7 +23,7 @@ def main():
     p.add_argument('--max-seconds',type=float,default=80.,help='Whole sequence budget; individual entry/exit deadlines are unchanged')
     a=p.parse_args()
     if not np.isfinite(a.initial_yaw_deg) or abs(a.initial_yaw_deg)>180:p.error('Invalid initial yaw')
-    if not np.isfinite(a.max_seconds) or not 1<=a.max_seconds<=300:p.error('Invalid simulation duration')
+    if not np.isfinite(a.max_seconds) or not 1<=a.max_seconds<=1800:p.error('Invalid simulation duration')
     if a.initial_yaw_deg and a.asset!='source':p.error('Initial yaw variation currently requires the source asset')
     root=a.root.resolve();a.output.mkdir(parents=True,exist_ok=False)
     from go2_nav.env import Go2MaplessEnv,load_config

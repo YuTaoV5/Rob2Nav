@@ -2,7 +2,7 @@
 
 ## 快速定位：网页编排、仿真与实机
 
-网页“部署框架 → 拖拽编排与长期仿真”将 `stand`、`walk_moe`、研究侧翻等配置拖入时间线，可调整驻留时间、前进速度和最多4轮循环。浏览器调用 `POST /api/live-skills/composition/start`，服务器生成受限的序列JSON，由 `rob2nav.deployment.verify_mujoco` 运行**真实自由机身MuJoCo动力学**，同一 `SkillSequence`/`UnifiedRuntime` 完成所有切换。实时JPEG与相机角度经只读帧/受限相机接口传输；停止按钮或页面失联8秒会停止进程。上限32步、300秒。侧翻必须显式启用“研究仿真”；训练指标、电机速度或落地失败会如实留在 `outputs/live_skills/<session>/evaluation/summary.json` 和 `process.log`。网页没有实机电机路由。
+网页“部署框架 → 拖拽编排与长期仿真”将 `stand`、`walk_moe`、研究侧翻等配置拖入时间线，可调整驻留时间、前进速度和最多4轮循环。浏览器调用 `POST /api/live-skills/composition/start`，服务器生成受限的序列JSON，由 `rob2nav.deployment.verify_mujoco` 运行**真实自由机身MuJoCo动力学**，同一 `SkillSequence`/`UnifiedRuntime` 完成所有切换。实时JPEG与相机角度经只读帧/受限相机接口传输；停止按钮或页面失联8秒会停止进程。上限32步、30分钟；浏览器需保持打开并持续心跳。侧翻必须显式启用“研究仿真”；训练指标、电机速度或落地失败会如实留在 `outputs/live_skills/<session>/evaluation/summary.json` 和 `process.log`。网页没有实机电机路由。
 
 可离线复现同一编排：在网页导出 `unified-composition.json`，复制到仓库目录，运行：
 

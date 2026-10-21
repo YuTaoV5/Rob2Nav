@@ -121,7 +121,7 @@ def mount_live_skills(app,root,python):
             if raw['trigger']!=bool(profiles[raw['skill']].get('atomic')):raise HTTPException(422,'原子技能需要显式触发，普通技能不能触发')
             try:Step(**raw).checked()
             except (ValueError,TypeError) as exc:raise HTTPException(422,str(exc)) from exc
-        budget=min(300.,max(30.,sum(s['seconds'] for s in steps)+len(steps)*8+15))
+        budget=min(1800.,max(30.,sum(s['seconds'] for s in steps)+len(steps)*8+15))
         with lock:
             stop();key=uuid.uuid4().hex[:12];out=root/'outputs/live_skills'/key
             stream=out/'stream';stream.mkdir(parents=True)
