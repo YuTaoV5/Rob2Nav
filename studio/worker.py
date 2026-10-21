@@ -33,11 +33,12 @@ def checked_training(folder,expected_iterations=None):
 def execute(jobs,job,root,python,mujoco_python=None):
     key=job['id'];folder=jobs.folder(key);folder.mkdir(parents=True,exist_ok=True)
     config=RunConfig.model_validate(job['config']);run=root/'outputs/studio/runs'/key
-    config_path=folder/'studio_config.json';config_path.write_text(json.dumps(config.overrides(),indent=2))
+    manual=config.task=='train' and config.recipe_id in ('navigation_ppo','sideflip_native_ppo','upright_walk_ppo','backflip_native_ppo')
+    config_path=folder/'studio_config.json';config_path.write_text(json.dumps({'recipe_id':config.recipe_id,'recipe_options':config.recipe_options,'seed':config.seed,'iterations':config.iterations,'num_envs':config.num_envs} if manual else config.overrides(),indent=2))
     (folder/'resolved_config.json').write_text(json.dumps(config.model_dump(),indent=2))
     from .upstreams import pie_python
     runtime=pie_python(root) if config.simulation_policy=='pie' else python if config.simulation_policy=='checkpoint' else mujoco_python
-    cmd=simulation_command(config,root,run,runtime) if config.task=='simulation' else command(config,root,run,config_path,python)
+    cmd=simulation_command(config,root,run,runtime) if config.task=='simulation' else command(config,root,run,config_path,python,mujoco_python)
     (folder/'command.json').write_text(json.dumps(cmd,indent=2))
     detail={'stage':'training','run':str(run.relative_to(root)),
             'config_sha256':hashlib.sha256((folder/'resolved_config.json').read_bytes()).hexdigest(),
@@ -57,7 +58,7 @@ def execute(jobs,job,root,python,mujoco_python=None):
                     # MoE checks the same flag at the next rollout boundary,
                     # saves an atomic stop checkpoint, then exits. Other jobs
                     # have no cooperative checkpoint contract.
-                    if stage!='training':os.killpg(proc.pid,signal.SIGINT)
+                    if stage!='training' or config.recipe_id in ('navigation_ppo','sideflip_native_ppo','upright_walk_ppo','backflip_native_ppo'):os.killpg(proc.pid,signal.SIGINT)
                     stopped=True;deadline=time.monotonic()+45
                 if stopped and time.monotonic()>deadline:
                     os.killpg(proc.pid,signal.SIGKILL)
@@ -75,6 +76,24 @@ def execute(jobs,job,root,python,mujoco_python=None):
         jobs.update(key,'succeeded',detail)
         return
     launch(cmd,'training')
+    if config.recipe_id in ('navigation_ppo','sideflip_native_ppo','upright_walk_ppo','backflip_native_ppo'):
+        if config.recipe_id=='navigation_ppo':
+            artifacts=[run/'navigation.zip',run/'manifest.json',run/'navigation_config.json']
+        elif config.recipe_id=='backflip_native_ppo':
+            upstream=root.parent/'Rob2Nav-upstreams/GO2_backflip/logs/rsl_rl/go2_backflip'
+            matches=list(upstream.glob('*studio_'+key))
+            artifacts=sorted(matches[-1].glob('model_*.pt')) if matches else []
+        else:
+            artifacts=list(run.glob('model_*.pt'))+[run/'completion.json']
+        if not artifacts or any(not p.is_file() or p.stat().st_size==0 for p in artifacts):
+            raise RuntimeError('Skill trainer exited without required artifacts; inspect training log')
+        if config.recipe_id in ('sideflip_native_ppo','upright_walk_ppo'):
+            completion=read_json(run/'completion.json',{})
+            if not completion.get('execution_complete') or completion.get('requested_iterations')!=config.iterations:
+                raise RuntimeError('Skill trainer completion manifest does not match the requested budget')
+        detail.update(artifacts=[str(p) for p in artifacts],note='Training artifacts exist; independent MuJoCo skill validation is still required.')
+        jobs.update(key,'succeeded',detail)
+        return
     ck=checked_training(run,config.iterations)
     detail.update(checkpoint=str(ck.relative_to(root)),checkpoint_sha256=hashlib.sha256(ck.read_bytes()).hexdigest())
     if config.auto_evaluate:

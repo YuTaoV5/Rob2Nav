@@ -187,23 +187,27 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
         errors=[];warnings=[]
         output=root/'outputs/studio/runs/PREVIEW'
         from .upstreams import pie_python
-        runtime=pie_python(root) if config.simulation_policy=='pie' else mujoco_python if config.task=='simulation' and config.simulation_policy!='checkpoint' else sim_python
-        try:cmd=simulation_command(config,root,output,runtime) if config.task=='simulation' else command(config,root,output,root/'outputs/studio/PREVIEW.json',runtime)
+        manual=config.task=='train' and config.recipe_id in ('navigation_ppo','sideflip_native_ppo','upright_walk_ppo','backflip_native_ppo')
+        runtime=pie_python(root) if config.task=='simulation' and config.simulation_policy=='pie' else mujoco_python if (config.task=='simulation' and config.simulation_policy!='checkpoint') or config.recipe_id=='navigation_ppo' else sim_python
+        try:cmd=simulation_command(config,root,output,runtime) if config.task=='simulation' else command(config,root,output,root/'outputs/studio/PREVIEW.json',sim_python,mujoco_python)
         except ValueError as e:cmd=[];errors.append(str(e))
         if not runtime.is_file():errors.append('当前主机没有所选任务的执行解释器；可保存草稿，在服务器运行。')
-        if config.task=='train' and not (root/'vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt').is_file():
+        if manual:
+            from .recipe_training import prerequisites
+            errors += ['缺少技能训练依赖：'+path for path in prerequisites(config,root)]
+        if config.task=='train' and not manual and not (root/'vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt').is_file():
             errors.append('缺少固定版本MoE基座权重；请先核对项目资源。')
         if os.name!='posix':errors.append('训练worker需要Linux主机；本地可浏览、编辑和保存配置。')
         if not allow_training:warnings.append('当前服务为只读训练模式，提交队列已关闭。')
         if config.task=='simulation':warnings.append('选定权重在原生Isaac中推理，教师/学生身份以检查点来源为准。' if config.simulation_policy=='checkpoint' else '使用历史MoE/IK/NJU技能组合，仿真成绩不计入新感知MoE能力。' if config.simulation_policy=='baseline' else '上游策略本地推理，仅仿真；独立能力验收另行记录。')
-        elif config.mode=='teacher':warnings.append('完整地图为特权教师输入，不能标为可部署相机/雷达策略。')
-        if config.course=='wide_deep':warnings.append('训练前置几何与原AME严格评估分开，不计为原尺寸成功。')
+        elif not manual and config.mode=='teacher':warnings.append('完整地图为特权教师输入，不能标为可部署相机/雷达策略。')
+        if not manual and config.course=='wide_deep':warnings.append('训练前置几何与原AME严格评估分开，不计为原尺寸成功。')
         if config.body_height_target_m is not None or config.swing_clearance_target_m is not None:
             warnings.append('高度是固定训练奖励目标，不是已有策略的运行指令；需要微调与独立验收。')
         if config.warmup+config.fusion+config.actor>config.iterations:warnings.append('阶段总轮数超过本次预算，后续阶段本次可能不会执行；恢复时按全局轮次计算。')
         if config.initialization=='resume':warnings.append('恢复需匹配原参数；不恢复模拟器物理状态，不保证逐步确定性。')
         return {'valid':not errors,'errors':errors,'warnings':warnings,'command':cmd,'resolved':config.model_dump(),
-                'environment_steps':config.num_envs*24*config.iterations,'estimated_hours':None,'rewards':reward_schema(config)}
+                'environment_steps':None if manual else config.num_envs*24*config.iterations,'estimated_hours':None,'rewards':{} if manual else reward_schema(config)}
 
     @app.post('/api/preflight')
     def validate(config:RunConfig):return preflight(config)

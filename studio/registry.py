@@ -23,7 +23,7 @@ def resolve_recipe(config,require_ready=False):
         raise ValueError('Robot / algorithm / adapter does not match the selected recipe; weights are not interchangeable')
     if config.capability_id and config.capability_id not in recipe['capabilities']:
         raise ValueError('Capability is not supported by this recipe')
-    if require_ready and recipe['execution']!='native':raise ValueError(recipe['blocker'])
+    if require_ready and recipe['execution'] not in ('native','manual_cli'):raise ValueError(recipe['blocker'])
     if require_ready and recipe.get('defaults',{}).get('kind','mixed')!='mixed' and config.kind!=recipe['defaults']['kind']:
         raise ValueError('Terrain does not match this capability recipe; select the matching recipe or custom experiment')
     return recipe

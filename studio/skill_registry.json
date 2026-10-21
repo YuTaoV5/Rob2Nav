@@ -374,7 +374,12 @@
         "minibatches",
         "max_grad_norm"
       ],
-      "note": "在V2既有观测/安装下做冻结本体的小步感知分支微调；新目标接口试验退化已归档，不冒称已解决。"
+      "note": "在V2既有观测/安装下做冻结本体的小步感知分支微调；新目标接口试验退化已归档，不冒称已解决。",
+      "workflow": [
+        "检查基座权重和实验配置",
+        "在Isaac中训练并核对完成标记",
+        "运行独立评估并审查验收结果"
+      ]
     },
     {
       "id": "moe_platform",
@@ -435,7 +440,12 @@
         "minibatches",
         "max_grad_norm"
       ],
-      "note": "在V2既有观测/安装下做冻结本体的小步感知分支微调；新目标接口试验退化已归档，不冒称已解决。"
+      "note": "在V2既有观测/安装下做冻结本体的小步感知分支微调；新目标接口试验退化已归档，不冒称已解决。",
+      "workflow": [
+        "检查基座权重和实验配置",
+        "在Isaac中训练并核对完成标记",
+        "运行独立评估并审查验收结果"
+      ]
     },
     {
       "id": "moe_mixed",
@@ -496,7 +506,12 @@
         "minibatches",
         "max_grad_norm"
       ],
-      "note": "在V2既有观测/安装下做冻结本体的小步感知分支微调；新目标接口试验退化已归档，不冒称已解决。"
+      "note": "在V2既有观测/安装下做冻结本体的小步感知分支微调；新目标接口试验退化已归档，不冒称已解决。",
+      "workflow": [
+        "检查基座权重和实验配置",
+        "在Isaac中训练并核对完成标记",
+        "运行独立评估并审查验收结果"
+      ]
     },
     {
       "id": "navigation_ppo",
@@ -511,7 +526,7 @@
         "navigation"
       ],
       "runtime": "MuJoCo3.2.3 / SB3 2.6 CPU",
-      "blocker": "使用专用CLI训练手册；不复用IsaacLab地形PPO配置器。",
+      "blocker": "提交前需通过依赖预检；训练完成后仍需按手册独立评估。",
       "observation": "273维雷达/深度槽位、目标与本体状态；lidar模式保持相同屏蔽",
       "action": "3维归一化vx/vy/wz；底层MoE137k不更新",
       "defaults": {
@@ -521,7 +536,15 @@
         "algorithm_id": "navigation_ppo",
         "robot_id": "go2",
         "initialization": "base",
-        "checkpoint": ""
+        "checkpoint": "",
+        "seed": 42,
+        "recipe_options": {
+          "sensors": "lidar",
+          "scene": "random",
+          "steps": 100000,
+          "envs": 4
+        },
+        "auto_evaluate": false
       },
       "parameters": [
         "--config skills/navigation/config.json",
@@ -529,7 +552,13 @@
         "--steps 100000",
         "--envs 4"
       ],
-      "note": "已实际完成100352步训练；8回合独立物理验证与网页交互通过。SDK实机仅方案，未验证。"
+      "note": "已实际完成100352步训练；8回合独立物理验证与网页交互通过。SDK实机仅方案，未验证。",
+      "workflow": [
+        "核对RoboGauge基座与273维观测配置",
+        "选择传感器和训练场景，运行PPO速度头",
+        "核对navigation.zip、manifest及配置快照",
+        "用独立种子执行空旷与绕障MuJoCo评估"
+      ]
     },
     {
       "id": "sideflip_native_ppo",
@@ -544,7 +573,7 @@
         "sideflip"
       ],
       "runtime": "IsaacSim5.1 / IsaacLab2.3 / MuJoCo3.2.3",
-      "blocker": "使用已执行验证的专用CLI；不复用地形MoE实验配置器。",
+      "blocker": "提交前需通过依赖预检；训练完成后仍需按手册独立评估。",
       "observation": "69维：参考q/dq、anchor方向、本体角速度、相对关节与前一动作",
       "action": "12维关节偏移×0.5；PD40/1，50Hz策略、200Hz物理",
       "defaults": {
@@ -554,7 +583,15 @@
         "algorithm_id": "motion_imitation_ppo",
         "robot_id": "go2",
         "initialization": "base",
-        "checkpoint": ""
+        "checkpoint": "",
+        "num_envs": 4096,
+        "iterations": 5000,
+        "seed": 43,
+        "recipe_options": {
+          "device": "cuda:0",
+          "transfer_motors": false
+        },
+        "auto_evaluate": false
       },
       "parameters": [
         "--num-envs 4096",
@@ -562,7 +599,13 @@
         "--headless",
         "--device cuda:0"
       ],
-      "note": "短程PPO与MuJoCo执行链已运行，完整训练进行中；任务与硬件模型约束分开计分。"
+      "note": "专用训练器已接入Studio。已归档的侧空翻动作8/8与关节速度未通过仅适用于对应固定权重；新任务须独立验证。",
+      "workflow": [
+        "锁定两个上游提交并准备参考动作NPZ",
+        "先用32环境×2轮做接口检查",
+        "训练5000轮或从已核对检查点继续",
+        "核对completion.json与模型，再做独立MuJoCo验证"
+      ]
     },
     {
       "id": "upright_walk_ppo",
@@ -577,7 +620,7 @@
         "upright_walk"
       ],
       "runtime": "IsaacSim5.1 / IsaacLab2.3 / MuJoCo3.2.3",
-      "blocker": "使用已执行验证的专用CLI；不复用地形MoE实验配置器。",
+      "blocker": "提交前需通过依赖预检；训练完成后仍需按手册独立评估。",
       "observation": "48维本体状态、水平速度命令与前一动作",
       "action": "12维关节偏移×0.5；PD40/1，50Hz策略、200Hz物理",
       "defaults": {
@@ -587,7 +630,15 @@
         "algorithm_id": "upright_velocity_ppo",
         "robot_id": "go2",
         "initialization": "base",
-        "checkpoint": ""
+        "checkpoint": "",
+        "num_envs": 4096,
+        "iterations": 5000,
+        "seed": 44,
+        "recipe_options": {
+          "device": "cuda:0",
+          "transfer_motors": false
+        },
+        "auto_evaluate": false
       },
       "parameters": [
         "--num-envs 4096",
@@ -595,7 +646,13 @@
         "--headless",
         "--device cuda:0"
       ],
-      "note": "短程PPO与MuJoCo执行链已运行，完整训练进行中；任务与硬件模型约束分开计分。"
+      "note": "专用训练器已接入Studio。已有起立前移记录仍有滑移；新任务须从四足起步独立验证。",
+      "workflow": [
+        "核对上游源码和Go2资产",
+        "先运行32环境×2轮接口检查",
+        "训练4096环境×5000轮",
+        "从四足起步做独立MuJoCo起立行走评估"
+      ]
     },
     {
       "id": "backflip_native_ppo",
@@ -610,7 +667,7 @@
         "backflip"
       ],
       "runtime": "IsaacSim5.1 / IsaacLab2.3 / MuJoCo3.2.3",
-      "blocker": "使用已执行验证的专用CLI；不复用地形MoE实验配置器。",
+      "blocker": "提交前需通过依赖预检；训练完成后仍需按手册独立评估。",
       "observation": "60维actor、165维特权critic；由固定原生源码定义，不复用69维LSD接口",
       "action": "12关节偏移；50Hz，KP40/KD1，scale0.5；5000轮已完成，关节约束仍失败",
       "defaults": {
@@ -620,7 +677,14 @@
         "algorithm_id": "backflip_ppo",
         "robot_id": "go2",
         "initialization": "base",
-        "checkpoint": ""
+        "checkpoint": "",
+        "num_envs": 4096,
+        "iterations": 5000,
+        "seed": 1,
+        "recipe_options": {
+          "device": "cuda:0"
+        },
+        "auto_evaluate": false
       },
       "parameters": [
         "--num-envs 4096",
@@ -628,7 +692,13 @@
         "--headless",
         "--device cuda:0"
       ],
-      "note": "短程PPO与MuJoCo执行链已运行，完整训练进行中；任务与硬件模型约束分开计分。"
+      "note": "专用训练器已接入Studio。既有动作通过记录仍有关键关节约束问题；新任务须独立验证。",
+      "workflow": [
+        "锁定GO2_backflip的PPO-backflip提交",
+        "先运行32环境×2轮接口检查",
+        "执行4096环境×5000轮训练",
+        "核对上游日志和检查点，导出后独立仿真"
+      ]
     }
   ],
   "archived_recipes": [

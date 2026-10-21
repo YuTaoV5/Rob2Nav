@@ -57,6 +57,7 @@ class RunConfig(BaseModel):
     swing_clearance_target_m:float|None=Field(default=None,ge=.04,le=.25)
     rewards:dict[str,float]=Field(default_factory=dict)
     auto_evaluate:bool=True
+    recipe_options:dict[str,str|int|float|bool]=Field(default_factory=dict)
 
     @field_validator('rewards')
     @classmethod
@@ -68,7 +69,11 @@ class RunConfig(BaseModel):
     @model_validator(mode='after')
     def consistency(self):
         from .registry import resolve_recipe
-        resolve_recipe(self)
+        recipe=resolve_recipe(self)
+        if recipe and recipe['execution']=='manual_cli' and self.task=='train':
+            from .recipe_training import validate_options
+            validate_options(recipe['id'],self.recipe_options)
+            return self
         if self.task=='simulation' and (self.body_height_target_m is not None or self.swing_clearance_target_m is not None):raise ValueError('Height targets are training objectives, not runtime simulation commands')
         if self.task=='simulation':
             if self.simulation_policy=='checkpoint' and (not self.checkpoint or self.kind=='mixed'):raise ValueError('Checkpoint simulation requires a weight and a specific terrain')
@@ -108,9 +113,12 @@ def resolve_checkpoint(root, value):
     return p
 
 
-def command(config,root,output,config_path,python):
+def command(config,root,output,config_path,python,mujoco_python=None):
     from .registry import resolve_recipe
-    resolve_recipe(config,require_ready=True)
+    recipe=resolve_recipe(config,require_ready=True)
+    if recipe and recipe['execution']=='manual_cli':
+        from .recipe_training import recipe_command
+        return recipe_command(config,root,output,python,mujoco_python)
     if config.adapter!='moe':raise ValueError('This adapter is not enabled for training yet')
     root=Path(root)
     cmd=[str(python),'-m','moe_perceptive.train','--headless','--moe',str(root/'vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt'),

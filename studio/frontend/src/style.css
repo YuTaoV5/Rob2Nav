@@ -10,3 +10,14 @@
 .capability-progress-row.selected{background:#e4f4ef;box-shadow:inset 3px 0 #159f91}.skill-card.focused{outline:2px solid #159f91;outline-offset:3px}.workbench-evidence-details{padding-top:16px}.workbench-weight{display:grid;gap:6px;padding:12px 0;border-bottom:1px solid #e6e9ed}.workbench-weight small{display:block;color:#687780}.feature-video iframe,.feature-video>img{width:100%;height:100%;object-fit:contain;border:0}.workbench-evidence-details .online-controls{margin-top:16px}
 
 .overview-grid{align-items:start}
+.overview-grid{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+.feature-video{aspect-ratio:auto;height:clamp(220px,24vw,340px)}
+.feature-video video{object-fit:contain}
+.workbench-evidence-details{padding-top:10px;border-top:1px solid #e9eff0;margin-top:14px}
+.workbench-evidence-details>summary{color:#248a7d;font-weight:650;font-size:11px;padding:10px 0 18px}
+.recipe-workflow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;list-style:none;counter-reset:recipe-step;padding:0;margin:18px 0}
+.recipe-workflow li{counter-increment:recipe-step;background:#f4f8f7;border:1px solid #e2eeeb;border-radius:7px;padding:12px 12px 12px 42px;position:relative;color:#54717a;line-height:1.6;font-size:11px}
+.recipe-workflow li:before{content:counter(recipe-step);position:absolute;left:12px;top:12px;background:#dcefe9;color:#228c79;border-radius:50%;width:20px;height:20px;display:grid;place-items:center;font-weight:700}
+.recipe-training-fields .form-section-title{margin-top:24px}
+@media(max-width:850px){.overview-grid{grid-template-columns:1fr}.feature-video{height:clamp(210px,48vw,320px)}}
+@media(max-width:600px){.feature-video{height:220px}.recipe-workflow{grid-template-columns:1fr}}
