@@ -1,0 +1,62 @@
+{
+  "robot": "Go2",
+  "asset_commit": "954aa61ceb62c515689677f44a21e32109f6b62d",
+  "runner_source_commit": "4960b84732b0c2ec593dccbfe963fda1bcd7b1e3",
+  "role": "real PhysX PPO training, no root stabilization force",
+  "reset_distribution": "100% shared standard four-foot stance",
+  "command_frame": "horizontal forward is projected negative body Z when upright",
+  "target_projected_gravity": [
+    -1,
+    0,
+    0
+  ],
+  "actor_observations": 52,
+  "action_dim": 12,
+  "joint_names": [
+    "FL_hip_joint",
+    "FR_hip_joint",
+    "RL_hip_joint",
+    "RR_hip_joint",
+    "FL_thigh_joint",
+    "FR_thigh_joint",
+    "RL_thigh_joint",
+    "RR_thigh_joint",
+    "FL_calf_joint",
+    "FR_calf_joint",
+    "RL_calf_joint",
+    "RR_calf_joint"
+  ],
+  "default_joint_pos": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.800000011920929,
+    0.800000011920929,
+    1.0,
+    1.0,
+    -1.5,
+    -1.5,
+    -1.5,
+    -1.5
+  ],
+  "action_scale": 0.5,
+  "kp": 40,
+  "kd": 1,
+  "policy_hz": 50,
+  "physics_hz": 500,
+  "motor_model": "dc_linear_v1",
+  "seed": 44,
+  "reward_version": "stepping_v1",
+  "reset_std": 0.2,
+  "num_envs": 2048,
+  "requested_iterations": 1500,
+  "source_sha256": {
+    "evaluate_isaac.py": "8afe1e7bf4b646c09a489aa00e907b16f860985521808a0162d1cc3802409538",
+    "__init__.py": "c215378ac6bb1df62937e0b421c09fbb8fc5138026cfad8ddf1bada34ea7d803",
+    "task.py": "7b949602600af366e054733dea174c80884702a0ffbc599cc9ce9cb06b2b135f",
+    "train.py": "934a1af3a0d942ad0e0cc03d5c7bc8eca5fcab32a2916c00c9fa02f71822cfdd"
+  },
+  "shared_asset_source_sha256": "49aa4b92f14991c72b99ae7363412c269a9103f0f2b7f5540bf3ea9f22525eaa",
+  "hardware_connected": false
+}

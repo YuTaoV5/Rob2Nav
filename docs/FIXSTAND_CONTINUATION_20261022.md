@@ -10,6 +10,7 @@
 | 侧空翻 v5，`outputs/fixstand_sideflip_terminal_v5_20261022` | 8400–8403：0/4；结束姿态误差约 0.267 rad，起始稳定比例约 0.69，速度比约 1.067 | 比 v4 退化；没有把最后检查点当成最佳模型。 |
 | 侧空翻 v7，`outputs/fixstand_sideflip_v4_hip_taper_v7_20261022` | 8700–8703：0/4；结束误差约 0.255 rad，初始稳定比例约 0.64–0.67，速度比约 1.065–1.066 | 髋关节衰减续训仍退化。v8 改用低学习率和单关节峰值误差奖励。 |
 | 后空翻 v4，`outputs/fixstand_backflip_urdf_speed_v4_20261022` | 9600–9603：0/4；补齐执行器合约后以9620–9623复核仍0/4，速度比约0.793–0.794，但身体触地、硬限位超出约0.302 rad、结束倒地 | 未达标。重启课程的 v5 从 v3 的更好父权重重新续训。 |
+| 直立行走 v3，`outputs/fixstand_upright_tight_endpoint_v3_20261022` | 9700–9703：0/4；直立3.44–3.50 s，直立段位移约0.67 m，双后足完整承重步态周期各0；速度比1.068–1.110，硬限位超出0.125–0.136 rad | 直立保持有进展，但仍属未完成真实迈步及首尾站稳的候选，未晋级。 |
 
 侧空翻 v4 的冻结权重做过**仅诊断、不声称训练**的髋关节末段残差衰减：8200–8203 的结束最大姿态误差降至约 0.130–0.131 rad，仍高于 0.12；速度比和限位超出不变。全关节衰减使小腿姿态更差，因此训练 v6 只衰减髋关节残差，其他关节保持承重控制。`reference_residual_v3` 是新动作合约，训练、MuJoCo 验收和统一部署采用同一相位映射；旧 v2 模型不能直接改名为 v3 并部署。
 
@@ -18,11 +19,11 @@
 服务器上并行训练和条件队列：
 
 - `bash scripts/train_sideflip_fixstand_v5.sh`：2048 环境、1000 次更新，从 v4 `model_6198.pt` 续训，8400–8403 独立验收；**已完成但未达标**。
-- `bash scripts/train_upright_fixstand_v3.sh`：2048 环境、1500 次更新，从 v2 `model_1499.pt` 续训，9700–9703 验收。
+- `bash scripts/train_upright_fixstand_v3.sh`：2048 环境、1500 次更新，从 v2 `model_1499.pt` 续训；**已完成，四种子未达标**。
 - `bash scripts/train_backflip_fixstand_v4.sh`：1024 环境、1500 次更新，从 v3 `model_7496.pt` 续训；**已完成但未达标**。
 - `bash scripts/train_sideflip_fixstand_v6.sh`：原条件队列在 v5 失败后短暂启动，因 v5 已明显退化而停止；保留部分检查点仅作中止记录，**没有独立验收**。
 - `bash scripts/train_sideflip_fixstand_v7.sh`：从 v4 `model_6198.pt` 分支，1024 环境、1000 次更新；**已完成但未达标**。
-- `bash scripts/train_upright_fixstand_v4.sh`：**条件队列**。v3 若四种子未达标，从其最后检查点续训；25% 训练重置从平衡直立姿态及动作相位开始，75% 仍从标准四足站姿开始，以增加动作阶段的承重步态样本。独立验收依然 100% 从标准四足站姿开始，9800–9803 四种子。32 环境、2 次更新的原生 Isaac 接口烟测已生成 `completion.json`，只证明环境能运行。
+- `bash scripts/train_upright_fixstand_v4.sh`：**已自动衔接训练**，从 v3 `model_2998.pt` 续训；25% 训练重置从平衡直立姿态及动作相位开始，75% 仍从标准四足站姿开始，以增加动作阶段的承重步态样本。已核对实际训练合约的75%/25%重置分布。独立验收依然 100% 从标准四足站姿开始，9800–9803 四种子。此前32环境、2次更新烟测仅证明环境接口可运行。
 - `bash scripts/train_backflip_fixstand_v5.sh`：从 v3 `model_7496.pt` 重新分支，1024 环境2000更新；显式 `--reset_curriculum`，前100更新热身、1500更新逐渐收紧，固定学习率1e-4、噪声范围0.05–0.20，9900–9903验收。v4恢复了旧训练计数，导致约束在续训开始即达到完整强度；v5已核对日志中初始课程为0、终止速度比1.75，而非误以为已重启。
 - `bash scripts/train_sideflip_fixstand_v8.sh`：从 v4 `model_6198.pt` 分支，固定学习率3e-5并重新建立优化器，探索标准差重设0.10，增加末段最大单关节误差、URDF速度裕度及关节限位奖励；1024环境1500更新，8800–8803验收。32环境2更新原生烟测已完成，正式训练已启动。奖励变化不放宽评估标准。
 
@@ -38,6 +39,6 @@
 
 ## 可复现文件
 
-[`artifacts/fixstand_resume_20261022/`](../artifacts/fixstand_resume_20261022/) 内固定了三条续训**父检查点**、导出模型、训练环境/代理参数、动作合约、四种子评估和侧空翻参考 NPZ。它们是服务器本次训练得到的候选，而非外部下载的合格权重。当前运行的 v5/v6、v4 后翻、v3 直立的**最终**权重只有完成和验收后才应加入发布资源。文件哈希见该目录的 `SHA256SUMS`。
+[`artifacts/fixstand_resume_20261022/`](../artifacts/fixstand_resume_20261022/) 内固定了早期三条续训**父检查点**、导出模型、训练环境/代理参数、动作合约、四种子评估和侧空翻参考 NPZ。它们是服务器本次训练得到的候选，而非外部下载的合格权重。直立v3的最终检查点`model_2998.pt`、导出、四种子评估、首种子诊断视频及v4启动参数位于[`artifacts/fixstand_upright_v3_20261022/`](../artifacts/fixstand_upright_v3_20261022/)，用于复现续训，不授予部署资格。当前活动任务是侧翻v8、后翻v5与直立v4；各目录`SHA256SUMS`固定已归档文件。
 
 在固定上游版本、Isaac Sim/Isaac Lab 和依赖环境准备好后，恢复 `artifacts/fixstand_resume_20261022/outputs/*` 到服务器仓库同名 `outputs/*`，运行以上脚本；侧空翻需同时恢复 `outputs/fixstand_finetune_20261021/sideflip.npz` 及 JSON 合约。脚本中的根目录可通过 `ROB2NAV_ROOT` 设置，Go2 上游源码默认路径仍为 `/root/gpufree-data/Rob2Nav-upstreams/GO2_backflip` 与 `unitree_rl_lab`。不要将冻结父权重的诊断重新解释为训练结果。配置、热切换按键和机载电脑连接见 [Go2 Edu 部署指南](GO2_EDU_HOT_SWITCH.md)。
