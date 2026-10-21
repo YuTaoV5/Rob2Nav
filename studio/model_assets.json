@@ -3,8 +3,8 @@
     {
       "skill": "backflip",
       "path": "artifacts/release_20261021/weights/backflip/selected/model_4999.pt",
-      "role": "selected",
-      "selection_basis": "本地完整5000轮训练最终候选；非全局最优",
+      "role": "archive",
+      "selection_basis": "历史选定模型；当前 FIXSTAND 优先候选已更新。本地完整5000轮训练最终候选；非全局最优",
       "validation": "本地5000轮候选：严格 MuJoCo 动作/落地0/1；速度及关节限位约束未通过。上游模型演示不计入此模型成绩。",
       "sha256": "3a368e238f541ee08a3117ff1d8eb2558db3b7bd94cc16a0246970f447a13baf",
       "bytes": 5376949,
@@ -26,8 +26,8 @@
     {
       "skill": "backflip",
       "path": "artifacts/release_20261021/weights/backflip/selected/exported/policy.pt",
-      "role": "selected",
-      "selection_basis": "本地完整5000轮训练最终候选；非全局最优",
+      "role": "archive",
+      "selection_basis": "历史选定模型；当前 FIXSTAND 优先候选已更新。本地完整5000轮训练最终候选；非全局最优",
       "validation": "本地5000轮候选：严格 MuJoCo 动作/落地0/1；速度及关节限位约束未通过。上游模型演示不计入此模型成绩。",
       "sha256": "5d9db0c12c156a98a294303719df510a3627b9e9df452f56d2f68dc63e6ccdd2",
       "bytes": 800018,
@@ -49,8 +49,8 @@
     {
       "skill": "backflip",
       "path": "artifacts/release_20261021/weights/backflip/selected/exported/policy.onnx",
-      "role": "selected",
-      "selection_basis": "本地完整5000轮训练最终候选；非全局最优",
+      "role": "archive",
+      "selection_basis": "历史选定模型；当前 FIXSTAND 优先候选已更新。本地完整5000轮训练最终候选；非全局最优",
       "validation": "本地5000轮候选：严格 MuJoCo 动作/落地0/1；速度及关节限位约束未通过。上游模型演示不计入此模型成绩。",
       "sha256": "63d1506863edb8b51ebdc699f863b96fb32ed07941e171d76b2c75c7828a4dc6",
       "bytes": 789269,
@@ -72,8 +72,8 @@
     {
       "skill": "sideflip",
       "path": "artifacts/release_20261021/weights/sideflip/selected/model_5200.pt",
-      "role": "selected",
-      "selection_basis": "model_5200，固定后使用独立种子3100–3107验证",
+      "role": "archive",
+      "selection_basis": "历史选定模型；当前 FIXSTAND 优先候选已更新。model_5200，固定后使用独立种子3100–3107验证",
       "validation": "MuJoCo 动作8/8；额定速度约束0/8",
       "sha256": "5c53cb7d26bd210e995c8a937b2be2ea67e84bdbf3351291ef1290fd988e65f4",
       "bytes": 5929909,
@@ -95,8 +95,8 @@
     {
       "skill": "sideflip",
       "path": "artifacts/release_20261021/weights/sideflip/selected/exported/policy.pt",
-      "role": "selected",
-      "selection_basis": "model_5200，固定后使用独立种子3100–3107验证",
+      "role": "archive",
+      "selection_basis": "历史选定模型；当前 FIXSTAND 优先候选已更新。model_5200，固定后使用独立种子3100–3107验证",
       "validation": "MuJoCo 动作8/8；额定速度约束0/8",
       "sha256": "7616e53e2c95434f824c2728621f8052e2d41a4e033fd00a25f316de211e07e1",
       "bytes": 817170,
@@ -392,6 +392,289 @@
       "sha256": "2206659a6a23886446dcfc05d86888d6cdc9b8a4e31f44cbbc4e2d17ba3d6ead",
       "bytes": 5206984,
       "resources": []
+    },
+    {
+      "skill": "sideflip",
+      "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/model_7697.pt",
+      "role": "selected",
+      "selection_basis": "FIXSTAND 首尾优先候选 v8；固定权重四种子评估，非全局最优或实机合格权重",
+      "validation": "侧翻 v8：首尾 FIXSTAND 各4/4；轴向占比0.724低于0.75，关节速度比1.0855–1.0871，完整验收0/4；仅研究仿真。",
+      "sha256": "63beca6bb21e1ffb71e542e5b398dd640d8a05ba7806df400cdbf26b3c708dae",
+      "bytes": 5929909,
+      "resources": [
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/agent.yaml",
+          "label": "agent.yaml"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/completion.json",
+          "label": "completion.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/contract.json",
+          "label": "contract.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/env.yaml",
+          "label": "env.yaml"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/evaluation.json",
+          "label": "evaluation.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/fixstand.json",
+          "label": "fixstand.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/exported/policy.json",
+          "label": "policy.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/seed_8800/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/seed_8801/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/seed_8802/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/seed_8803/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "docs/GO2_EDU_FLIP_DEPLOYMENT.md",
+          "label": "GO2_EDU_FLIP_DEPLOYMENT.md"
+        }
+      ]
+    },
+    {
+      "skill": "sideflip",
+      "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/exported/policy.pt",
+      "role": "selected",
+      "selection_basis": "FIXSTAND 首尾优先候选 v8；固定权重四种子评估，非全局最优或实机合格权重",
+      "validation": "侧翻 v8：首尾 FIXSTAND 各4/4；轴向占比0.724低于0.75，关节速度比1.0855–1.0871，完整验收0/4；仅研究仿真。",
+      "sha256": "c3394814b2447bb87fd83ba914136dbb4f827c551a332afe7605a099073bd87d",
+      "bytes": 817170,
+      "resources": [
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/agent.yaml",
+          "label": "agent.yaml"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/completion.json",
+          "label": "completion.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/contract.json",
+          "label": "contract.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/env.yaml",
+          "label": "env.yaml"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/evaluation.json",
+          "label": "evaluation.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/fixstand.json",
+          "label": "fixstand.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/exported/policy.json",
+          "label": "policy.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/seed_8800/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/seed_8801/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/seed_8802/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/seed_8803/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "docs/GO2_EDU_FLIP_DEPLOYMENT.md",
+          "label": "GO2_EDU_FLIP_DEPLOYMENT.md"
+        }
+      ]
+    },
+    {
+      "skill": "backflip",
+      "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/model_9495.pt",
+      "role": "selected",
+      "selection_basis": "FIXSTAND 首尾优先候选 v6；固定权重四种子评估，非全局最优或实机合格权重",
+      "validation": "后翻 v6：首尾 FIXSTAND 各4/4；关节速度比1.0986–1.1092，非足端接地4/4，完整验收0/4；仅研究仿真。",
+      "sha256": "e2be04ae535f11b2a15a17ffa97b7c830f43a8084a4447091027197165e1a9a8",
+      "bytes": 5376949,
+      "resources": [
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/completion.json",
+          "label": "completion.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/evaluation.json",
+          "label": "evaluation.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/fixstand.json",
+          "label": "fixstand.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/exported/export.json",
+          "label": "export.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/params/agent.yaml",
+          "label": "agent.yaml"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/params/env.yaml",
+          "label": "env.yaml"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/seed_10000/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/seed_10001/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/seed_10002/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/seed_10003/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "docs/GO2_EDU_FLIP_DEPLOYMENT.md",
+          "label": "GO2_EDU_FLIP_DEPLOYMENT.md"
+        }
+      ]
+    },
+    {
+      "skill": "backflip",
+      "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/exported/policy.onnx",
+      "role": "selected",
+      "selection_basis": "FIXSTAND 首尾优先候选 v6；固定权重四种子评估，非全局最优或实机合格权重",
+      "validation": "后翻 v6：首尾 FIXSTAND 各4/4；关节速度比1.0986–1.1092，非足端接地4/4，完整验收0/4；仅研究仿真。",
+      "sha256": "e7748f3b2dc33b58c20e1cdd1d89e8fd511f1860689f21d0727fce5ceffe86a4",
+      "bytes": 788939,
+      "resources": [
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/completion.json",
+          "label": "completion.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/evaluation.json",
+          "label": "evaluation.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/fixstand.json",
+          "label": "fixstand.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/exported/export.json",
+          "label": "export.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/params/agent.yaml",
+          "label": "agent.yaml"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/params/env.yaml",
+          "label": "env.yaml"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/seed_10000/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/seed_10001/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/seed_10002/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/seed_10003/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "docs/GO2_EDU_FLIP_DEPLOYMENT.md",
+          "label": "GO2_EDU_FLIP_DEPLOYMENT.md"
+        }
+      ]
+    },
+    {
+      "skill": "backflip",
+      "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/exported/policy.pt",
+      "role": "selected",
+      "selection_basis": "FIXSTAND 首尾优先候选 v6；固定权重四种子评估，非全局最优或实机合格权重",
+      "validation": "后翻 v6：首尾 FIXSTAND 各4/4；关节速度比1.0986–1.1092，非足端接地4/4，完整验收0/4；仅研究仿真。",
+      "sha256": "296166dabf30167cc872e252e68970cee5db1317702411b9332a1864261c09ba",
+      "bytes": 798738,
+      "resources": [
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/completion.json",
+          "label": "completion.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/evaluation.json",
+          "label": "evaluation.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/fixstand.json",
+          "label": "fixstand.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/exported/export.json",
+          "label": "export.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/params/agent.yaml",
+          "label": "agent.yaml"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/params/env.yaml",
+          "label": "env.yaml"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/seed_10000/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/seed_10001/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/seed_10002/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/seed_10003/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "docs/GO2_EDU_FLIP_DEPLOYMENT.md",
+          "label": "GO2_EDU_FLIP_DEPLOYMENT.md"
+        }
+      ]
     }
   ],
   "notes": [

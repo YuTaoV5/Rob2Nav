@@ -83,18 +83,17 @@ def mount_live_skills(app,root,python):
                 module='go2_nav.terrain_run'
                 args=['--scene',{'multiterrain':'mixed'}.get(a.skill,a.skill),'--locomotion','moe','--max-seconds','45','--episodes','1','--seed','801','--no-jump','--output',str(out/'evaluation')]
                 note='RoboGauge预训练MoE + 感知地形控制；不是Isaac感知微调检查点的迁移验收。'
-            elif a.skill=='backflip':
-                module='skills.backflip.simulate'
-                policy=resource('backflip/selected/exported/policy.onnx',source/'logs/rsl_rl/go2_backflip/2026-10-21_00-04-59_rob2nav_reproduction/exported/policy.onnx')
-                args=['--source',str(source),'--onnx',str(policy),'--physics-hz','1000','--seconds','8','--output',str(out/'evaluation')]
-                note='本地5000轮策略；严格落地和电机约束未通过。'
+            elif a.skill in ('backflip','sideflip'):
+                from .published_flips import live_flip
+                try:module,args,policy,note=live_flip(root,a.skill,source)
+                except (OSError,ValueError,KeyError) as exc:raise HTTPException(409,str(exc)) from exc
+                args+=['--output',str(out/'evaluation')]
             else:
                 module='rob2nav.mujoco_skill'
-                policy=root/('outputs/sideflip_dc_adapt_20261021/probe_5200/policy.pt' if a.skill=='sideflip' else 'outputs/upright_walk_full_20261021/exported_final/policy.pt')
-                policy=resource('sideflip/selected/exported/policy.pt' if a.skill=='sideflip' else 'upright_walk/representative_failed_baseline/exported/policy.pt',policy)
+                policy=root/'outputs/upright_walk_full_20261021/exported_final/policy.pt'
+                policy=resource('upright_walk/representative_failed_baseline/exported/policy.pt',policy)
                 args=['--kind',a.skill,'--policy',str(policy),'--backflip-source',str(source),'--physics-hz','1000','--seconds','10','--output',str(out/'evaluation')]
-                if a.skill=='sideflip':args+=['--motion','/root/gpufree-data/capability-work/sideflip/reference.npz']
-                note='侧翻动作已验证8/8，额定速度未通过。' if a.skill=='sideflip' else '实验策略：MuJoCo起立/行走未通过，展示实际失败行为。'
+                note='实验策略：MuJoCo起立/行走未通过，展示实际失败行为。'
             if policy is not None and not policy.is_file():raise HTTPException(409,'该技能导出模型尚未就绪')
             log=(out/'process.log').open('wb')
             try:proc=subprocess.Popen([str(python),'-m','studio.live_runner','--stream',str(stream),'--module',module,'--',*args],cwd=root,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
@@ -145,7 +144,7 @@ def mount_live_skills(app,root,python):
             s.update(read(Path(current['stream'])/'state.json',{}))
             result=read(Path(current['stream']).parent/'evaluation/summary.json',{})
             if result:
-                s['result']={k:result[k] for k in ['successes','total','hardware_constraints_pass','metrics','collisions','falls'] if k in result}
+                s['result']={k:result[k] for k in ['successes','total','hardware_constraints_pass','metrics','collisions','falls','policy_sha256'] if k in result}
                 if current.get('skill')=='composition':s['result'].update({k:result[k] for k in ['passed','reason','sequence','max_torque_step_Nm','maximum_joint_speed_ratio','commits'] if k in result})
                 if 'total' not in s['result'] and isinstance(result.get('episodes'),int):s['result']['total']=result['episodes']
             if proc is not None and proc.poll() is not None:

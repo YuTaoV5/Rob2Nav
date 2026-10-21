@@ -1,0 +1,112 @@
+{
+  "hardware_connected": false,
+  "models": [
+    {
+      "skill": "sideflip",
+      "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/exported/policy.pt",
+      "sha256": "c3394814b2447bb87fd83ba914136dbb4f827c551a332afe7605a099073bd87d",
+      "bytes": 817170,
+      "download_verified": true
+    },
+    {
+      "skill": "sideflip",
+      "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/model_7697.pt",
+      "sha256": "63beca6bb21e1ffb71e542e5b398dd640d8a05ba7806df400cdbf26b3c708dae",
+      "bytes": 5929909,
+      "download_verified": true
+    },
+    {
+      "skill": "backflip",
+      "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/exported/policy.onnx",
+      "sha256": "e7748f3b2dc33b58c20e1cdd1d89e8fd511f1860689f21d0727fce5ceffe86a4",
+      "bytes": 788939,
+      "download_verified": true
+    },
+    {
+      "skill": "backflip",
+      "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/exported/policy.pt",
+      "sha256": "296166dabf30167cc872e252e68970cee5db1317702411b9332a1864261c09ba",
+      "bytes": 798738,
+      "download_verified": true
+    },
+    {
+      "skill": "backflip",
+      "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/model_9495.pt",
+      "sha256": "e2be04ae535f11b2a15a17ffa97b7c830f43a8084a4447091027197165e1a9a8",
+      "bytes": 5376949,
+      "download_verified": true
+    }
+  ],
+  "live": [
+    {
+      "skill": "sideflip",
+      "phase": "COMPLETED",
+      "frames": 85,
+      "jpeg_verified": true,
+      "camera_request_accepted": true,
+      "policy_sha256": "c3394814b2447bb87fd83ba914136dbb4f827c551a332afe7605a099073bd87d",
+      "successes": 0,
+      "hardware_constraints_pass": false,
+      "fixstand": {
+        "passed": true,
+        "initial": {
+          "passed": true,
+          "samples": 36,
+          "stable_fraction": 1.0,
+          "max_pose_error_rad": 0.11797586888185148
+        },
+        "terminal": {
+          "passed": true,
+          "samples": 51,
+          "stable_fraction": 1.0,
+          "max_pose_error_rad": 0.11478718428626482
+        },
+        "pose_tolerance_rad": 0.12,
+        "max_joint_speed_rad_s": 1.0,
+        "minimum_upright_cos": 0.98,
+        "required_stable_fraction": 0.95,
+        "terminal_hold_s": 1.0,
+        "base_height_range_m": [
+          0.26,
+          0.4
+        ],
+        "minimum_foot_force_N": 4.0
+      }
+    },
+    {
+      "skill": "backflip",
+      "phase": "COMPLETED",
+      "frames": 50,
+      "jpeg_verified": true,
+      "camera_request_accepted": true,
+      "policy_sha256": "e7748f3b2dc33b58c20e1cdd1d89e8fd511f1860689f21d0727fce5ceffe86a4",
+      "successes": 0,
+      "hardware_constraints_pass": false,
+      "fixstand": {
+        "passed": true,
+        "initial": {
+          "passed": true,
+          "samples": 35,
+          "stable_fraction": 1.0,
+          "max_pose_error_rad": 0.1105757502959579
+        },
+        "terminal": {
+          "passed": true,
+          "samples": 51,
+          "stable_fraction": 1.0,
+          "max_pose_error_rad": 0.06365915256529409
+        },
+        "pose_tolerance_rad": 0.12,
+        "max_joint_speed_rad_s": 1.0,
+        "minimum_upright_cos": 0.98,
+        "required_stable_fraction": 0.95,
+        "terminal_hold_s": 1.0,
+        "base_height_range_m": [
+          0.26,
+          0.4
+        ],
+        "minimum_foot_force_N": 4.0
+      }
+    }
+  ]
+}

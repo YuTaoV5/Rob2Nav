@@ -231,17 +231,23 @@
       "projects": [
         "go2_backflip_native"
       ],
-      "description": "Own final model completes a -6.151 rad backflip and settles in MuJoCo. Peak joint speed 77.96 rad/s and joint-limit excess 0.5146 rad fail hardware constraints; overall acceptance FAIL.",
+      "description": "后翻 v6：首尾 FIXSTAND 各4/4；关节速度比1.0986–1.1092，非足端接地4/4，完整验收0/4；仅研究仿真。",
       "acceptance": "本次训练模型需独立完成完整俯仰翻转、稳定落地、多条件重复及关节/力矩/速度约束；实机仅方案。",
       "recipe": "backflip_native_ppo",
-      "local_status": "动作通过；关节约束未通过",
+      "local_status": "v6 首尾站立4/4；完整验收0/4",
       "evidence": {
         "prefixes": [
-          "artifacts/capability_campaign/backflip"
+          "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022"
         ],
         "kinds": []
       },
-      "curated_media": [],
+      "curated_media": [
+        {
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/seed_10000/episode_0.mp4",
+          "title": "backflip v6 · FIXSTAND 往返 · seed 10000",
+          "label": "后翻 v6：首尾 FIXSTAND 各4/4；关节速度比1.0986–1.1092，非足端接地4/4，完整验收0/4；仅研究仿真。"
+        }
+      ],
       "training_entry": "manual"
     },
     {
@@ -253,21 +259,21 @@
         "go2_backflip_native",
         "lsd"
       ],
-      "description": "完整5000轮后继续显式电机模型适配，固定5200检查点在MuJoCo的8个新种子回合均完成侧翻并落稳，无非足端接地及关节越限。仅覆盖固定场景、±0.002rad初始关节扰动；额定速度约束仍失败，未做实机验证。",
+      "description": "侧翻 v8：首尾 FIXSTAND 各4/4；轴向占比0.724低于0.75，关节速度比1.0855–1.0871，完整验收0/4；仅研究仿真。",
       "acceptance": "完整约2π侧向旋转、真实腾空、无机身触地且稳定落地；逐物理步另查关节速度/限位。",
       "recipe": "sideflip_native_ppo",
-      "local_status": "MuJoCo动作8/8；速度约束未通过",
+      "local_status": "v8 首尾站立4/4；完整验收0/4",
       "evidence": {
         "prefixes": [
-          "skills/sideflip/evidence/"
+          "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022"
         ],
         "kinds": []
       },
       "curated_media": [
         {
-          "path": "skills/sideflip/evidence/dc_5200_mujoco/episode_0.mp4",
-          "title": "Go2 侧空翻 · MuJoCo · seed 3100",
-          "label": "固定模型8/8动作；此视频为seed 3100，额定速度门限未通过"
+          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022/seed_8800/episode_0.mp4",
+          "title": "sideflip v8 · FIXSTAND 往返 · seed 8800",
+          "label": "侧翻 v8：首尾 FIXSTAND 各4/4；轴向占比0.724低于0.75，关节速度比1.0855–1.0871，完整验收0/4；仅研究仿真。"
         }
       ],
       "training_entry": "manual"
