@@ -14,6 +14,7 @@ p.add_argument('--resume', type=Path)
 p.add_argument('--transfer-motors',action='store_true')
 p.add_argument('--stepping-gait',action='store_true')
 p.add_argument('--reset-std',type=float)
+p.add_argument('--fixstand-roundtrip',action='store_true')
 AppLauncher.add_app_launcher_args(p)
 args = p.parse_args()
 if args.stepping_gait and not args.transfer_motors:p.error('--stepping-gait requires --transfer-motors')
@@ -41,12 +42,18 @@ def main():
     if args.stepping_gait:
         from .task import enable_stepping_rewards
         enable_stepping_rewards(cfg)
+    if args.fixstand_roundtrip:
+        from skills.fixstand import configure_upright
+        configure_upright(cfg)
     agent = BasePPORunnerCfg()
     agent.seed,agent.device = args.seed,cfg.sim.device
     agent.max_iterations,agent.save_interval = args.iterations,100
     agent.experiment_name = 'rob2nav_go2_upright_walk'
     if args.reset_std is not None:agent.policy.init_noise_std=args.reset_std
     args.output.mkdir(parents=True,exist_ok=False)
+    if args.fixstand_roundtrip:
+        from skills.fixstand import write_contract
+        write_contract(args.output/'fixstand.json','upright',actor_observations=52,phase_seconds=[1.,5.,6.5,8.])
     dump_yaml(str(args.output/'env.yaml'),cfg)
     dump_yaml(str(args.output/'agent.yaml'),agent)
     torch.set_num_threads(4)
@@ -55,7 +62,7 @@ def main():
         wrapped = RslRlVecEnvWrapper(env,clip_actions=100.)
         write_json(args.output/'contract.json',dict(robot='Go2',asset_commit=BACKFLIP_COMMIT,
             runner_source_commit=UNITREE_COMMIT,role='real PhysX PPO training, no root stabilization force',
-            reset_distribution='50% four feet, 50% balanced upright; skill validation must start on four feet',
+            reset_distribution='100% shared standard four-foot stance' if args.fixstand_roundtrip else '50% four feet, 50% balanced upright; skill validation must start on four feet',
             command_frame='horizontal forward is projected negative body Z when upright',
             target_projected_gravity=[-1,0,0],actor_observations=int(wrapped.get_observations()['policy'].shape[-1]),action_dim=12,
             joint_names=env.scene['robot'].joint_names,default_joint_pos=env.scene['robot'].data.default_joint_pos[0].tolist(),
@@ -69,7 +76,19 @@ def main():
         runner_cfg['obs_groups'] = {'policy':['policy'],'critic':['policy']}
         runner = OnPolicyRunner(wrapped,runner_cfg,log_dir=str(args.output),device=cfg.sim.device)
         if args.resume:
-            runner.load(str(args.resume))
+            if args.fixstand_roundtrip:
+                prior=args.resume.parent/'fixstand.json'
+                if prior.is_file():
+                    import json
+                    previous=json.loads(prior.read_text())
+                    if previous.get('actor_observations')!=52 or previous.get('phase_seconds')!=[1.,5.,6.5,8.]:
+                        raise RuntimeError('Incompatible fixstand phase contract')
+                    runner.load(str(args.resume))
+                else:
+                    from skills.fixstand import initialize_expanded_policy
+                    transfer=initialize_expanded_policy(runner,args.resume)
+                    write_json(args.output/'transfer.json',transfer)
+            else:runner.load(str(args.resume))
         if args.reset_std is not None:
             import math
             parameters=dict(runner.alg.policy.named_parameters())

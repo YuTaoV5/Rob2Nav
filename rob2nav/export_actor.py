@@ -51,6 +51,8 @@ def export(checkpoint, output):
         raise ValueError('Expected a finite twelve-action Go2 actor')
     env = yaml.load((checkpoint.parent/'env.yaml').read_text(),Loader=ConfigLoader)
     contract = json.loads((checkpoint.parent/'contract.json').read_text())
+    if (checkpoint.parent/'fixstand.json').is_file():
+        contract['fixstand_roundtrip']=json.loads((checkpoint.parent/'fixstand.json').read_text())
     default = env['scene']['robot']['init_state']['joint_pos']
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)

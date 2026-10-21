@@ -50,6 +50,7 @@ def main():
     p.add_argument('--seed',type=int,default=1000)
     p.add_argument('--command',type=float,nargs=3,default=[.2,0.,0.])
     p.add_argument('--video',action='store_true')
+    p.add_argument('--fixstand-roundtrip',action='store_true')
     p.add_argument('--initialization',choices=['settled','reference_state','standing_reset'],default='settled',
         help='reference_state is an explicit training-reset parity diagnostic, not standing-start acceptance')
     p.add_argument('--output',required=True,type=Path)
@@ -148,6 +149,7 @@ def main():
                 terms={'base_ang_vel':body_velocity[:3], 'projected_gravity':gravity,
                     'velocity_commands':command,'joint_pos':q,'joint_vel':dq,'actions':last,
                     'base_lin_vel':body_velocity[3:]}
+                terms['fixstand_phase']=np.array([float(now<1.),float(1.<=now<5.),float(now>=5.),min(now/8.,1.)])
                 values=[]
                 for term in meta['actor_observation_terms']:
                     value=np.asarray(terms[term['name']]).copy()
@@ -165,6 +167,12 @@ def main():
                 raise FloatingPointError('Nonfinite actor output')
             last=np.clip(action,-100,100)
             target=default+float(meta['action_scale'])*last
+            boundary=meta.get('fixstand_roundtrip',{})
+            if boundary.get('action_parameterization')=='reference_residual_v2':
+                if reference is None:raise ValueError('Reference residual policy requires its motion reference')
+                padding=boundary['padded_region_frames']
+                if index<padding or index>=len(reference['joint_pos'])-padding:
+                    target=reference['joint_pos'][index]+boundary['residual_limit_rad']*np.tanh(last)
             for _ in range(args.physics_hz//50):
                 data.ctrl[aids]=motor_torque(target,data.qpos[qids],data.qvel[vids],effort,velocity_limits,meta.get('motor_model','ideal_pd'))
                 before_step=float(data.time)
@@ -197,6 +205,20 @@ def main():
                 speed=float(np.linalg.norm(data.qvel[:2])),joint_speed_ratio=float(np.max(np.abs(data.qvel[vids])/velocity_limits)),
                 angular_speed=float(np.linalg.norm(velocity_buffer[:3])),
                 joint_limit_excess=float(max(0,np.max(over)))))
+            from skills.fixstand import POSE
+            foot_forces={leg:0. for leg in ('FR','FL','RR','RL')}
+            force=np.zeros(6)
+            for ci,contact in enumerate(data.contact):
+                x,y=int(contact.geom1),int(contact.geom2)
+                other=y if model.geom_bodyid[x]==0 else x if model.geom_bodyid[y]==0 else None
+                if other is None:continue
+                body=model.body(int(model.geom_bodyid[other])).name
+                for leg in foot_forces:
+                    if body.startswith(leg+'_'):
+                        mujoco.mj_contactForce(model,data,ci,force);foot_forces[leg]+=abs(float(force[0]))
+            trace[-1].update(standard_pose_error=float(np.max(np.abs(data.qpos[qids]-[POSE[name] for name in names]))),
+                max_joint_speed=float(np.max(abs(data.qvel[vids]))),
+                all_feet_ground=all(value>4. for value in foot_forces.values()),foot_forces_N=foot_forces)
             if renderer is not None and now>=next_frame:
                 camera.lookat[:]=data.qpos[:3]
                 renderer.update_scene(data,camera=camera);writer.append_data(renderer.render());next_frame+=.04
@@ -225,6 +247,12 @@ def main():
             rear_support_fraction=support,started_on_four_feet=True)
     metrics.update(max_joint_speed_ratio=max_speed_ratio,max_joint_limit_excess_rad=max_limit_excess,
         unexpected_body_ground_contact=bad_floor_contact)
+    if args.fixstand_roundtrip:
+        from .fixstand_validation import assess
+        endpoints=assess(trace)
+        if args.kind=='upright_walk':success=bool(duration>=1.5 and not bad_floor_contact)
+        metrics['action_completed']=bool(success)
+        metrics['fixstand']=endpoints;success=bool(success and endpoints['passed'])
     (args.output/'trace.json').write_text(json.dumps(trace))
     summary=dict(args=dict(kind=args.kind,seed=args.seed,initialization=args.initialization,physics_hz=args.physics_hz,joint_limit_time_constant=args.joint_limit_time_constant),backend='MuJoCo',successes=int(success),total=1,
         evaluator_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),

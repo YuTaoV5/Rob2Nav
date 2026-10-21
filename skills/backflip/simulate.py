@@ -26,6 +26,7 @@ def main():
     p.add_argument('--seed',type=int,default=1000)
     p.add_argument('--initial-joint-noise',type=float,default=.002)
     p.add_argument('--video',action='store_true')
+    p.add_argument('--fixstand-roundtrip',action='store_true')
     p.add_argument('--output',required=True,type=Path)
     a=p.parse_args()
     if not 0<a.seconds<=60 or not 0<=a.initial_joint_noise<=.05:raise ValueError('Invalid evaluation duration/noise')
@@ -65,16 +66,27 @@ def main():
         ids=np.array([model.joint(n).id for n in module.JOINT_NAMES])
         max_excess=max(max_excess,float(max(0,np.max(np.maximum(data.qpos[qids]-model.jnt_range[ids,1],model.jnt_range[ids,0]-data.qpos[qids])))))
         ground={i for i in range(model.ngeom) if model.geom_bodyid[i]==0};contacts=[]
-        for c in data.contact:
+        foot_forces={leg:0. for leg in ('FR','FL','RR','RL')};contact_force=np.zeros(6)
+        for ci,c in enumerate(data.contact):
             x,y=int(c.geom1),int(c.geom2)
-            if x in ground and y not in ground:contacts.append(model.body(int(model.geom_bodyid[y])).name)
-            elif y in ground and x not in ground:contacts.append(model.body(int(model.geom_bodyid[x])).name)
+            name=None
+            if x in ground and y not in ground:name=model.body(int(model.geom_bodyid[y])).name
+            elif y in ground and x not in ground:name=model.body(int(model.geom_bodyid[x])).name
+            if name is not None:
+                contacts.append(name)
+                for leg in foot_forces:
+                    if name.startswith(leg+'_'):
+                        mujoco.mj_contactForce(model,data,ci,contact_force);foot_forces[leg]+=abs(float(contact_force[0]))
         air=0. if contacts else air+model.opt.timestep;max_air=max(max_air,air)
         bad|=any('foot' not in n and 'calf' not in n for n in contacts)
         up=float(data.xmat[model.body('base').id].reshape(3,3)[2,2]);minimum_up=min(minimum_up,up);max_height=max(max_height,float(data.qpos[2]))
         if data.time>=next_trace:
             trace.append(dict(time=float(data.time),position=data.qpos[:3].tolist(),quaternion=data.qpos[3:7].tolist(),
                 joints=data.qpos[qids].tolist(),upright=up,speed=float(np.linalg.norm(data.qvel[:2])),angular_speed=float(np.linalg.norm(data.qvel[3:6]))))
+            from skills.fixstand import POSE
+            trace[-1].update(standard_pose_error=float(np.max(abs(data.qpos[qids]-[POSE[n] for n in module.JOINT_NAMES]))),
+                max_joint_speed=float(np.max(abs(data.qvel[dids]))),
+                all_feet_ground=all(value>4. for value in foot_forces.values()),foot_forces_N=foot_forces)
             next_trace+=.02
         if a.video and data.time>=next_frame:
             if writer is None:
@@ -99,6 +111,10 @@ def main():
         all(x['upright']>.9 and x['position'][2]>.22 and x['speed']<.25 and x['angular_speed']<1. for x in tail))
     metrics=dict(body_y_rotation_rad=rotation,axis_dominance=dominance,airtime_s=max_air,max_height=max_height,
         terminal_upright=trace[-1]['upright'],unexpected_body_ground_contact=bad,max_joint_speed_ratio=max_speed,max_joint_limit_excess_rad=max_excess)
+    if a.fixstand_roundtrip:
+        from rob2nav.fixstand_validation import assess
+        metrics['action_completed']=bool(success);metrics['fixstand']=assess(trace,initial_end=.35)
+        success=bool(success and metrics['fixstand']['passed'])
     summary=dict(args=dict(kind='backflip',seed=a.seed,physics_hz=a.physics_hz,initial_joint_noise=a.initial_joint_noise),backend='MuJoCo',
         role='locally trained Go2 backflip; pinned native observation/controller',successes=int(success),total=1,episodes=[dict(success=success,**metrics)],metrics=metrics,
         policy_sha256=hashlib.sha256(policy.read_bytes()).hexdigest(),source_commit=PIN,source_sha256=hashlib.sha256(file.read_bytes()).hexdigest(),

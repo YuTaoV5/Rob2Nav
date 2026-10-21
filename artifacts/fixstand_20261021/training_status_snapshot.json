@@ -1,0 +1,175 @@
+{
+  "started": 1792590712.9750187,
+  "status": "running",
+  "budget": {
+    "output": "/root/gpufree-data/Rob2Nav/outputs/fixstand_finetune_20261021",
+    "iterations": 500,
+    "num_envs": 1024,
+    "root": "/root/gpufree-data/Rob2Nav"
+  },
+  "stages": [
+    {
+      "name": "reference_csv",
+      "command": [
+        "/root/gpufree-data/envs/go2-mapless/bin/python",
+        "-m",
+        "skills.fixstand_reference",
+        "--csv",
+        "/root/gpufree-data/capability-work/sideflip/input.csv",
+        "--output",
+        "/root/gpufree-data/Rob2Nav/outputs/fixstand_finetune_20261021/sideflip.csv"
+      ],
+      "started": 1792590712.9945588,
+      "status": "completed",
+      "source_sha256": {
+        "skills/fixstand.py": "5e217f7310d42604ed05af98dcf7a75cbede5aa939233a7991894277ea6a5a17",
+        "skills/fixstand_motion.py": "d34106c34727e0a7504c0dfd510f0033884fed9ea2ac8cc0691802ccf8a4c82c",
+        "skills/train_fixstand.py": "8f7bddd3f572a88cdc1444d746a523d660367a506a0b57af82e4f1eb8e24461a",
+        "skills/fixstand_reference.py": "ceb34e6b269ed6518452f2028ce79d65920364c5eba10bcfa9168128417c7337",
+        "skills/sideflip/train.py": "5822fe367213f0268d172384cd8687dee810d6302ebed778cd27774fb5f0d48e",
+        "skills/sideflip/task.py": "73ce934578ac27e8d60783014c27ac0a221cd0f495320ee87f11fb2d3c3a8313",
+        "skills/sideflip/common.py": "49aa4b92f14991c72b99ae7363412c269a9103f0f2b7f5540bf3ea9f22525eaa",
+        "skills/sideflip/build_motion.py": "53a0e3f08df12810f4f4eed93131c04d51a1c2c9b16e9e250a6bfc5fbc3f10e8",
+        "skills/upright_walk/train.py": "4b10a3da75fd372175ec4f57908b4813da0063d52fd909799acba1ec6c0a6b84",
+        "skills/upright_walk/task.py": "7b949602600af366e054733dea174c80884702a0ffbc599cc9ce9cb06b2b135f",
+        "skills/backflip/train_isaac51.py": "ea84cc3ab1b66fde736fa26ca763e6888d7d67678da26f381b1833f60257f841"
+      },
+      "exit_code": 0,
+      "finished": 1792590713.2826345
+    },
+    {
+      "name": "reference_fk",
+      "command": [
+        "/root/isaacsim/python.sh",
+        "-m",
+        "skills.sideflip.build_motion",
+        "--backflip-source",
+        "/root/gpufree-data/Rob2Nav-upstreams/GO2_backflip",
+        "--csv",
+        "/root/gpufree-data/Rob2Nav/outputs/fixstand_finetune_20261021/sideflip.csv",
+        "--output",
+        "/root/gpufree-data/Rob2Nav/outputs/fixstand_finetune_20261021/sideflip.npz",
+        "--headless",
+        "--device",
+        "cuda:0"
+      ],
+      "started": 1792590713.2830808,
+      "status": "completed",
+      "source_sha256": {
+        "skills/fixstand.py": "5e217f7310d42604ed05af98dcf7a75cbede5aa939233a7991894277ea6a5a17",
+        "skills/fixstand_motion.py": "d34106c34727e0a7504c0dfd510f0033884fed9ea2ac8cc0691802ccf8a4c82c",
+        "skills/train_fixstand.py": "8f7bddd3f572a88cdc1444d746a523d660367a506a0b57af82e4f1eb8e24461a",
+        "skills/fixstand_reference.py": "ceb34e6b269ed6518452f2028ce79d65920364c5eba10bcfa9168128417c7337",
+        "skills/sideflip/train.py": "5822fe367213f0268d172384cd8687dee810d6302ebed778cd27774fb5f0d48e",
+        "skills/sideflip/task.py": "73ce934578ac27e8d60783014c27ac0a221cd0f495320ee87f11fb2d3c3a8313",
+        "skills/sideflip/common.py": "49aa4b92f14991c72b99ae7363412c269a9103f0f2b7f5540bf3ea9f22525eaa",
+        "skills/sideflip/build_motion.py": "53a0e3f08df12810f4f4eed93131c04d51a1c2c9b16e9e250a6bfc5fbc3f10e8",
+        "skills/upright_walk/train.py": "4b10a3da75fd372175ec4f57908b4813da0063d52fd909799acba1ec6c0a6b84",
+        "skills/upright_walk/task.py": "7b949602600af366e054733dea174c80884702a0ffbc599cc9ce9cb06b2b135f",
+        "skills/backflip/train_isaac51.py": "ea84cc3ab1b66fde736fa26ca763e6888d7d67678da26f381b1833f60257f841"
+      },
+      "exit_code": 0,
+      "finished": 1792590725.2695513
+    },
+    {
+      "name": "sideflip",
+      "command": [
+        "/root/isaacsim/python.sh",
+        "-m",
+        "skills.sideflip.train",
+        "--backflip-source",
+        "/root/gpufree-data/Rob2Nav-upstreams/GO2_backflip",
+        "--unitree-source",
+        "/root/gpufree-data/Rob2Nav-upstreams/unitree_rl_lab",
+        "--motion",
+        "/root/gpufree-data/Rob2Nav/outputs/fixstand_finetune_20261021/sideflip.npz",
+        "--resume",
+        "/root/gpufree-data/Rob2Nav/artifacts/release_20261021/weights/sideflip/selected/model_5200.pt",
+        "--output",
+        "/root/gpufree-data/Rob2Nav/outputs/fixstand_finetune_20261021/sideflip",
+        "--num-envs",
+        "1024",
+        "--iterations",
+        "500",
+        "--headless",
+        "--device",
+        "cuda:0",
+        "--transfer-motors",
+        "--fixstand-roundtrip"
+      ],
+      "started": 1792590725.270089,
+      "status": "completed",
+      "source_sha256": {
+        "skills/fixstand.py": "5e217f7310d42604ed05af98dcf7a75cbede5aa939233a7991894277ea6a5a17",
+        "skills/fixstand_motion.py": "d34106c34727e0a7504c0dfd510f0033884fed9ea2ac8cc0691802ccf8a4c82c",
+        "skills/train_fixstand.py": "8f7bddd3f572a88cdc1444d746a523d660367a506a0b57af82e4f1eb8e24461a",
+        "skills/fixstand_reference.py": "ceb34e6b269ed6518452f2028ce79d65920364c5eba10bcfa9168128417c7337",
+        "skills/sideflip/train.py": "5822fe367213f0268d172384cd8687dee810d6302ebed778cd27774fb5f0d48e",
+        "skills/sideflip/task.py": "73ce934578ac27e8d60783014c27ac0a221cd0f495320ee87f11fb2d3c3a8313",
+        "skills/sideflip/common.py": "49aa4b92f14991c72b99ae7363412c269a9103f0f2b7f5540bf3ea9f22525eaa",
+        "skills/sideflip/build_motion.py": "53a0e3f08df12810f4f4eed93131c04d51a1c2c9b16e9e250a6bfc5fbc3f10e8",
+        "skills/upright_walk/train.py": "4b10a3da75fd372175ec4f57908b4813da0063d52fd909799acba1ec6c0a6b84",
+        "skills/upright_walk/task.py": "7b949602600af366e054733dea174c80884702a0ffbc599cc9ce9cb06b2b135f",
+        "skills/backflip/train_isaac51.py": "ea84cc3ab1b66fde736fa26ca763e6888d7d67678da26f381b1833f60257f841"
+      },
+      "exit_code": 0,
+      "finished": 1792591914.1095731
+    },
+    {
+      "name": "upright",
+      "command": [
+        "/root/isaacsim/python.sh",
+        "-m",
+        "skills.upright_walk.train",
+        "--backflip-source",
+        "/root/gpufree-data/Rob2Nav-upstreams/GO2_backflip",
+        "--unitree-source",
+        "/root/gpufree-data/Rob2Nav-upstreams/unitree_rl_lab",
+        "--resume",
+        "/root/gpufree-data/Rob2Nav/outputs/upright_walk_full_20261021/model_4999.pt",
+        "--output",
+        "/root/gpufree-data/Rob2Nav/outputs/fixstand_finetune_20261021/upright",
+        "--reset-std",
+        ".25",
+        "--num-envs",
+        "1024",
+        "--iterations",
+        "500",
+        "--headless",
+        "--device",
+        "cuda:0",
+        "--transfer-motors",
+        "--fixstand-roundtrip"
+      ],
+      "started": 1792591914.1101236,
+      "status": "running",
+      "source_sha256": {
+        "skills/fixstand.py": "dbb0b21a0aab378d808e992f8d9904dd4d7948ec5db6d33735c0f323d1f91829",
+        "skills/fixstand_motion.py": "d34106c34727e0a7504c0dfd510f0033884fed9ea2ac8cc0691802ccf8a4c82c",
+        "skills/evaluate_fixstand.py": "a0562fafdb539fc3402f4304deda15dca37c99257ca2b40475f25865d10b07bc",
+        "skills/train_fixstand.py": "a0dc5b4ff605a8e6df319df59edb620ecef1b2a5bb01f278fa55481c9860190c",
+        "skills/fixstand_reference.py": "ceb34e6b269ed6518452f2028ce79d65920364c5eba10bcfa9168128417c7337",
+        "skills/sideflip/train.py": "5822fe367213f0268d172384cd8687dee810d6302ebed778cd27774fb5f0d48e",
+        "skills/sideflip/task.py": "73ce934578ac27e8d60783014c27ac0a221cd0f495320ee87f11fb2d3c3a8313",
+        "skills/sideflip/common.py": "49aa4b92f14991c72b99ae7363412c269a9103f0f2b7f5540bf3ea9f22525eaa",
+        "skills/sideflip/build_motion.py": "53a0e3f08df12810f4f4eed93131c04d51a1c2c9b16e9e250a6bfc5fbc3f10e8",
+        "skills/upright_walk/train.py": "037d8a1cba761725b73f02ea43b452e9ae590b93fed612e0f2c890e6114ec7b6",
+        "skills/upright_walk/task.py": "7b949602600af366e054733dea174c80884702a0ffbc599cc9ce9cb06b2b135f",
+        "skills/backflip/train_isaac51.py": "02c52c2156ece6e7afa4f1d3aa47ae433bf77543409ed093ed3ad3c7899a32e8"
+      }
+    }
+  ],
+  "checkpoint_sources": {
+    "/root/gpufree-data/Rob2Nav/artifacts/release_20261021/weights/sideflip/selected/model_5200.pt": "5c53cb7d26bd210e995c8a937b2be2ea67e84bdbf3351291ef1290fd988e65f4",
+    "/root/gpufree-data/Rob2Nav/outputs/upright_walk_full_20261021/model_4999.pt": "a022b086e5d0ff9fad417ad20811f691f24b737c87dc4312c713b6f44e084b21",
+    "/root/gpufree-data/Rob2Nav/artifacts/release_20261021/weights/backflip/selected/model_4999.pt": "3a368e238f541ee08a3117ff1d8eb2558db3b7bd94cc16a0246970f447a13baf"
+  },
+  "source_sha256": {
+    "skills/fixstand.py": "5e217f7310d42604ed05af98dcf7a75cbede5aa939233a7991894277ea6a5a17",
+    "skills/fixstand_motion.py": "d34106c34727e0a7504c0dfd510f0033884fed9ea2ac8cc0691802ccf8a4c82c",
+    "skills/train_fixstand.py": "8f7bddd3f572a88cdc1444d746a523d660367a506a0b57af82e4f1eb8e24461a",
+    "skills/fixstand_reference.py": "ceb34e6b269ed6518452f2028ce79d65920364c5eba10bcfa9168128417c7337"
+  },
+  "hardware_connected": false,
+  "independently_validated": false
+}

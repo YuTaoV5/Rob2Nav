@@ -15,8 +15,11 @@ p.add_argument('--iterations', type=int, default=5000)
 p.add_argument('--seed', type=int, default=43)
 p.add_argument('--resume', type=Path)
 p.add_argument('--transfer-motors',action='store_true',help='Experimental explicit DC motor envelope without PhysX hard speed clamp')
+p.add_argument('--fixstand-roundtrip',action='store_true')
+p.add_argument('--boundary-residual',action='store_true')
 AppLauncher.add_app_launcher_args(p)
 args = p.parse_args()
+if args.boundary_residual and not args.fixstand_roundtrip:p.error('--boundary-residual requires --fixstand-roundtrip')
 args.kit_args = (args.kit_args+' --enable isaacsim.asset.importer.urdf').strip()
 app = AppLauncher(args).app
 
@@ -47,6 +50,9 @@ def main():
         from .common import enable_transfer_motors
         enable_transfer_motors(cfg,source)
         cfg.rewards.undesired_contacts.weight=-10.
+    if args.fixstand_roundtrip:
+        from skills.fixstand import configure_sideflip
+        configure_sideflip(cfg,contract,args.boundary_residual)
     bodies = contract['body_names']
     anchor = cfg.commands.motion.anchor_body_name
     feet = cfg.terminations.ee_body_pos.params['body_names']
@@ -57,6 +63,11 @@ def main():
     agent.save_interval = 100
     agent.experiment_name = 'rob2nav_go2_sideflip'
     args.output.mkdir(parents=True, exist_ok=False)
+    if args.fixstand_roundtrip:
+        from skills.fixstand import write_contract
+        write_contract(args.output/'fixstand.json','sideflip',reference_sha256=sha(args.motion),actor_observations=69,
+            action_parameterization='reference_residual_v2' if args.boundary_residual else 'joint_offset_v1',
+            padded_region_frames=90,residual_limit_rad=.05)
     dump_yaml(str(args.output/'env.yaml'), cfg)
     dump_yaml(str(args.output/'agent.yaml'), agent)
     write_json(args.output/'contract.json', dict(robot='Go2', role='real PhysX PPO training, not FK replay',

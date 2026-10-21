@@ -9,6 +9,8 @@ import sys
 parser = argparse.ArgumentParser(add_help=False)
 parser.add_argument('--source', required=True, type=Path)
 parser.add_argument('--entry', choices=['train', 'play'], default='train')
+parser.add_argument('--fixstand-roundtrip',action='store_true')
+parser.add_argument('--fixstand-output',type=Path)
 args, rest = parser.parse_known_args()
 source = args.source.resolve()
 entry = source / (args.entry + '.py')
@@ -31,7 +33,24 @@ if _old in _method:
     print('[Rob2Nav] Guarded optional URDF importer inertia API; native legacy behavior retained', flush=True)
 '''
 text = text.replace(needle, needle + '\n' + patch)
+if args.fixstand_roundtrip:
+    if args.entry!='train':raise ValueError('Fixstand launcher currently targets training')
+    for required in ('env_cfg = Go2BackflipEnvCfg()','init_at_random_ep_len=True'):
+        if text.count(required)!=1:raise RuntimeError('Pinned training entry changed: '+required)
+    text=text.replace('env_cfg = Go2BackflipEnvCfg()', 'env_cfg = Go2BackflipEnvCfg()\n    from skills.fixstand import configure_backflip\n    configure_backflip(env_cfg)')
+    text=text.replace('init_at_random_ep_len=True','init_at_random_ep_len=False')
+    text=text.replace('runner.learn(agent_cfg.max_iterations, init_at_random_ep_len=False)',
+        'runner.learn(agent_cfg.max_iterations, init_at_random_ep_len=False)\n    from skills.fixstand import write_completion\n    write_completion(log_dir,agent_cfg.max_iterations)')
+    if args.fixstand_output:
+        output=args.fixstand_output.resolve()
+        if output.exists():raise FileExistsError(output)
+        text=text.replace('log_dir = (log_root / run_dir_name).resolve()',f'log_dir = Path({str(output)!r})')
+        text=text.replace('raw_env = gym.make(TASK_ID, cfg=env_cfg)',"from skills.fixstand import write_contract\n    write_contract(log_dir / 'fixstand.json','backflip',actor_observations=60)\n    raw_env = gym.make(TASK_ID, cfg=env_cfg)")
+if '--checkpoint' in rest:
+    index=rest.index('--checkpoint')+1
+    rest[index]=str(Path(rest[index]).expanduser().resolve())
 os.chdir(source)
+sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
 sys.path.insert(0, str(source))
 sys.argv = [str(entry)] + rest
 exec(compile(text, str(entry), 'exec'), {'__name__': '__main__', '__file__': str(entry)})
