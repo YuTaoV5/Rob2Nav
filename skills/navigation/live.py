@@ -21,13 +21,15 @@ import uvicorn
 
 class Control(BaseModel):
     model_config = ConfigDict(extra='forbid', allow_inf_nan=False)
-    action: Literal['goal', 'start', 'stop', 'reset']
+    action: Literal['goal', 'start', 'stop', 'reset', 'camera']
     goal: list[float] | None = Field(default=None, min_length=2, max_length=2)
+    camera: dict[str,float] | None = None
     scene: Literal['empty', 'slalom', 'blocked'] | None = None
 
 
 class Engine:
-    def __init__(self, config=None, checkpoint=None):
+    def __init__(self, config=None, checkpoint=None, planner_backend="ppo"):
+        self.planner_backend=planner_backend
         self.config, self.checkpoint = config, checkpoint
         self.commands = queue.Queue(maxsize=16)
         self.lock = threading.Lock()
@@ -44,6 +46,7 @@ class Engine:
         from go2_nav.planner import ReactivePlanner
         from .controller import action as navigation_action
         env = None
+        scan = None
         try:
             cfg = load_config(self.config or Path(__file__).with_name('config.json'))
             config_sha = hashlib.sha256(json.dumps(cfg, sort_keys=True).encode()).hexdigest()
@@ -66,6 +69,9 @@ class Engine:
                 policy = PPO.load(self.checkpoint, device='cpu')
                 if policy.observation_space.shape != (273,) or policy.action_space.shape != (3,):
                     raise ValueError('Navigation policy must match 273 observations / 3 normalized velocity actions')
+            if self.planner_backend=='scan':
+                from .scan_client import ScanClient
+                scan=ScanClient()
             phase = 'READY'
             reason = ''
             goal = np.array([2., 0.])
@@ -77,6 +83,7 @@ class Engine:
             started = 0.
             next_render = 0.
             boxes = []
+            camera_settings = dict(azimuth=135.,elevation=-45.,distance=5.,pan_x=0.,pan_y=0.)
 
             def geometry():
                 return [dict(name=env.model.geom(i).name,
@@ -93,7 +100,11 @@ class Engine:
             while not self.closed.is_set():
                 while not self.commands.empty():
                     cmd = self.commands.get_nowait()
+                    if cmd.action == 'camera':
+                        camera_settings.update(cmd.camera or {})
+                        continue
                     if cmd.action == 'reset':
+                        if scan:scan.reset()
                         scene = cmd.scene or scene
                         env.close()
                         env = Go2MaplessEnv(cfg, scene=scene, sensor_mode='lidar')
@@ -128,7 +139,9 @@ class Engine:
                     phase, reason = 'STOPPED', 'client_timeout'
                 if phase == 'RUNNING' and float(env.data.time)-started > 120:
                     phase, reason = 'STOPPED', 'navigation_timeout'
-                if phase == 'RUNNING':
+                if scan is not None:
+                    action=scan.act(env,goal,phase=='RUNNING')
+                elif phase == 'RUNNING':
                     # Planner sees ray returns, odometry and target only. Display boxes never enter act().
                     action = navigation_action(env, planner, policy)
                 else:
@@ -143,7 +156,12 @@ class Engine:
                     path = path[-1600:]
                 if env.data.time >= next_render:
                     env.model.site('goal').pos[:2] = goal
-                    frame = env.render()
+                    import mujoco
+                    if env.renderer is None:env.renderer=mujoco.Renderer(env.model,height=480,width=640)
+                    camera=mujoco.MjvCamera()
+                    camera.azimuth=camera_settings['azimuth'];camera.elevation=camera_settings['elevation'];camera.distance=camera_settings['distance']
+                    camera.lookat[:]=env.data.qpos[:3];camera.lookat[0]+=camera_settings['pan_x'];camera.lookat[1]+=camera_settings['pan_y']
+                    env.renderer.update_scene(env.data,camera=camera);frame=env.renderer.render().copy()
                     buf = io.BytesIO()
                     Image.fromarray(frame).save(buf, format='JPEG', quality=82)
                     elapsed = time.monotonic()-wall
@@ -154,8 +172,9 @@ class Engine:
                         command=env.command.tolist(), collision=info['collision'], fallen=info['fallen'],
                         path=path, boxes=boxes, events=events, hardware_enabled=False,
                         realtime_factor=(float(env.data.time)-sim_start)/max(elapsed, .01),
-                        backend='MuJoCo / RoboGauge MoE / '+('PPO navigation' if policy else 'sensor-only reactive planner'),
-                        policy_sha256=policy_sha,
+                        backend='MuJoCo / RoboGauge MoE / '+('SCAN ROS2 native planner' if scan else 'PPO navigation' if policy else 'sensor-only reactive planner'),
+                        scan=scan.telemetry if scan else None,
+                        camera=camera_settings.copy(),policy_sha256=policy_sha,
                         planner_inputs='simulated lidar returns, odometry, selected goal; no obstacle metadata')
                     with self.lock:
                         self.state, self.jpeg = snap, buf.getvalue()
@@ -168,13 +187,14 @@ class Engine:
             traceback.print_exc()
             self.error = str(exc)
         finally:
+            if scan is not None:scan.close()
             if env is not None:
                 env.close()
 
 
-def create_app(config=None, checkpoint=None):
+def create_app(config=None, checkpoint=None,planner_backend="ppo"):
     app = FastAPI(title='Live Go2 MuJoCo navigation')
-    engine = Engine(config=config, checkpoint=checkpoint)
+    engine = Engine(config=config, checkpoint=checkpoint,planner_backend=planner_backend)
 
     @app.get('/')
     def page():
@@ -195,8 +215,13 @@ def create_app(config=None, checkpoint=None):
 
     @app.post('/api/control')
     def control(cmd: Control):
+        engine.last_client=time.monotonic()
         if cmd.action == 'goal' and cmd.goal is None:
             raise HTTPException(422, 'goal requires two finite coordinates')
+        if cmd.action=='camera':
+            from studio.live_skills import Camera
+            try:cmd.camera=Camera(**(cmd.camera or {})).model_dump()
+            except ValueError as exc:raise HTTPException(422,str(exc))
         if engine.error:
             raise HTTPException(503, engine.error)
         try:
@@ -210,8 +235,9 @@ def create_app(config=None, checkpoint=None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--planner',choices=['ppo','scan'],default='ppo')
     parser.add_argument('--port', type=int, default=8768)
     parser.add_argument('--config', type=Path)
     parser.add_argument('--checkpoint', type=Path, help='Locally trained PPO velocity head; default is the classical planner')
     args = parser.parse_args()
-    uvicorn.run(create_app(args.config, args.checkpoint), host='127.0.0.1', port=args.port, access_log=False)
+    uvicorn.run(create_app(args.config, args.checkpoint,args.planner), host='127.0.0.1', port=args.port, access_log=False)

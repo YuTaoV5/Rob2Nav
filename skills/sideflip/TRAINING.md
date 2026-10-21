@@ -1,6 +1,6 @@
 # Go2 侧空翻训练手册
 
-本目录是Rob2Nav新适配：官方Unitree mimic MDP、Go2 URDF及独立PPO。已实际生成118帧参考，完成32环境2次PPO更新并导出69维actor；4096环境5000更新完整训练正在运行。短程模型的MuJoCo回合没有完成翻转，记录为0/1；完整能力尚未通过。
+本目录使用官方Unitree mimic MDP、Go2 URDF及独立PPO。已完成4096环境5000轮训练，再做显式电机模型适配；固定model_5200在MuJoCo的8个独立新种子回合中动作通过8/8，关节速度门限仍未通过。以下命令覆盖参考预处理、原生训练与已通过动作的适配版本，不借用上游预训练特技权重。
 
 服务器环境：Isaac Sim5.1、IsaacLab2.3.2、torch2.7 CUDA12.8、RSL-RL3.1.2。使用Isaac解释器训练，CPU MuJoCo环境用于导出/评估。
 
@@ -41,11 +41,11 @@ ls outputs/sideflip_interface_new/model_*.pt outputs/sideflip_interface_new/comp
 /isaac-sim/python.sh -m skills.sideflip.train --backflip-source /root/gpufree-data/Rob2Nav-upstreams/GO2_backflip --unitree-source /root/gpufree-data/Rob2Nav-upstreams/unitree_rl_lab --motion /root/gpufree-data/capability-work/sideflip/reference_new.npz --output outputs/sideflip_full_new --num-envs 4096 --iterations 5000 --seed 43 --device cuda:0 --headless
 ```
 
-本次相同参数完整任务已在outputs/sideflip_native_full_20261021运行，不要重复启动。日志capability-work/sideflip/full.log；checkpoint每100更新及末次保存。恢复可增加--resume旧检查点并选择新--output；--iterations表示继续的更新数。Actor69维、12动作、50Hz，物理200Hz、PD40/1、动作缩放0.5；力矩及速度限制按URDF逐关节读取。训练中的动作参考相位重采样属于episode reset；独立MuJoCo评估仅初始化时设置根状态。
+本次相同参数完整任务已在outputs/sideflip_native_full_20261021完成，最后检查点为model_4999.pt；不要覆盖已有输出。日志capability-work/sideflip/full.log；checkpoint每100更新及末次保存。恢复可增加--resume旧检查点并选择新--output；--iterations表示继续的更新数。Actor69维、12动作、50Hz，物理200Hz、PD40/1、动作缩放0.5；力矩及速度限制按URDF逐关节读取。训练中的动作参考相位重采样属于episode reset；独立MuJoCo评估仅初始化时设置根状态。
 
 下一步：[仿真手册](SIMULATION.md)、[SDK方案](DEPLOYMENT.md)。奖励上升和训练结束均不等于侧空翻通过。
 
-## 显式DC执行器迁移对照（实验）
+## 复现已通过动作的DC5200版本
 
 旧5000轮结果保留，不覆盖。新增 `--transfer-motors` 将PhysX硬限速替换为显式线性力矩—速度包络，物理步长2ms、策略50Hz；两引擎使用相同包络。参数取URDF额定边界，仅为仿真模型，不代表已辨识的真实Go2电机。该对照不自动证明跨仿真成功。
 
@@ -53,9 +53,11 @@ ls outputs/sideflip_interface_new/model_*.pt outputs/sideflip_interface_new/comp
 cd /root/gpufree-data/Rob2Nav
 /isaac-sim/python.sh -m skills.sideflip.train --headless --device cuda:0 \
   --backflip-source /root/gpufree-data/Rob2Nav-upstreams/GO2_backflip \
-  --unitree-source /root/gpufree-data/Rob2Nav-upstreams/unitree_rl_lab --motion /root/gpufree-data/capability-work/sideflip/reference.npz \
-  --resume outputs/sideflip_native_full_20261021/model_4999.pt --transfer-motors \
-  --num-envs 2048 --iterations 1000 --output outputs/sideflip_dc_review
+  --unitree-source /root/gpufree-data/Rob2Nav-upstreams/unitree_rl_lab --motion /root/gpufree-data/capability-work/sideflip/reference_new.npz \
+  --resume outputs/sideflip_full_new/model_4999.pt --transfer-motors \
+  --num-envs 2048 --iterations 202 --seed 43 --output outputs/sideflip_dc_reproduce_202
 ```
 
 完整检查点含优化器和迭代数；恢复后文件编号继续沿用原编号，不应假定最终文件名为model_999.pt。按目录实际编号选择最高检查点，使用CPU导出器保存新目录；policy.json中的motor_model应为dc_linear_v1。评估时不应把DC模型权重套到旧理想PD执行器上。侧空翻适配同时将非足端接触惩罚设为−10，必须重新评估接触和落稳，不能借用旧模型成绩。
+
+上述202次继续更新对应model_5200.pt。服务器的适配任务使用1000轮预算并继续运行；已通过8回合的模型是其中固定的5200检查点，不是未来末次检查点。先用seed 1000作模型检查，再冻结策略，以3100–3107八个种子独立测试。已执行策略SHA256为7616e53e2c95434f824c2728621f8052e2d41a4e033fd00a25f316de211e07e1。重训受GPU数值与依赖影响，不承诺逐位相同；以自身模型的独立仿真为准。

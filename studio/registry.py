@@ -42,7 +42,7 @@ def capabilities(catalog,jobs):
             and (not selector.get('kinds') or e['kind'] in selector['kinds']) and not e.get('diagnostic')]
         skill['evaluations']=matches
         skill['local_videos']=[{'url':'/api/files/'+e['video'],'type':'video','origin':'local','title':e['name'],
-            'evaluation_id':e['id'],'label':f"{e['successes']}/{e['total']} · {e['role']} · {e['geometry']}"}
+            'evaluation_id':e['id'],'label':f"{e['successes']}/{e['total']} · {e['role']} · {e['geometry']}"+(f" · {e['video_scope']}" if e.get('video_scope') else '')}
             for e in matches if e.get('video')]
         for job in related:
             for video in catalog['videos']:

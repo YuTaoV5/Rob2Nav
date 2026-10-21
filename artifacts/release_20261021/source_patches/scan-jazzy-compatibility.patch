@@ -1,0 +1,37 @@
+diff --git a/src/planner/plan_env/include/plan_env/grid_map.h b/src/planner/plan_env/include/plan_env/grid_map.h
+index 19b77c5..8455220 100644
+--- a/src/planner/plan_env/include/plan_env/grid_map.h
++++ b/src/planner/plan_env/include/plan_env/grid_map.h
+@@ -4,7 +4,7 @@
+ #include <Eigen/Eigen>
+ #include <Eigen/StdVector>
+ #include <algorithm>
+-#include <cv_bridge/cv_bridge.h>
++#include <cv_bridge/cv_bridge.hpp>
+ #include <cmath>
+ #include <geometry_msgs/msg/pose_stamped.hpp>
+ #include <iostream>
+diff --git a/src/simulator/local_sensing/src/opengl_render_node.cpp b/src/simulator/local_sensing/src/opengl_render_node.cpp
+index ecc6df5..90449e9 100644
+--- a/src/simulator/local_sensing/src/opengl_render_node.cpp
++++ b/src/simulator/local_sensing/src/opengl_render_node.cpp
+@@ -1,5 +1,5 @@
+ #include "opengl_sim.hpp"
+-#include <cv_bridge/cv_bridge.h>
++#include <cv_bridge/cv_bridge.hpp>
+ #include <algorithm>
+ #include <cstdint>
+ #include <chrono>
+diff --git a/src/simulator/local_sensing/src/pointcloud_render_node.cpp b/src/simulator/local_sensing/src/pointcloud_render_node.cpp
+index a894e9b..de7818a 100644
+--- a/src/simulator/local_sensing/src/pointcloud_render_node.cpp
++++ b/src/simulator/local_sensing/src/pointcloud_render_node.cpp
+@@ -30,7 +30,7 @@
+ #include <geometry_msgs/msg/transform_stamped.hpp>
+ #include <sensor_msgs/msg/image.hpp>
+ #include <pcl/common/transforms.h>
+-#include <cv_bridge/cv_bridge.h>
++#include <cv_bridge/cv_bridge.hpp>
+ #include <opencv2/highgui/highgui.hpp>
+ #include <opencv2/opencv.hpp>
+ #include <opencv2/core/eigen.hpp>

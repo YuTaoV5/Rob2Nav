@@ -1,0 +1,94 @@
+"""Real free-base MuJoCo hot-switch integration, not kinematic state replay."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import time
+os.environ.setdefault('MUJOCO_GL','egl')
+import numpy as np
+import mujoco
+from .types import Snapshot,SDK_JOINTS
+from .core import EFFORT
+from .runner import UnifiedRuntime
+
+
+def main():
+    p=argparse.ArgumentParser();p.add_argument('--root',type=Path,default=Path(__file__).resolve().parents[2]);p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--seed',type=int,default=9201);p.add_argument('--video',action='store_true');a=p.parse_args()
+    root=a.root.resolve();a.output.mkdir(parents=True,exist_ok=False)
+    from go2_nav.env import Go2MaplessEnv,load_config
+    cfg=load_config(root/'skills/navigation/config.json');cfg.update(max_seconds=1e9)
+    env=Go2MaplessEnv(cfg,scene='empty',sensor_mode='lidar');env.reset(seed=a.seed)
+    model,data=env.model,env.data
+    ids=np.array([model.joint(n).id for n in SDK_JOINTS]);qids=model.jnt_qposadr[ids];dids=model.jnt_dofadr[ids]
+    aids=np.array([int(np.where(model.actuator_trnid[:,0]==i)[0][0]) for i in ids])
+    foot_ids=[model.geom(n).id for n in ['FR','FL','RR','RL']];floor=model.geom('floor').id
+    start_time=float(data.time);runtime=UnifiedRuntime(root);samples=[];events=[];requests=[];video=None;next_render=0.
+    sequence=['stand_soft','stand_stiff','walk_mlp','walk_moe','stand'];requested=0;last_active=None;active_since=0.
+    old_tau=None;old_kp=None;last_ref=None;naive=[];max_torque_step=0.;max_gain_step=0.;max_ref_step=0.;max_tilt=0.;min_height=1e9
+    wall=time.monotonic();loop_gaps=[];last_wall=wall;passed=False;reason='time budget'
+    def snapshot(t,i):
+        forces=np.zeros(4);contact_force=np.zeros(6)
+        for index in range(data.ncon):
+            c=data.contact[index];other=int(c.geom2) if int(c.geom1)==floor else int(c.geom1) if int(c.geom2)==floor else -1
+            if other in foot_ids:
+                mujoco.mj_contactForce(model,data,index,contact_force);forces[foot_ids.index(other)]+=abs(contact_force[0])
+        rot=env.rotation;velocity=np.zeros(6)
+        mujoco.mj_objectVelocity(model,data,mujoco.mjtObj.mjOBJ_BODY,env.base_id,velocity,0)
+        return Snapshot(t,i,data.qpos[qids].copy(),data.qvel[dids].copy(),data.actuator_force[aids].copy(),
+            rot.T@velocity[:3],rot.T@np.array([0.,0.,-1.]),forces,rot.T@velocity[3:],data.qpos[3:7].copy())
+    try:
+        initial=snapshot(0.,0);runtime.arm(initial,0.);runtime.stage_async(sequence[0],initial);requested=1
+        if a.video:
+            import imageio.v2 as imageio
+            video=imageio.get_writer(a.output/'switches.mp4',fps=10,macro_block_size=1)
+        for i in range(1,40001):
+            t=i*.002;before=time.monotonic();loop_gaps.append(before-last_wall);last_wall=before
+            s=snapshot(t,i)
+            c=runtime.controller
+            current_id=c.active.id if c.active else None
+            if c.phase=='ACTIVE' and current_id!=last_active:
+                last_active=current_id;active_since=t;events.append(dict(time=t,skill=current_id,position=data.qpos[:3].tolist()))
+            if c.phase=='ACTIVE' and t-active_since>=2.5 and requested<len(sequence) and runtime.future is None and runtime.next is None:
+                target=sequence[requested];profile=runtime.profile(target)[1]
+                raw=profile.to_sdk(profile.kp)*(profile.to_sdk(profile.default)-s.q)-profile.to_sdk(profile.kd)*s.dq
+                naive.append(dict(from_skill=current_id,to_skill=target,analytical_naive_torque_jump_Nm=float(np.max(abs(raw-c.servo.tau)))))
+                runtime.stage_async(target,s);requests.append(dict(time=t,to_skill=target));requested+=1
+            c.set_velocity([.18,0,0] if c.phase=='ACTIVE' and current_id in ('walk_mlp','walk_moe') and t-active_since>.4 and runtime.next is None and runtime.future is None else [0,0,0])
+            if c.phase=='ACTIVE' and requested==len(sequence) and current_id==sequence[-1] and t-active_since>2:
+                passed=True;reason='all five profiles committed and settled';break
+            command=runtime.step(s,t)
+            if old_tau is not None:max_torque_step=max(max_torque_step,float(np.max(abs(command.tau-old_tau))))
+            if old_kp is not None:max_gain_step=max(max_gain_step,float(np.max(abs(command.kp-old_kp))))
+            if last_ref is not None:max_ref_step=max(max_ref_step,float(np.max(abs(command.qref-last_ref))))
+            old_tau=command.tau.copy();old_kp=command.kp.copy();last_ref=command.qref.copy()
+            data.ctrl[aids]=command.tau;mujoco.mj_step(model,data)
+            if abs(float(data.time)-start_time-t)>1e-7:raise RuntimeError('Physics time discontinuity/reset')
+            tilt=float(np.arccos(np.clip(env.rotation[2,2],-1,1)));max_tilt=max(max_tilt,tilt);min_height=min(min_height,float(data.qpos[2]))
+            samples.append(np.r_[t,command.tau,command.qref,command.kp,command.kd,s.q,s.dq,s.feet,tilt,data.qpos[:3]])
+            if c.phase=='FAULT':reason=c.fault;break
+            if data.qpos[2]<.22 or tilt>.35:reason='posture envelope exceeded';break
+            if runtime.stage_error:reason='staging failure:'+runtime.stage_error;break
+            if video is not None and t>=next_render:video.append_data(env.render());next_render=t+.1
+            delay=.002-(time.monotonic()-before)
+            if delay>0:time.sleep(delay)
+        np.savez_compressed(a.output/'control_trace.npz',values=np.asarray(samples),
+            columns=np.array(['time']+[f'{k}:{j}' for k in ['tau','qref','kp','kd','q','dq'] for j in SDK_JOINTS]+[f'force:{l}' for l in ['FR','FL','RR','RL']]+['tilt','x','y','z']))
+        report=dict(seed=a.seed,passed=bool(passed and max_torque_step<=.300001 and max_gain_step<=.030001),reason=reason,
+            backend='MuJoCo real free-base hot-switch harness; commits/model hashes below define which actors were actually exercised',
+            commits=events,requests=requests,controller_events=runtime.controller.events,
+            max_torque_step_Nm=max_torque_step,max_kp_step=max_gain_step,max_reference_step_rad=max_ref_step,
+            max_tilt_deg=float(np.degrees(max_tilt)),min_base_height_m=min_height,steps=len(samples),
+            analytical_naive_switches=naive,loop_wall_gap_ms_p99=float(np.percentile(loop_gaps,99)*1000),
+            loop_wall_gap_ms_max=max(loop_gaps)*1000,
+            timing_scope='Simulation clock drives the controller; pacing/rendering IPC timing is recorded but is not a hard-real-time hardware certificate',
+            model_sha256={p.skill.id:p.skill.sha256 for p in runtime.prepared},hardware_connected=False,
+            root_writes='env.reset initialization only; torque-only rollout, no stabilizing root force or weld',final_position=data.qpos[:3].tolist())
+        (a.output/'summary.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report),flush=True)
+    finally:
+        if video is not None:video.close()
+        runtime.close();env.close()
+
+
+if __name__=='__main__':main()

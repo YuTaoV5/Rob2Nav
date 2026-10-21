@@ -81,3 +81,21 @@ def test_retained_capabilities_have_three_real_manuals_and_no_archived_recipe():
         for name in ('TRAINING.md','SIMULATION.md','DEPLOYMENT.md'):
             source=(folder/name).read_text(encoding='utf-8')
             assert len(source)>200, (skill['id'],name)
+
+
+def test_per_skill_evidence_is_indexed_and_published(tmp_path):
+    folder=tmp_path/'skills/sideflip/evidence/reproduced';folder.mkdir(parents=True)
+    summary={'args':{'kind':'sideflip'},'backend':'MuJoCo','role':'locally trained policy','video_scope':'one representative seed only',
+        'successes':1,'total':1,'episodes':[{'success':True}]}
+    (folder/'summary.json').write_text(json.dumps(summary),encoding='utf-8')
+    (folder/'episode_0.mp4').write_bytes(b'video-route-fixture')
+    with TestClient(create_app(tmp_path)) as c:
+        catalog=c.get('/api/catalog').json()
+        result=next(e for e in catalog['evaluations'] if e['path'].startswith('skills/sideflip/evidence'))
+        assert result['role']=='locally trained policy' and result['successes']==1
+        skill=next(s for s in c.get('/api/capabilities').json()['capabilities'] if s['id']=='sideflip')
+        assert 'one representative seed only' in skill['local_videos'][0]['label']
+        assert c.get('/api/files/'+result['video']).content==b'video-route-fixture'
+        assert c.get('/api/evaluations/'+result['id']).json()['summary']['backend']=='MuJoCo'
+        (tmp_path/'private.json').write_text('{}')
+        assert c.get('/api/files/private.json').status_code==404

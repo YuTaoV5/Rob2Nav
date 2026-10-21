@@ -1,0 +1,62 @@
+diff --git a/studio/api.py b/studio/api.py
+index 217938e..303fb01 100644
+--- a/studio/api.py
++++ b/studio/api.py
+@@ -25,6 +25,8 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
+     mujoco_python=Path(mujoco_python or '/root/gpufree-data/envs/go2-mapless/bin/python')
+     catalog=Catalog(root);jobs=Jobs(root)
+     app=FastAPI(title='Rob2Nav Studio',version='0.1.0')
++    from .paw_routes import mount_handshake
++    mount_handshake(app, root)
+ 
+     @app.get('/api/deployment')
+     def deployment_framework():
+diff --git a/studio/frontend/src/App.tsx b/studio/frontend/src/App.tsx
+index 0c3e79b..e6e762d 100644
+--- a/studio/frontend/src/App.tsx
++++ b/studio/frontend/src/App.tsx
+@@ -53,7 +53,7 @@ export default function App(){
+    <button className="project-switch" disabled title="当前仅配置Go2工作区"><span className="project-avatar">G2</span><span><b>Go2 感知运动控制</b><small>Rob2Nav workspace</small></span><ChevronDown size={14}/></button>
+    <button className="button primary sidebar-create" onClick={()=>navigate('configure')}><Plus size={17}/>创建实验</button>
+    <div className="nav-label">工作空间</div>
+-   <nav aria-label="主导航">{pages.filter(p=>['overview','experiments','deployment','simulation','navigation','robot'].includes(p[0])).map(([id,label,Icon])=><button key={id} className={(page===id||(id==='experiments'&&page==='jobs')||(id==='robot'&&page==='sensors'))?'active':''} onClick={()=>navigate(id)}><Icon size={18}/><span>{label}</span>{id==='experiments'&&running>0&&<em>{running}</em>}</button>)}</nav>
++   <nav aria-label="主导航">{pages.filter(p=>['overview','experiments','deployment','simulation','navigation','robot'].includes(p[0])).map(([id,label,Icon])=><button key={id} className={(page===id||(id==='experiments'&&page==='jobs')||(id==='robot'&&page==='sensors'))?'active':''} onClick={()=>navigate(id)}><Icon size={18}/><span>{label}</span>{id==='experiments'&&running>0&&<em>{running}</em>}</button>)}<button onClick={()=>window.location.assign('/handshake')}><Bot size={18}/><span>握手互动</span></button></nav>
+    <div className="sidebar-bottom"><nav className="utility-nav" aria-label="研究与证据快捷入口">{pages.filter(p=>['capabilities','compare','models','reports'].includes(p[0])).map(([id,label,Icon])=><button key={id} className={page===id?'active':''} onClick={()=>navigate(id)} title={label} aria-label={label}><Icon size={19}/><span className="utility-tooltip">{label}</span></button>)}</nav><div className="system-state"><span className="status-dot"/><b>旧窄桩探索已暂停</b></div><div className="sidebar-user"><span>YT</span><div><b>Robotics workspace</b><small>Go2 · 私有实验空间</small></div></div></div>
+   </aside>
+   <div className="workspace">
+diff --git a/studio/paw_routes.py b/studio/paw_routes.py
+new file mode 100644
+index 0000000..c427758
+--- /dev/null
++++ b/studio/paw_routes.py
+@@ -0,0 +1,30 @@
++"""Same-origin Studio proxy to the isolated, loopback-only MuJoCo worker."""
++import asyncio
++from pathlib import Path
++import urllib.error
++import urllib.request
++
++from fastapi import HTTPException, Request
++from fastapi.responses import FileResponse, Response
++
++
++def mount_handshake(app, root):
++    @app.get('/handshake')
++    def page():
++        return FileResponse(Path(root)/'go2_nav/paw_contact/index.html',headers={'Cache-Control':'no-store'})
++
++    @app.api_route('/handshake-api/{path:path}',methods=['GET','POST'])
++    async def proxy(path:str, request:Request):
++        methods={'api/state':'GET','api/frame.jpg':'GET','api/control':'POST'}
++        if methods.get(path)!=request.method:raise HTTPException(404)
++        body=await request.body()
++        if len(body)>4096:raise HTTPException(413)
++        def fetch():
++            req=urllib.request.Request('http://127.0.0.1:8767/'+path,data=body if request.method=='POST' else None,
++                method=request.method,headers={'Content-Type':'application/json'})
++            try:
++                with urllib.request.urlopen(req,timeout=5) as r:return r.status,r.headers.get('Content-Type'),r.read()
++            except urllib.error.HTTPError as e:return e.code,e.headers.get('Content-Type'),e.read()
++        try:status,kind,payload=await asyncio.to_thread(fetch)
++        except (OSError,urllib.error.URLError):raise HTTPException(503,'Paw simulation worker is unavailable')
++        return Response(payload,status_code=status,media_type=kind,headers={'Cache-Control':'no-store'})

@@ -1,0 +1,41 @@
+{
+  "args": {
+    "kind": "upright_walk",
+    "seed": 1000,
+    "initialization": "settled",
+    "physics_hz": 1000,
+    "joint_limit_time_constant": 0.004
+  },
+  "backend": "MuJoCo",
+  "successes": 0,
+  "total": 1,
+  "evaluator_sha256": "297745141cda7bdc1349636df6d877faa62acffc9dd18fad08c739387b1d99f0",
+  "episodes": [
+    {
+      "success": false,
+      "upright_seconds": 0.34,
+      "travel_m": 0.8296839421973297,
+      "upright_travel_m": 0.1428983820747202,
+      "rear_support_fraction": 0.5,
+      "started_on_four_feet": true,
+      "max_joint_speed_ratio": 1.143974956242751,
+      "max_joint_limit_excess_rad": 0.037660192494025635,
+      "unexpected_body_ground_contact": true
+    }
+  ],
+  "metrics": {
+    "upright_seconds": 0.34,
+    "travel_m": 0.8296839421973297,
+    "upright_travel_m": 0.1428983820747202,
+    "rear_support_fraction": 0.5,
+    "started_on_four_feet": true,
+    "max_joint_speed_ratio": 1.143974956242751,
+    "max_joint_limit_excess_rad": 0.037660192494025635,
+    "unexpected_body_ground_contact": true
+  },
+  "policy_sha256": "6235142f265e015179e61297157d4e0f3da5d9d7ed11d01b39678a0b6672a81e",
+  "root_state_writes": "initialization only; no root stabilization/weld/teleport during evaluation",
+  "hardware_connected": false,
+  "motor_model": "dc_linear_v1",
+  "hardware_constraints_pass": false
+}

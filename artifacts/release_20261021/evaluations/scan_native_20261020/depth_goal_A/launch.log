@@ -1,0 +1,216 @@
+[INFO] [launch]: All log files can be found below /root/.ros/log/2026-10-20-23-13-12-006737-gpufree-container-32825
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [scan_planner_node-1]: process started with pid [32831]
+[INFO] [robot_state_publisher-2]: process started with pid [32832]
+[INFO] [closed_loop_controller-3]: process started with pid [32833]
+[INFO] [go2_kinematic_sim-4]: process started with pid [32834]
+[INFO] [go2_gait_publisher-5]: process started with pid [32835]
+[INFO] [mockamap_node-6]: process started with pid [32836]
+[INFO] [pcl_render_node-7]: process started with pid [32837]
+[INFO] [odom_visualization-8]: process started with pid [32838]
+[closed_loop_controller-3] [INFO] [1792509192.270709905] [closed_loop_controller]: Closed-loop controller ready
+[robot_state_publisher-2] [INFO] [1792509192.273317582] [go2_robot_state_publisher]: Robot initialized
+[go2_kinematic_sim-4] [INFO] [1792509192.273482032] [go2_kinematic_sim]: Go2 kinematic simulator ready
+[mockamap_node-6] [INFO] [1792509192.299931128] [mockamap_node]: finish: infill 0.137303%
+[scan_planner_node-1] hit: 1.7346
+[scan_planner_node-1] miss: -0.847298
+[scan_planner_node-1] min log: -1.99243
+[scan_planner_node-1] max: 3.89182
+[scan_planner_node-1] thresh log: 1.38629
+[pcl_render_node-7] [INFO] [1792509192.396901198] [pcl_render_node]: pcl_render_node sensor_type: depth
+[pcl_render_node-7] [INFO] [1792509192.397260283] [pcl_render_node]: drone_drawpoints_num = 0,0,0, Uav points num = 0
+[scan_planner_node-1] [INFO] [1792509192.543725194] [scan_planner_node]: Set RViz goal height from initial body_pose z: 0.300
+[pcl_render_node-7] [INFO] [1792509192.656851805] [pcl_render_node]: Global point cloud received
+[scan_planner_node-1] [FSM]: state: INIT
+[scan_planner_node-1] wait for goal.
+[pcl_render_node-7] [INFO] [1792509193.611376967] [pcl_render_node]: Normal computation finished; map size=223015
+[pcl_render_node-7] [INFO] [1792509193.613257700] [pcl_render_node]: map bounds=(-20.317698 -19.843794 0.000000) (20.178617 20.098776 2.000000)
+[scan_planner_node-1] [FSM]: state: INIT
+[scan_planner_node-1] wait for goal.
+[scan_planner_node-1] [FSM]: state: INIT
+[scan_planner_node-1] wait for goal.
+[scan_planner_node-1] [FSM]: state: INIT
+[scan_planner_node-1] wait for goal.
+[scan_planner_node-1] [FSM]: state: INIT
+[scan_planner_node-1] wait for goal.
+[scan_planner_node-1] [FSM]: state: INIT
+[scan_planner_node-1] wait for goal.
+[scan_planner_node-1] [WARN] [1792509199.206282226] [scan_planner_node]: New subscription discovered on topic '/grid_map/occupancy', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[scan_planner_node-1] [WARN] [1792509199.206408640] [scan_planner_node]: New subscription discovered on topic '/grid_map/occupancy_inflate', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[scan_planner_node-1] Triggered!
+[scan_planner_node-1] [FSM]: from INIT to WAIT_TARGET
+[scan_planner_node-1] [FSM]: from WAIT_TARGET to GEN_NEW_TRAJ
+[scan_planner_node-1] [WARN] [1792509204.146392387] [scan_planner_node]: Local target was adjusted to a nearby collision-free point
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------0
+[scan_planner_node-1] start: -19   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-14.2     1   0.3, 0.65    0    0
+[scan_planner_node-1] [32miter(+1)=1,time(ms)=0.006,keep optimizing
+[scan_planner_node-1] [0m[32miter(+1)=1,time(ms)=0.004,keep optimizing
+[scan_planner_node-1] [0m[32miter(+1)=1,time(ms)=0.003,keep optimizing
+[scan_planner_node-1] [0mfirst_optimize_step_success=0
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from GEN_NEW_TRAJ to GEN_NEW_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------1
+[scan_planner_node-1] start: -19   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-14.2     1   0.3, 0.65    0    0
+[scan_planner_node-1] [32miter(+1)=40,time(ms)=0.322,keep optimizing
+[scan_planner_node-1] [0m[32miter(+1)=23,time(ms)=0.159,total_t(ms)=0.827,cost=0.308
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] total time:[42m0.0022[0m,optimize:0.0022,refine:5e-05
+[scan_planner_node-1] final_plan_success=1
+[scan_planner_node-1] [FSM]: from GEN_NEW_TRAJ to EXEC_TRAJ
+[closed_loop_controller-3] [INFO] [1792509204.196636390] [closed_loop_controller]: Received trajectory 1, duration 7.680s
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------2
+[scan_planner_node-1] start: -19   1 0.3,     0.157 -0.000186 -6.04e-15
+[scan_planner_node-1] goal:-14.2  1.11   0.3,     0.574   0.00131 -1.04e-16
+[scan_planner_node-1] [32miter(+1)=12,time(ms)=0.059,total_t(ms)=0.059,cost=0.046
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] total time:[42m0.0021[0m,optimize:0.00206,refine:3.98e-05
+[scan_planner_node-1] final_plan_success=1
+[scan_planner_node-1] [SAFETY]: from EXEC_TRAJ to EXEC_TRAJ
+[closed_loop_controller-3] [INFO] [1792509204.594865041] [closed_loop_controller]: Received trajectory 2, duration 7.680s
+[scan_planner_node-1] [WARN] [1792509206.087130197] [scan_planner_node]: Local target was adjusted to a nearby collision-free point
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------3
+[scan_planner_node-1] start: -18.3 0.938   0.3,     0.646    -0.107 -7.83e-16
+[scan_planner_node-1] goal: -14 1.25  0.3,     0.575    0.0163 -6.46e-17
+[scan_planner_node-1] [32miter(+1)=1,time(ms)=0.008,keep optimizing
+[scan_planner_node-1] [0miter=5,time(ms)=1,rebound.
+[scan_planner_node-1] [ERROR] [1792509206.130383079] [bspline_opt]: A-star failed; aborting optimization
+[scan_planner_node-1] [32miter(+1)=21,time(ms)=0.114,keep optimizing
+[scan_planner_node-1] [0m[32miter(+1)=7,time(ms)=0.046,keep optimizing
+[scan_planner_node-1] [0mfirst_optimize_step_success=0
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------4
+[scan_planner_node-1] start: -18.3 0.938   0.3,     0.646    -0.107 -7.83e-16
+[scan_planner_node-1] goal: -14 1.25  0.3,     0.575    0.0163 -6.46e-17
+[scan_planner_node-1] [ERROR] [1792509206.131484459] [bspline_opt]: A-star error
+[scan_planner_node-1] iter=10,time(ms)=0.065,rebound.
+[scan_planner_node-1] iter=5,time(ms)=0.021,rebound.
+[scan_planner_node-1] [ERROR] [1792509206.131522508] [bspline_opt]: A-star error
+[scan_planner_node-1] [ERROR] [1792509206.131543366] [bspline_opt]: A-star error
+[scan_planner_node-1] iter=5,time(ms)=0.019,rebound.
+[scan_planner_node-1] iter=5,time(ms)=0.16,rebound.
+[scan_planner_node-1] [ERROR] [1792509206.138068133] [bspline_opt]: A-star failed; aborting optimization
+[scan_planner_node-1] [32miter(+1)=4,time(ms)=0.014,keep optimizing
+[scan_planner_node-1] [0m[32miter(+1)=31,time(ms)=0.182,total_t(ms)=6.851,cost=0.274
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] Need to reallocate time.
+[scan_planner_node-1] total time:[42m0.0076[0m,optimize:0.0074,refine:0.00019
+[scan_planner_node-1] final_plan_success=1
+[closed_loop_controller-3] [INFO] [1792509206.138666950] [closed_loop_controller]: Received trajectory 3, duration 8.719s
+[scan_planner_node-1] [SAFETY]: from EXEC_TRAJ to EXEC_TRAJ
+[scan_planner_node-1] [FSM]: state: EXEC_TRAJ
+[scan_planner_node-1] [FSM]: from EXEC_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] [WARN] [1792509207.631046731] [scan_planner_node]: Local target was adjusted to a nearby collision-free point
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------5
+[scan_planner_node-1] start: -17.4 0.479   0.3,     0.642     -0.43 -3.49e-12
+[scan_planner_node-1] goal: -13 1.04  0.3,   0.522 0.00829 7.1e-12
+[scan_planner_node-1] [32miter(+1)=1,time(ms)=0.007,keep optimizing
+[scan_planner_node-1] [0m[32miter(+1)=14,time(ms)=0.057,keep optimizing
+[scan_planner_node-1] [0m[32miter(+1)=3,time(ms)=0.008,keep optimizing
+[scan_planner_node-1] [0mfirst_optimize_step_success=0
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------6
+[scan_planner_node-1] start: -17.4 0.479   0.3,     0.642     -0.43 -3.49e-12
+[scan_planner_node-1] goal: -13 1.04  0.3,   0.522 0.00829 7.1e-12
+[scan_planner_node-1] [32miter(+1)=1,time(ms)=0.004,total_t(ms)=0.004,cost=0.000
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] total time:[42m0.000161[0m,optimize:0.000123,refine:3.85e-05
+[scan_planner_node-1] final_plan_success=1
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to EXEC_TRAJ
+[closed_loop_controller-3] [INFO] [1792509207.631787453] [closed_loop_controller]: Received trajectory 4, duration 7.360s
+[scan_planner_node-1] [FSM]: from EXEC_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------7
+[scan_planner_node-1] start:  -16.4 0.0102    0.3,    0.602   -0.119 -1.4e-11
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] [32miter(+1)=6,time(ms)=0.023,total_t(ms)=0.023,cost=0.039
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] total time:[42m0.000182[0m,optimize:0.000143,refine:3.84e-05
+[scan_planner_node-1] final_plan_success=1
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to EXEC_TRAJ
+[closed_loop_controller-3] [INFO] [1792509209.274202099] [closed_loop_controller]: Received trajectory 5, duration 7.360s
+[scan_planner_node-1] [FSM]: from EXEC_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------8
+[scan_planner_node-1] start: -15.3  0.05   0.3,     0.818     0.164 -1.96e-13
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] [32miter(+1)=1,time(ms)=0.009,total_t(ms)=0.009,cost=0.043
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] total time:[42m0.000139[0m,optimize:0.000108,refine:3.14e-05
+[scan_planner_node-1] final_plan_success=1
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to EXEC_TRAJ
+[closed_loop_controller-3] [INFO] [1792509210.918881587] [closed_loop_controller]: Received trajectory 6, duration 6.080s
+[scan_planner_node-1] [FSM]: from EXEC_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------9
+[scan_planner_node-1] start: -14.3 0.306   0.3,     0.834     0.251 -1.88e-15
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] [32miter(+1)=1,time(ms)=0.009,total_t(ms)=0.010,cost=0.026
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] total time:[42m0.000123[0m,optimize:9.51e-05,refine:2.77e-05
+[scan_planner_node-1] final_plan_success=1
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to EXEC_TRAJ
+[closed_loop_controller-3] [INFO] [1792509212.280960647] [closed_loop_controller]: Received trajectory 7, duration 4.480s
+[scan_planner_node-1] [FSM]: from EXEC_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------10
+[scan_planner_node-1] start: -13.4 0.608   0.3,    0.759    0.229 8.74e-16
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] [32miter(+1)=1,time(ms)=0.009,total_t(ms)=0.010,cost=0.002
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] total time:[42m8.54e-05[0m,optimize:6.78e-05,refine:1.76e-05
+[scan_planner_node-1] final_plan_success=1
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to EXEC_TRAJ
+[closed_loop_controller-3] [INFO] [1792509213.660299367] [closed_loop_controller]: Received trajectory 8, duration 3.200s
+[scan_planner_node-1] [FSM]: from EXEC_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------11
+[scan_planner_node-1] start: -12.4 0.897   0.3,     0.467     0.132 -1.73e-16
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] [32miter(+1)=8,time(ms)=0.016,total_t(ms)=0.017,cost=0.396
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] Need to reallocate time.
+[scan_planner_node-1] total time:[42m0.000122[0m,optimize:5.73e-05,refine:6.47e-05
+[scan_planner_node-1] final_plan_success=1
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to EXEC_TRAJ
+[closed_loop_controller-3] [INFO] [1792509215.243170622] [closed_loop_controller]: Received trajectory 9, duration 1.142s
+[scan_planner_node-1] [FSM]: state: EXEC_TRAJ
+[scan_planner_node-1] [FSM]: from EXEC_TRAJ to WAIT_TARGET
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[INFO] [odom_visualization-8]: sending signal 'SIGINT' to process[odom_visualization-8]
+[INFO] [pcl_render_node-7]: sending signal 'SIGINT' to process[pcl_render_node-7]
+[INFO] [mockamap_node-6]: sending signal 'SIGINT' to process[mockamap_node-6]
+[INFO] [go2_gait_publisher-5]: sending signal 'SIGINT' to process[go2_gait_publisher-5]
+[INFO] [go2_kinematic_sim-4]: sending signal 'SIGINT' to process[go2_kinematic_sim-4]
+[INFO] [closed_loop_controller-3]: sending signal 'SIGINT' to process[closed_loop_controller-3]
+[INFO] [robot_state_publisher-2]: sending signal 'SIGINT' to process[robot_state_publisher-2]
+[INFO] [scan_planner_node-1]: sending signal 'SIGINT' to process[scan_planner_node-1]
+[go2_kinematic_sim-4] [INFO] [1792509217.189005962] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[closed_loop_controller-3] [INFO] [1792509217.189006037] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ERROR] [go2_kinematic_sim-4]: process has died [pid 32834, exit code -2, cmd '/root/gpufree-data/scan-reproduction/upstream/install/scan_planner/lib/scan_planner/go2_kinematic_sim --ros-args -r __node:=go2_kinematic_sim --params-file /root/gpufree-data/scan-reproduction/upstream/install/scan_planner/share/scan_planner/config/controllers.yaml --params-file /tmp/launch_params_ufgv2hep --params-file /tmp/launch_params_c235zysa -r body_pose:=/quad_0/body_pose -r cmd_vel:=/quad_0/cmd_vel'].
+[mockamap_node-6] [INFO] [1792509217.189010707] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ERROR] [closed_loop_controller-3]: process has died [pid 32833, exit code -2, cmd '/root/gpufree-data/scan-reproduction/upstream/install/scan_planner/lib/scan_planner/closed_loop_controller --ros-args -r __node:=closed_loop_controller --params-file /root/gpufree-data/scan-reproduction/upstream/install/scan_planner/share/scan_planner/config/controllers.yaml --params-file /tmp/launch_params_2c07k_k5 -r body_pose:=/quad_0/body_pose -r cmd_vel:=/quad_0/cmd_vel'].
+[robot_state_publisher-2] [INFO] [1792509217.189013090] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[odom_visualization-8] [INFO] [1792509217.189006579] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[go2_gait_publisher-5] [INFO] [1792509217.189010535] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[scan_planner_node-1] [INFO] [1792509217.189033361] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[pcl_render_node-7] [INFO] [1792509217.189045771] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[odom_visualization-8] [INFO] [1792509217.192349044] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ERROR] [robot_state_publisher-2]: process has died [pid 32832, exit code -2, cmd '/opt/ros/jazzy/lib/robot_state_publisher/robot_state_publisher --ros-args -r __node:=go2_robot_state_publisher --params-file /tmp/launch_params_d4nlhe9h --params-file /tmp/launch_params_clj7hp07'].
+[mockamap_node-6] [INFO] [1792509217.193409263] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[go2_gait_publisher-5] [INFO] [1792509217.193918555] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[scan_planner_node-1] des manager
+[scan_planner_node-1] [INFO] [1792509217.195822331] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ERROR] [pcl_render_node-7]: process has died [pid 32837, exit code -2, cmd '/root/gpufree-data/scan-reproduction/upstream/install/local_sensing_node/lib/local_sensing_node/pcl_render_node --ros-args -r __node:=pcl_render_node --params-file /root/gpufree-data/scan-reproduction/upstream/install/scan_planner/share/scan_planner/config/simulator.yaml --params-file /tmp/launch_params__ntx1aop -r global_map:=/map_generator/global_cloud -r body_pose:=/quad_0/body_pose -r cloud:=/quad_0/cloud -r sensor_cloud:=/quad_0/sensor_cloud -r depth:=/quad_0/depth -r dyn_cloud:=/quad_0/dyn_cloud -r uav_cloud:=/quad_0/uav_cloud'].
+[INFO] [go2_gait_publisher-5]: process has finished cleanly [pid 32835]
+[INFO] [odom_visualization-8]: process has finished cleanly [pid 32838]
+[INFO] [mockamap_node-6]: process has finished cleanly [pid 32836]
+[INFO] [scan_planner_node-1]: process has finished cleanly [pid 32831]

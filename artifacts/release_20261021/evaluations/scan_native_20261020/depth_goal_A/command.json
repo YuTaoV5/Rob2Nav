@@ -1,0 +1,37 @@
+{
+  "argv": [
+    "ros2",
+    "launch",
+    "scan_planner",
+    "run.launch.py",
+    "is_real_world:=false",
+    "navi_mode:=1",
+    "sensor_type:=depth",
+    "controller_mode:=closed_loop",
+    "use_gpu:=false",
+    "init_x:=-19.0",
+    "init_y:=1.0",
+    "init_z:=0.3"
+  ],
+  "args": {
+    "workspace": "/root/gpufree-data/scan-reproduction/upstream",
+    "output": "/root/gpufree-data/Rob2Nav/outputs/scan_native_20261020/depth_goal_A",
+    "sensor": "depth",
+    "goal": [
+      -12.0,
+      1.0,
+      0.3
+    ],
+    "initial": [
+      -19.0,
+      1.0,
+      0.3
+    ],
+    "timeout": 70.0,
+    "pcd": null,
+    "rviz": true,
+    "rviz_config": "/root/gpufree-data/scan-reproduction/rviz_recording.rviz"
+  },
+  "domain_id": "77",
+  "backend": "upstream ROS2 kinematic"
+}

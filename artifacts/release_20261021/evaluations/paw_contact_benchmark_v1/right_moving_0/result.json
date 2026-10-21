@@ -1,0 +1,101 @@
+{
+  "case": {
+    "name": "right_moving_0",
+    "kind": "moving",
+    "seed": 0,
+    "target": [
+      0.37,
+      -0.13,
+      0.19
+    ],
+    "friction": 0.8,
+    "mass_scale": 1.0
+  },
+  "success": true,
+  "placement": true,
+  "rejected": false,
+  "stable": true,
+  "returned": true,
+  "max_continuous_gentle_contact_s": 1.480000000000001,
+  "peak_hand_force_n": 5.503506895236407,
+  "peak_tilt_deg": 0.8799131093060633,
+  "final": {
+    "time": 14.500000000001512,
+    "state": "COOLDOWN",
+    "leg": "FR",
+    "force": 0.0,
+    "peak_force": 5.503506895236407,
+    "tilt_deg": 0.7078710571159986,
+    "base": [
+      -0.05311531072443431,
+      0.04922156684797783,
+      0.3295415628660716
+    ],
+    "hand": [
+      0.8,
+      -0.15188582664422495,
+      0.25
+    ],
+    "paw": [
+      0.1829598858992754,
+      -0.1369792682265972,
+      0.022621046591078553
+    ],
+    "ground_force": [
+      43.41348076443235,
+      10.852980560346463,
+      64.18695706264567,
+      31.56470191830688
+    ],
+    "observation_age": 0.01000000000000334,
+    "reason": "retract_deadline",
+    "torque_peak": 10.775908287968473,
+    "armed": false
+  },
+  "events": [
+    {
+      "time": 1.5,
+      "previous": "SETTLE",
+      "state": "WAIT",
+      "reason": ""
+    },
+    {
+      "time": 2.16,
+      "previous": "WAIT",
+      "state": "SHIFT",
+      "reason": "stable_open_palm"
+    },
+    {
+      "time": 3.07,
+      "previous": "SHIFT",
+      "state": "LIFT",
+      "reason": ""
+    },
+    {
+      "time": 4.28,
+      "previous": "LIFT",
+      "state": "LOWER",
+      "reason": ""
+    },
+    {
+      "time": 5.56,
+      "previous": "LOWER",
+      "state": "HOLD",
+      "reason": "measured_contact"
+    },
+    {
+      "time": 11.04,
+      "previous": "HOLD",
+      "state": "RETRACT",
+      "reason": "hand_lost_or_outside_workspace"
+    },
+    {
+      "time": 14.04,
+      "previous": "RETRACT",
+      "state": "COOLDOWN",
+      "reason": "retract_deadline"
+    }
+  ],
+  "contact_dynamics": true,
+  "criterion": ">=1s continuous HOLD, 1..8N palm contact, <4.5cm lateral error, <12deg tilt; overall peak<15N, tilt<15deg, four-foot return. Invalid requests must be rejected."
+}

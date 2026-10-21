@@ -75,6 +75,7 @@ class Catalog:
         evaluations, runs, reports, videos, models, issues = [], [], [], [], [], []
         records = {}
         roots = [p for p in (self.root/'artifacts', self.root/'outputs') if p.exists()]
+        roots += sorted(p for p in (self.root/'skills').glob('*/evidence') if p.is_dir())
         # Include live server training trees without exposing arbitrary host files.
         live = self.root.parent/'MoE-runs'
         scan_roots = roots + ([live] if live.exists() else [])
@@ -93,10 +94,10 @@ class Catalog:
                 precursor = course == 'wide_deep' or 'PRECURSOR' in geometry or args.get('shallow_probe', False)
                 teacher=args.get('teacher_map') or 'teacher_' in rel.lower() or '/teacher/' in rel.replace('\\','/')
                 student='student' in rel.lower() or ('teacher_map' in args and not args['teacher_map'] and bool(args.get('checkpoint')))
-                role = '特权教师' if teacher else ('感知学生' if student else '历史对照')
+                role = d.get('role') or ('特权教师' if teacher else ('感知学生' if student else '历史对照'))
                 assisted = 'active' in rel or 'ik' in rel.lower() or 'jump_backend' in args
                 video = folder/'episode_0.mp4'
-                row = {'id':key,'name':folder.name,'group':str(folder.parent.name),'path':rel.replace('\\','/'),
+                row = {'id':key,'name':d.get('display_name',folder.name),'group':str(folder.parent.name),'path':rel.replace('\\','/'),
                        'kind':args.get('kind', d.get('kind', folder.name)), 'difficulty':args.get('difficulty'),
                        'successes':d['successes'],'total':d['total'],'seed':args.get('seed'),
                        'scored':not bool(d.get('diagnostic_only')),
@@ -106,7 +107,7 @@ class Catalog:
                        'backend':d.get('backend','MuJoCo' if assisted or 'mujoco' in rel.lower() or 'results' in d else 'Isaac / 需核对'),
                        'assistance':'技能调度 / IK' if assisted else '关节策略 / 见来源',
                        'diagnostic':bool(args.get('map_ablation','none') != 'none' or d.get('diagnostic_only')),
-                       'checkpoint':d.get('checkpoint_sha256'),'video':self.relative(video) if video.exists() and video.is_relative_to(self.root) else None}
+                       'video_scope':d.get('video_scope'),'checkpoint':d.get('checkpoint_sha256'),'video':self.relative(video) if video.exists() and video.is_relative_to(self.root) else None}
                 evaluations.append(row)
             for path in base.rglob('iterations.jsonl'):
                 if 'source' in path.parts: continue
@@ -128,7 +129,7 @@ class Catalog:
                     if path.name=='actor.pt' or 'source' in path.parts: continue
                     key=ident(path); records[key]=path
                     models.append({'id':key,'name':path.name,'group':path.parent.name,'path':self.relative(path),'bytes':path.stat().st_size})
-        report_paths=list(self.root.glob('*.md'))+list((self.root/'docs').rglob('*.md'))+list((self.root/'skills').rglob('*.md'))
+        report_paths=list(self.root.glob('*.md'))+list((self.root/'docs').rglob('*.md'))+list((self.root/'skills').rglob('*.md'))+list((self.root/'go2_nav/paw_contact').glob('*.md'))
         if (self.root/'studio/README.md').exists():report_paths.append(self.root/'studio/README.md')
         for path in sorted(report_paths):
             key=ident(path); records[key]=path

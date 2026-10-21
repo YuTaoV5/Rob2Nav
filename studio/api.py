@@ -29,6 +29,8 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
     mount_handshake(app, root)
     from .navigation_live_routes import mount_navigation_live
     mount_navigation_live(app, root)
+    from .live_skills import mount_live_skills
+    mount_live_skills(app,root,mujoco_python)
 
     @app.get('/api/deployment')
     def deployment_framework():
@@ -150,7 +152,7 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
         if not p.is_relative_to(root) or not p.is_file() or p.suffix.lower() not in {'.mp4','.png','.jpg','.jpeg','.webp','.json','.jsonl','.md','.yaml','.csv','.pt','.svg'}:
             raise HTTPException(404,'Artifact not found')
         # Never expose arbitrary files in .git, credentials or runtime control files.
-        if any(s.startswith('.') for s in Path(path).parts) or not (p.is_relative_to(root/'artifacts') or p.is_relative_to(root/'outputs') or p.suffix=='.md'):
+        if any(s.startswith('.') for s in Path(path).parts) or not (p.is_relative_to(root/'artifacts') or p.is_relative_to(root/'outputs') or p.is_relative_to(root/'skills') or p.is_relative_to(root/'docs/evidence') or p.suffix=='.md'):
             raise HTTPException(404,'Artifact not published')
         if p.is_relative_to(root/'outputs/studio') and p.suffix not in ('.mp4','.png','.jpg','.jsonl','.pt'):
             raise HTTPException(404,'Use job API for runtime metadata')

@@ -1,0 +1,119 @@
+{
+  "robot": "Go2",
+  "role": "real PhysX PPO training, not FK replay",
+  "unitree_commit": "4960b84732b0c2ec593dccbfe963fda1bcd7b1e3",
+  "backflip_asset_commit": "954aa61ceb62c515689677f44a21e32109f6b62d",
+  "reference_sha256": "12877865c884becf477077a750fe1db3cdb01270c34a09ab35661d36ec375981",
+  "source_sha256": {
+    "build_motion.py": "2cd2c1c886696375b85aeb4fbd7ac09970946b20cf4233c3d8965be1153d3cc7",
+    "__init__.py": "ffcc68bfbdf6da1f4c28bc3dc023ce973e296f061197538697a3acc2dc9d7388",
+    "train.py": "31606e270ce1d07abb0e6b84935917e47930ec8b238b88f8f113035c0f06bafc",
+    "common.py": "32ba027cf3b5b025414cd6004ad03d953a3847a3addf5d0560f0a504757ef0fb"
+  },
+  "joint_names": [
+    "FL_hip_joint",
+    "FR_hip_joint",
+    "RL_hip_joint",
+    "RR_hip_joint",
+    "FL_thigh_joint",
+    "FR_thigh_joint",
+    "RL_thigh_joint",
+    "RR_thigh_joint",
+    "FL_calf_joint",
+    "FR_calf_joint",
+    "RL_calf_joint",
+    "RR_calf_joint"
+  ],
+  "body_names": [
+    "base",
+    "FL_hip",
+    "FR_hip",
+    "Head_upper",
+    "RL_hip",
+    "RR_hip",
+    "FL_thigh",
+    "FR_thigh",
+    "Head_lower",
+    "RL_thigh",
+    "RR_thigh",
+    "FL_calf",
+    "FR_calf",
+    "RL_calf",
+    "RR_calf",
+    "FL_foot",
+    "FR_foot",
+    "RL_foot",
+    "RR_foot"
+  ],
+  "anchor": "base",
+  "distal_bodies": [
+    "FL_foot",
+    "FR_foot",
+    "RL_foot",
+    "RR_foot"
+  ],
+  "action_scale": 0.5,
+  "kp": 40,
+  "kd": 1,
+  "actor_observations": 69,
+  "action_dim": 12,
+  "policy_hz": 50,
+  "physics_hz": 200,
+  "seed": 43,
+  "requested_iterations": 2,
+  "num_envs": 32,
+  "hardware_connected": false,
+  "actor_input_dim": 69,
+  "actor_output_dim": 12,
+  "normalization": "identity",
+  "actor_observation_terms": [
+    {
+      "name": "motion_command",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "motion_anchor_ori_b",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "base_ang_vel",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "joint_pos_rel",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "joint_vel_rel",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "last_action",
+      "scale": null,
+      "clip": null
+    }
+  ],
+  "default_joint_pos": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.8,
+    0.8,
+    1.0,
+    1.0,
+    -1.5,
+    -1.5,
+    -1.5,
+    -1.5
+  ],
+  "checkpoint_sha256": "e111b5d7d42309fd3ae108c1f5c11056fe66c5bdbeb78914fcc1539a035e6901",
+  "policy_sha256": "b051a24f8d90d558fb3747acbd4a493dfef76807de8db7b87f8af31372d3db9c",
+  "export_verified_finite": true,
+  "capability_verified": false
+}

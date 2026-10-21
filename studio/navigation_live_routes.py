@@ -8,10 +8,15 @@ from fastapi.responses import FileResponse, Response
 
 
 def mount_navigation_live(app, root):
+    @app.get('/scan-live')
+    def scan_page():
+        return FileResponse(Path(root)/'skills/navigation/scan.html',headers={'Cache-Control':'no-store'})
+
     @app.get('/navigation-live')
     def page():
         return FileResponse(Path(root)/'skills/navigation/index.html', headers={'Cache-Control': 'no-store'})
 
+    @app.api_route('/scan-live-api/{path:path}', methods=['GET','POST'])
     @app.api_route('/navigation-live-api/{path:path}', methods=['GET', 'POST'])
     async def proxy(path: str, request: Request):
         if {'api/state': 'GET', 'api/frame.jpg': 'GET', 'api/control': 'POST'}.get(path) != request.method:
@@ -21,7 +26,8 @@ def mount_navigation_live(app, root):
             raise HTTPException(413)
 
         def fetch():
-            req = urllib.request.Request('http://127.0.0.1:8768/'+path, data=body if request.method == 'POST' else None,
+            port=8769 if request.url.path.startswith('/scan-live-api/') else 8768
+            req = urllib.request.Request(f'http://127.0.0.1:{port}/'+path, data=body if request.method == 'POST' else None,
                 method=request.method, headers={'Content-Type': 'application/json'})
             try:
                 with urllib.request.urlopen(req, timeout=5) as r:

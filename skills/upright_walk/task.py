@@ -47,9 +47,9 @@ def horizontal_velocity(env):
     return torch.stack([torch.sum(vel*forward,dim=1),torch.sum(vel*side,dim=1)],dim=1)
 
 
-def track_velocity(env):
+def track_velocity(env, std2=.20):
     target = env.command_manager.get_command('base_velocity')[:,:2]
-    return upright(env)*torch.exp(-torch.sum((horizontal_velocity(env)-target)**2,dim=1)/.20)
+    return upright(env)*torch.exp(-torch.sum((horizontal_velocity(env)-target)**2,dim=1)/std2)
 
 
 def track_yaw(env):
@@ -57,8 +57,8 @@ def track_yaw(env):
     return upright(env)*torch.exp(-(env.scene['robot'].data.root_ang_vel_w[:,2]-target)**2/.25)
 
 
-def height(env):
-    return upright(env)*torch.exp(-(env.scene['robot'].data.root_pos_w[:,2]-.56)**2/.025)
+def height(env, target=.56, std2=.025):
+    return upright(env)*torch.exp(-(env.scene['robot'].data.root_pos_w[:,2]-target)**2/std2)
 
 
 def reset_mixed(env, env_ids, upright_fraction=.5):
@@ -131,3 +131,66 @@ def make_cfg(backflip_source, num_envs, seed, device):
     cfg.commands.base_velocity.rel_standing_envs = .2
     cfg.commands.base_velocity.resampling_time_range = (3.,6.)
     return cfg
+
+
+def rear_gait_state(env):
+    robot=env.scene['robot'];sensor=env.scene['contact_forces']
+    if not hasattr(env,'_upright_rear_ids'):
+        env._upright_rear_ids=robot.find_bodies('R.*_foot')[0]
+        env._upright_sensor_ids=sensor.find_bodies('R.*_foot')[0]
+    contacts=torch.linalg.vector_norm(sensor.data.net_forces_w[:,env._upright_sensor_ids],dim=-1)>4.
+    moving=torch.linalg.vector_norm(env.command_manager.get_command('base_velocity')[:,:2],dim=-1)>.08
+    return robot,sensor,contacts,moving
+
+
+def rear_stance_slip(env):
+    robot,sensor,contacts,moving=rear_gait_state(env)
+    velocity=robot.data.body_lin_vel_w[:,env._upright_rear_ids,:2]
+    return upright(env)*torch.sum(torch.sum(velocity**2,dim=-1)*contacts,dim=1)
+
+
+def rear_airtime_reward(env):
+    robot,sensor,contacts,moving=rear_gait_state(env)
+    first=sensor.compute_first_contact(env.step_dt)[:,env._upright_sensor_ids]
+    duration=sensor.data.last_air_time[:,env._upright_sensor_ids]
+    valid=torch.clamp(duration/.12,max=1.)*(duration>=.04)*first
+    return upright(env)*moving*torch.sum(valid,dim=1)
+
+
+def rear_single_support(env):
+    robot,sensor,contacts,moving=rear_gait_state(env)
+    return upright(env)*moving*(contacts.sum(dim=1)==1)
+
+
+def rear_flight(env):
+    robot,sensor,contacts,moving=rear_gait_state(env)
+    return upright(env)*(contacts.sum(dim=1)==0)
+
+
+def rear_clearance(env):
+    robot,sensor,contacts,moving=rear_gait_state(env)
+    height=robot.data.body_pos_w[:,env._upright_rear_ids,2]-env.scene.env_origins[:,2:3]
+    return upright(env)*moving*torch.mean(torch.exp(-(height-.055)**2/.001)*(~contacts),dim=1)
+
+
+def upright_nonfoot_contacts(env):
+    sensor=env.scene['contact_forces']
+    if not hasattr(env,'_upright_nonfoot_ids'):
+        env._upright_nonfoot_ids=[i for i,n in enumerate(sensor.body_names) if not n.endswith('_foot')]
+    force=torch.linalg.vector_norm(sensor.data.net_forces_w[:,env._upright_nonfoot_ids],dim=-1)
+    return upright(env)*(force>1.).sum(dim=1)
+
+
+def enable_stepping_rewards(cfg):
+    """Correct the sliding optimum; actual foot lifts and quiet stance contacts are required."""
+    cfg.rewards.velocity.weight=6.
+    cfg.rewards.velocity.params={'std2':.04}
+    cfg.rewards.height.weight=3.
+    cfg.rewards.height.params={'target':.48,'std2':.01}
+    cfg.rewards.rear_support.weight=.5
+    cfg.rewards.rear_slip=RewTerm(func=rear_stance_slip,weight=-10.)
+    cfg.rewards.rear_airtime=RewTerm(func=rear_airtime_reward,weight=15.)
+    cfg.rewards.single_support=RewTerm(func=rear_single_support,weight=2.)
+    cfg.rewards.rear_flight=RewTerm(func=rear_flight,weight=-3.)
+    cfg.rewards.rear_clearance=RewTerm(func=rear_clearance,weight=1.5)
+    cfg.rewards.nonfoot_contact=RewTerm(func=upright_nonfoot_contacts,weight=-3.)

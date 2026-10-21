@@ -7,10 +7,10 @@ The active workbench now retains seven independent skills with per-skill folders
 | stairs | skills/stairs | 已有历史仿真 |
 | platform | skills/platform | 已有历史仿真 |
 | multiterrain | skills/multiterrain | 已有失败与保持对照 |
-| backflip | skills/backflip | 5000 updates complete; MuJoCo task PASS, hardware constraints FAIL |
-| sideflip | skills/sideflip | 5000 updates complete; final MuJoCo evaluation FAIL (0/1) |
+| backflip | skills/backflip | 动作通过；关节约束未通过 |
+| sideflip | skills/sideflip | MuJoCo动作8/8；速度约束未通过 |
 | navigation | skills/navigation | PPO训练完成；8回合与网页点击通过 |
-| upright_walk | skills/upright_walk | 完整训练中；短程模型未通过 |
+| upright_walk | skills/upright_walk | 原生起立前进；MuJoCo未通过 |
 
 The following cards and their unused training recipes are archived in studio/skill_registry.json and excluded from executable selectors. Historical artifacts/reports are preserved. This follows the request to remove hard-to-complete skills after investigating them; it does not claim they were solved.
 

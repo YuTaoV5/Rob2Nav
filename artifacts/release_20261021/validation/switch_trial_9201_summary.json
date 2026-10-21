@@ -1,0 +1,43 @@
+{
+  "seed": 9201,
+  "passed": false,
+  "reason": "neutral acquisition timeout",
+  "backend": "MuJoCo real free-base contacts / actual TorchScript MLP and MoE in isolated processes",
+  "commits": [],
+  "requests": [],
+  "controller_events": [
+    {
+      "time": 0.0,
+      "event": "capture_measured_state",
+      "phase": "CAPTURE",
+      "epoch": 0
+    },
+    {
+      "time": 1.0,
+      "event": "NEUTRAL",
+      "phase": "NEUTRAL",
+      "epoch": 0
+    },
+    {
+      "time": 7.002,
+      "event": "fault:neutral acquisition timeout",
+      "phase": "FAULT",
+      "epoch": 0
+    }
+  ],
+  "max_torque_step_Nm": 0.0693611669528913,
+  "max_kp_step": 0.030000000000001137,
+  "max_reference_step_rad": 0.0005394303449518523,
+  "max_tilt_deg": 9.673182129397198,
+  "min_base_height_m": 0.3014810755199728,
+  "steps": 3501,
+  "analytical_naive_switches": [],
+  "loop_wall_gap_ms_p99": 2.5309626944363117,
+  "loop_wall_gap_ms_max": 240.92025496065617,
+  "timing_scope": "Simulation clock drives the controller; pacing/rendering IPC timing is recorded but is not a hard-real-time hardware certificate",
+  "model_sha256": {
+    "stand_soft": ""
+  },
+  "hardware_connected": false,
+  "root_writes": "env.reset initialization only; torque-only rollout, no stabilizing root force or weld"
+}

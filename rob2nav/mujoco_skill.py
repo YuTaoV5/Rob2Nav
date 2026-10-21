@@ -20,6 +20,14 @@ def base_link_velocity(model,data,base,out):
     return out
 
 
+def assert_physics_step(data,previous_time,timestep):
+    if abs(float(data.time)-previous_time-timestep)>1e-8:
+        raise FloatingPointError('MuJoCo time discontinuity: possible internal physics reset')
+    warnings=(mujoco.mjtWarning.mjWARN_BADQPOS,mujoco.mjtWarning.mjWARN_BADQVEL,mujoco.mjtWarning.mjWARN_BADQACC)
+    if any(data.warning[int(w)].number for w in warnings):
+        raise FloatingPointError('MuJoCo reported invalid position, velocity or acceleration')
+
+
 def motor_torque(target,q,dq,effort,velocity_limit,motor_model='ideal_pd'):
     raw=40*(target-q)-dq
     if motor_model=='ideal_pd':return np.clip(raw,-effort,effort)
@@ -38,10 +46,11 @@ def main():
     p.add_argument('--motion',type=Path)
     p.add_argument('--seconds',type=float,default=6.)
     p.add_argument('--physics-hz',type=int,choices=[200,500,1000,2000],default=200)
+    p.add_argument('--joint-limit-time-constant',type=float,help='Explicit joint-stop compliance diagnostic; >=2 physics steps')
     p.add_argument('--seed',type=int,default=1000)
     p.add_argument('--command',type=float,nargs=3,default=[.2,0.,0.])
     p.add_argument('--video',action='store_true')
-    p.add_argument('--initialization',choices=['settled','reference_state'],default='settled',
+    p.add_argument('--initialization',choices=['settled','reference_state','standing_reset'],default='settled',
         help='reference_state is an explicit training-reset parity diagnostic, not standing-start acceptance')
     p.add_argument('--output',required=True,type=Path)
     args=p.parse_args()
@@ -55,6 +64,10 @@ def main():
     actor=torch.jit.load(str(args.policy),map_location='cpu').eval()
     model=mujoco.MjModel.from_xml_path(str(args.backflip_source/'mujoco/go2/go2_isaac.xml'))
     model.opt.timestep=1./args.physics_hz
+    if args.joint_limit_time_constant is not None:
+        if not np.isfinite(args.joint_limit_time_constant) or not 2/args.physics_hz<=args.joint_limit_time_constant<=.1:
+            raise ValueError('Joint limit time constant must be between two physics steps and 0.1 seconds')
+        model.jnt_solref[1:,0]=args.joint_limit_time_constant
     data=mujoco.MjData(model)
     names=meta['joint_names']
     jids=np.array([model.joint(n).id for n in names])
@@ -86,6 +99,7 @@ def main():
     rng=np.random.default_rng(args.seed)
     # Small initial joint uncertainty, never an in-flight state reset.
     data.qpos[qids]+=rng.uniform(-.002,.002,12)
+    mujoco.mj_forward(model,data)
     target=data.qpos[qids].copy()
     if args.initialization=='reference_state':
         if reference is None:raise ValueError('reference_state initialization requires sideflip reference')
@@ -96,7 +110,9 @@ def main():
         mujoco.mj_forward(model,data)
     for _ in range(round(.5*args.physics_hz) if args.initialization=='settled' else 0):
         data.ctrl[aids]=motor_torque(target,data.qpos[qids],data.qvel[vids],effort,velocity_limits,meta.get('motor_model','ideal_pd'))
+        before_step=float(data.time)
         mujoco.mj_step(model,data)
+        assert_physics_step(data,before_step,model.opt.timestep)
     start=float(data.time)
     last=np.zeros(12,dtype=np.float32)
     trace=[]
@@ -151,7 +167,9 @@ def main():
             target=default+float(meta['action_scale'])*last
             for _ in range(args.physics_hz//50):
                 data.ctrl[aids]=motor_torque(target,data.qpos[qids],data.qvel[vids],effort,velocity_limits,meta.get('motor_model','ideal_pd'))
+                before_step=float(data.time)
                 mujoco.mj_step(model,data)
+                assert_physics_step(data,before_step,model.opt.timestep)
                 if not np.isfinite(data.qpos).all() or not np.isfinite(data.qvel).all():
                     raise FloatingPointError('Nonfinite MuJoCo state')
                 base_link_velocity(model,data,base,velocity_buffer)
@@ -208,7 +226,7 @@ def main():
     metrics.update(max_joint_speed_ratio=max_speed_ratio,max_joint_limit_excess_rad=max_limit_excess,
         unexpected_body_ground_contact=bad_floor_contact)
     (args.output/'trace.json').write_text(json.dumps(trace))
-    summary=dict(args=dict(kind=args.kind,seed=args.seed,initialization=args.initialization,physics_hz=args.physics_hz),backend='MuJoCo',successes=int(success),total=1,
+    summary=dict(args=dict(kind=args.kind,seed=args.seed,initialization=args.initialization,physics_hz=args.physics_hz,joint_limit_time_constant=args.joint_limit_time_constant),backend='MuJoCo',successes=int(success),total=1,
         evaluator_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         episodes=[dict(success=success,**metrics)],metrics=metrics,policy_sha256=meta['policy_sha256'],
         root_state_writes='initialization only; no root stabilization/weld/teleport during evaluation',hardware_connected=False,

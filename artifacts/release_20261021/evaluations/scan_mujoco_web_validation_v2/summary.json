@@ -1,0 +1,81 @@
+{
+  "backend": "MuJoCo / RoboGauge MoE / native SCAN ROS2",
+  "scope": "Two fixed scenes and goals; integration checks, not independent-seed robustness",
+  "episodes": [
+    {
+      "scene": "empty",
+      "requested_goal": [
+        2.0,
+        0.0
+      ],
+      "phase": "ARRIVED",
+      "distance": 0.3771700557215125,
+      "collision": false,
+      "fallen": false,
+      "scan": {
+        "session": "6f8a16662e0a4552986a4c2c8c438262",
+        "command": [
+          0.4950865130791396,
+          0.0039533632204756,
+          0.0309687080065559
+        ],
+        "command_age": 0.001529789064079523,
+        "plans": 3,
+        "commands": 589,
+        "source_commit": "d0b921c9b05a6d291d144d60882b2e0e88d2c0e0",
+        "ready": true,
+        "sensor_points": 231,
+        "goal_published": true,
+        "goal_attempts": 1,
+        "goal_subscribers": 1,
+        "goal_acknowledged": true
+      },
+      "samples": 31,
+      "success": true,
+      "hardware_enabled": false
+    },
+    {
+      "scene": "slalom",
+      "requested_goal": [
+        6.0,
+        1.6
+      ],
+      "phase": "ARRIVED",
+      "distance": 0.371456268147866,
+      "collision": false,
+      "fallen": false,
+      "scan": {
+        "session": "acffe0b0ba4b45b2aea5ab7b1533aaaa",
+        "command": [
+          0.6041589506462474,
+          0.0133844852303578,
+          0.040631467722814577
+        ],
+        "command_age": 0.0019317460246384144,
+        "plans": 10,
+        "commands": 1450,
+        "source_commit": "d0b921c9b05a6d291d144d60882b2e0e88d2c0e0",
+        "ready": true,
+        "sensor_points": 382,
+        "goal_published": true,
+        "goal_attempts": 1,
+        "goal_subscribers": 1,
+        "goal_acknowledged": true
+      },
+      "samples": 73,
+      "success": true,
+      "hardware_enabled": false
+    }
+  ],
+  "successes": 2,
+  "total": 2,
+  "hardware_enabled": false,
+  "source_sha256": {
+    "skills/navigation/scan_ros.py": "c70b55534f4e42f43915f5b40dec964ee3fe543c09ce951439097a129b85ae39",
+    "skills/navigation/scan_client.py": "1c896ce5493555d378160563df4d0b807652a9eb81d0763e21ddc6035408df48",
+    "skills/navigation/live.py": "db2a972088ae5f3a0b478230932b4685bf5b02c4bf70ad9340f21051d7d1d38d",
+    "go2_nav/env.py": "d95aa248c5c21710125c72d40984e6e3c1bdde3a365e61b87777aa41a97e5c23",
+    "skills/navigation/config.json": "de4baacb70595e90e690e586d025f0086538d5eb54d92580ca8ead9904eb7568",
+    "vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt": "2206659a6a23886446dcfc05d86888d6cdc9b8a4e31f44cbbc4e2d17ba3d6ead"
+  }
+}

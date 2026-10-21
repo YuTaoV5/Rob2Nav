@@ -12,6 +12,7 @@ mkdir -p ~/src
 cd ~/src
 git clone https://github.com/unitreerobotics/unitree_sdk2_python.git
 cd unitree_sdk2_python
+git checkout --detach 814556d15970dd2ecf1c9984e845ca02ab07e206
 git rev-parse HEAD > ../sdk2-reviewed-commit.txt
 python -m pip install -e .
 ip addr
@@ -30,3 +31,5 @@ Implement this exact chain locally on the robot computer:
 Deployment stages: read-only state recording -> offline inference parity -> suspended joint-order/sign checks -> flat-ground low-speed standing/walking -> one small terrain element -> fixed-layout repetitions -> sensor/connection fault injection. This task stops at the plan; it does not execute these hardware stages. Save model, SDK and calibration hashes, time-aligned states/targets, constraint violations and videos. A reliable terrain crossing needs independent real-world validation after the missing adapters are built.
 
 Official SDK source: [Unitree SDK2 Python](https://github.com/unitreerobotics/unitree_sdk2_python). [Training](TRAINING.md) / [simulation](SIMULATION.md).
+
+本次方案的官方SDK源码固定为 `814556d15970dd2ecf1c9984e845ca02ab07e206`；仅作源码核对，未安装SDK、未打开DDS、未连接机器人。实机型号/固件兼容性仍按各技能方案在后续实施时审查。

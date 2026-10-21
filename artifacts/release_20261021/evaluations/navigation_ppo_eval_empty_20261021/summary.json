@@ -1,0 +1,119 @@
+{
+  "arguments": {
+    "config": "outputs/navigation_ppo_full_20261021/navigation_config.json",
+    "checkpoint": "outputs/navigation_ppo_full_20261021/navigation.zip",
+    "scene": "empty",
+    "goal": [
+      2.0,
+      0.5
+    ],
+    "episodes": 4,
+    "seed": 1300,
+    "output": "outputs/navigation_ppo_eval_empty_20261021"
+  },
+  "backend": "MuJoCo",
+  "planner": "PPO",
+  "episodes": [
+    {
+      "episode": 0,
+      "seed": 1300,
+      "reached": true,
+      "stable_stop": true,
+      "success": true,
+      "distance": 0.31409531593896034,
+      "collision": false,
+      "fallen": false,
+      "seconds": 21.09999999999863,
+      "terminal_speed_m_s": 0.001950085076350349
+    },
+    {
+      "episode": 1,
+      "seed": 1301,
+      "reached": true,
+      "stable_stop": true,
+      "success": true,
+      "distance": 0.34811172757675674,
+      "collision": false,
+      "fallen": false,
+      "seconds": 19.99999999999924,
+      "terminal_speed_m_s": 0.012690025556042024
+    },
+    {
+      "episode": 2,
+      "seed": 1302,
+      "reached": true,
+      "stable_stop": true,
+      "success": true,
+      "distance": 0.3225163190924774,
+      "collision": false,
+      "fallen": false,
+      "seconds": 20.19999999999913,
+      "terminal_speed_m_s": 0.0026525398407484736
+    },
+    {
+      "episode": 3,
+      "seed": 1303,
+      "reached": true,
+      "stable_stop": true,
+      "success": true,
+      "distance": 0.3330705732393046,
+      "collision": false,
+      "fallen": false,
+      "seconds": 21.49999999999841,
+      "terminal_speed_m_s": 0.0011032157452055505
+    }
+  ],
+  "successes": 4,
+  "total": 4,
+  "config": {
+    "control_dt": 0.02,
+    "depth_height": 24,
+    "depth_horizontal_fov_degrees": 87,
+    "depth_noise_std": 0.01,
+    "depth_pitch_degrees": 0,
+    "depth_position": [
+      0.31,
+      0.0,
+      0.06
+    ],
+    "depth_vertical_fov_degrees": 58,
+    "depth_width": 32,
+    "goal_tolerance": 0.4,
+    "lidar_azimuth_samples": 120,
+    "lidar_elevation_degrees": [
+      -7,
+      0,
+      7,
+      14,
+      21,
+      28,
+      35,
+      42,
+      49
+    ],
+    "lidar_noise_std": 0.01,
+    "lidar_position": [
+      0.0,
+      0.0,
+      0.18
+    ],
+    "locomotion": "moe",
+    "max_range": 8.0,
+    "max_seconds": 75,
+    "max_vx": 0.65,
+    "max_vy": 0.25,
+    "max_wz": 1.2,
+    "navigation_dt": 0.1,
+    "physics_dt": 0.002,
+    "robot_radius": 0.34,
+    "sensor_dropout": 0.005,
+    "sensor_payload_kg": 0.0,
+    "settle_seconds": 1.0,
+    "goal": [
+      2.0,
+      0.5
+    ]
+  },
+  "hardware_connected": false,
+  "success_definition": "Within goal tolerance, then 2s zero command; no collision/fall, final distance < tolerance+.15m and horizontal speed < .20m/s"
+}

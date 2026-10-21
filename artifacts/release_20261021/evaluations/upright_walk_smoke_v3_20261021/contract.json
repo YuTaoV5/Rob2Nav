@@ -1,0 +1,57 @@
+{
+  "robot": "Go2",
+  "asset_commit": "954aa61ceb62c515689677f44a21e32109f6b62d",
+  "runner_source_commit": "4960b84732b0c2ec593dccbfe963fda1bcd7b1e3",
+  "role": "real PhysX PPO training, no root stabilization force",
+  "reset_distribution": "50% four feet, 50% balanced upright; skill validation must start on four feet",
+  "command_frame": "horizontal forward is projected negative body Z when upright",
+  "target_projected_gravity": [
+    -1,
+    0,
+    0
+  ],
+  "actor_observations": 48,
+  "action_dim": 12,
+  "joint_names": [
+    "FL_hip_joint",
+    "FR_hip_joint",
+    "RL_hip_joint",
+    "RR_hip_joint",
+    "FL_thigh_joint",
+    "FR_thigh_joint",
+    "RL_thigh_joint",
+    "RR_thigh_joint",
+    "FL_calf_joint",
+    "FR_calf_joint",
+    "RL_calf_joint",
+    "RR_calf_joint"
+  ],
+  "default_joint_pos": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.800000011920929,
+    0.800000011920929,
+    1.0,
+    1.0,
+    -1.5,
+    -1.5,
+    -1.5,
+    -1.5
+  ],
+  "action_scale": 0.5,
+  "kp": 40,
+  "kd": 1,
+  "policy_hz": 50,
+  "physics_hz": 200,
+  "seed": 44,
+  "num_envs": 32,
+  "requested_iterations": 2,
+  "source_sha256": {
+    "__init__.py": "c215378ac6bb1df62937e0b421c09fbb8fc5138026cfad8ddf1bada34ea7d803",
+    "task.py": "8fda603ea118daf324c98b8119224568f6a9bb4a867281d9fa15eae7ab885b72",
+    "train.py": "1321eb51a76b037a52f4d78758c98a5f273de0c651b66abe11c1cb290ff95686"
+  },
+  "hardware_connected": false
+}

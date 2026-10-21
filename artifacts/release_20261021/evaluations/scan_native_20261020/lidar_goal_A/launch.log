@@ -1,0 +1,578 @@
+[INFO] [launch]: All log files can be found below /root/.ros/log/2026-10-20-23-10-37-725994-gpufree-container-30960
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [scan_planner_node-1]: process started with pid [30966]
+[INFO] [robot_state_publisher-2]: process started with pid [30967]
+[INFO] [closed_loop_controller-3]: process started with pid [30968]
+[INFO] [go2_kinematic_sim-4]: process started with pid [30969]
+[INFO] [go2_gait_publisher-5]: process started with pid [30970]
+[INFO] [mockamap_node-6]: process started with pid [30971]
+[INFO] [pcl_render_node-7]: process started with pid [30972]
+[INFO] [odom_visualization-8]: process started with pid [30973]
+[closed_loop_controller-3] [INFO] [1792509037.969747818] [closed_loop_controller]: Closed-loop controller ready
+[go2_kinematic_sim-4] [INFO] [1792509037.971619601] [go2_kinematic_sim]: Go2 kinematic simulator ready
+[robot_state_publisher-2] [INFO] [1792509037.973766466] [go2_robot_state_publisher]: Robot initialized
+[mockamap_node-6] [INFO] [1792509038.001137503] [mockamap_node]: finish: infill 0.137303%
+[scan_planner_node-1] hit: 1.7346
+[scan_planner_node-1] miss: -0.847298
+[scan_planner_node-1] min log: -1.99243
+[scan_planner_node-1] max: 3.89182
+[scan_planner_node-1] thresh log: 1.38629
+[pcl_render_node-7] [INFO] [1792509038.098325198] [pcl_render_node]: pcl_render_node sensor_type: lidar
+[pcl_render_node-7] [INFO] [1792509038.098637040] [pcl_render_node]: drone_drawpoints_num = 0,0,0, Uav points num = 0
+[scan_planner_node-1] [INFO] [1792509038.171927087] [scan_planner_node]: Set RViz goal height from initial body_pose z: 0.300
+[pcl_render_node-7] [INFO] [1792509038.397736543] [pcl_render_node]: Global point cloud received
+[scan_planner_node-1] [FSM]: state: INIT
+[scan_planner_node-1] wait for goal.
+[pcl_render_node-7] [INFO] [1792509039.425847687] [pcl_render_node]: Normal computation finished; map size=223015
+[pcl_render_node-7] [INFO] [1792509039.432770904] [pcl_render_node]: map bounds=(-20.317698 -19.843794 0.000000) (20.178617 20.098776 2.000000)
+[scan_planner_node-1] [FSM]: state: INIT
+[scan_planner_node-1] wait for goal.
+[scan_planner_node-1] [FSM]: state: INIT
+[scan_planner_node-1] wait for goal.
+[scan_planner_node-1] [FSM]: state: INIT
+[scan_planner_node-1] wait for goal.
+[scan_planner_node-1] [FSM]: state: INIT
+[scan_planner_node-1] wait for goal.
+[scan_planner_node-1] [FSM]: state: INIT
+[scan_planner_node-1] wait for goal.
+[pcl_render_node-7] [WARN] [1792509044.800020215] [pcl_render_node]: New subscription discovered on topic '/quad_0/cloud', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[scan_planner_node-1] [WARN] [1792509044.801103593] [scan_planner_node]: New subscription discovered on topic '/grid_map/occupancy', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[scan_planner_node-1] [WARN] [1792509044.804187240] [scan_planner_node]: New subscription discovered on topic '/grid_map/occupancy_inflate', requesting incompatible QoS. No messages will be sent to it. Last incompatible policy: RELIABILITY_QOS_POLICY
+[scan_planner_node-1] [FSM]: state: INIT
+[scan_planner_node-1] wait for goal.
+[scan_planner_node-1] Triggered!
+[scan_planner_node-1] [FSM]: from INIT to WAIT_TARGET
+[scan_planner_node-1] [FSM]: from WAIT_TARGET to GEN_NEW_TRAJ
+[scan_planner_node-1] [WARN] [1792509049.769636654] [scan_planner_node]: Local target was adjusted to a nearby collision-free point
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------0
+[scan_planner_node-1] start: -19   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-14.2     1   0.3, 0.65    0    0
+[scan_planner_node-1] iter=13,time(ms)=56,rebound.
+[scan_planner_node-1] [32miter(+1)=15,time(ms)=0.072,total_t(ms)=56.381,cost=0.092
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] total time:[42m0.057[0m,optimize:0.057,refine:4e-05
+[scan_planner_node-1] final_plan_success=1
+[scan_planner_node-1] [FSM]: from GEN_NEW_TRAJ to EXEC_TRAJ
+[closed_loop_controller-3] [INFO] [1792509049.826931212] [closed_loop_controller]: Received trajectory 1, duration 7.680s
+[scan_planner_node-1] [FSM]: from EXEC_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] [WARN] [1792509052.926908032] [scan_planner_node]: Local target was adjusted to a nearby collision-free point
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------1
+[scan_planner_node-1] start:   -18 0.798   0.3,    0.741   -0.494 5.13e-16
+[scan_planner_node-1] goal:-13.8  1.24   0.3,      0.58    0.0139 -8.82e-18
+[scan_planner_node-1] [32miter(+1)=1,time(ms)=0.010,total_t(ms)=0.010,cost=0.001
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] total time:[42m0.000166[0m,optimize:0.00013,refine:3.6e-05
+[scan_planner_node-1] final_plan_success=1
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to EXEC_TRAJ
+[closed_loop_controller-3] [INFO] [1792509052.927285922] [closed_loop_controller]: Received trajectory 2, duration 7.040s
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------2
+[scan_planner_node-1] start: -17.5 0.474   0.3,     0.747    -0.408 -7.87e-17
+[scan_planner_node-1] goal:  -13 0.994   0.3,    0.531   0.0209 1.06e-15
+[scan_planner_node-1] [32miter(+1)=1,time(ms)=0.012,total_t(ms)=0.012,cost=0.000
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] total time:[42m0.000295[0m,optimize:0.000206,refine:8.9e-05
+[scan_planner_node-1] final_plan_success=1
+[closed_loop_controller-3] [INFO] [1792509053.742330702] [closed_loop_controller]: Received trajectory 3, duration 7.360s
+[scan_planner_node-1] [SAFETY]: from EXEC_TRAJ to EXEC_TRAJ
+[scan_planner_node-1] [WARN] [1792509054.395067511] [scan_planner_node]: Local target was adjusted to a nearby collision-free point
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------3
+[scan_planner_node-1] start:   -17 0.266   0.3,     0.715    -0.252 -3.73e-15
+[scan_planner_node-1] goal:-12.6 0.945   0.3, 0 0 0
+[scan_planner_node-1] [32miter(+1)=1,time(ms)=0.008,total_t(ms)=0.008,cost=0.079
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] total time:[42m0.000165[0m,optimize:0.000127,refine:3.85e-05
+[scan_planner_node-1] final_plan_success=1
+[scan_planner_node-1] [SAFETY]: from EXEC_TRAJ to EXEC_TRAJ
+[closed_loop_controller-3] [INFO] [1792509054.395455146] [closed_loop_controller]: Received trajectory 4, duration 7.360s
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------4
+[scan_planner_node-1] start: -16.2 0.122   0.3,     0.761  -0.00638 -1.76e-15
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] [ERROR] [1792509055.548914474] [bspline_opt]: A-star failed; aborting optimization
+[scan_planner_node-1] [ERROR] [1792509055.554611722] [bspline_opt]: A-star failed; aborting optimization
+[scan_planner_node-1] [ERROR] [1792509055.559109819] [bspline_opt]: A-star failed; aborting optimization
+[scan_planner_node-1] [ERROR] [1792509055.563528830] [bspline_opt]: A-star failed; aborting optimization
+[scan_planner_node-1] [32miter(+1)=1,time(ms)=0.010,keep optimizing
+[scan_planner_node-1] [0m[32miter(+1)=1,time(ms)=0.010,keep optimizing
+[scan_planner_node-1] [0m[32miter(+1)=1,time(ms)=0.007,keep optimizing
+[scan_planner_node-1] [0mfirst_optimize_step_success=0
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------5
+[scan_planner_node-1] start: -16.2 0.122   0.3,     0.761  -0.00638 -1.76e-15
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] [32miter(+1)=9,time(ms)=0.030,total_t(ms)=0.030,cost=0.021
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] total time:[42m0.000247[0m,optimize:0.000211,refine:3.59e-05
+[scan_planner_node-1] final_plan_success=1
+[scan_planner_node-1] [SAFETY]: from EXEC_TRAJ to EXEC_TRAJ
+[closed_loop_controller-3] [INFO] [1792509055.563944553] [closed_loop_controller]: Received trajectory 5, duration 7.040s
+[scan_planner_node-1] [FSM]: state: EXEC_TRAJ
+[scan_planner_node-1] [FSM]: from EXEC_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------6
+[scan_planner_node-1] start: -15.2 0.193   0.3,    0.502   0.0485 6.23e-11
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] [32miter(+1)=3,time(ms)=0.014,total_t(ms)=0.014,cost=0.019
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] total time:[42m0.000133[0m,optimize:0.000102,refine:3.06e-05
+[scan_planner_node-1] final_plan_success=1
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to EXEC_TRAJ
+[closed_loop_controller-3] [INFO] [1792509057.181763964] [closed_loop_controller]: Received trajectory 6, duration 5.760s
+[scan_planner_node-1] [FSM]: from EXEC_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------7
+[scan_planner_node-1] start: -14.1 0.383   0.3,     0.772     0.195 -1.14e-12
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] [32miter(+1)=1,time(ms)=0.007,total_t(ms)=0.007,cost=0.011
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] total time:[42m9.48e-05[0m,optimize:7.16e-05,refine:2.32e-05
+[scan_planner_node-1] final_plan_success=1
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to EXEC_TRAJ
+[closed_loop_controller-3] [INFO] [1792509059.034409325] [closed_loop_controller]: Received trajectory 7, duration 4.160s
+[scan_planner_node-1] [FSM]: from EXEC_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------8
+[scan_planner_node-1] start: -13.1 0.654   0.3,    0.747    0.221 2.12e-14
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] [32miter(+1)=1,time(ms)=0.008,total_t(ms)=0.009,cost=0.001
+[scan_planner_node-1] [0mfirst_optimize_step_success=1
+[scan_planner_node-1] total time:[42m7.33e-05[0m,optimize:5.72e-05,refine:1.6e-05
+[scan_planner_node-1] final_plan_success=1
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to EXEC_TRAJ
+[closed_loop_controller-3] [INFO] [1792509060.371201934] [closed_loop_controller]: Received trajectory 8, duration 2.880s
+[scan_planner_node-1] [FSM]: from EXEC_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------9
+[scan_planner_node-1] start: -12.1 0.963   0.3,    0.268   0.0812 1.27e-15
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------10
+[scan_planner_node-1] start: -12.1 0.963   0.3,    0.268   0.0812 1.27e-15
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------11
+[scan_planner_node-1] start: -12.1 0.976   0.3,    0.207   0.0628 2.26e-15
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------12
+[scan_planner_node-1] start: -12.1 0.976   0.3,    0.207   0.0628 2.26e-15
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------13
+[scan_planner_node-1] start: -12.1 0.981   0.3,     0.18   0.0544 5.84e-17
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------14
+[scan_planner_node-1] start: -12.1 0.981   0.3,     0.18   0.0544 5.84e-17
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------15
+[scan_planner_node-1] start:   -12 0.988   0.3,     0.151    0.0457 -4.43e-15
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------16
+[scan_planner_node-1] start:   -12 0.988   0.3,     0.151    0.0457 -4.43e-15
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------17
+[scan_planner_node-1] start:   -12 0.992   0.3,     0.125    0.0379 -5.55e-15
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------18
+[scan_planner_node-1] start:   -12 0.992   0.3,     0.125    0.0379 -5.55e-15
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------19
+[scan_planner_node-1] start:   -12 0.996   0.3,  0.0722  0.0218 1.5e-15
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------20
+[scan_planner_node-1] start:   -12 0.996   0.3,  0.0722  0.0218 1.5e-15
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------21
+[scan_planner_node-1] start: -12   1 0.3,   0.0387   0.0117 6.95e-15
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------22
+[scan_planner_node-1] start: -12   1 0.3,   0.0387   0.0117 6.95e-15
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------23
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------24
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------25
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------26
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------27
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------28
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------29
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------30
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------31
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------32
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------33
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------34
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------35
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------36
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------37
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------38
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------39
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------40
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------41
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------42
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------43
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------44
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------45
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------46
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------47
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------48
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------49
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------50
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------51
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------52
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------53
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------54
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------55
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------56
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------57
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------58
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------59
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------60
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------61
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------62
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------63
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------64
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------65
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] 
+[scan_planner_node-1] [rebo replan]: -------------------------------------66
+[scan_planner_node-1] start: -12   1 0.3, 0 0 0
+[scan_planner_node-1] goal:-12   1 0.3, 0 0 0
+[scan_planner_node-1] Close to goal
+[scan_planner_node-1] final_plan_success=0
+[scan_planner_node-1] [FSM]: from REPLAN_TRAJ to REPLAN_TRAJ
+[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[INFO] [odom_visualization-8]: sending signal 'SIGINT' to process[odom_visualization-8]
+[INFO] [pcl_render_node-7]: sending signal 'SIGINT' to process[pcl_render_node-7]
+[INFO] [mockamap_node-6]: sending signal 'SIGINT' to process[mockamap_node-6]
+[INFO] [go2_gait_publisher-5]: sending signal 'SIGINT' to process[go2_gait_publisher-5]
+[INFO] [go2_kinematic_sim-4]: sending signal 'SIGINT' to process[go2_kinematic_sim-4]
+[INFO] [closed_loop_controller-3]: sending signal 'SIGINT' to process[closed_loop_controller-3]
+[INFO] [robot_state_publisher-2]: sending signal 'SIGINT' to process[robot_state_publisher-2]
+[INFO] [scan_planner_node-1]: sending signal 'SIGINT' to process[scan_planner_node-1]
+[go2_kinematic_sim-4] [INFO] [1792509063.956124535] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[mockamap_node-6] [INFO] [1792509063.956127994] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[closed_loop_controller-3] [INFO] [1792509063.956125684] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[robot_state_publisher-2] [INFO] [1792509063.956136837] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[go2_gait_publisher-5] [INFO] [1792509063.956128921] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ERROR] [go2_gait_publisher-5]: process has died [pid 30970, exit code -2, cmd '/root/gpufree-data/scan-reproduction/upstream/install/scan_planner/lib/scan_planner/go2_gait_publisher --ros-args -r __node:=go2_gait_publisher --params-file /root/gpufree-data/scan-reproduction/upstream/install/scan_planner/share/scan_planner/config/controllers.yaml --params-file /tmp/launch_params_dbvew2xn -r body_pose:=/quad_0/body_pose'].
+[odom_visualization-8] [INFO] [1792509063.956125533] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[pcl_render_node-7] [INFO] [1792509063.956143120] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[scan_planner_node-1] [INFO] [1792509063.956145201] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ERROR] [closed_loop_controller-3]: process has died [pid 30968, exit code -2, cmd '/root/gpufree-data/scan-reproduction/upstream/install/scan_planner/lib/scan_planner/closed_loop_controller --ros-args -r __node:=closed_loop_controller --params-file /root/gpufree-data/scan-reproduction/upstream/install/scan_planner/share/scan_planner/config/controllers.yaml --params-file /tmp/launch_params_eydw7z6e -r body_pose:=/quad_0/body_pose -r cmd_vel:=/quad_0/cmd_vel'].
+[scan_planner_node-1] des manager
+[odom_visualization-8] [INFO] [1792509063.959853711] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[pcl_render_node-7] [INFO] [1792509063.960548012] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[mockamap_node-6] [INFO] [1792509063.961587459] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[ERROR] [robot_state_publisher-2]: process has died [pid 30967, exit code -2, cmd '/opt/ros/jazzy/lib/robot_state_publisher/robot_state_publisher --ros-args -r __node:=go2_robot_state_publisher --params-file /tmp/launch_params_bf1we03t --params-file /tmp/launch_params_p0yjjxdv'].
+[go2_kinematic_sim-4] [INFO] [1792509063.962621521] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[scan_planner_node-1] [INFO] [1792509063.963593736] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [odom_visualization-8]: process has finished cleanly [pid 30973]
+[INFO] [mockamap_node-6]: process has finished cleanly [pid 30971]
+[INFO] [go2_kinematic_sim-4]: process has finished cleanly [pid 30969]
+[pcl_render_node-7] Failed to delete datawriter, at ./src/publisher.cpp:45 during '__function__'
+[pcl_render_node-7] [ERROR] [1792509064.135060350] [pcl_render_node.rclcpp]: Error in destruction of rcl publisher handle: cannot publish data, at ./src/rmw_publish.cpp:66, at ./src/rcl/publisher.c:201
+[pcl_render_node-7] cannot publish data, at ./src/rmw_publish.cpp:66 during '__function__'
+[pcl_render_node-7] [ERROR] [1792509064.135186824] [pcl_render_node.rclcpp]: Error in destruction of rcl subscription handle: Failed to delete datareader, at ./src/subscription.cpp:52, at ./src/rcl/subscription.c:200
+[pcl_render_node-7] cannot publish data, at ./src/rmw_publish.cpp:66 during '__function__'
+[pcl_render_node-7] [ERROR] [1792509064.135198109] [pcl_render_node.rclcpp]: Error in destruction of rcl subscription handle: Failed to delete datareader, at ./src/subscription.cpp:52, at ./src/rcl/subscription.c:200
+[pcl_render_node-7] Failed to delete datawriter, at ./src/publisher.cpp:45 during '__function__'
+[pcl_render_node-7] [ERROR] [1792509064.135211251] [pcl_render_node.rclcpp]: Error in destruction of rcl publisher handle: cannot publish data, at ./src/rmw_publish.cpp:66, at ./src/rcl/publisher.c:201
+[pcl_render_node-7] Failed to delete datawriter, at ./src/publisher.cpp:45 during '__function__'
+[pcl_render_node-7] [ERROR] [1792509064.135225896] [pcl_render_node.rclcpp]: Error in destruction of rcl publisher handle: cannot publish data, at ./src/rmw_publish.cpp:66, at ./src/rcl/publisher.c:201
+[pcl_render_node-7] Failed to delete datawriter, at ./src/publisher.cpp:45 during '__function__'
+[pcl_render_node-7] [ERROR] [1792509064.135233430] [pcl_render_node.rclcpp]: Error in destruction of rcl publisher handle: cannot publish data, at ./src/rmw_publish.cpp:66, at ./src/rcl/publisher.c:201
+[pcl_render_node-7] Failed to delete datawriter, at ./src/publisher.cpp:45 during '__function__'
+[pcl_render_node-7] [ERROR] [1792509064.135239700] [pcl_render_node.rclcpp]: Error in destruction of rcl publisher handle: cannot publish data, at ./src/rmw_publish.cpp:66, at ./src/rcl/publisher.c:201
+[pcl_render_node-7] Failed to delete datawriter, at ./src/publisher.cpp:45 during '__function__'
+[pcl_render_node-7] [ERROR] [1792509064.135246145] [pcl_render_node.rclcpp]: Error in destruction of rcl publisher handle: cannot publish data, at ./src/rmw_publish.cpp:66, at ./src/rcl/publisher.c:201
+[pcl_render_node-7] Failed to delete datawriter, at ./src/publisher.cpp:45 during '__function__'
+[pcl_render_node-7] [ERROR] [1792509064.135256562] [pcl_render_node.rclcpp]: Error in destruction of rcl publisher handle: cannot publish data, at ./src/rmw_publish.cpp:66, at ./src/rcl/publisher.c:201
+[pcl_render_node-7] cannot publish data, at ./src/rmw_publish.cpp:66 during '__function__'
+[pcl_render_node-7] [ERROR] [1792509064.135732467] [pcl_render_node.rclcpp]: Error in destruction of rcl subscription handle: Failed to delete datareader, at ./src/subscription.cpp:52, at ./src/rcl/subscription.c:200
+[pcl_render_node-7] cannot publish data, at ./src/rmw_publish.cpp:66 during '__function__'
+[pcl_render_node-7] Fail in delete datareader, at ./src/rmw_service.cpp:89 during '__function__'
+[INFO] [scan_planner_node-1]: process has finished cleanly [pid 30966]
+[ERROR] [pcl_render_node-7]: process has died [pid 30972, exit code -11, cmd '/root/gpufree-data/scan-reproduction/upstream/install/local_sensing_node/lib/local_sensing_node/pcl_render_node --ros-args -r __node:=pcl_render_node --params-file /root/gpufree-data/scan-reproduction/upstream/install/scan_planner/share/scan_planner/config/simulator.yaml --params-file /tmp/launch_params_atv0h3f0 -r global_map:=/map_generator/global_cloud -r body_pose:=/quad_0/body_pose -r cloud:=/quad_0/cloud -r sensor_cloud:=/quad_0/sensor_cloud -r depth:=/quad_0/depth -r dyn_cloud:=/quad_0/dyn_cloud -r uav_cloud:=/quad_0/uav_cloud'].

@@ -14,6 +14,7 @@ mkdir -p ~/src
 cd ~/src
 git clone https://github.com/unitreerobotics/unitree_sdk2_python.git
 cd unitree_sdk2_python
+git checkout --detach 814556d15970dd2ecf1c9984e845ca02ab07e206
 git rev-parse HEAD > ../sdk2-reviewed-commit.txt
 python -m pip install -e .
 ip addr
@@ -27,6 +28,8 @@ ip addr
 4. 保持同一MoE底层的路线需要另实现SDK2 LowState→与上游完全一致的5×45历史观测→MoE关节目标→500Hz有界PD/力矩LowCmd。固定关节映射、IMU四元数顺序、动作缩放、默认姿态、PD、推理延迟、CRC、状态时效与单写入仲裁。低层不能同时运行SportClient运动服务。不得把导航头的3维速度直接当12维电机目标。
 5. 实机本地看门狗独立检查状态与速度指令超时、倾斜、电源、温度、足端接触异常和求解/推理数值。网页2.5秒超时仅用于演示，不直接用于实机。机器人端应按实际控制周期与制动能力设更短指令寿命并测试停止距离；失效时进入经过验证的站立/阻尼保护，避免简单断电失撑。
 
-官方SDK参考：[高层速度与停止示例](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/example/go2/high_level/go2_sport_client.py)、[低层站立/CRC示例](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/example/go2/low_level/go2_stand_example.py)。不要直接运行示例里的翻转等菜单动作来替代本项目策略验证。
+官方SDK参考：[高层速度与停止示例](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/unitree_sdk2py/go2/sport/sport_client.py)、[低层站立/CRC示例](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/example/go2/low_level/go2_stand_example.py)。不要直接运行示例里的翻转等菜单动作来替代本项目策略验证。
 
 接机顺序：只读状态录制与离线回放→悬吊关节/符号校验（低层路线）→无导航速度跟踪和停止→空旷低速定点→固定软障碍绕行→遮挡/里程计漂移/网络断流测试。保存模型/SDK/标定哈希、目标与速度时序、低层状态和同步视频。验收至少检查到达误差、碰撞/跌倒、停止距离、状态年龄和本地急停接管。实机方案仍需驱动与传感适配开发；本次只交付方案及仿真证据。
+
+本次方案的官方SDK源码固定为 `814556d15970dd2ecf1c9984e845ca02ab07e206`；仅作源码核对，未安装SDK、未打开DDS、未连接机器人。实机型号/固件兼容性仍按各技能方案在后续实施时审查。

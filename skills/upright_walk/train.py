@@ -12,8 +12,12 @@ p.add_argument('--iterations', type=int, default=5000)
 p.add_argument('--seed', type=int, default=44)
 p.add_argument('--resume', type=Path)
 p.add_argument('--transfer-motors',action='store_true')
+p.add_argument('--stepping-gait',action='store_true')
+p.add_argument('--reset-std',type=float)
 AppLauncher.add_app_launcher_args(p)
 args = p.parse_args()
+if args.stepping_gait and not args.transfer_motors:p.error('--stepping-gait requires --transfer-motors')
+if args.reset_std is not None and not .01<=args.reset_std<=1.:p.error('--reset-std must be in [0.01,1]')
 args.kit_args = (args.kit_args+' --enable isaacsim.asset.importer.urdf').strip()
 app = AppLauncher(args).app
 
@@ -34,10 +38,14 @@ def main():
         from skills.sideflip.common import enable_transfer_motors
         enable_transfer_motors(cfg,source)
         cfg.commands.base_velocity.debug_vis=False
+    if args.stepping_gait:
+        from .task import enable_stepping_rewards
+        enable_stepping_rewards(cfg)
     agent = BasePPORunnerCfg()
     agent.seed,agent.device = args.seed,cfg.sim.device
     agent.max_iterations,agent.save_interval = args.iterations,100
     agent.experiment_name = 'rob2nav_go2_upright_walk'
+    if args.reset_std is not None:agent.policy.init_noise_std=args.reset_std
     args.output.mkdir(parents=True,exist_ok=False)
     dump_yaml(str(args.output/'env.yaml'),cfg)
     dump_yaml(str(args.output/'agent.yaml'),agent)
@@ -53,6 +61,7 @@ def main():
             joint_names=env.scene['robot'].joint_names,default_joint_pos=env.scene['robot'].data.default_joint_pos[0].tolist(),
             action_scale=.5,kp=40,kd=1,policy_hz=round(1/(cfg.sim.dt*cfg.decimation)),physics_hz=round(1/cfg.sim.dt),
             motor_model='dc_linear_v1' if args.transfer_motors else 'ideal_pd',seed=args.seed,
+            reward_version='stepping_v1' if args.stepping_gait else 'upright_velocity_v1',reset_std=args.reset_std,
             num_envs=args.num_envs,requested_iterations=args.iterations,
             source_sha256={f.name:sha(f) for f in Path(__file__).parent.glob('*.py')},
             shared_asset_source_sha256=sha(Path(__file__).parents[1]/'sideflip'/'common.py'),hardware_connected=False))
@@ -61,6 +70,14 @@ def main():
         runner = OnPolicyRunner(wrapped,runner_cfg,log_dir=str(args.output),device=cfg.sim.device)
         if args.resume:
             runner.load(str(args.resume))
+        if args.reset_std is not None:
+            import math
+            parameters=dict(runner.alg.policy.named_parameters())
+            key='log_std' if 'log_std' in parameters else 'std'
+            if key not in parameters:raise RuntimeError('Unsupported policy noise parameter')
+            value=math.log(args.reset_std) if key=='log_std' else args.reset_std
+            with torch.no_grad():parameters[key].fill_(value)
+            runner.alg.optimizer.state.pop(parameters[key],None)
         runner.learn(num_learning_iterations=args.iterations,init_at_random_ep_len=False)
         write_json(args.output/'completion.json',dict(execution_complete=True,requested_iterations=args.iterations,
             capability_verified=False,hardware_connected=False))

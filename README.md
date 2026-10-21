@@ -1,5 +1,8 @@
 # Rob2Nav
 
+> 2026-10-21发布快照：[最新handover](handover.md) · [全部新增权重与实验资源](artifacts/release_20261021/README.md) · [统一Go2部署框架（验证中）](docs/UNIFIED_GO2_DEPLOYMENT.md)。所有实机资格仍关闭，成功与失败证据均保留。
+
+
 面向宇树 Go2 本体的训练、仿真和研究工作台。网页提供实时 MuJoCo 目标点导航、虚拟手握爪演示、能力证据与逐条命令手册。实机部分仅提供 SDK2 部署方案，本项目尚未进行实机验证。
 
 当前保留七项独立能力。训练完成与仿真验收分开记录，失败结果也可复现；最新状态见[复现交付进度](docs/CAPABILITY_REPRODUCTION_STATUS.md)和[能力审计](docs/WORKBENCH_CAPABILITY_AUDIT.md)。
@@ -18,7 +21,7 @@
 
 网页导航采用持续 MuJoCo 动力学，点击目标点后由导航策略驱动底层运动策略。当前默认 PPO 头完成 100352 步训练，在两种固定布局的 8 个独立回合通过到达与落稳检查，另通过网页两目标及断线停止检查；这不代表任意场景可靠性，也不是 SCAN/SEA 原生策略。模型与原始评估在 skills/navigation。
 
-三项特技的首轮 5000 轮训练均已完成。后空翻最终模型能在 MuJoCo 翻转落稳，但关节约束失败；侧空翻原引擎完成翻转但有一次大腿接触，MuJoCo迁移失败；站立行走原引擎能够从四足起立并前进，MuJoCo迁移仍失败。当前正在进行显式电机模型的迁移对照，不将这些任务标为完整通过。
+三项特技的首轮 5000 轮训练均已完成。后空翻最终模型能在 MuJoCo 翻转落稳，但关节约束失败；侧空翻经显式电机适配后，固定5200检查点MuJoCo八个新种子动作8/8、无非足端接地/关节越限，但额定速度门限仍失败；站立行走原引擎能起立前移，但后足未真实换步，存在滑移，MuJoCo迁移仍失败。当前正在进行显式电机模型的迁移对照，不将这些任务标为完整通过。
 
 虚拟手握爪位于网页独立演示页：拖拽虚拟手、选择左/右爪并开始，使用真实 MuJoCo 接触控制；[控制器、验证和实机方案](go2_nav/paw_contact/DEPLOYMENT.md)与学习式特技分别记录。
 
@@ -308,3 +311,5 @@ V4在2000轮触发平台期停训，原尺寸窄桩六组在四次评估中均0/
 The Studio **能力与方案** page now connects reviewed projects, robot/observation contracts, training recipes, jobs, checkpoints and videos. See [integration and deployment notes](docs/UNIFIED_CAPABILITIES.md) and [source audits](docs/project_audits/). Source demonstrations and local unscored inference are clearly separate from independent capability validation. External trainers marked as pending are not connected merely because their recipe is listed.
 
 </details>
+
+实时交互更新：在线仿真可选择工作台技能并调整MuJoCo视角，导航页可切换PPO与原生SCAN。模型来源和已知失败见[实时技能手册](docs/LIVE_SKILL_SIMULATION.md)、[SCAN桥接手册](docs/SCAN_WEB_SIMULATION.md)。

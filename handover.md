@@ -1,3 +1,71 @@
+# 最新交接：2026-10-21（本节优先于下方历史记录）
+
+## 本次发布与网站
+
+用户要求启动网站、更新handover，并将现有代码、成果、特技选定权重、文档和数据上传到 https://github.com/YuTaoV5/Rob2Nav 。发布仓库为本目录；上层X:/Items/data_fusion不是该Git仓库。所有验证与权重按各自哈希记录，不把完成训练等同于技能或实机通过。
+
+网站访问： http://127.0.0.1:8766/#navigation 。本次发现服务器容器已重启，原网站、隧道及训练进程均不在；已通过部署脚本恢复5个Supervisor服务，并重建本地8766 SSH隧道。检查返回网站health=200/ok、导航READY、托爪WAIT。隧道凭据只在进程内存，不写入本仓库。
+
+```bash
+# 服务器恢复网站，不启动训练
+bash /root/gpufree-data/deployment/start-studio.sh
+supervisorctl -c /root/gpufree-data/deployment/rob2nav-supervisord.conf status
+# 本机交互式建立访问隧道（根据提示输入凭据）
+ssh -N -L 8766:127.0.0.1:8765 -p 30752 root@120.209.70.195
+```
+
+## 当前真实完成程度
+
+| 能力/功能 | 已执行结果 | 不能宣称的部分 |
+|---|---|---|
+| 网页技能部署 | 在线仿真下拉选择保留技能，实际MuJoCo实时渲染；6项启动和旋转/平移/缩放、完成后检查相机通过 | 启动成功不等于每个技能动作通过；地形入口用RoboGauge预训练MoE，不能冒称Isaac微调权重迁移 |
+| SCAN网页 | 固定ROS2 community提交原生规划/跟踪→真实MuJoCo点云、里程计与MoE；空旷/绕障2/2到达，无碰撞/跌倒；修复前1/2保留 | 两个固定布局不是广泛鲁棒性或实机验证；不是原生运动学模拟器冒充接触动力学 |
+| 左右爪托手 | 拖虚拟手，左右爪接触、撤手、停止、推扰；74项检查；新增相机交互 | 没有真实相机/手掌/机器人测试 |
+| 后空翻 | 自训5000轮，源MuJoCo完成翻转落稳；提供4999检查点及ONNX/PT | 严格落地与电机边界失败，没有完整验收合格的实机权重 |
+| 侧空翻 | 自训5000轮后DC适配，固定5200在独立种子3100–3107动作8/8 | 最高额定速度比1.08505，速度门限0/8；5998仅未验证候选 |
+| 站立行走 | 5000轮结束；PhysX起立前移，但后足无真实换步并伴滑移；MuJoCo失败 | 没有可称为最佳合格行走的模型；不能用位移代替迈步 |
+| 地形手册复跑 | stairs32/32；platform18/32；multiterrain flat31/32、stairs32/32、platform32/32 | 固定seed801与场景，不是全地形或全局最优 |
+| 统一Go2部署框架 | 契约、后台模型加载、切换状态机、统一PD/力矩输出、SDK编解码及门禁原型；8项核心检查、官方SDK消息/CRC离线通过 | 首轮MuJoCo中立获取超时，提交次数0；不宣称MLP/MoE热切换或实机通过；全部hardware_qualified=false |
+
+网页与手册：[实时技能](docs/LIVE_SKILL_SIMULATION.md)、[SCAN](docs/SCAN_WEB_SIMULATION.md)、[统一部署验证中方案](docs/UNIFIED_GO2_DEPLOYMENT.md)、[能力状态](docs/CAPABILITY_REPRODUCTION_STATUS.md)。研究报告页收录docs、skills及托爪手册；7能力各3份手册21个链接已实测。
+
+## 权重、日志、视频和数据
+
+新增完整归档：`artifacts/release_20261021/`。原始服务器快照597文件、265,722,077字节，缺失0、排除0；附加验证与索引均在该目录。不要把下载用的145MB ZIP重复提交；仓库保存已解开的普通Git资源，每个文件均小于95MiB，不依赖LFS。
+
+- 总索引：[README](artifacts/release_20261021/README.md)、[模型选择及SHA](artifacts/release_20261021/model_index.json)、[原始文件清单](artifacts/release_20261021/manifest.json)。
+- 后空翻：`weights/backflip/selected/model_4999.pt`、`exported/policy.onnx`及`policy.pt`。
+- 侧空翻选定：`weights/sideflip/selected/model_5200.pt`和`exported/policy.pt/.json`，策略SHA `7616e53e2c95434f824c2728621f8052e2d41a4e033fd00a25f316de211e07e1`。原5000与DC5998候选分目录。
+- 直立行走：`weights/upright_walk/representative_failed_baseline/`；DC5998候选与新增迈步奖励5700中断快照均单独保留，均未放行。
+- `weights/{stairs,platform,multiterrain}/manual_reproduction/model_199.pt`含各自配置、源清单、迭代日志。
+- `evaluations/`包含本次特技成功/失败诊断、8个侧翻holdout完整trace、导航、SCAN、地形、托爪和浏览器记录；`logs/`含5000轮与适配训练日志；`validation/`含SDK检查、核心检查和切换失败轨迹/视频。
+- 既有导航PPO在`skills/navigation/policy/navigation.zip`；RoboGauge本体与旧留存权重仍在原vendor/artifacts位置，模型索引含其哈希。
+- 外部无根许可声明的CSV/源码缓存、虚拟环境、node_modules和凭据不打包；参考动作按训练手册固定URL/SHA另行准备。
+
+```bash
+python scripts/verify_release_resources.py
+# 部署离线检查，不初始化DDS
+python -m rob2nav.deployment profiles
+python -m rob2nav.deployment plan --from walk_moe --to backflip60
+```
+
+## 容器重启后的训练状态
+
+原backflip/sideflip/upright各5000轮均已完整结束。侧翻DC1000轮和直立DC1000轮适配均结束，最终5998检查点存在。新增`upright_stepping_full_20261021`原预算1000轮，最后保存`model_5700.pt`，没有`completion.json`，没有终态exit文件，当前无训练进程：**容器重启中断，不是完成**。日志最后约37,453,824 timesteps。此次只恢复网站，没有重复开训/自动续训。
+
+## 统一部署框架下一步（不能跳过）
+
+当前原型位于`rob2nav/deployment/`，配置在`deployment/skills/`。新的目标是统一Go2 Python SDK、安全权重热切换，尤其避免PD、默认姿态、关节顺序、相位和历史差异造成冲击。协议检查使用独立`go2-sdk-check`环境、SDK814556d与CycloneDDS0.10.2；仅消息构造/CRC，未初始化DDS或创建发布器。
+
+真实MuJoCo首轮seed9201失败：中立获取超时、3501步、0提交，最大相邻力矩变化约0.0694N·m、kp变化0.03、倾斜9.67°、最低高度0.301m。先分析四足支撑、姿态/重力补偿和退出过程，不仅放宽门槛。原报告backend文字是测试计划，实际未执行到MLP/MoE提交。
+
+后续需补多种子实际权重热切换、异步加载失败回滚、推理停顿与低层恢复、符号/零位/IMU标定及设备健康闭环、48维线速度来源、69维参考yaw对齐，以及真实实时性/独立看门狗与硬件资格。现有原型含部分标定/健康门禁代码，但其新分支未完成完整物理验证。不可因文件存在或8项逻辑测试通过而放行实机。仍遵守原范围：实机仅方案与离线检查，不向真实机器人发送电机指令。
+
+---
+
+<details>
+<summary>2026-10-20及更早历史交接（旧状态可能已过期；以上最新节优先）</summary>
+
 # 最新工作台整合（2026-10-20）
 
 持续迭代新增（2026-10-20早间）：混合任务72f9bb2d17384900检查时仍训练中，未重复启动。新增步态测量 `--gait-metrics`，原生8环境1秒烟测已通过，全部8回合有指标，输出 `outputs/gait_smoke_native`，PID260772为已结束烟测，不是训练。短时结果显式不计任务成功率。suite默认采集，可用 `--no-gait-metrics`做旧测量对照；当前训练进程不变，后续评估子进程使用新suite。网页新增按成功/失败分组的步态诊断，并允许无视频的指标记录。定义及未测量边界见docs/GAIT_METRICS.md。35项测试通过。下一步等500轮完整评估，再对留存基线与新权重做802/803独立种子匹配，不能仅靠训练地形等级升高续训或宣称步态更好。
@@ -500,3 +568,6 @@ stance任务4549d2b29e744c95仍正常运行，核实iteration258/fusion无数值
 
 ## 2026-10-20 09:48 stance完整评估、平方指标诊断
 4549d2b29e744c95 strict九项完成，密集各32/32，原桩六项0/32；独立802/803密集6项全32/32，但足链均值高于平台对照。artifacts/stance_v4_completed和docs/STANCE_V4_VALIDATION.md归档，不晋级不追加训练。诊断发现训练平方速度与旧均值指标非同一量，新增平方积分、按脚数和总时长归一化的奖励原始量、支撑峰值，旧记录网站显示未采集；41测试和构建通过。已核实无活动eval后启动outputs/moe_perceptive/stance_squared_802，PID330085，对照/stance相同802三密集地形共6项新指标复评。下次先看driver/completed和summary，不重复启动；再据平方/峰值/通过率/姿态/功率决定设计。
+
+
+</details>

@@ -151,7 +151,7 @@ flowchart LR
 
 在独立测力台上从约1N接触目标开始，测量后再递增到约3N。触手腿的竖直方向采用低刚度+力/导纳，平面采用有界阻抗；不要把「设定脚坐标+高刚度」当作柔顺接触。阈值、下探速度、力矩限制和急停响应要依据真实负载、足垫及传感器闭环延迟重新验证。
 
-官方SDK2示例使用`rt/lowstate`、`rt/lowcmd`、0.002秒周期、CRC和PMSM电机模式。文档依据：[官方Go2低层示例](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/example/go2/low_level/go2_stand_example.py)、[官方常量](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/example/go2/low_level/unitree_legged_const.py)、[SDK说明](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/README.md)。部署时固定经过验证的SDK提交，不直接追随master。
+官方SDK2示例使用`rt/lowstate`、`rt/lowcmd`、0.002秒周期、CRC和PMSM电机模式。文档依据：[官方Go2低层示例](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/example/go2/low_level/go2_stand_example.py)、[官方常量](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/example/go2/low_level/unitree_legged_const.py)、[SDK说明](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/README.md)。部署时固定经过验证的SDK提交，不直接追随master。
 
 | 内部MuJoCo顺序 | SDK2电机索引 |
 |---|---|
@@ -203,3 +203,5 @@ flowchart LR
 5. **最终实机包**：固定版本部署镜像或安装脚本、systemd服务、配置与标定文件、实验数据、操作/接管步骤和已知限制。
 
 因此，网页演示目前可以直接使用；实机接入并非「换一个IP」即可完成。关键缺口是经过标定的状态/力反馈、实时动力学与驱动适配以及真实人机接触验证，不是再训练一个动画策略。
+
+本次方案的官方SDK源码固定为 `814556d15970dd2ecf1c9984e845ca02ab07e206`；仅作源码核对，未安装SDK、未打开DDS、未连接机器人。实机型号/固件兼容性仍按各技能方案在后续实施时审查。

@@ -1,0 +1,104 @@
+{
+  "robot": "Go2",
+  "asset_commit": "954aa61ceb62c515689677f44a21e32109f6b62d",
+  "runner_source_commit": "4960b84732b0c2ec593dccbfe963fda1bcd7b1e3",
+  "role": "real PhysX PPO training, no root stabilization force",
+  "reset_distribution": "50% four feet, 50% balanced upright; skill validation must start on four feet",
+  "command_frame": "horizontal forward is projected negative body Z when upright",
+  "target_projected_gravity": [
+    -1,
+    0,
+    0
+  ],
+  "actor_observations": 48,
+  "action_dim": 12,
+  "joint_names": [
+    "FL_hip_joint",
+    "FR_hip_joint",
+    "RL_hip_joint",
+    "RR_hip_joint",
+    "FL_thigh_joint",
+    "FR_thigh_joint",
+    "RL_thigh_joint",
+    "RR_thigh_joint",
+    "FL_calf_joint",
+    "FR_calf_joint",
+    "RL_calf_joint",
+    "RR_calf_joint"
+  ],
+  "default_joint_pos": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.8,
+    0.8,
+    1.0,
+    1.0,
+    -1.5,
+    -1.5,
+    -1.5,
+    -1.5
+  ],
+  "action_scale": 0.5,
+  "kp": 40,
+  "kd": 1,
+  "policy_hz": 50,
+  "physics_hz": 500,
+  "motor_model": "dc_linear_v1",
+  "seed": 44,
+  "num_envs": 2048,
+  "requested_iterations": 1000,
+  "source_sha256": {
+    "evaluate_isaac.py": "36ea1bdc4d491fa9f2029c9dc85ce6e4d30a3f2ed61f709b1843992e967be2ba",
+    "__init__.py": "c215378ac6bb1df62937e0b421c09fbb8fc5138026cfad8ddf1bada34ea7d803",
+    "task.py": "8fda603ea118daf324c98b8119224568f6a9bb4a867281d9fa15eae7ab885b72",
+    "train.py": "85dfe97ecec92ab5ef6544e0062c21bf9246a2ba44c29539466d4c79ffc42c21"
+  },
+  "shared_asset_source_sha256": "49aa4b92f14991c72b99ae7363412c269a9103f0f2b7f5540bf3ea9f22525eaa",
+  "hardware_connected": false,
+  "actor_input_dim": 48,
+  "actor_output_dim": 12,
+  "normalization": "identity",
+  "actor_observation_terms": [
+    {
+      "name": "base_lin_vel",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "base_ang_vel",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "projected_gravity",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "velocity_commands",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "joint_pos",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "joint_vel",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "actions",
+      "scale": null,
+      "clip": null
+    }
+  ],
+  "checkpoint_sha256": "f28f6ac589c4ac207452681d3ced76accb73ba527234b8b8365a3b7f6b8058b5",
+  "policy_sha256": "482ab19041f189c8e2530402eeadd0188c2bae6312cb2c15f21117ff06576800",
+  "export_verified_finite": true,
+  "capability_verified": false
+}

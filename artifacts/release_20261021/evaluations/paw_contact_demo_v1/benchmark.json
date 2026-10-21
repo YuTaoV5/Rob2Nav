@@ -1,0 +1,223 @@
+{
+  "successes": 2,
+  "total": 2,
+  "groups": {
+    "moving": {
+      "passed": 2,
+      "total": 2
+    }
+  },
+  "results": [
+    {
+      "case": {
+        "name": "left_demo",
+        "kind": "moving",
+        "seed": 42,
+        "target": [
+          0.37,
+          0.13,
+          0.19
+        ],
+        "friction": 0.8,
+        "mass_scale": 1.0
+      },
+      "success": true,
+      "placement": true,
+      "rejected": false,
+      "stable": true,
+      "returned": true,
+      "max_continuous_gentle_contact_s": 2.579999999999989,
+      "peak_hand_force_n": 4.784401209588836,
+      "peak_tilt_deg": 0.8799019229581143,
+      "final": {
+        "time": 14.500000000001512,
+        "state": "COOLDOWN",
+        "leg": "FL",
+        "force": 0.0,
+        "peak_force": 4.784401209588836,
+        "tilt_deg": 0.7087229076440495,
+        "base": [
+          -0.05311748771941283,
+          -0.04922725163976823,
+          0.3295408918113616
+        ],
+        "hand": [
+          0.8,
+          0.10811417335577506,
+          0.25
+        ],
+        "paw": [
+          0.18294959567914731,
+          0.1369718381607296,
+          0.022622929340576275
+        ],
+        "ground_force": [
+          10.843059406660489,
+          43.41803371995723,
+          31.55920392209605,
+          64.19999930695408
+        ],
+        "observation_age": 0.01000000000000334,
+        "reason": "retract_deadline",
+        "torque_peak": 10.777905713046312,
+        "armed": false,
+        "unexpected_hand_force": 0.0
+      },
+      "events": [
+        {
+          "time": 1.5,
+          "previous": "SETTLE",
+          "state": "WAIT",
+          "reason": ""
+        },
+        {
+          "time": 2.16,
+          "previous": "WAIT",
+          "state": "SHIFT",
+          "reason": "stable_open_palm"
+        },
+        {
+          "time": 3.07,
+          "previous": "SHIFT",
+          "state": "LIFT",
+          "reason": ""
+        },
+        {
+          "time": 4.28,
+          "previous": "LIFT",
+          "state": "LOWER",
+          "reason": ""
+        },
+        {
+          "time": 5.61,
+          "previous": "LOWER",
+          "state": "HOLD",
+          "reason": "measured_contact"
+        },
+        {
+          "time": 11.04,
+          "previous": "HOLD",
+          "state": "RETRACT",
+          "reason": "hand_lost_or_outside_workspace"
+        },
+        {
+          "time": 14.04,
+          "previous": "RETRACT",
+          "state": "COOLDOWN",
+          "reason": "retract_deadline"
+        }
+      ],
+      "contact_dynamics": true,
+      "criterion": ">=1s continuous HOLD, 1..8N palm contact, <4.5cm lateral error, <12deg tilt; overall peak<15N, tilt<15deg, four-foot return. Invalid requests must be rejected."
+    },
+    {
+      "case": {
+        "name": "right_demo",
+        "kind": "moving",
+        "seed": 42,
+        "target": [
+          0.37,
+          -0.13,
+          0.19
+        ],
+        "friction": 0.8,
+        "mass_scale": 1.0
+      },
+      "success": true,
+      "placement": true,
+      "rejected": false,
+      "stable": true,
+      "returned": true,
+      "max_continuous_gentle_contact_s": 2.759999999999985,
+      "peak_hand_force_n": 4.505925335826814,
+      "peak_tilt_deg": 0.8799131093060633,
+      "final": {
+        "time": 14.500000000001512,
+        "state": "COOLDOWN",
+        "leg": "FR",
+        "force": 0.0,
+        "peak_force": 4.505925335826814,
+        "tilt_deg": 0.7071563424646795,
+        "base": [
+          -0.053108594830662825,
+          0.04921705635020007,
+          0.3295433296445101
+        ],
+        "hand": [
+          0.8,
+          -0.15188582664422495,
+          0.25
+        ],
+        "paw": [
+          0.1829674498693084,
+          -0.13698178200225003,
+          0.022620983077369594
+        ],
+        "ground_force": [
+          43.41382577537178,
+          10.854314613116555,
+          64.18950576056932,
+          31.561356418495293
+        ],
+        "observation_age": 0.01000000000000334,
+        "reason": "retract_deadline",
+        "torque_peak": 10.77493688231574,
+        "armed": false,
+        "unexpected_hand_force": 0.0
+      },
+      "events": [
+        {
+          "time": 1.5,
+          "previous": "SETTLE",
+          "state": "WAIT",
+          "reason": ""
+        },
+        {
+          "time": 2.16,
+          "previous": "WAIT",
+          "state": "SHIFT",
+          "reason": "stable_open_palm"
+        },
+        {
+          "time": 3.07,
+          "previous": "SHIFT",
+          "state": "LIFT",
+          "reason": ""
+        },
+        {
+          "time": 4.28,
+          "previous": "LIFT",
+          "state": "LOWER",
+          "reason": ""
+        },
+        {
+          "time": 5.52,
+          "previous": "LOWER",
+          "state": "HOLD",
+          "reason": "measured_contact"
+        },
+        {
+          "time": 11.03,
+          "previous": "HOLD",
+          "state": "LOWER",
+          "reason": "reacquire_contact"
+        },
+        {
+          "time": 11.04,
+          "previous": "LOWER",
+          "state": "RETRACT",
+          "reason": "hand_lost_or_outside_workspace"
+        },
+        {
+          "time": 14.04,
+          "previous": "RETRACT",
+          "state": "COOLDOWN",
+          "reason": "retract_deadline"
+        }
+      ],
+      "contact_dynamics": true,
+      "criterion": ">=1s continuous HOLD, 1..8N palm contact, <4.5cm lateral error, <12deg tilt; overall peak<15N, tilt<15deg, four-foot return. Invalid requests must be rejected."
+    }
+  ],
+  "scope": "MuJoCo free-base rigid contact, tracked virtual palm. No camera or real robot validation."
+}

@@ -22,7 +22,8 @@ except ImportError:
 
 
 class Control(BaseModel):
-    action: Literal['target','start','stop','withdraw','reset','push']
+    action: Literal['target','start','stop','withdraw','reset','push','camera']
+    camera: dict[str,float] | None = None
     position: list[float] | None = Field(default=None,min_length=3,max_length=3)
     leg: Literal['FL','FR'] | None = None
 
@@ -39,9 +40,12 @@ class Engine:
             s=PawSimulation(self.root);s.armed=False;s.requested_leg=1
             position=np.array([.37,-.13,.19]);visible=True;seq=0;push_until=-1.
             wall=time.monotonic();start_sim=float(s.data.time);next_render=0.;last_obs=-1.;last_push=0.
+            camera_settings=dict(azimuth=125.,elevation=-18.,distance=1.45,pan_x=0.,pan_y=0.)
             while self.running:
                 while not self.queue.empty():
                     cmd=self.queue.get_nowait()
+                    if cmd.action=='camera':
+                        camera_settings.update(cmd.camera or {});continue
                     if cmd.action=='reset':
                         s.close();s=PawSimulation(self.root);s.armed=False;s.requested_leg=1
                         position=np.array([.37,-.13,.19]);visible=True;seq=0;push_until=-1.
@@ -70,7 +74,7 @@ class Engine:
                     s.step(min(5,max(1,int((target_time-now)/.01))))
                 else:time.sleep(.002)
                 if s.data.time>=next_render:
-                    frame=s.render();image=Image.fromarray(frame);buf=io.BytesIO();image.save(buf,format='JPEG',quality=83)
+                    frame=s.render(camera_settings=camera_settings);image=Image.fromarray(frame);buf=io.BytesIO();image.save(buf,format='JPEG',quality=83)
                     camera=s.renderer.scene.camera
                     eye=(camera[0].pos+camera[1].pos)/2
                     forward=np.array(camera[0].forward);up=np.array(camera[0].up);right=np.cross(forward,up)
@@ -80,7 +84,7 @@ class Engine:
                     snap.update(target=position.tolist(),selected_leg='FL' if s.requested_leg==0 else 'FR',visible=visible,
                         workspace_valid=bool(.29<=p[0]<=.46 and .055<=abs(p[1])<=.23 and .12<=p[2]<=.27 and side_ok),
                         camera=dict(eye=eye.tolist(),forward=forward.tolist(),up=up.tolist(),right=right.tolist(),fy=float(fy),width=960,height=640),
-                        events=s.events[-15:],hardware_enabled=False,simulation='MuJoCo 3.2.3 / free-base / rigid contacts')
+                        camera_settings=camera_settings.copy(),events=s.events[-15:],hardware_enabled=False,simulation='MuJoCo 3.2.3 / free-base / rigid contacts')
                     with self.lock:self.state=snap;self.jpeg=buf.getvalue()
                     next_render=float(s.data.time)+.10
         except Exception as exc:
@@ -110,6 +114,10 @@ def create_app(root,assets):
     @app.post('/api/control',status_code=202)
     def control(cmd:Control):
         engine.last_client=time.monotonic()
+        if cmd.action=='camera':
+            from studio.live_skills import Camera
+            try:cmd.camera=Camera(**(cmd.camera or {})).model_dump()
+            except ValueError as exc:raise HTTPException(422,str(exc))
         if cmd.action=='target':
             p=cmd.position
             if p is None or not np.isfinite(p).all() or not (.18<=p[0]<=.70 and -.35<=p[1]<=.35 and .06<=p[2]<=.35):

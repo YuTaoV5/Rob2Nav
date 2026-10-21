@@ -1,0 +1,133 @@
+{
+  "hardware_enabled": false,
+  "skills": [
+    {
+      "skill": "sideflip",
+      "id": "0adc787c71bc",
+      "frames": 16,
+      "camera": {
+        "azimuth": 92.0,
+        "elevation": -32.5,
+        "distance": 2.505810634233816,
+        "pan_x": -0.2,
+        "pan_y": 0.075
+      },
+      "actual_backend": "MuJoCo",
+      "note": "侧翻动作已验证8/8，额定速度未通过。"
+    },
+    {
+      "skill": "backflip",
+      "id": "34fe373cf8b8",
+      "frames": 15,
+      "camera": {
+        "azimuth": 92.0,
+        "elevation": -32.5,
+        "distance": 2.505810634233816,
+        "pan_x": -0.2,
+        "pan_y": 0.075
+      },
+      "actual_backend": "MuJoCo",
+      "note": "本地5000轮策略；严格落地和电机约束未通过。"
+    },
+    {
+      "skill": "upright_walk",
+      "id": "7197ac902e7d",
+      "frames": 16,
+      "camera": {
+        "azimuth": 92.0,
+        "elevation": -32.5,
+        "distance": 2.505810634233816,
+        "pan_x": -0.2,
+        "pan_y": 0.075
+      },
+      "actual_backend": "MuJoCo",
+      "note": "实验策略：MuJoCo起立/行走未通过，展示实际失败行为。"
+    },
+    {
+      "skill": "stairs",
+      "id": "1643de95af61",
+      "frames": 15,
+      "camera": {
+        "azimuth": 92.0,
+        "elevation": -32.5,
+        "distance": 2.505810634233816,
+        "pan_x": -0.2,
+        "pan_y": 0.075
+      },
+      "actual_backend": "MuJoCo",
+      "note": "RoboGauge预训练MoE + 感知地形控制；不是Isaac感知微调检查点的迁移验收。"
+    },
+    {
+      "skill": "platform",
+      "id": "f78317587335",
+      "frames": 16,
+      "camera": {
+        "azimuth": 92.0,
+        "elevation": -32.5,
+        "distance": 2.505810634233816,
+        "pan_x": -0.2,
+        "pan_y": 0.075
+      },
+      "actual_backend": "MuJoCo",
+      "note": "RoboGauge预训练MoE + 感知地形控制；不是Isaac感知微调检查点的迁移验收。"
+    },
+    {
+      "skill": "multiterrain",
+      "id": "97dee80894c9",
+      "frames": 15,
+      "camera": {
+        "azimuth": 92.0,
+        "elevation": -32.5,
+        "distance": 2.505810634233816,
+        "pan_x": -0.2,
+        "pan_y": 0.075
+      },
+      "actual_backend": "MuJoCo",
+      "note": "RoboGauge预训练MoE + 感知地形控制；不是Isaac感知微调检查点的迁移验收。"
+    }
+  ],
+  "options": [
+    "感知阶梯 / 提前抬腿",
+    "高台攀爬",
+    "多技能保持与地形切换",
+    "后空翻",
+    "Go2 侧空翻",
+    "实时目标点导航",
+    "Go2 站立行走",
+    "左右爪托手互动",
+    "SCAN 原生规划仿真"
+  ],
+  "ppo_camera": {
+    "azimuth": 103.00000000000023,
+    "elevation": -54.0,
+    "distance": 4.17635105705636,
+    "pan_x": 0.0,
+    "pan_y": 0.0
+  },
+  "scan_camera": {
+    "azimuth": 103.00000000000023,
+    "elevation": -54.0,
+    "distance": 4.17635105705636,
+    "pan_x": 0.0,
+    "pan_y": 0.0
+  },
+  "handshake_camera": {
+    "azimuth": 96.99999999999989,
+    "elevation": -22.499999999999993,
+    "distance": 1.45,
+    "pan_x": 0.0,
+    "pan_y": 0.0
+  },
+  "completed_state_camera": {
+    "time": 10.49899999999962,
+    "camera": {
+      "azimuth": 44.0,
+      "elevation": -30.0,
+      "distance": 2.0,
+      "pan_x": 0,
+      "pan_y": 0
+    }
+  },
+  "console_errors": [],
+  "passed": true
+}

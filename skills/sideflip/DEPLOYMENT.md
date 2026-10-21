@@ -4,9 +4,9 @@
 
 参考相位由本地单调时钟按50Hz推进。启动时仅将参考的yaw对齐实测站立yaw，保留真实姿态、速度和动作历史；不重置机器人状态。参考末尾保持最后参考并观察落地恢复；再次触发须恢复四足站稳并单独验证重复动作。训练中随机参考相位重置只属于episode初始化，不能搬到实机动作中。
 
-部署前冻结模型、参考、默认姿态和SDK提交。当前两轮模型没有翻转且速度约束失败，完整模型未验收。厂家高层LeftFlip固件动作是另一条实现路线，不能用它替代本策略训练/迁移证据。
+部署前冻结模型、参考、默认姿态和SDK提交。当前DC5200固定模型MuJoCo动作8/8，但URDF额定速度比最高1.08505，速度门限0/8；仍未完成部署约束验收。厂家高层LeftFlip固件动作是另一条实现路线，不能用它替代本策略训练/迁移证据。
 
-本次范围为SDK2部署方案：未连接Go2、未发布LowCmd、未做实机验收。当前完整训练与独立仿真未完成，不应直接执行动态特技。
+本次范围为SDK2部署方案：未连接Go2、未发布LowCmd、未做实机验收。完整训练与独立仿真已执行，速度约束仍失败；本文不执行动态特技部署。
 
 控制计算机准备（以下仅安装与离线文件操作）：
 
@@ -18,12 +18,13 @@ mkdir -p ~/src
 cd ~/src
 git clone https://github.com/unitreerobotics/unitree_sdk2_python.git
 cd unitree_sdk2_python
+git checkout --detach 814556d15970dd2ecf1c9984e845ca02ab07e206
 git rev-parse HEAD > ../sdk2-reviewed-commit.txt
 python -m pip install -e .
 ip addr
 ```
 
-SDK依赖CycloneDDS0.10.2。若安装时找不到DDS，先在~/src克隆eclipse-cyclonedds/cyclonedds的releases/0.10.x分支，用cmake -S/-B构建并安装到用户目录，设置CYCLONEDDS_HOME后重试；具体依赖见[官方SDK安装说明](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/README.md)。接机时记录并锁定审查后的SDK提交、Go2型号/固件、低层控制权限和网卡。本文未执行SDK安装或通信。
+SDK依赖CycloneDDS0.10.2。若安装时找不到DDS，先在~/src克隆eclipse-cyclonedds/cyclonedds的releases/0.10.x分支，用cmake -S/-B构建并安装到用户目录，设置CYCLONEDDS_HOME后重试；具体依赖见[官方SDK安装说明](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/README.md)。接机时记录并锁定审查后的SDK提交、Go2型号/固件、低层控制权限和网卡。本文未执行SDK安装或通信。
 
 将[仿真手册](SIMULATION.md)导出的policy.pt和policy.json、配置清单复制到机器人本地控制计算机，核对SHA256。控制必须在机器人本地运行，网页/SSH不进入实时电机链。
 
@@ -35,4 +36,8 @@ SDK依赖CycloneDDS0.10.2。若安装时找不到DDS，先在~/src克隆eclipse-
 
 交付实机驱动时还需实现只读录制→离线回放/dry-run→悬吊映射与限幅→四足站立/断流接管→受保护动态动作的分阶段验收。记录原始q/dq/tau、IMU、命令、接触和控制周期P99/最大值。当前仓库提供训练和仿真代码，SDK发送节点属于本方案后续接机实现内容；没有虚构可直接运行的发送器命令。
 
-官方接口依据：[Go2低层LowState/LowCmd与CRC示例](https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/example/go2/low_level/go2_stand_example.py)。该示例本身会控制电机，不能当作只读采集程序。实机策略加载前必须通过本次模型的MuJoCo任务与约束检查；仿真通过仍不等于硬件通过。
+官方接口依据：[Go2低层LowState/LowCmd与CRC示例](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/example/go2/low_level/go2_stand_example.py)。该示例本身会控制电机，不能当作只读采集程序。实机策略加载前必须通过本次模型的MuJoCo任务与约束检查；仿真通过仍不等于硬件通过。
+
+本次通过动作的仿真策略使用dc_linear_v1包络。实机适配必须以实际电机、传动和固件参数辨识替代该近似，并重新验证速度/力矩边界；不要将MuJoCo8/8当作SDK硬件兼容证据。
+
+本次方案的官方SDK源码固定为 `814556d15970dd2ecf1c9984e845ca02ab07e206`；仅作源码核对，未安装SDK、未打开DDS、未连接机器人。实机型号/固件兼容性仍按各技能方案在后续实施时审查。

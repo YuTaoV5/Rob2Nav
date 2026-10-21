@@ -356,12 +356,15 @@ class PawSimulation:
             reason=self.last_reason,torque_peak=float(np.abs(self.last_tau).max()),armed=self.armed,
             unexpected_hand_force=float(self.other_hand_force))
 
-    def render(self, width=960, height=640):
+    def render(self, width=960, height=640, camera_settings=None):
         if self.renderer is None:
             self.renderer = mujoco.Renderer(self.model,height=height,width=width)
         cam = mujoco.MjvCamera()
         cam.lookat[:] = [.12,0,.23]
         cam.distance,cam.azimuth,cam.elevation = 1.45,125,-18
+        if camera_settings:
+            cam.distance=camera_settings["distance"];cam.azimuth=camera_settings["azimuth"];cam.elevation=camera_settings["elevation"]
+            cam.lookat[0]+=camera_settings["pan_x"];cam.lookat[1]+=camera_settings["pan_y"]
         opt = mujoco.MjvOption();opt.geomgroup[3]=0
         self.renderer.update_scene(self.data,camera=cam,scene_option=opt)
         return self.renderer.render().copy()

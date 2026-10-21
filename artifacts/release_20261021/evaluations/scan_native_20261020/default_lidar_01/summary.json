@@ -1,0 +1,69 @@
+{
+  "backend": "SCAN-Planner ROS2 community / upstream kinematic simulator",
+  "upstream_commit": "d0b921c9b05a6d291d144d60882b2e0e88d2c0e0",
+  "diagnostic_only": true,
+  "episodes": 1,
+  "successes": 0,
+  "arguments": {
+    "kind": "scan_native_lidar",
+    "seed": 127,
+    "sensor": "lidar",
+    "controller_mode": "closed_loop",
+    "goal": [
+      -11.0,
+      1.0,
+      0.3
+    ]
+  },
+  "results": [
+    {
+      "success": false,
+      "reached_goal": false,
+      "timeout": true,
+      "error": null,
+      "seconds": 90.0031329439953,
+      "goal_start_t": 12.906940615270287,
+      "goal": [
+        -11.0,
+        1.0,
+        0.3
+      ],
+      "final_pose": [
+        -10.568174696531031,
+        1.2708975471726742,
+        0.3,
+        0.01616437485343584
+      ],
+      "distance": 0.5097632526773956,
+      "path_length": 8.962459731187227,
+      "planned_trajectories": 13,
+      "sensor_frames": 756,
+      "odometry_samples": 9522,
+      "sensor": "lidar",
+      "planning_ms": {
+        "count": 11,
+        "mean": 1.7453545454545456,
+        "p95": 8.85,
+        "max": 16.5
+      },
+      "collision": null,
+      "contact_dynamics_verified": false,
+      "sampled_envelope_check": {
+        "min_clearance_m": 0.08783572703529419,
+        "overlap_samples": 0,
+        "samples": 8631,
+        "definition": "Two planar cylinder centers at +/-0.18m, radius0.25m; map surface points z in (0.1,0.5)m. Discrete geometric diagnostic, not contact dynamics or continuous collision proof."
+      },
+      "diagnosis": "Requested goal has approximately 0.182m center clearance in the sampled obstacle map; upstream adjusted target. Original requested goal was not reached and remains a timeout.",
+      "shutdown_process_exits": [
+        "[ERROR] [closed_loop_controller-3]: process has died [pid 29182, exit code -2, cmd '/root/gpufree-data/scan-reproduction/upstream/install/scan_planner/lib/scan_planner/closed_loop_controller --ros-args -r __node:=closed_loop_controller --params-file /root/gpufree-data/scan-reproduction/upstream/install/scan_planner/share/scan_planner/config/controllers.yaml --params-file /tmp/launch_params_r7f7jtkl -r body_pose:=/quad_0/body_pose -r cmd_vel:=/quad_0/cmd_vel'].",
+        "[ERROR] [robot_state_publisher-2]: process has died [pid 29181, exit code -2, cmd '/opt/ros/jazzy/lib/robot_state_publisher/robot_state_publisher --ros-args -r __node:=go2_robot_state_publisher --params-file /tmp/launch_params_jgiip28t --params-file /tmp/launch_params_9y7myf37'].",
+        "[ERROR] [pcl_render_node-7]: process has died [pid 29186, exit code -11, cmd '/root/gpufree-data/scan-reproduction/upstream/install/local_sensing_node/lib/local_sensing_node/pcl_render_node --ros-args -r __node:=pcl_render_node --params-file /root/gpufree-data/scan-reproduction/upstream/install/scan_planner/share/scan_planner/config/simulator.yaml --params-file /tmp/launch_params_x_3crqf6 -r global_map:=/map_generator/global_cloud -r body_pose:=/quad_0/body_pose -r cloud:=/quad_0/cloud -r sensor_cloud:=/quad_0/sensor_cloud -r depth:=/quad_0/depth -r dyn_cloud:=/quad_0/dyn_cloud -r uav_cloud:=/quad_0/uav_cloud']."
+      ],
+      "shutdown_abnormal_exits": [
+        "[ERROR] [pcl_render_node-7]: process has died [pid 29186, exit code -11, cmd '/root/gpufree-data/scan-reproduction/upstream/install/local_sensing_node/lib/local_sensing_node/pcl_render_node --ros-args -r __node:=pcl_render_node --params-file /root/gpufree-data/scan-reproduction/upstream/install/scan_planner/share/scan_planner/config/simulator.yaml --params-file /tmp/launch_params_x_3crqf6 -r global_map:=/map_generator/global_cloud -r body_pose:=/quad_0/body_pose -r cloud:=/quad_0/cloud -r sensor_cloud:=/quad_0/sensor_cloud -r depth:=/quad_0/depth -r dyn_cloud:=/quad_0/dyn_cloud -r uav_cloud:=/quad_0/uav_cloud']."
+      ]
+    }
+  ],
+  "scope": "Sensor-driven planning and kinematic tracking only; no RL training or contact dynamics."
+}

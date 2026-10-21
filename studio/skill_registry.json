@@ -253,18 +253,23 @@
         "go2_backflip_native",
         "lsd"
       ],
-      "description": "Go2原生PPO训练已完成；原引擎转轴旋转−6.347rad并落稳，但有一次大腿接触。MuJoCo迁移未通过；保留全部失败证据，不以训练完成代替验收。",
+      "description": "完整5000轮后继续显式电机模型适配，固定5200检查点在MuJoCo的8个新种子回合均完成侧翻并落稳，无非足端接地及关节越限。仅覆盖固定场景、±0.002rad初始关节扰动；额定速度约束仍失败，未做实机验证。",
       "acceptance": "完整约2π侧向旋转、真实腾空、无机身触地且稳定落地；逐物理步另查关节速度/限位。",
       "recipe": "sideflip_native_ppo",
-      "local_status": "5000轮完成；严格验收未通过",
+      "local_status": "MuJoCo动作8/8；速度约束未通过",
       "evidence": {
         "prefixes": [
-          "outputs/sideflip_native_",
-          "outputs/sideflip_final_"
+          "skills/sideflip/evidence/"
         ],
         "kinds": []
       },
-      "curated_media": [],
+      "curated_media": [
+        {
+          "path": "skills/sideflip/evidence/dc_5200_mujoco/episode_0.mp4",
+          "title": "Go2 侧空翻 · MuJoCo · seed 3100",
+          "label": "固定模型8/8动作；此视频为seed 3100，额定速度门限未通过"
+        }
+      ],
       "training_entry": "manual"
     },
     {
@@ -295,11 +300,11 @@
         "unitree_mimic_go2",
         "go2_backflip_native"
       ],
-      "description": "5000轮训练已完成。原引擎从四足自行起立，直立7.64秒、末两秒前进0.40米；MuJoCo迁移失败，原生步态接触与鲁棒性还需补验。",
-      "acceptance": "从四足站姿真实起立；末2秒保持双足姿态、后足支撑且移动>0.20m，无机身触地；实机仅方案。",
+      "description": "5000轮训练已完成。原引擎可起立前移，但后足连续接触、没有真实换步；MuJoCo迁移失败。新增离地/换步与支撑期足端运动约束正在重训。",
+      "acceptance": "四足自行起立；真实后足交替离地和落地，保持姿态并前进；禁止用滑移代替迈步。实机仅方案。",
       "recipe": "upright_walk_ppo",
       "training_entry": "manual",
-      "local_status": "原生起立前进；MuJoCo未通过",
+      "local_status": "起立前移伴滑移；真实行走未通过",
       "evidence": {
         "prefixes": [
           "outputs/upright_walk_",

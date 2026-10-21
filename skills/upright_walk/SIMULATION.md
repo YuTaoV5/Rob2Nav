@@ -1,6 +1,16 @@
 # Go2 站立行走仿真手册
 
-两轮PPO短程模型已实际导出并执行8秒MuJoCo：保持四足、未起立，0/1；模型硬件约束通过不等于任务通过。完整模型仍训练中。
+CPU环境固定为已执行的Python3.11依赖。首次建立环境时执行（已有环境不重复创建）：
+
+```bash
+cd /root/gpufree-data/Rob2Nav
+python3.11 -m venv /root/gpufree-data/envs/go2-skills-cpu
+/root/gpufree-data/envs/go2-skills-cpu/bin/python -m pip install -r skills/requirements-stunts-cpu.txt
+```
+
+本次服务器已具备相同版本的/root/gpufree-data/envs/go2-mapless；下文沿用它。新环境使用者把后续PY/解释器替换为go2-skills-cpu/bin/python。训练仍必须使用Isaac解释器，不能用这个CPU环境启动IsaacLab训练。
+
+两轮PPO短程模型已实际导出并执行8秒MuJoCo：保持四足、未起立，0/1；模型硬件约束通过不等于任务通过。首轮5000轮已结束；最终模型的MuJoCo迁移也未通过。原生起立前移不是迈步：最后4秒两只后足均没有离地换步，支撑期足链接平均水平速度约0.562m/s。新增迈步奖励正在重训，不能将滑移记为行走成功。
 
 ```bash
 cd /root/gpufree-data/Rob2Nav
