@@ -20,5 +20,12 @@ class FixstandReferenceAction(JointPositionAction):
         hold=getattr(self.cfg,'residual_limit_rad',.05)
         bridge=getattr(self.cfg,'bridge_residual_limit_rad',hold)
         limit=sideflip_boundary_limit(command.time_steps,frames,hold,bridge).unsqueeze(-1)
-        target=command.joint_pos+limit*torch.tanh(self._raw_actions)
+        residual=limit*torch.tanh(self._raw_actions)
+        taper=getattr(self.cfg,'terminal_hip_taper_frames',0)
+        if taper:
+            from skills.fixstand import terminal_hip_weight
+            hip=torch.tensor([name.endswith('_hip_joint') for name in self.cfg.joint_names],device=residual.device)
+            factor=terminal_hip_weight(command.time_steps,frames,taper).unsqueeze(-1)
+            residual=torch.where(hip,residual*factor,residual)
+        target=command.joint_pos+residual
         self._processed_actions[boundary]=target[boundary]

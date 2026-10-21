@@ -34,7 +34,7 @@ def action_target(skill,raw,phase=0.,reference=None):
     elif mode in ('upright_endpoint_v2','upright_endpoint_v3'):
         weight=max(1.-_smooth((phase-1.)/.5),_smooth((phase-5.)/1.5))
         target=(1.-weight)*target+weight*(vector(skill.default)+skill.endpoint_residual_limit_rad*np.tanh(raw))
-    elif mode=='reference_residual_v2':
+    elif mode in ('reference_residual_v2','reference_residual_v3'):
         if reference is None:raise ValueError('Sideflip residual requires the pinned reference')
         if 'frame' in reference:
             frame=int(reference['frame']);count=int(reference['count']);nominal=reference['joint_pos']
@@ -45,7 +45,11 @@ def action_target(skill,raw,phase=0.,reference=None):
             distance=min(frame,count-1-frame)
             blend=_smooth((distance-50.)/40.)
             limit=skill.residual_limit_rad+(skill.bridge_residual_limit_rad-skill.residual_limit_rad)*blend
-            target=vector(nominal)+limit*np.tanh(raw)
+            residual=limit*np.tanh(raw)
+            if skill.terminal_hip_taper_frames:
+                taper=_smooth((count-1-frame)/(skill.terminal_hip_taper_frames-1))
+                residual=np.where([name.endswith('_hip_joint') for name in skill.joints],residual*taper,residual)
+            target=vector(nominal)+residual
     return skill.to_sdk(target)
 
 

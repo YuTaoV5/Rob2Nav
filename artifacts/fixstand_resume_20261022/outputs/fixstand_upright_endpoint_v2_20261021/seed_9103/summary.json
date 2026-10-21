@@ -1,0 +1,115 @@
+{
+  "args": {
+    "kind": "upright_walk",
+    "seed": 9103,
+    "initialization": "settled",
+    "physics_hz": 1000,
+    "joint_limit_time_constant": null
+  },
+  "backend": "MuJoCo",
+  "successes": 0,
+  "total": 1,
+  "evaluator_sha256": "661f9e3135cbfcb7fae89250189debb7ca7f1076519d58c4c7cd10d66e6f1a35",
+  "episodes": [
+    {
+      "success": false,
+      "upright_seconds": 0.34,
+      "travel_m": 0.5518908545440276,
+      "upright_travel_m": 0.007056101954682786,
+      "rear_support_fraction": 1.0,
+      "started_on_four_feet": true,
+      "max_joint_speed_ratio": 1.2072624786006876,
+      "max_joint_limit_excess_rad": 0.1074328456763789,
+      "unexpected_body_ground_contact": true,
+      "walking": {
+        "passed": false,
+        "upright_seconds": 0.34,
+        "upright_travel_m": 0.04653879325217686,
+        "rear_support_fraction": 0.7058823529411765,
+        "rear_loaded_step_cycles": {
+          "RR": 0,
+          "RL": 0
+        },
+        "minimum_cycles_per_rear_foot": 2
+      },
+      "action_completed": false,
+      "fixstand": {
+        "passed": false,
+        "initial": {
+          "passed": false,
+          "samples": 36,
+          "stable_fraction": 0.0,
+          "max_pose_error_rad": 0.3102161749708845
+        },
+        "terminal": {
+          "passed": false,
+          "samples": 51,
+          "stable_fraction": 0.0,
+          "max_pose_error_rad": 0.22352862409054472
+        },
+        "pose_tolerance_rad": 0.12,
+        "max_joint_speed_rad_s": 1.0,
+        "minimum_upright_cos": 0.98,
+        "required_stable_fraction": 0.95,
+        "terminal_hold_s": 1.0,
+        "base_height_range_m": [
+          0.26,
+          0.4
+        ],
+        "minimum_foot_force_N": 4.0
+      }
+    }
+  ],
+  "metrics": {
+    "upright_seconds": 0.34,
+    "travel_m": 0.5518908545440276,
+    "upright_travel_m": 0.007056101954682786,
+    "rear_support_fraction": 1.0,
+    "started_on_four_feet": true,
+    "max_joint_speed_ratio": 1.2072624786006876,
+    "max_joint_limit_excess_rad": 0.1074328456763789,
+    "unexpected_body_ground_contact": true,
+    "walking": {
+      "passed": false,
+      "upright_seconds": 0.34,
+      "upright_travel_m": 0.04653879325217686,
+      "rear_support_fraction": 0.7058823529411765,
+      "rear_loaded_step_cycles": {
+        "RR": 0,
+        "RL": 0
+      },
+      "minimum_cycles_per_rear_foot": 2
+    },
+    "action_completed": false,
+    "fixstand": {
+      "passed": false,
+      "initial": {
+        "passed": false,
+        "samples": 36,
+        "stable_fraction": 0.0,
+        "max_pose_error_rad": 0.3102161749708845
+      },
+      "terminal": {
+        "passed": false,
+        "samples": 51,
+        "stable_fraction": 0.0,
+        "max_pose_error_rad": 0.22352862409054472
+      },
+      "pose_tolerance_rad": 0.12,
+      "max_joint_speed_rad_s": 1.0,
+      "minimum_upright_cos": 0.98,
+      "required_stable_fraction": 0.95,
+      "terminal_hold_s": 1.0,
+      "base_height_range_m": [
+        0.26,
+        0.4
+      ],
+      "minimum_foot_force_N": 4.0
+    }
+  },
+  "policy_sha256": "45bb1acf12f9ce269ec4c41da84c583848782dbb36da43209741240e268da378",
+  "root_state_writes": "initialization only; no root stabilization/weld/teleport during evaluation",
+  "hardware_connected": false,
+  "motor_model": "dc_linear_v1",
+  "hardware_constraints_pass": false
+}

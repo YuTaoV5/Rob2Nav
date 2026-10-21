@@ -21,6 +21,14 @@ def sideflip_boundary_limit(frame,total,hold_limit,bridge_limit,hold_frames=50,r
     return hold_limit+(bridge_limit-hold_limit)*smooth
 
 
+def terminal_hip_weight(frame,total,frames=50):
+    """Keep calf support while phasing out only hip residuals near the final stand."""
+    import torch
+    if not 2<=frames<=50:raise ValueError('Hip taper must fit inside the final padded hold')
+    x=torch.clamp((total-1-torch.as_tensor(frame))/(frames-1),0.,1.)
+    return x*x*(3.-2.*x)
+
+
 def stance_score(robot):
     import torch
     q=target_pose(robot)
@@ -120,7 +128,7 @@ def configure_upright(cfg,endpoint_residual=False,endpoint_limit=.2):
         cfg.commands.base_velocity.rel_standing_envs=0.
 
 
-def configure_sideflip(cfg,contract,boundary_residual=False,residual_limit=.05,bridge_limit=None):
+def configure_sideflip(cfg,contract,boundary_residual=False,residual_limit=.05,bridge_limit=None,terminal_hip_taper_frames=0):
     from isaaclab.managers import RewardTermCfg
     from skills.fixstand_motion import StartAtStand
     cfg.commands.motion.class_type=StartAtStand
@@ -137,6 +145,7 @@ def configure_sideflip(cfg,contract,boundary_residual=False,residual_limit=.05,b
         cfg.actions.JointPositionAction.class_type=FixstandReferenceAction
         cfg.actions.JointPositionAction.residual_limit_rad=residual_limit
         cfg.actions.JointPositionAction.bridge_residual_limit_rad=residual_limit if bridge_limit is None else bridge_limit
+        cfg.actions.JointPositionAction.terminal_hip_taper_frames=terminal_hip_taper_frames
 
 
 def initialize_expanded_policy(runner,checkpoint):
@@ -156,7 +165,7 @@ def initialize_expanded_policy(runner,checkpoint):
     return {'initialization':'weight transfer; fresh optimizer and iteration counter','expanded_parameters':expanded}
 
 
-def configure_backflip(cfg):
+def configure_backflip(cfg,velocity_limit_source=None,fast_safety_curriculum=False):
     import torch
     from isaaclab_backflip.tasks.go2_backflip.go2_backflip_env import Go2BackflipEnv
     cfg.episode_length_s=4.
@@ -169,6 +178,19 @@ def configure_backflip(cfg):
     cfg.rewards.scales['recovery_default_pose']=8.
     cfg.rewards.scales['recovery_still']=6.
     cfg.rewards.scales['recovery_dof_velocity']=-4.
+    if velocity_limit_source is not None:
+        from xml.etree import ElementTree as ET
+        source=Path(velocity_limit_source)
+        urdf=source/'resources/robots/go2/urdf/go2_description.urdf'
+        limits={joint.attrib['name']:float(joint.find('limit').attrib['velocity'])
+                for joint in ET.parse(urdf).getroot().findall('joint') if joint.find('limit') is not None}
+        names=[f'{leg}_{joint}_joint' for leg in ('FL','FR','RL','RR') for joint in ('hip','thigh','calf')]
+        cfg.control.joint_velocity_limits=tuple(limits[name] for name in names)
+        if fast_safety_curriculum:
+            cfg.control.velocity_termination_start_ratio=1.75
+            cfg.rewards.safety_curriculum_start=.5
+            cfg.rewards.safety_curriculum_warmup_steps=0
+            cfg.rewards.safety_curriculum_ramp_steps=12000
     original=Go2BackflipEnv._get_rewards
     def rewards(self):
         base=original(self);t=self.episode_length_buf*self.step_dt

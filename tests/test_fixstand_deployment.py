@@ -12,9 +12,10 @@ from rob2nav.deployment.types import Skill,SDK_JOINTS,Snapshot
 def skill(mode,observation_name):
     return Skill(id='test',joints=SDK_JOINTS,default=tuple(NEUTRAL),kp=(40.,)*12,kd=(1.,)*12,
         observation=observation_name,policy_hz=50,scale=.5,action_parameterization=mode,
-        reference='motion.npz' if mode=='reference_residual_v2' else '',
-        residual_limit_rad=.2 if mode=='reference_residual_v2' else 0.,
-        bridge_residual_limit_rad=.05 if mode=='reference_residual_v2' else 0.).checked()
+        reference='motion.npz' if mode.startswith('reference_residual_') else '',
+        residual_limit_rad=.2 if mode.startswith('reference_residual_') else 0.,
+        bridge_residual_limit_rad=.05 if mode.startswith('reference_residual_') else 0.,
+        terminal_hip_taper_frames=50 if mode=='reference_residual_v3' else 0).checked()
 
 
 class FixstandDeploymentTests(unittest.TestCase):
@@ -47,9 +48,20 @@ class FixstandDeploymentTests(unittest.TestCase):
         frame=reference_action_frame(reference,0.)
         np.testing.assert_allclose(action_target(s,raw,0.,frame),action_target(s,raw,0.,reference))
 
+    def test_sideflip_terminal_taper_changes_only_hips(self):
+        s=skill('reference_residual_v3','mimic69');raw=np.ones(12)
+        reference={'fps':np.array([50.]),'joint_pos':np.tile(NEUTRAL+.1,(300,1))}
+        v2=skill('reference_residual_v2','mimic69')
+        target=action_target(s,raw,5.98,reference)
+        original=action_target(v2,raw,5.98,reference)
+        hip=np.array([name.endswith('_hip_joint') for name in SDK_JOINTS])
+        np.testing.assert_allclose(target[hip],(NEUTRAL+.1)[hip])
+        np.testing.assert_allclose(target[~hip],original[~hip])
+
     def test_invalid_contracts_rejected(self):
         with self.assertRaises(ValueError):skill('upright_endpoint_v2','upright48')
         with self.assertRaises(ValueError):replace(skill('joint_offset_v1','backflip60'),residual_limit_rad=.2).checked()
+        with self.assertRaises(ValueError):replace(skill('reference_residual_v2','mimic69'),terminal_hip_taper_frames=50).checked()
 
     def test_keyboard_commands(self):
         self.assertEqual(key_request('3'),{'switch':'sideflip69'})

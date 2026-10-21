@@ -175,14 +175,20 @@ def main():
                 weight=float(upright_endpoint_weight(now))
                 endpoint=np.asarray([POSE[n] for n in names])+boundary['residual_limit_rad']*np.tanh(last)
                 target=(1.-weight)*target+weight*endpoint
-            if boundary.get('action_parameterization')=='reference_residual_v2':
+            if boundary.get('action_parameterization') in ('reference_residual_v2','reference_residual_v3'):
                 if reference is None:raise ValueError('Reference residual policy requires its motion reference')
                 padding=boundary['padded_region_frames']
                 if index<padding or index>=len(reference['joint_pos'])-padding:
                     from skills.fixstand import sideflip_boundary_limit
                     hold=boundary['residual_limit_rad'];bridge=boundary.get('bridge_residual_limit_rad',hold)
                     limit=float(sideflip_boundary_limit(index,len(reference['joint_pos']),hold,bridge))
-                    target=reference['joint_pos'][index]+limit*np.tanh(last)
+                    residual=limit*np.tanh(last)
+                    taper=boundary.get('terminal_hip_taper_frames',0)
+                    if taper:
+                        from skills.fixstand import terminal_hip_weight
+                        hip=np.array([name.endswith('_hip_joint') for name in names])
+                        residual[hip]*=float(terminal_hip_weight(index,len(reference['joint_pos']),taper))
+                    target=reference['joint_pos'][index]+residual
             for _ in range(args.physics_hz//50):
                 data.ctrl[aids]=motor_torque(target,data.qpos[qids],data.qvel[vids],effort,velocity_limits,meta.get('motor_model','ideal_pd'))
                 before_step=float(data.time)

@@ -663,3 +663,7 @@ stance任务4549d2b29e744c95仍正常运行，核实iteration258/fusion无数值
 
 
 </details>
+
+## 2026-10-22 FIXSTAND 续训与 GPU 任务
+
+本轮核对后翻 v3 独立四种子：动作及首尾标准站立 4/4，但 URDF 关节速度上限比 1.656–1.679，故已把服务器 `evaluation.json` 从仅按动作判断的 `passed_simulation_only` 更正为 `not_accepted`；没有放入实机部署。侧翻 v4 髋关节末段诊断将末端误差从约 0.149 降到 0.130 rad，仍未达到 0.12 门槛。侧翻 v5 完成后四种子均失败且站姿退化（末端约0.267 rad），所以中止从 v5 继续的 v6，改从更好的 v4 启动 v7 髋关节末段训练；后翻 v4 按 URDF 小腿15.7 rad/s 上限训练，直立 v3继续。独立验收现在同时要求动作/首尾和 `hardware_constraints_pass`；GPU 使用率检查约 94–98%，无需为了占满显存继续叠加任务。训练父检查点、导出与参考文件见 `artifacts/fixstand_resume_20261022/`，完整状态和复现命令见 [续训报告](docs/FIXSTAND_CONTINUATION_20261022.md)。这些在途任务未产生合格实机权重；原 MoE 平地/楼梯仍使用同一原始权重。

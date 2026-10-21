@@ -59,6 +59,11 @@ class FixstandTests(unittest.TestCase):
         x=sideflip_boundary_limit(torch.tensor([0,49,50,70,89,90,207,208,247,297]),298,.2,.05)
         torch.testing.assert_close(x,torch.tensor([.2,.2,.2,.125,.05027656,.05,.05,.05027656,.2,.2]),atol=1e-6,rtol=0)
 
+    def test_sideflip_terminal_hip_taper(self):
+        from skills.fixstand import terminal_hip_weight
+        value=terminal_hip_weight(torch.tensor([247,248,272,296,297]),298,50)
+        torch.testing.assert_close(value,torch.tensor([1.,1.,.51530403,0.00123255,0.]),atol=1e-6,rtol=0)
+
     def test_walking_rejects_sliding_and_accepts_loaded_cycles(self):
         from rob2nav.fixstand_validation import walking_action
         trace=[dict(time=1.+i*.02,upright_walk_error=.1,position=[i*.003,0.,.5],

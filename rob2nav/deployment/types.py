@@ -93,6 +93,7 @@ class Skill:
     bridge_residual_limit_rad:float=0.
     entry_hold_scale:float=.4
     endpoint_residual_limit_rad:float=.2
+    terminal_hip_taper_frames:int=0
 
     def checked(self):
         if len(self.joints)!=12 or set(self.joints)!=set(SDK_JOINTS):raise ValueError('Joint-name mapping must be a complete Go2 bijection')
@@ -100,11 +101,14 @@ class Skill:
         if min(self.kp)<0 or max(self.kp)>80 or min(self.kd)<0 or max(self.kd)>8:raise ValueError('PD outside configured bound')
         if not np.isfinite([self.policy_hz,self.scale]).all() or self.policy_hz not in (25,50,100) or self.scale<=0:raise ValueError('Invalid policy timing/scale')
         if self.observation not in ('stand','robogauge45','backflip60','upright48','upright52','mimic69'):raise ValueError('Unsupported observation adapter')
-        compatible={'joint_offset_v1':None,'reference_residual_v2':'mimic69','backflip_entry_v2':'backflip60','backflip_entry_v3':'backflip60','upright_endpoint_v2':'upright52','upright_endpoint_v3':'upright52'}
+        compatible={'joint_offset_v1':None,'reference_residual_v2':'mimic69','reference_residual_v3':'mimic69','backflip_entry_v2':'backflip60','backflip_entry_v3':'backflip60','upright_endpoint_v2':'upright52','upright_endpoint_v3':'upright52'}
         if self.action_parameterization not in compatible or (compatible[self.action_parameterization] is not None and self.observation!=compatible[self.action_parameterization]):raise ValueError('Action and observation contracts disagree')
-        if self.action_parameterization=='reference_residual_v2':
+        if self.action_parameterization in ('reference_residual_v2','reference_residual_v3'):
             if not self.reference or not .01<=self.bridge_residual_limit_rad<=self.residual_limit_rad<=.3:raise ValueError('Invalid sideflip residual contract')
-        elif self.residual_limit_rad or self.bridge_residual_limit_rad:raise ValueError('Residual limits require reference_residual_v2')
+        elif self.residual_limit_rad or self.bridge_residual_limit_rad:raise ValueError('Residual limits require reference residual action')
+        if self.action_parameterization=='reference_residual_v3':
+            if type(self.terminal_hip_taper_frames) is not int or not 2<=self.terminal_hip_taper_frames<=50:raise ValueError('Invalid terminal hip taper')
+        elif self.terminal_hip_taper_frames:raise ValueError('Terminal hip taper requires reference_residual_v3')
         if not np.isfinite(self.entry_hold_scale) or not 0<=self.entry_hold_scale<=.4:raise ValueError('Invalid backflip entry hold scale')
         if self.action_parameterization=='backflip_entry_v2' and self.entry_hold_scale!=.4:raise ValueError('Backflip v2 hold scale is 0.4')
         if self.action_parameterization not in ('backflip_entry_v2','backflip_entry_v3') and self.entry_hold_scale!=.4:raise ValueError('Entry hold scale requires backflip contract')

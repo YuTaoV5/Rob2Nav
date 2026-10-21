@@ -1,0 +1,40 @@
+{
+  "checkpoint_sha256": "8cdd940ebee99823b4ed17f4d807d8a1b1c700339f44fcefa3886d92c3c364a4",
+  "policy_sha256": "5d82094b65d2963e010b505dddc80da7dd65ae92187e49dc631251a5dc5380f5",
+  "actor_input_dim": 60,
+  "actor_output_dim": 12,
+  "onnx_max_error": 3.5762786865234375e-07,
+  "fixstand_roundtrip": {
+    "skill": "backflip",
+    "objective": "standard four-foot stance -> action -> standard four-foot stance",
+    "standard_pose": {
+      "FR_hip_joint": 0.0,
+      "FR_thigh_joint": 0.8,
+      "FR_calf_joint": -1.5,
+      "FL_hip_joint": 0.0,
+      "FL_thigh_joint": 0.8,
+      "FL_calf_joint": -1.5,
+      "RR_hip_joint": 0.0,
+      "RR_thigh_joint": 1.0,
+      "RR_calf_joint": -1.5,
+      "RL_hip_joint": 0.0,
+      "RL_thigh_joint": 1.0,
+      "RL_calf_joint": -1.5
+    },
+    "terminal_hold_s": 1.0,
+    "reset_only_state_writes": true,
+    "hardware_connected": false,
+    "shared_objective_sha256": "a49c878cb343f2d4ad7f4117dc72d30b620f1d638a0dfccd2e65c71d23425782",
+    "independently_validated": false,
+    "actor_observations": 60,
+    "action_parameterization": "backflip_entry_v3",
+    "entry_hold_scale": 0.1,
+    "entry_seconds": 1.0,
+    "release_seconds": [
+      1.0,
+      1.2
+    ],
+    "episode_seconds": 5.0
+  },
+  "capability_verified": false
+}
