@@ -62,8 +62,10 @@ class Servo:
 
 class SwitchController:
     """Two-phase skill activation. Atomic skills cannot be interrupted by a switch."""
-    def __init__(self,hardware=False):
+    def __init__(self,hardware=False,compact_transitions=False):
         self.hardware=hardware;self.phase='OFF';self.active=None;self.pending=None;self.epoch=0
+        self.compact_transitions=compact_transitions and not hardware
+        self.entry_duration=2.;self.entry_fallback=False
         self.servo=None;self.last_tick=None;self.last_sequence=None;self.sequence_at=0.;self.stable_since=None
         self.phase_at=0.;self.fault='';self.events=[];self.start_pose=None;self.exit_ready=False;self.warm_since=None
         self.command=np.zeros(3);self.requested_command=np.zeros(3)
@@ -96,6 +98,18 @@ class SwitchController:
     def latch(self,now,reason):
         if self.phase!='FAULT':self.phase='FAULT';self.fault=reason;self.event(now,'fault:'+reason)
     def _phase(self,name,now):self.phase=name;self.phase_at=now;self.stable_since=None;self.event(now,name)
+    def gains_ready(self,skill):
+        return np.max(abs(self.servo.kp-skill.to_sdk(skill.kp)))<.05 and np.max(abs(self.servo.kd-skill.to_sdk(skill.kd)))<.01
+    def compact_entry_allowed(self):
+        # Only the physically compared contract pairs use the compact route.
+        supported={'stand','walk_moe','sideflip69'}
+        return (self.compact_transitions and self.pending is not None and self.pending.id in supported
+                and (self.active is None or self.active.id in supported))
+    def begin_entry(self,now):
+        self.start_pose=self.servo.q.copy();self.warm_since=None
+        distance=float(np.max(abs(self.pending.entry_sdk()-self.start_pose)))
+        self.entry_duration=float(np.clip(1.875*distance/1.2,.35,2.)) if self.compact_entry_allowed() else 2.
+        self._phase('ENTRY',now)
     def tick(self,s,now,intent=None):
         if self.phase=='OFF':return None
         dt=now-self.last_tick
@@ -136,7 +150,7 @@ class SwitchController:
         elif self.phase=='READY':
             target=NEUTRAL
             if self.pending and settled:
-                self.start_pose=self.servo.q.copy();self._phase('ENTRY',now)
+                self.begin_entry(now)
         elif self.phase=='ACTIVE':
             integrate=self.active.observation=='stand';bias_scale=1. if integrate else 0.
             if intent is None:self.latch(now,'missing policy output')
@@ -148,19 +162,27 @@ class SwitchController:
                     quiescent_tripod=not self.active.atomic and s.safe_tripod() and np.linalg.norm(self.command)<.01 and elapsed>2
                     if self.pending and (settled or quiescent_tripod) and (not self.active.atomic or intent.finished):
                         self.servo.match_bias(s,capture=self.active.actuation=='native_pd');integrate=True;bias_scale=1.
-                        self.start_pose=self.servo.q.copy();self._phase('EXIT',now)
+                        self.entry_fallback=False
+                        if self.compact_entry_allowed() and settled and np.max(abs(s.q-self.pending.entry_sdk()))<.6:
+                            self.event(now,'direct_entry:'+self.active.id+'->'+self.pending.id)
+                            self.begin_entry(now)
+                        else:
+                            self.start_pose=self.servo.q.copy();self._phase('EXIT',now)
         elif self.phase=='EXIT':
             target=self.start_pose+quintic(elapsed/2.)*(NEUTRAL-self.start_pose)
             if elapsed>=2. and settled and np.max(abs(s.q-NEUTRAL))<.10:
-                self.start_pose=self.servo.q.copy();self._phase('ENTRY',now)
+                self.begin_entry(now)
             elif elapsed>6:self.latch(now,'exit did not recover stable neutral stance')
         elif self.phase=='ENTRY':
             goal=self.pending.entry_sdk()
-            target=self.start_pose+quintic(elapsed/2.)*(goal-self.start_pose)
+            target=self.start_pose+quintic(elapsed/self.entry_duration)*(goal-self.start_pose)
             kp=self.pending.to_sdk(self.pending.kp);kd=self.pending.to_sdk(self.pending.kd)
-            if elapsed>=2. and settled and np.max(abs(s.q-goal))<self.pending.entry_tolerance:
+            if elapsed>=self.entry_duration and settled and self.gains_ready(self.pending) and np.max(abs(s.q-goal))<self.pending.entry_tolerance:
                 self.epoch+=1;self.warm_since=None;self._phase('WARMUP',now)
-            elif elapsed>6:self.latch(now,'entry pose/gain transition timeout')
+            elif elapsed>6:
+                if self.compact_transitions and not self.entry_fallback and s.stable():
+                    self.entry_fallback=True;self.start_pose=self.servo.q.copy();self.event(now,'entry_fallback_neutral');self._phase('EXIT',now)
+                else:self.latch(now,'entry pose/gain transition timeout')
         elif self.phase=='ARMED':
             target=self.active.entry_sdk();kp=self.active.to_sdk(self.active.kp);kd=self.active.to_sdk(self.active.kd)
             if intent is None:self.latch(now,'missing armed atomic policy output')
@@ -185,7 +207,7 @@ class SwitchController:
             if self.phase=='WARMUP':
                 if valid and stable:
                     if self.warm_since is None:self.warm_since=now
-                    if now-self.warm_since>self.pending.warmup_s:
+                    if now-self.warm_since>self.pending.warmup_s and self.gains_ready(self.pending):
                         if self.pending.atomic:
                             self.active=self.pending;self.pending=None;self._phase('ARMED',now);self.event(now,'commit:'+self.active.id)
                         else:self._phase('BLEND',now)

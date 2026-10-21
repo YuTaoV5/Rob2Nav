@@ -25,6 +25,48 @@ def skill(id='stand',**kw):
 
 
 class DeploymentCoreTests(unittest.TestCase):
+    def test_compact_switch_enters_candidate_without_neutral_detour(self):
+        c=SwitchController(compact_transitions=True);c.arm(state(),0)
+        c.phase='ACTIVE';c.active=skill('stand');c.pending=skill('walk_moe',default=tuple(NEUTRAL+.03),actuation='native_pd')
+        c.stable_since=0.;c.servo.kp[:]=30;c.servo.kd[:]=1.5
+        c.tick(state(.4,1),.4,Intent(0,.4,NEUTRAL))
+        self.assertEqual(c.phase,'FAULT')  # A compact route cannot bypass a control deadline.
+        c=SwitchController(compact_transitions=True);c.arm(state(),0)
+        c.phase='ACTIVE';c.active=skill('stand');c.pending=skill('walk_moe',default=tuple(NEUTRAL+.03),actuation='native_pd')
+        c.stable_since=-1.;c.servo.kp[:]=30;c.servo.kd[:]=1.5
+        c.tick(state(.002,1),.002,Intent(0,.002,NEUTRAL))
+        self.assertEqual(c.phase,'ENTRY');self.assertLess(c.entry_duration,2.)
+        self.assertTrue(any(e['event'].startswith('direct_entry:') for e in c.events))
+
+    def test_entry_waits_for_actual_gain_convergence(self):
+        c=SwitchController(compact_transitions=True);c.arm(state(),0)
+        c.pending=skill('new',kp=(60.,)*12);c.phase='ENTRY';c.phase_at=-3
+        c.start_pose=NEUTRAL.copy();c.stable_since=-1.;c.servo.kp[:]=30;c.servo.kd[:]=1.5
+        c.tick(state(.002,1),.002)
+        self.assertEqual(c.phase,'ENTRY')
+        c.servo.kp[:]=60
+        c.tick(state(.004,2),.004)
+        self.assertEqual(c.phase,'WARMUP')
+
+    def test_compact_routes_remain_disabled_for_hardware(self):
+        self.assertFalse(SwitchController(hardware=True,compact_transitions=True).compact_transitions)
+
+    def test_soft_stand_keeps_full_load_acquisition_entry(self):
+        c=SwitchController(compact_transitions=True);c.arm(state(),0)
+        c.pending=skill('stand_soft',kp=(15.,)*12,kd=(.5,)*12)
+        c.begin_entry(.002)
+        self.assertFalse(c.compact_entry_allowed());self.assertEqual(c.entry_duration,2.)
+
+    def test_compact_entry_only_retries_neutral_once(self):
+        c=SwitchController(compact_transitions=True);c.arm(state(),0)
+        c.pending=skill('walk_moe',default=tuple(NEUTRAL+.3));c.start_pose=NEUTRAL.copy()
+        c.phase='ENTRY';c.phase_at=-7;c.stable_since=-1
+        c.tick(state(.002,1),.002)
+        self.assertEqual(c.phase,'EXIT');self.assertTrue(c.entry_fallback)
+        c.phase='ENTRY';c.phase_at=-7;c.stable_since=-1
+        c.tick(state(.004,2),.004)
+        self.assertEqual(c.phase,'FAULT')
+
     def test_preparation_bounds_metadata_and_closes_evicted_reference_handles(self):
         with tempfile.TemporaryDirectory() as temp:
             root=Path(temp);folder=root/'deployment/skills';folder.mkdir(parents=True)

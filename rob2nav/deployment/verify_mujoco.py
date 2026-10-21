@@ -17,6 +17,7 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--root',type=Path,default=Path(__file__).resolve().parents[2]);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--wire-mode',choices=['torque','hybrid_pd'],default='hybrid_pd');p.add_argument('--asset',choices=['robogauge','source'],default='robogauge');p.add_argument('--atomic-cycle',action='store_true')
     p.add_argument('--seed',type=int,default=9201);p.add_argument('--video',action='store_true')
+    p.add_argument('--legacy-transitions',action='store_true',help='Compare against mandatory neutral/2s entry transitions')
     p.add_argument('--sequence',type=Path,help='Use the same state-driven sequence component as the device service')
     p.add_argument('--source-model',type=Path,help='Exact Go2 MuJoCo source XML; defaults to packaged deployment/models/go2_isaac.xml')
     p.add_argument('--initial-yaw-deg',type=float,default=0.)
@@ -49,7 +50,7 @@ def main():
     aids=np.array([int(np.where(model.actuator_trnid[:,0]==i)[0][0]) for i in ids])
     from .observer import KinematicObserver
     observer=KinematicObserver(model);foot_ids=observer.feet;floor=model.geom('floor').id
-    start_time=float(data.time);runtime=UnifiedRuntime(root,allow_research_stunts=a.atomic_cycle);samples=[];events=[];requests=[];video=None;next_render=0.
+    start_time=float(data.time);runtime=UnifiedRuntime(root,allow_research_stunts=a.atomic_cycle,compact_transitions=not a.legacy_transitions);samples=[];events=[];requests=[];video=None;next_render=0.
     sequence=['stand','walk_moe','sideflip69','walk_moe','stand'] if a.atomic_cycle else ['stand_soft','stand_stiff','walk_mlp','walk_moe','stand'];requested=0;last_active=None;active_since=0.
     choreography=None
     if a.sequence:
@@ -136,6 +137,10 @@ def main():
             model_sha256=dict(runtime.model_history),retained_prepared_entries=len(runtime.prepared),hardware_connected=False,
             root_writes='initialization only; actuator rollout in reported wire_mode, no stabilizing root force or weld',final_position=data.qpos[:3].tolist())
         report['source_sha256']={str(f.relative_to(root)):hashlib.sha256(f.read_bytes()).hexdigest() for f in (root/'rob2nav/deployment').glob('*.py')}
+        trace=np.asarray(samples)
+        report['compact_transitions']=not a.legacy_transitions
+        report['duration_s']=float(trace[-1,0]) if len(trace) else 0.
+        report['joint_travel_rad']=float(np.abs(np.diff(trace[:,49:61],axis=0)).sum()) if len(trace)>1 else 0.
         report['profile_sha256']={str(f.relative_to(root)):hashlib.sha256(f.read_bytes()).hexdigest() for f in (root/'deployment/skills').glob('*.json')}
         (a.output/'summary.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report),flush=True)
     finally:

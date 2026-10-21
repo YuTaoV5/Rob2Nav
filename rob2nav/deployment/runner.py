@@ -24,8 +24,8 @@ class Prepared:
 
 
 class UnifiedRuntime:
-    def __init__(self,root,hardware=False,allow_research_stunts=False,approval=None):
-        self.root=Path(root).resolve();self.controller=SwitchController(hardware)
+    def __init__(self,root,hardware=False,allow_research_stunts=False,approval=None,compact_transitions=True):
+        self.root=Path(root).resolve();self.controller=SwitchController(hardware,compact_transitions)
         self.executor=ThreadPoolExecutor(max_workers=1,thread_name_prefix='policy-staging')
         self.future=None;self.active=None;self.next=None;self.queued=None;self.stage_error=None;self.started=0.;self.prepared=[]
         self.model_history={}
@@ -116,11 +116,11 @@ class UnifiedRuntime:
             except ValueError as exc:self.stage_error=str(exc);c.event(now,'switch_rejected:'+str(exc))
             self.queued=None
         before_phase=c.phase
-        candidate=self.next if c.phase in ('WARMUP','BLEND') else self.active if c.phase in ('ACTIVE','ARMED') else None
+        candidate=self.next if c.phase in ('WARMUP','BLEND') or (c.compact_transitions and c.phase=='ENTRY') else self.active if c.phase in ('ACTIVE','ARMED') else None
         intent=None
         if candidate:
             skill=candidate.skill
-            if c.phase=='WARMUP' and candidate.entry_epoch!=c.epoch:
+            if c.phase in ('ENTRY','WARMUP') and candidate.entry_epoch!=c.epoch:
                 # Preloading can happen while the previous gait still turns.
                 # Anchor the reference to the actual entry orientation, not a
                 # stale orientation captured when the file started loading.

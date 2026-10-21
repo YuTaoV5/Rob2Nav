@@ -1,0 +1,239 @@
+{
+  "seed": 9411,
+  "asset": "source",
+  "wire_mode": "hybrid_pd",
+  "sequence": [
+    "stand",
+    "walk_moe",
+    "stand"
+  ],
+  "shared_sequencer": true,
+  "initial_yaw_deg": 0.0,
+  "atomic_cycle": false,
+  "flip_rotation_rad": 0.0,
+  "native_motion_peak_torque_step_Nm": 1.8668303942087374,
+  "maximum_joint_speed_ratio": 0.21728706504876447,
+  "passed": true,
+  "reason": "all requested profiles committed and settled",
+  "backend": "MuJoCo real free-base hot-switch harness; commits/model hashes below define which actors were actually exercised",
+  "commits": [
+    {
+      "time": 5.66,
+      "skill": "stand",
+      "position": [
+        -0.008070601918950421,
+        -6.81825635479579e-10,
+        0.33112401382066353
+      ]
+    },
+    {
+      "time": 12.648,
+      "skill": "walk_moe",
+      "position": [
+        -0.017433081430115363,
+        -0.0009040549843400669,
+        0.3149274138289371
+      ]
+    },
+    {
+      "time": 17.692,
+      "skill": "stand",
+      "position": [
+        0.03452504559326404,
+        0.004381902294759006,
+        0.33110775090792766
+      ]
+    }
+  ],
+  "requests": [],
+  "controller_events": [
+    {
+      "time": 0.0,
+      "event": "capture_measured_state",
+      "phase": "CAPTURE",
+      "epoch": 0
+    },
+    {
+      "time": 1.0,
+      "event": "NEUTRAL",
+      "phase": "NEUTRAL",
+      "epoch": 0
+    },
+    {
+      "time": 3.0,
+      "event": "READY",
+      "phase": "READY",
+      "epoch": 0
+    },
+    {
+      "time": 3.0020000000000002,
+      "event": "request:stand",
+      "phase": "READY",
+      "epoch": 0
+    },
+    {
+      "time": 3.3040000000000003,
+      "event": "ENTRY",
+      "phase": "ENTRY",
+      "epoch": 0
+    },
+    {
+      "time": 3.656,
+      "event": "WARMUP",
+      "phase": "WARMUP",
+      "epoch": 1
+    },
+    {
+      "time": 4.658,
+      "event": "BLEND",
+      "phase": "BLEND",
+      "epoch": 1
+    },
+    {
+      "time": 5.658,
+      "event": "ACTIVE",
+      "phase": "ACTIVE",
+      "epoch": 1
+    },
+    {
+      "time": 5.658,
+      "event": "commit:stand",
+      "phase": "ACTIVE",
+      "epoch": 1
+    },
+    {
+      "time": 7.96,
+      "event": "request:walk_moe",
+      "phase": "ACTIVE",
+      "epoch": 1
+    },
+    {
+      "time": 7.96,
+      "event": "EXIT",
+      "phase": "EXIT",
+      "epoch": 1
+    },
+    {
+      "time": 9.96,
+      "event": "ENTRY",
+      "phase": "ENTRY",
+      "epoch": 1
+    },
+    {
+      "time": 10.626,
+      "event": "WARMUP",
+      "phase": "WARMUP",
+      "epoch": 2
+    },
+    {
+      "time": 11.646,
+      "event": "BLEND",
+      "phase": "BLEND",
+      "epoch": 2
+    },
+    {
+      "time": 12.646,
+      "event": "ACTIVE",
+      "phase": "ACTIVE",
+      "epoch": 2
+    },
+    {
+      "time": 12.646,
+      "event": "commit:walk_moe",
+      "phase": "ACTIVE",
+      "epoch": 2
+    },
+    {
+      "time": 13.652000000000001,
+      "event": "request:stand",
+      "phase": "ACTIVE",
+      "epoch": 2
+    },
+    {
+      "time": 14.028,
+      "event": "direct_entry:walk_moe->stand",
+      "phase": "ACTIVE",
+      "epoch": 2
+    },
+    {
+      "time": 14.028,
+      "event": "ENTRY",
+      "phase": "ENTRY",
+      "epoch": 2
+    },
+    {
+      "time": 15.686,
+      "event": "WARMUP",
+      "phase": "WARMUP",
+      "epoch": 3
+    },
+    {
+      "time": 16.69,
+      "event": "BLEND",
+      "phase": "BLEND",
+      "epoch": 3
+    },
+    {
+      "time": 17.69,
+      "event": "ACTIVE",
+      "phase": "ACTIVE",
+      "epoch": 3
+    },
+    {
+      "time": 17.69,
+      "event": "commit:stand",
+      "phase": "ACTIVE",
+      "epoch": 3
+    }
+  ],
+  "max_torque_step_Nm": 0.3000000000001002,
+  "max_kp_step": 0.030000000000011795,
+  "max_reference_step_rad": 0.35198091356518624,
+  "max_tilt_deg": 3.1744509720281826,
+  "min_base_height_m": 0.29171274751261494,
+  "steps": 9345,
+  "analytical_naive_switches": [],
+  "loop_wall_gap_ms_p99": 2.058238862082362,
+  "loop_wall_gap_ms_max": 4.47218818590045,
+  "timing_scope": "Simulation clock drives the controller; pacing/rendering IPC timing is recorded but is not a hard-real-time hardware certificate",
+  "model_sha256": {
+    "stand": "",
+    "walk_moe": "2206659a6a23886446dcfc05d86888d6cdc9b8a4e31f44cbbc4e2d17ba3d6ead"
+  },
+  "retained_prepared_entries": 2,
+  "hardware_connected": false,
+  "root_writes": "initialization only; actuator rollout in reported wire_mode, no stabilizing root force or weld",
+  "final_position": [
+    0.03841094069762704,
+    0.008054999494307616,
+    0.32940339265526486
+  ],
+  "source_sha256": {
+    "rob2nav/deployment/runner.py": "c214c54fd4a642a578fad3306f1aadb4a80f66f4c9103a2f5f019437ec832d81",
+    "rob2nav/deployment/verify_mujoco.py": "fc7028672df0fba6b96a21aa32c564727a1cfe97541d71247b434960527dce3c",
+    "rob2nav/deployment/__main__.py": "72bac55a79bb707cb75f65b0c5b6881e0326703782bc5cc6a98957771c5ddb2f",
+    "rob2nav/deployment/core.py": "3d7df870ff8e422269a587d6205d5f93511efc31bd6a5e2e96ea2b1d5d4d2e28",
+    "rob2nav/deployment/sequence.py": "f434badcf26fd5b3b5d30fb67fd8a70ecd883bdfd118fe6a581ad5c7812e2a77",
+    "rob2nav/deployment/service.py": "8df855a08fcad8355c143fde8ea78e46a795c84f02e0f4d32a1a452637d7c519",
+    "rob2nav/deployment/__init__.py": "fe519182f7cf5e8d6a3244d1b297b08aada027a7fe0c0ac67e757b75db51412e",
+    "rob2nav/deployment/teleop.py": "008bb4ad27cb76479aa6d0c09b9482c909441932a88e90d3de176a4835ba3ee0",
+    "rob2nav/deployment/unitree.py": "fc0b11d1f675c1480e6e99e5c7c43a6cee93cbf3845c789944b5472f0cf59062",
+    "rob2nav/deployment/calibration.py": "e1a41f21454c137a7860796092978798d0de98c1a1e4d7d4856eb884ffecc24e",
+    "rob2nav/deployment/observer.py": "9ca2b40405adb1060b528c33c4e5414f771b15a4cb6a1bb6ec86636065d2f49a",
+    "rob2nav/deployment/types.py": "40d07010f4be9223f44be35c00de571287e16ac47f65b7ddc18a390479bf2bc1",
+    "rob2nav/deployment/policies.py": "5fed2f1dec9bd3f868683be1b62a7f8a5677ae5fa102ef7db3c049a17812b683"
+  },
+  "compact_transitions": true,
+  "duration_s": 18.69,
+  "joint_travel_rad": 16.584987552563256,
+  "profile_sha256": {
+    "deployment/skills/walk_mlp.json": "90ea64b6db16306486bed125fa19cb0e3b468618441c7e33ba05e7ebcea7287c",
+    "deployment/skills/sideflip69.json": "2619df3b644caf7bbe670ce25fc8d39e11bb4b3ec5cba7a2633d770780f16145",
+    "deployment/skills/stand.json": "a473e274b6adbfd180fbe24a042e4038a872da1701f5bf28256e056f377e0e85",
+    "deployment/skills/walk_moe.json": "10ffd4467791389d8cb3b8a8512c20b4b7b99f9591811eab52c2715cc37e6239",
+    "deployment/skills/backflip60.json": "2e16b2a0820815b162529a97c5304213f6d901c121f2ea5c2e0cbdbb1c3ff12d",
+    "deployment/skills/upright48.json": "f9a4aec02843363ea3a6443716af3a21a4aa20ff240b1b1b166074d58d66d641",
+    "deployment/skills/stand_soft.json": "f6a00c6ba4d7d096055b418e9d8991ba574839a438d5ebb8aa9e85dc0837a971",
+    "deployment/skills/stand_stiff.json": "f012c5d89da667f42041e423254f75f244cc3f4052cf2d1576ecc9ed9d7e4e38"
+  }
+}
