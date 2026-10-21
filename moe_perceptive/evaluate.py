@@ -122,6 +122,7 @@ records=[];trace=[];diagnostics=[];frames=0;writer=None;maximum_zero_error=0.
 from .gait_metrics import GaitMetrics
 gait=GaitMetrics(a.num_envs,env.step_dt) if a.gait_metrics else None
 stream=None
+stream_wall=__import__('time').monotonic()
 if a.studio_stream:
     from studio.visuals import terrain_data
     scene=terrain_data(a.kind,a.course,a.difficulty)
@@ -170,6 +171,10 @@ try:
                 from .attention_diagnostic import describe
                 diagnostics[-1]['attention']=describe(actor,policy_obs[:1])
             obs,_,done,_=wrapped.step(actions);state=env._eval_state
+            if a.studio_stream:
+                import time
+                delay=(step+1)*env.step_dt-(time.monotonic()-stream_wall)
+                if delay>0:time.sleep(delay)
             if gait:
                 values=[state[k].cpu().tolist() for k in ('foot_velocity','forces','joint_velocity','applied_torque','root_velocity','upright')]
                 gait.update((~done_first).cpu().tolist(),*values)

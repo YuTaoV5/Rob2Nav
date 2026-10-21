@@ -27,6 +27,8 @@ class Camera(BaseModel):
 
 
 def mount_live_skills(app,root,python):
+    from .checkpoint_live import mount_checkpoint_live
+    mount_checkpoint_live(app,root)
     root=Path(root);lock=threading.RLock();current={};proc=None;last_client=0.
     source=Path('/root/gpufree-data/Rob2Nav-upstreams/GO2_backflip')
     def resource(relative,fallback):

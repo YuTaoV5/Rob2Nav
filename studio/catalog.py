@@ -107,7 +107,7 @@ class Catalog:
                        'backend':d.get('backend','MuJoCo' if assisted or 'mujoco' in rel.lower() or 'results' in d else 'Isaac / 需核对'),
                        'assistance':'技能调度 / IK' if assisted else '关节策略 / 见来源',
                        'diagnostic':bool(args.get('map_ablation','none') != 'none' or d.get('diagnostic_only')),
-                       'video_scope':d.get('video_scope'),'checkpoint':d.get('checkpoint_sha256'),'video':self.relative(video) if video.exists() and video.is_relative_to(self.root) else None}
+                       'video_scope':d.get('video_scope'),'checkpoint':d.get('checkpoint_sha256') or d.get('policy_sha256'),'video':self.relative(video) if video.exists() and video.is_relative_to(self.root) else None}
                 evaluations.append(row)
             for path in base.rglob('iterations.jsonl'):
                 if 'source' in path.parts: continue
@@ -125,8 +125,8 @@ class Catalog:
                     if 'source' in path.parts: continue
                     key=ident(path); records[key]=path
                     videos.append({'id':key,'name':path.parent.name,'path':self.relative(path),'bytes':path.stat().st_size})
-                for path in base.rglob('*.pt'):
-                    if path.name=='actor.pt' or 'source' in path.parts: continue
+                for path in (p for p in base.rglob('*') if p.suffix.lower() in {'.pt','.onnx','.zip'}):
+                    if not path.is_file() or 'source' in path.parts: continue
                     key=ident(path); records[key]=path
                     models.append({'id':key,'name':path.name,'group':path.parent.name,'path':self.relative(path),'bytes':path.stat().st_size})
         report_paths=list(self.root.glob('*.md'))+list((self.root/'docs').rglob('*.md'))+list((self.root/'skills').rglob('*.md'))+list((self.root/'go2_nav/paw_contact').glob('*.md'))
@@ -136,6 +136,10 @@ class Catalog:
             text=path.read_text(encoding='utf-8-sig', errors='replace')
             title=next((s.lstrip('# ').strip() for s in text.splitlines() if s.startswith('# ')),path.stem)
             reports.append({'id':key,'name':title,'path':self.relative(path),'bytes':path.stat().st_size})
+        from .model_registry import inventory
+        models,model_issues=inventory(self.root,models,evaluations)
+        issues.extend(model_issues)
+        for model in models:records[model['id']]=self.root/model['path']
         self.records=records
         self.data=clean({'evaluations':evaluations,'runs':sorted(runs,key=lambda r:r['updated'],reverse=True),
                          'reports':reports,'videos':videos,'models':models,'issues':issues,'indexed_at':time.time()})
