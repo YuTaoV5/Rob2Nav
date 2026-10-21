@@ -16,5 +16,5 @@ class FixstandReferenceAction(JointPositionAction):
         command=self._env.command_manager.get_term('motion')
         frames=command.motion.time_step_total
         boundary=(command.time_steps<90)|(command.time_steps>=frames-90)
-        target=command.joint_pos+.05*torch.tanh(self._raw_actions)
+        target=command.joint_pos+getattr(self.cfg,'residual_limit_rad',.05)*torch.tanh(self._raw_actions)
         self._processed_actions[boundary]=target[boundary]

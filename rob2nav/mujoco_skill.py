@@ -250,7 +250,10 @@ def main():
     if args.fixstand_roundtrip:
         from .fixstand_validation import assess
         endpoints=assess(trace)
-        if args.kind=='upright_walk':success=bool(duration>=1.5 and not bad_floor_contact)
+        if args.kind=='upright_walk':
+            from .fixstand_validation import walking_action
+            metrics['walking']=walking_action(trace)
+            success=bool(metrics['walking']['passed'] and not bad_floor_contact)
         metrics['action_completed']=bool(success)
         metrics['fixstand']=endpoints;success=bool(success and endpoints['passed'])
     (args.output/'trace.json').write_text(json.dumps(trace))

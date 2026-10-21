@@ -94,7 +94,7 @@ def configure_upright(cfg):
     cfg.commands.base_velocity.ranges.ang_vel_z=(0.,0.)
 
 
-def configure_sideflip(cfg,contract,boundary_residual=False):
+def configure_sideflip(cfg,contract,boundary_residual=False,residual_limit=.05):
     from isaaclab.managers import RewardTermCfg
     from skills.fixstand_motion import StartAtStand
     cfg.commands.motion.class_type=StartAtStand
@@ -109,6 +109,7 @@ def configure_sideflip(cfg,contract,boundary_residual=False):
             raise ValueError('Boundary residual contract requires 50Hz reference with 90-frame padded ends')
         from skills.fixstand_motion import FixstandReferenceAction
         cfg.actions.JointPositionAction.class_type=FixstandReferenceAction
+        cfg.actions.JointPositionAction.residual_limit_rad=residual_limit
 
 
 def initialize_expanded_policy(runner,checkpoint):

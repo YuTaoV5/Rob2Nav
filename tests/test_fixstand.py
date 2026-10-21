@@ -44,6 +44,16 @@ class FixstandTests(unittest.TestCase):
         result=upright_phase(env)
         torch.testing.assert_close(result[:,:3],torch.eye(3))
 
+    def test_walking_rejects_sliding_and_accepts_loaded_cycles(self):
+        from rob2nav.fixstand_validation import walking_action
+        trace=[dict(time=1.+i*.02,upright_walk_error=.1,position=[i*.003,0.,.5],
+                    rear_ground=True,front_ground=False,foot_forces_N={'RR':30.,'RL':30.}) for i in range(151)]
+        self.assertFalse(walking_action(trace)['passed'])
+        for i,row in enumerate(trace):
+            row['foot_forces_N']['RR']=0. if 5<=i%40<12 else 30.
+            row['foot_forces_N']['RL']=0. if 25<=i%40<32 else 30.
+        self.assertTrue(walking_action(trace)['passed'])
+
     def test_endpoint_validation_rejects_terminal_motion(self):
         trace=[dict(time=i*.02,standard_pose_error=.02,max_joint_speed=.1,upright=1.,speed=.01,
                     angular_speed=.01,all_feet_ground=True,position=[0.,0.,.32]) for i in range(401)]
