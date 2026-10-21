@@ -6,14 +6,7 @@ import sys
 import termios
 import time
 import tty
-
-
-KEYS={
-    'w':(.18,0.,0.), 's':(-.12,0.,0.),
-    'a':(0.,.10,0.), 'd':(0.,-.10,0.),
-    'q':(0.,0.,.35), 'e':(0.,0.,-.35),
-    ' ':(0.,0.,0.),
-}
+from .keys import VELOCITY_KEYS,key_request
 
 
 def main():
@@ -26,14 +19,18 @@ def main():
     try:
         proc=subprocess.Popen(command,stdin=subprocess.PIPE,text=True,bufsize=1)
         tty.setcbreak(sys.stdin.fileno())
-        print('W/S forward/back, A/D lateral, Q/E yaw; SPACE stand, ESC stop. Hold key for motion.',flush=True)
+        print('W/S forward/back, A/D lateral, Q/E yaw; SPACE zero velocity; 1 stand, 2 walk, 3 sideflip, 4 backflip, 5 upright; T trigger armed action; ESC stop.',flush=True)
         velocity=(0.,0.,0.);last_key=0.;last_send=0.
         while proc.poll() is None:
             readable,_,_=select.select([sys.stdin],[],[],.04)
             if readable:
                 key=sys.stdin.read(1).lower()
-                if key=='\x1b':break
-                if key in KEYS:velocity=KEYS[key];last_key=time.monotonic()
+                request=key_request(key)
+                if request=={'stop':True}:break
+                if key in VELOCITY_KEYS:velocity=VELOCITY_KEYS[key];last_key=time.monotonic()
+                elif request is not None:
+                    try:proc.stdin.write(json.dumps(request)+'\n');proc.stdin.flush()
+                    except BrokenPipeError:break
             now=time.monotonic()
             if now-last_key>.18:velocity=(0.,0.,0.)
             if now-last_send>=.08:

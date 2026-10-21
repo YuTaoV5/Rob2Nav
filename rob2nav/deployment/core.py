@@ -62,9 +62,10 @@ class Servo:
 
 class SwitchController:
     """Two-phase skill activation. Atomic skills cannot be interrupted by a switch."""
-    def __init__(self,hardware=False,compact_transitions=False):
+    def __init__(self,hardware=False,compact_transitions=False,qualified_compact_pairs=()):
         self.hardware=hardware;self.phase='OFF';self.active=None;self.pending=None;self.epoch=0
-        self.compact_transitions=compact_transitions and not hardware
+        self.qualified_compact_pairs=frozenset(tuple(pair) for pair in qualified_compact_pairs)
+        self.compact_transitions=bool(compact_transitions and (not hardware or self.qualified_compact_pairs))
         self.entry_duration=2.;self.entry_fallback=False
         self.servo=None;self.last_tick=None;self.last_sequence=None;self.sequence_at=0.;self.stable_since=None
         self.phase_at=0.;self.fault='';self.events=[];self.start_pose=None;self.exit_ready=False;self.warm_since=None
@@ -102,6 +103,9 @@ class SwitchController:
         return np.max(abs(self.servo.kp-skill.to_sdk(skill.kp)))<.05 and np.max(abs(self.servo.kd-skill.to_sdk(skill.kd)))<.01
     def compact_entry_allowed(self):
         # Only the physically compared contract pairs use the compact route.
+        if self.hardware:
+            return (self.compact_transitions and self.active is not None and self.pending is not None and
+                (self.active.digest(),self.pending.digest()) in self.qualified_compact_pairs)
         supported={'stand','walk_moe','sideflip69'}
         return (self.compact_transitions and self.pending is not None and self.pending.id in supported
                 and (self.active is None or self.active.id in supported))

@@ -88,13 +88,29 @@ class Skill:
     entry_gravity:tuple[float,...]=(0.,0.,-1.)
     entry_gravity_tolerance:float=.12
     support_model_gain:float=0.
+    action_parameterization:str='joint_offset_v1'
+    residual_limit_rad:float=0.
+    bridge_residual_limit_rad:float=0.
+    entry_hold_scale:float=.4
+    endpoint_residual_limit_rad:float=.2
 
     def checked(self):
         if len(self.joints)!=12 or set(self.joints)!=set(SDK_JOINTS):raise ValueError('Joint-name mapping must be a complete Go2 bijection')
         for x in [self.default,self.kp,self.kd]:vector(x)
         if min(self.kp)<0 or max(self.kp)>80 or min(self.kd)<0 or max(self.kd)>8:raise ValueError('PD outside configured bound')
         if not np.isfinite([self.policy_hz,self.scale]).all() or self.policy_hz not in (25,50,100) or self.scale<=0:raise ValueError('Invalid policy timing/scale')
-        if self.observation not in ('stand','robogauge45','backflip60','upright48','mimic69'):raise ValueError('Unsupported observation adapter')
+        if self.observation not in ('stand','robogauge45','backflip60','upright48','upright52','mimic69'):raise ValueError('Unsupported observation adapter')
+        compatible={'joint_offset_v1':None,'reference_residual_v2':'mimic69','backflip_entry_v2':'backflip60','backflip_entry_v3':'backflip60','upright_endpoint_v2':'upright52','upright_endpoint_v3':'upright52'}
+        if self.action_parameterization not in compatible or (compatible[self.action_parameterization] is not None and self.observation!=compatible[self.action_parameterization]):raise ValueError('Action and observation contracts disagree')
+        if self.action_parameterization=='reference_residual_v2':
+            if not self.reference or not .01<=self.bridge_residual_limit_rad<=self.residual_limit_rad<=.3:raise ValueError('Invalid sideflip residual contract')
+        elif self.residual_limit_rad or self.bridge_residual_limit_rad:raise ValueError('Residual limits require reference_residual_v2')
+        if not np.isfinite(self.entry_hold_scale) or not 0<=self.entry_hold_scale<=.4:raise ValueError('Invalid backflip entry hold scale')
+        if self.action_parameterization=='backflip_entry_v2' and self.entry_hold_scale!=.4:raise ValueError('Backflip v2 hold scale is 0.4')
+        if self.action_parameterization not in ('backflip_entry_v2','backflip_entry_v3') and self.entry_hold_scale!=.4:raise ValueError('Entry hold scale requires backflip contract')
+        if not np.isfinite(self.endpoint_residual_limit_rad) or not .01<=self.endpoint_residual_limit_rad<=.2:raise ValueError('Invalid upright endpoint limit')
+        if self.action_parameterization=='upright_endpoint_v2' and self.endpoint_residual_limit_rad!=.2:raise ValueError('Upright v2 endpoint limit is 0.2')
+        if self.action_parameterization!='upright_endpoint_v3' and self.endpoint_residual_limit_rad!=.2:raise ValueError('Upright limit requires v3 contract')
         if self.entry not in ('four_feet','requires_exit_controller'):raise ValueError('Unsupported entry condition')
         if not np.isfinite(self.warmup_s) or not .3<=self.warmup_s<=3:raise ValueError('Invalid history warmup duration')
         if self.actuation not in ('bounded_pd','native_pd'):raise ValueError('Unknown motor execution contract')

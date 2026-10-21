@@ -168,12 +168,12 @@ def main():
             last=np.clip(action,-100,100)
             target=default+float(meta['action_scale'])*last
             boundary=meta.get('fixstand_roundtrip',{})
-            if boundary.get('action_parameterization')=='upright_endpoint_v2':
+            if boundary.get('action_parameterization') in ('upright_endpoint_v2','upright_endpoint_v3'):
                 from skills.fixstand import POSE,upright_endpoint_weight
-                if boundary['residual_limit_rad']!=.20 or boundary['release_seconds']!=[1.,1.5] or boundary['recovery_seconds']!=[5.,6.5]:
+                if not .01<=boundary['residual_limit_rad']<=.2 or boundary['release_seconds']!=[1.,1.5] or boundary['recovery_seconds']!=[5.,6.5]:
                     raise ValueError('Unsupported upright endpoint action contract')
                 weight=float(upright_endpoint_weight(now))
-                endpoint=np.asarray([POSE[n] for n in names])+.20*np.tanh(last)
+                endpoint=np.asarray([POSE[n] for n in names])+boundary['residual_limit_rad']*np.tanh(last)
                 target=(1.-weight)*target+weight*endpoint
             if boundary.get('action_parameterization')=='reference_residual_v2':
                 if reference is None:raise ValueError('Reference residual policy requires its motion reference')

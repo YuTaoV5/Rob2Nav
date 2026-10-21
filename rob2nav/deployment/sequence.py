@@ -12,12 +12,14 @@ class Step:
     seconds:float=2.
     velocity:tuple[float,...]=(0.,0.,0.)
     trigger:bool=False
+    handover_extension_s:float=60.
     def checked(self):
         if not self.skill or any(x not in 'abcdefghijklmnopqrstuvwxyz0123456789_' for x in self.skill):raise ValueError('Invalid sequence skill ID')
         if not np.isfinite(self.seconds) or not 0<self.seconds<=120:raise ValueError('Invalid sequence dwell time')
         command=vector(self.velocity,3)
         if np.any(abs(command)>np.array([.5,.25,.7])):raise ValueError(f'速度 {tuple(self.velocity)} 超出指令范围：前后 ±0.5 m/s、左右 ±0.25 m/s、转向 ±0.7 rad/s')
         if type(self.trigger) is not bool:raise ValueError('Sequence trigger must be boolean')
+        if not np.isfinite(self.handover_extension_s) or not 0<=self.handover_extension_s<=300:raise ValueError('Invalid terrain handover extension')
         return self
 
 
@@ -37,6 +39,13 @@ class SkillSequence:
             _,contract=runtime.profile(step.skill)
             if contract.atomic!=step.trigger:raise ValueError('Atomic sequence steps require an explicit trigger; gait steps must not trigger')
         self.index=0;self.requested=False;self.started=None;self.done=False;self.error=None
+    @staticmethod
+    def terrain_handover_ready(snapshot):
+        # A terrain policy may remain pitched on a stair. Keep it active until
+        # the body is back in a level transfer corridor; the core still demands
+        # a slower, fully settled stance before committing the next policy.
+        return bool(np.linalg.norm(snapshot.gravity-np.array([0.,0.,-1.]))<.18 and
+            np.linalg.norm(snapshot.gyro)<.35 and np.count_nonzero(snapshot.contacts())>=3)
     def tick(self,snapshot,now):
         r=self.runtime;c=r.controller
         if self.done or self.error:c.set_velocity([0,0,0],now);return
@@ -56,6 +65,13 @@ class SkillSequence:
         c.set_velocity(step.velocity,now)
         # Queue the return gait as soon as the atomic action starts. The core,
         # not this sequencer's timer, enforces completion and landing stability.
-        if c.active.atomic or now-self.started>=step.seconds:
+        elapsed=now-self.started
+        if not c.active.atomic and elapsed>=step.seconds and self.index<len(self.steps)-1:
+            next_step=self.steps[self.index+1]
+            if next_step.skill!=step.skill and not self.terrain_handover_ready(snapshot):
+                if elapsed>step.seconds+step.handover_extension_s:
+                    self.error='terrain handover window timed out';c.set_velocity([0,0,0],now)
+                return
+        if c.active.atomic or elapsed>=step.seconds:
             if self.index==len(self.steps)-1:self.done=True;c.set_velocity([0,0,0],now)
             else:self.index+=1;self.requested=False;self.started=None

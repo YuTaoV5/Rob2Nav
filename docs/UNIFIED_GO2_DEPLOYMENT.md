@@ -38,7 +38,7 @@ python -m rob2nav.deployment.teleop -- run --profile <qualified-gait> \
   --model <verified-go2.xml> --output outputs/teleop_001 --enable-motors
 ```
 
-该入口只在Linux本地终端工作。按住 `W/S` 前后、`A/D` 横移、`Q/E` 转向，空格请求零速度，Esc请求停止；按键停止约0.18秒后客户端自动发送零速度，控制器本身在0.25秒后也会把过期速度目标渐降为零。键盘只是给统一控制器发速度意图，不能绕开电机资格门。初次站立/步态只在支架、急停和独立看门狗就绪时执行；可先以不带 `--enable-motors` 的命令观察门禁。
+该入口只在Linux本地终端工作。按住 `W/S` 前后、`A/D` 横移、`Q/E` 转向，空格请求零速度；`1/2/3/4/5` 分别选择站立/MoE/侧翻/后翻/预留直立，`T` 触发已就绪的原子动作，Esc请求停止。按键停止约0.18秒后客户端自动发送零速度，控制器本身在0.25秒后也会把过期速度目标渐降为零。未资格化的动作仍会拒绝切换；完整按键和 Go2 Edu 说明见 [Go2 Edu 热切换](GO2_EDU_HOT_SWITCH.md)。初次站立/步态只在支架、急停和独立看门狗就绪时执行；可先以不带 `--enable-motors` 的命令观察门禁。
 
 实机服务的状态机为 `CAPTURE → NEUTRAL → READY → ENTRY → WARMUP → BLEND → ACTIVE`（步态），原子技能经 `WARMUP → ARMED → 显式trigger → ACTIVE`；切换时 `ACTIVE → EXIT → NEUTRAL → ENTRY`。任何状态时效、接触、姿态、热/电压、力矩或资格条件失效进入 `FAULT` 并请求阻尼停止。键盘入口只用于已获准的步态；编排序列可用 `run --sequence <json>` 交给同一个服务，但序列中的**每一份**技能合同仍需单独获得资格。当前没有任何发布的特技满足该条件。
 

@@ -7,7 +7,7 @@ import time
 import numpy as np
 from .core import SwitchController
 from .types import Skill,Intent
-from .policies import PolicyProcess,observation
+from .policies import PolicyProcess,observation,reference_action_frame
 
 
 @dataclass
@@ -24,8 +24,8 @@ class Prepared:
 
 
 class UnifiedRuntime:
-    def __init__(self,root,hardware=False,allow_research_stunts=False,approval=None,compact_transitions=True):
-        self.root=Path(root).resolve();self.controller=SwitchController(hardware,compact_transitions)
+    def __init__(self,root,hardware=False,allow_research_stunts=False,approval=None,compact_transitions=True,qualified_compact_pairs=()):
+        self.root=Path(root).resolve();self.controller=SwitchController(hardware,compact_transitions,qualified_compact_pairs)
         self.executor=ThreadPoolExecutor(max_workers=1,thread_name_prefix='policy-staging')
         self.future=None;self.active=None;self.next=None;self.queued=None;self.stage_error=None;self.started=0.;self.prepared=[]
         self.model_history={}
@@ -67,7 +67,8 @@ class UnifiedRuntime:
                     while worker.inflight and time.monotonic()<deadline:worker.poll();time.sleep(.002)
                     if worker.inflight:raise ValueError('Cached worker did not drain its previous output')
                     obs=observation(skill,snapshot,[0,0,0],action,action,reference=reference,reference_yaw=yaw)
-                    if not worker.submit(obs,-1,0.):raise ValueError('Candidate probe could not be submitted')
+                    nominal=reference_action_frame(reference,0.) if skill.action_parameterization=='reference_residual_v2' else None
+                    if not worker.submit(obs,-1,0.,phase=0.,reference=nominal):raise ValueError('Candidate probe could not be submitted')
                     deadline=time.monotonic()+3;result=None
                     while time.monotonic()<deadline:
                         result=worker.poll()
@@ -135,15 +136,24 @@ class UnifiedRuntime:
                 except (EOFError,OSError) as exc:result={'error':repr(exc)}
                 if result and 'error' in result:c.latch(now,'policy process failed:'+result['error'])
                 elif result and 'target' in result:
-                    candidate.intent=Intent(result['epoch'],result['stamp'],np.asarray(result['target']),finished=now-self.started>skill.atomic_duration_s+skill.recovery_s)
+                    candidate.intent=Intent(result['epoch'],result['stamp'],np.asarray(result['target']),
+                        finished=c.phase=='ACTIVE' and now-self.started>skill.atomic_duration_s+skill.recovery_s)
+                    if skill.action_parameterization!='joint_offset_v1' and result['epoch']==c.epoch and c.phase=='ACTIVE':
+                        candidate.previous=candidate.last.copy();candidate.last=np.asarray(result['raw_action'])
                 if now+1e-9>=candidate.next_inference and c.phase!='FAULT':
                     effective=(c.servo.q-skill.to_sdk(skill.default))/skill.scale
                     if skill.atomic and c.phase!='ACTIVE':effective=np.zeros(12)
                     elapsed=max(0.,now-self.started) if c.phase=='ACTIVE' else 0.
                     try:
-                        obs=observation(skill,snapshot,c.command,effective,candidate.last,phase=elapsed,reference=candidate.reference,reference_yaw=candidate.reference_yaw)
-                        if candidate.worker.submit(obs,c.epoch,now):
-                            candidate.previous=candidate.last.copy();candidate.last=effective.copy()
+                        history=candidate.last if skill.action_parameterization!='joint_offset_v1' else effective
+                        previous=candidate.previous if skill.action_parameterization!='joint_offset_v1' else candidate.last
+                        if skill.atomic and c.phase!='ACTIVE' and skill.action_parameterization!='joint_offset_v1':
+                            history=np.zeros(12);previous=np.zeros(12)
+                        obs=observation(skill,snapshot,c.command,history,previous,phase=elapsed,reference=candidate.reference,reference_yaw=candidate.reference_yaw)
+                        nominal=reference_action_frame(candidate.reference,elapsed) if skill.action_parameterization=='reference_residual_v2' else None
+                        if candidate.worker.submit(obs,c.epoch,now,phase=elapsed,reference=nominal):
+                            if skill.action_parameterization=='joint_offset_v1':
+                                candidate.previous=candidate.last.copy();candidate.last=effective.copy()
                             period=1/skill.policy_hz
                             candidate.next_inference=candidate.next_inference+period if candidate.next_inference>0 else now+period
                             if candidate.next_inference<=now+1e-9:candidate.next_inference=now+period
@@ -156,7 +166,10 @@ class UnifiedRuntime:
             # Preparation evicts extra inactive workers off the control thread.
         if before_phase=='ARMED' and c.phase=='ACTIVE':
             self.started=now
-            if self.active is not None:self.active.next_inference=now+1/self.active.skill.policy_hz
+            if self.active is not None:
+                if self.active.skill.action_parameterization!='joint_offset_v1':
+                    self.active.last=np.zeros(12);self.active.previous=np.zeros(12)
+                self.active.next_inference=now+1/self.active.skill.policy_hz
         return command
     def close(self):
         self.executor.shutdown(wait=True,cancel_futures=True)

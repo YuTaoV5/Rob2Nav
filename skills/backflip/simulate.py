@@ -43,12 +43,14 @@ def main():
     export_file=policy.parent/'export.json'
     exported=json.loads(export_file.read_text()) if export_file.exists() else {}
     contract=exported.get('fixstand_roundtrip') or {}
-    delayed=contract.get('action_parameterization')=='backflip_entry_v2'
+    delayed=contract.get('action_parameterization') in ('backflip_entry_v2','backflip_entry_v3')
     if delayed:
         if hashlib.sha256(policy.read_bytes()).hexdigest()!=exported['policy_sha256']:
             raise ValueError('Backflip export hash mismatch')
         if contract['entry_seconds']!=1. or contract['release_seconds']!=[1.,1.2]:
             raise ValueError('Unsupported backflip entry contract')
+        hold_scale=float(contract.get('entry_hold_scale',.4))
+        if not 0.<=hold_scale<=.4:raise ValueError('Unsupported backflip hold scale')
         module.PHASE_DURATION=3.
         original_phase=module.phase_features
         module.phase_features=lambda t:original_phase(min(t-1.,2.))
@@ -59,7 +61,7 @@ def main():
                 from skills.fixstand import backflip_entry_weight
                 result=self.session.run(*args,**kwargs)
                 weight=float(backflip_entry_weight(self.calls*.02));self.calls+=1
-                result[0]=(1.-weight)*result[0]+weight*.4*np.tanh(result[0])
+                result[0]=(1.-weight)*result[0]+weight*hold_scale*np.tanh(result[0])
                 return result
         def load(path):
             session,inp,out,name=original_load(path)

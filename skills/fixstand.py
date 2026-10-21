@@ -94,7 +94,7 @@ def upright_endpoint_weight(time):
     return torch.maximum(1.-smooth(release),smooth(recover))
 
 
-def configure_upright(cfg,endpoint_residual=False):
+def configure_upright(cfg,endpoint_residual=False,endpoint_limit=.2):
     from isaaclab.managers import ObservationTermCfg,RewardTermCfg,EventTermCfg
     cfg.episode_length_s=8.
     cfg.events.reset_base=EventTermCfg(func=reset_standard,mode='reset')
@@ -112,8 +112,10 @@ def configure_upright(cfg,endpoint_residual=False):
     cfg.commands.base_velocity.ranges.lin_vel_y=(0.,0.)
     cfg.commands.base_velocity.ranges.ang_vel_z=(0.,0.)
     if endpoint_residual:
+        if not .01<=endpoint_limit<=.2:raise ValueError('Upright endpoint limit must be in [0.01, 0.2]')
         from .fixstand_actions import UprightEndpointAction
         cfg.actions.joint_pos.class_type=UprightEndpointAction
+        cfg.actions.joint_pos.endpoint_residual_limit_rad=endpoint_limit
         cfg.commands.base_velocity.ranges.lin_vel_x=(.12,.20)
         cfg.commands.base_velocity.rel_standing_envs=0.
 
@@ -192,9 +194,10 @@ def backflip_entry_weight(time):
     return 1.-x*x*(3.-2.*x)
 
 
-def configure_backflip_delayed_entry(cfg):
+def configure_backflip_delayed_entry(cfg,hold_scale=.4):
     """Train an observed one-second entry; raw actor -> bounded hold -> original control."""
     import torch
+    if not 0.<=hold_scale<=.4:raise ValueError('Backflip hold scale must be in [0, 0.4]')
     from isaaclab_backflip.tasks.go2_backflip.go2_backflip_env import Go2BackflipEnv
     cfg.episode_length_s=5.
     cfg.entry_delay_seconds=1.
@@ -202,7 +205,7 @@ def configure_backflip_delayed_entry(cfg):
     def pre(self,actions):
         raw_time=self.episode_length_buf.float()*self.step_dt
         w=backflip_entry_weight(raw_time).unsqueeze(-1)
-        processed=torch.lerp(actions,.4*torch.tanh(actions),w)
+        processed=torch.lerp(actions,hold_scale*torch.tanh(actions),w)
         return original_pre(self,processed)
     def phases(self):
         t=torch.clamp(self.episode_length_buf[:,None].float()*self.step_dt-1.,max=2.)

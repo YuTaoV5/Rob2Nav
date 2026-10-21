@@ -9,5 +9,5 @@ class UprightEndpointAction(JointPositionAction):
         super().process_actions(actions)
         time=self._env.episode_length_buf*self._env.step_dt
         weight=upright_endpoint_weight(time).unsqueeze(-1)
-        endpoint=target_pose(self._env.scene['robot'])+.20*torch.tanh(self._raw_actions)
+        endpoint=target_pose(self._env.scene['robot'])+self.cfg.endpoint_residual_limit_rad*torch.tanh(self._raw_actions)
         self._processed_actions[:]=torch.lerp(self._processed_actions,endpoint,weight)

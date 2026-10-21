@@ -16,10 +16,13 @@ p.add_argument('--stepping-gait',action='store_true')
 p.add_argument('--reset-std',type=float)
 p.add_argument('--fixstand-roundtrip',action='store_true')
 p.add_argument('--endpoint-residual',action='store_true')
+p.add_argument('--endpoint-residual-limit',type=float,default=.2)
 AppLauncher.add_app_launcher_args(p)
 args = p.parse_args()
 if args.endpoint_residual and not (args.fixstand_roundtrip and args.stepping_gait):
     p.error('--endpoint-residual requires --fixstand-roundtrip and --stepping-gait')
+if not .01<=args.endpoint_residual_limit<=.2 or (args.endpoint_residual_limit!=.2 and not args.endpoint_residual):
+    p.error('--endpoint-residual-limit requires endpoint residual and a value in [0.01, 0.2]')
 if args.stepping_gait and not args.transfer_motors:p.error('--stepping-gait requires --transfer-motors')
 if args.reset_std is not None and not .01<=args.reset_std<=1.:p.error('--reset-std must be in [0.01,1]')
 args.kit_args = (args.kit_args+' --enable isaacsim.asset.importer.urdf').strip()
@@ -47,7 +50,7 @@ def main():
         enable_stepping_rewards(cfg)
     if args.fixstand_roundtrip:
         from skills.fixstand import configure_upright
-        configure_upright(cfg,args.endpoint_residual)
+        configure_upright(cfg,args.endpoint_residual,args.endpoint_residual_limit)
     agent = BasePPORunnerCfg()
     agent.seed,agent.device = args.seed,cfg.sim.device
     agent.max_iterations,agent.save_interval = args.iterations,100
@@ -57,8 +60,8 @@ def main():
     if args.fixstand_roundtrip:
         from skills.fixstand import write_contract
         write_contract(args.output/'fixstand.json','upright',actor_observations=52,phase_seconds=[1.,5.,6.5,8.],
-            action_parameterization='upright_endpoint_v2' if args.endpoint_residual else 'joint_offset_v1',
-            residual_limit_rad=.20,release_seconds=[1.,1.5],recovery_seconds=[5.,6.5])
+            action_parameterization=('upright_endpoint_v2' if args.endpoint_residual_limit==.2 else 'upright_endpoint_v3') if args.endpoint_residual else 'joint_offset_v1',
+            residual_limit_rad=args.endpoint_residual_limit,release_seconds=[1.,1.5],recovery_seconds=[5.,6.5])
     dump_yaml(str(args.output/'env.yaml'),cfg)
     dump_yaml(str(args.output/'agent.yaml'),agent)
     torch.set_num_threads(4)

@@ -31,7 +31,13 @@ def run(root,profile,interface,sdk_root,calibration_path,qualification_path,mode
     skill=preflight(root,profile,record,calibration,observer.source_sha256,transport.bundle_digest())
     def approved(s):
         if not s.hardware_qualified or s.digest() not in record['approved_contracts']:raise ValueError('Switch target not in device-qualified contract set')
-    runtime=UnifiedRuntime(root,hardware=True,approval=approved);commands=queue.Queue(maxsize=4)
+    qualified_pairs=[]
+    approved_contracts=set(record['approved_contracts'])
+    for pair in record.get('compact_switch_pairs',[]):
+        if (not isinstance(pair,list) or len(pair)!=2 or any(d not in approved_contracts for d in pair)):
+            raise ValueError('Compact switch pair must contain two approved contract digests')
+        qualified_pairs.append(tuple(pair))
+    runtime=UnifiedRuntime(root,hardware=True,approval=approved,qualified_compact_pairs=qualified_pairs);commands=queue.Queue(maxsize=4)
     from .sequence import SkillSequence,load_steps
     choreography=None
     if sequence_path is not None:
@@ -58,7 +64,7 @@ def run(root,profile,interface,sdk_root,calibration_path,qualification_path,mode
         runtime.future.result(timeout=20)  # Preload happens before creating a LowCmd writer.
         transport.claim_writer(record,skill);claimed=True
         now=time.monotonic();runtime.arm(transport.read(),now)
-        threading.Thread(target=input_loop,daemon=True).start();start=now;fault_at=None;index=0
+        threading.Thread(target=input_loop,daemon=True).start();start=now;fault_at=None;index=0;last_status=now
         while time.monotonic()-start<duration:
             now=time.monotonic();snapshot=transport.read(ignore_health=runtime.controller.phase=='FAULT')
             if choreography is not None:choreography.tick(snapshot,now)
@@ -78,6 +84,11 @@ def run(root,profile,interface,sdk_root,calibration_path,qualification_path,mode
                     try:runtime.stage_async(request['switch'],snapshot)
                     except ValueError as exc:runtime.controller.event(now,'request_rejected:'+str(exc))
             command=runtime.step(snapshot,now)
+            if now-last_status>=1.:
+                print(json.dumps(dict(phase=runtime.controller.phase,active=runtime.controller.active.id if runtime.controller.active else None,
+                    pending=runtime.controller.pending.id if runtime.controller.pending else None,
+                    stage_error=runtime.stage_error,fault=runtime.controller.fault)),flush=True)
+                last_status=now
             context=runtime.controller.pending if runtime.controller.phase in ('WARMUP','BLEND') else runtime.controller.active
             if command.epoch and command.epoch not in transport.allowed_epochs and context is not None:transport.authorize_epoch(command.epoch,context)
             transport.write(command);index+=1

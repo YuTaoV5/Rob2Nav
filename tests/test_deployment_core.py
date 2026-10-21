@@ -51,6 +51,14 @@ class DeploymentCoreTests(unittest.TestCase):
     def test_compact_routes_remain_disabled_for_hardware(self):
         self.assertFalse(SwitchController(hardware=True,compact_transitions=True).compact_transitions)
 
+    def test_hardware_compact_route_requires_exact_qualified_pair(self):
+        old=skill('stand');new=skill('walk_moe',default=tuple(NEUTRAL+.03))
+        c=SwitchController(hardware=True,compact_transitions=True,qualified_compact_pairs=[(old.digest(),new.digest())])
+        c.active=old;c.pending=new
+        self.assertTrue(c.compact_entry_allowed())
+        c.pending=skill('walk_moe',default=tuple(NEUTRAL+.04))
+        self.assertFalse(c.compact_entry_allowed())
+
     def test_soft_stand_keeps_full_load_acquisition_entry(self):
         c=SwitchController(compact_transitions=True);c.arm(state(),0)
         c.pending=skill('stand_soft',kp=(15.,)*12,kd=(.5,)*12)
@@ -138,6 +146,31 @@ class DeploymentCoreTests(unittest.TestCase):
         self.assertIs(c.active,flip);self.assertEqual(c.phase,'ACTIVE')
         with self.assertRaises(ValueError):SkillSequence(r,[Step('flip')])
         with self.assertRaises(ValueError):Step('walk',velocity=(3,0,0)).checked()
+
+    def test_long_sequence_keeps_stair_gait_until_level_handover(self):
+        c=SwitchController();c.arm(state(),0);c.phase='ACTIVE';c.active=skill('walk_moe')
+        contracts={'walk_moe':c.active,'stand':skill()}
+        r=Mock();r.controller=c;r.profile=lambda name:(None,contracts[name]);r.stage_error=None;r.future=None;r.next=None;r.queued=None
+        seq=SkillSequence(r,[Step('walk_moe',seconds=.01,velocity=(.2,0,0),handover_extension_s=1.),Step('stand')])
+        tilted=state(.02,1,gravity=np.array([.34,0,-np.sqrt(1-.34**2)]))
+        seq.tick(tilted,0);seq.tick(tilted,.02)
+        self.assertEqual(seq.index,0);self.assertAlmostEqual(c.requested_command[0],.2)
+        seq.tick(state(.04,2),.04)
+        self.assertEqual(seq.index,1)
+        seq.tick(state(.06,3),.06)
+        r.stage_async.assert_called_once()
+
+    def test_flat_to_stairs_same_moe_keeps_model_and_history(self):
+        c=SwitchController();c.arm(state(),0);c.phase='ACTIVE';c.active=skill('walk_moe')
+        r=Mock();r.controller=c;r.profile=lambda name:(None,c.active if name=='walk_moe' else skill())
+        r.stage_error=None;r.future=None;r.next=None;r.queued=None
+        seq=SkillSequence(r,[Step('walk_moe',seconds=.01,velocity=(.2,0,0)),
+            Step('walk_moe',seconds=.1,velocity=(.18,0,0)),Step('stand')])
+        tilted=state(.02,1,gravity=np.array([.34,0,-np.sqrt(1-.34**2)]))
+        seq.tick(tilted,0);seq.tick(tilted,.02);seq.tick(tilted,.04)
+        self.assertEqual(seq.index,1)
+        self.assertAlmostEqual(c.requested_command[0],.18)
+        r.stage_async.assert_not_called()
 
     def test_supported_integral_does_not_leak_to_inaccurate_nominal_load(self):
         s=state(support_torque=np.full(12,-5.))
