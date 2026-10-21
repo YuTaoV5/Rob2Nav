@@ -1,0 +1,26 @@
+<launch>
+  <arg name="use_sim_time" default="false"/>
+  <param name="use_sim_time" value="$(arg use_sim_time)"/>
+  <param name="body_pose_topic" value="/rob2nav/body_pose"/>
+  <include file="$(find scan_planner)/launch/advanced_param.xml">
+    <arg name="is_real_world" value="true"/><arg name="navi_mode" value="1"/>
+    <arg name="sensor_type" value="lidar"/>
+    <arg name="body_pose_topic" value="/rob2nav/body_pose"/>
+    <arg name="sensor_pose_topic" value="/rob2nav/lidar_pose"/>
+    <arg name="cloud_topic" value="/rob2nav/cloud_world"/>
+    <arg name="cloud_is_world" value="true"/>
+    <arg name="depth_topic" value="/unused_depth"/>
+    <arg name="cx" value="0"/><arg name="cy" value="0"/>
+    <arg name="fx" value="1"/><arg name="fy" value="1"/>
+    <arg name="max_vel" value="0.20"/><arg name="max_acc" value="0.20"/>
+    <arg name="planning_horizon" value="3.0"/>
+  </include>
+  <param name="scan_planner_node/grid_map/need_extrinsic" value="false"/>
+  <param name="scan_planner_node/grid_map/frame_id" value="nav_odom"/>
+  <param name="closed_loop_controller/max_vx" value="0.20"/>
+  <param name="closed_loop_controller/max_vy" value="0.10"/>
+  <param name="closed_loop_controller/max_vyaw" value="0.30"/>
+  <node pkg="scan_planner" type="closed_loop_controller" name="closed_loop_controller" output="screen">
+    <remap from="cmd_vel" to="/rob2nav/cmd_vel_raw"/>
+  </node>
+</launch>

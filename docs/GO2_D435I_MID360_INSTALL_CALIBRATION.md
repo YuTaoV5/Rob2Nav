@@ -2,6 +2,8 @@
 
 更新：2026-10-21。适用当前 Rob2Nav 的 SCAN 导航与伸手托爪方案。配套：[SCAN实机部署](../skills/navigation/SCAN_DEPLOYMENT.md)、[真实相机托爪完整流程](../go2_nav/paw_contact/REAL_CAMERA_DEPLOYMENT.md)。
 
+你的Go2 EDU已明确运行Noetic/Foxy，新增[机载逐条命令手册](GO2_EDU_NOETIC_FOXY_NAVIGATION.md)，从支架、供电/网络、环境构建、标定输入到每日启动和目标设置。新配套工具仍需现场联调，不改变本文对未实机验证环节的说明。
+
 本文给出现场安装和集成步骤；本次未连接传感器或机器人，未完成真实标定，也没有发送电机命令。这里的配置样例、误差预算和频率建议不是本机测量结果。
 
 ## 1. 先分清两个功能需要什么
