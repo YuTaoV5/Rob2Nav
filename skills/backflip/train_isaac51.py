@@ -48,9 +48,9 @@ if args.fixstand_roundtrip:
     if args.entry!='train':raise ValueError('Fixstand launcher currently targets training')
     for required in ('env_cfg = Go2BackflipEnvCfg()','init_at_random_ep_len=True'):
         if text.count(required)!=1:raise RuntimeError('Pinned training entry changed: '+required)
-    text=text.replace('env_cfg = Go2BackflipEnvCfg()',
-        'env_cfg = Go2BackflipEnvCfg()\n    from skills.fixstand import configure_backflip\n    '
-        + f'configure_backflip(env_cfg,{str(source)!r} if {args.urdf_speed_limits!r} else None,{args.fast_safety_curriculum!r})')
+    from skills.backflip.launcher_patch import configure_fixstand_source
+    text=configure_fixstand_source(text,source,args.urdf_speed_limits,args.fast_safety_curriculum,
+        args.delayed_entry,args.entry_hold_scale)
     if args.safety_start is not None:
         text=text.replace('agent_cfg = Go2BackflipPPORunnerCfg()',
             f'env_cfg.rewards.safety_curriculum_start={args.safety_start!r}\n    agent_cfg = Go2BackflipPPORunnerCfg()')
@@ -58,8 +58,6 @@ if args.fixstand_roundtrip:
         needle='agent_cfg = Go2BackflipPPORunnerCfg()'
         if text.count(needle)!=1:raise RuntimeError('Pinned agent config entry changed')
         text=text.replace(needle,needle+f'\n    agent_cfg.algorithm.learning_rate={args.finetune_learning_rate!r}\n    agent_cfg.algorithm.schedule="fixed"')
-    if args.delayed_entry:
-        text=text.replace('configure_backflip(env_cfg)', f'configure_backflip(env_cfg)\n    from skills.fixstand import configure_backflip_delayed_entry\n    configure_backflip_delayed_entry(env_cfg,{args.entry_hold_scale!r})')
     text=text.replace('init_at_random_ep_len=True','init_at_random_ep_len=False')
     text=text.replace('runner.learn(agent_cfg.max_iterations, init_at_random_ep_len=False)',
         'runner.learn(agent_cfg.max_iterations, init_at_random_ep_len=False)\n    from skills.fixstand import write_completion\n    write_completion(log_dir,agent_cfg.max_iterations)')

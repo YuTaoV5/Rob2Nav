@@ -5,6 +5,14 @@ import numpy as np
 JOINT_NAMES=tuple(f'{leg}_{joint}_joint' for leg in ('FL','FR','RL','RR') for joint in ('hip','thigh','calf'))
 
 
+def validate_entry_contract(env,contract):
+    if contract and contract.get('action_parameterization') in ('backflip_entry_v2','backflip_entry_v3'):
+        if env.get('episode_length_s')!=5. or env.get('entry_delay_seconds')!=1.:
+            raise ValueError('Training environment does not match delayed-entry export contract')
+        if 'entry_hold_scale' in env and env['entry_hold_scale']!=contract.get('entry_hold_scale',.4):
+            raise ValueError('Training entry hold scale differs from export contract')
+
+
 def control_contract(raw):
     names=tuple(raw.get('joint_names',JOINT_NAMES))
     if names!=JOINT_NAMES:raise ValueError('Backflip control joint order differs from pinned actor')

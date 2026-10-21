@@ -63,6 +63,8 @@ ACTIVE → [满足完整动作结束和稳定站立] → ENTRY 或 EXIT → ENTR
 
 后翻模型还需核对`export.json.control_contract`中的逐关节速度曲线、目标速度、动作截断8和PD增益；不能用上游默认所有关节30 rad/s、动作截断100替代本轮训练配置。统一工作进程将动作历史转为SDK顺序传递，观测适配器再取回策略顺序；后翻入口历史包括训练时的入场缩放和截断。该适配仍须随最终合格权重进行动态切换复核。
 
+导出前必须由实际`params/env.yaml`核对5秒episode、1秒入口延迟及入口残差，导出器记录`entry_training_contract_verified=true`。后翻v4/v5因实际训练4秒且缺少延迟入口，已标记`invalid_training_contract`，不可使用旧导出标签接入部署；修复后的训练从v6开始。
+
 离线回归：
 
 ```bash

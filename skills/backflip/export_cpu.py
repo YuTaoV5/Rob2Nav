@@ -8,13 +8,17 @@ import torch
 from torch import nn
 import yaml
 from rob2nav.export_actor import ConfigLoader
-from .control import control_contract
+from .control import control_contract,validate_entry_contract
 
 
 def export(checkpoint,output):
     checkpoint=Path(checkpoint);output=Path(output)
     cfg=yaml.safe_load((checkpoint.parent/'params/agent.yaml').read_text())
     if cfg['policy']['activation']!='elu':raise ValueError('Expected reviewed ELU architecture')
+    contract=json.loads((checkpoint.parent/'fixstand.json').read_text()) if (checkpoint.parent/'fixstand.json').exists() else None
+    env=yaml.load((checkpoint.parent/'params/env.yaml').read_text(),Loader=ConfigLoader)
+    validate_entry_contract(env,contract)
+    controller=control_contract(env['control'])
     saved=torch.load(checkpoint,map_location='cpu',weights_only=False);state=saved['model_state_dict']
     if any('normalizer' in key for key in state):raise ValueError('Explicit normalization export required')
     weights={k[6:]:v for k,v in state.items() if k.startswith('actor.')}
@@ -37,13 +41,10 @@ def export(checkpoint,output):
     actual=session.run(None,{'obs':probe})[0]
     error=float(np.max(abs(actual-expected)))
     if not np.isfinite(actual).all() or actual.shape!=(16,12) or error>1e-5:raise RuntimeError('ONNX parity failed')
-    contract=json.loads((checkpoint.parent/'fixstand.json').read_text()) if (checkpoint.parent/'fixstand.json').exists() else None
-    env=yaml.load((checkpoint.parent/'params/env.yaml').read_text(),Loader=ConfigLoader)
-    controller=control_contract(env['control'])
     (output/'export.json').write_text(json.dumps(dict(checkpoint_sha256=hashlib.sha256(checkpoint.read_bytes()).hexdigest(),
         policy_sha256=hashlib.sha256((output/'policy.onnx').read_bytes()).hexdigest(),actor_input_dim=60,
         actor_output_dim=12,onnx_max_error=error,fixstand_roundtrip=contract,control_contract=controller,
-        capability_verified=False),indent=2)+'\n')
+        entry_training_contract_verified=True,capability_verified=False),indent=2)+'\n')
 
 
 if __name__=='__main__':

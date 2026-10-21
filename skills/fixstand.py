@@ -275,6 +275,7 @@ def configure_backflip_delayed_entry(cfg,hold_scale=.4):
     from isaaclab_backflip.tasks.go2_backflip.go2_backflip_env import Go2BackflipEnv
     cfg.episode_length_s=5.
     cfg.entry_delay_seconds=1.
+    cfg.entry_hold_scale=hold_scale
     original_pre=Go2BackflipEnv._pre_physics_step
     def pre(self,actions):
         raw_time=self.episode_length_buf.float()*self.step_dt
