@@ -15,17 +15,32 @@ from .runner import UnifiedRuntime
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--root',type=Path,default=Path(__file__).resolve().parents[2]);p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--asset',choices=['robogauge','source'],default='robogauge');p.add_argument('--atomic-cycle',action='store_true')
     p.add_argument('--seed',type=int,default=9201);p.add_argument('--video',action='store_true');a=p.parse_args()
     root=a.root.resolve();a.output.mkdir(parents=True,exist_ok=False)
     from go2_nav.env import Go2MaplessEnv,load_config
     cfg=load_config(root/'skills/navigation/config.json');cfg.update(max_seconds=1e9)
     env=Go2MaplessEnv(cfg,scene='empty',sensor_mode='lidar');env.reset(seed=a.seed)
+    if a.asset=='source':
+        env.model=mujoco.MjModel.from_xml_path('/root/gpufree-data/Rob2Nav-upstreams/GO2_backflip/mujoco/go2/go2_isaac.xml')
+        env.model.opt.timestep=.001;env.data=mujoco.MjData(env.model);env.base_id=env.model.body('base').id
+        env.data.qpos[:3]=[0,0,.32];env.data.qpos[3:7]=[1,0,0,0]
+        from .core import NEUTRAL
+        for k,n in enumerate(SDK_JOINTS):env.data.qpos[env.model.jnt_qposadr[env.model.joint(n).id]]=NEUTRAL[k]
+        mujoco.mj_forward(env.model,env.data)
+        for _ in range(1000):
+            for k,n in enumerate(SDK_JOINTS):
+                joint=env.model.joint(n).id;aid=int(np.where(env.model.actuator_trnid[:,0]==joint)[0][0]);q=env.model.jnt_qposadr[joint];dq=env.model.jnt_dofadr[joint]
+                env.data.ctrl[aid]=np.clip(40*(NEUTRAL[k]-env.data.qpos[q])-env.data.qvel[dq],-EFFORT[k],EFFORT[k])
+            mujoco.mj_step(env.model,env.data)
     model,data=env.model,env.data
     ids=np.array([model.joint(n).id for n in SDK_JOINTS]);qids=model.jnt_qposadr[ids];dids=model.jnt_dofadr[ids]
     aids=np.array([int(np.where(model.actuator_trnid[:,0]==i)[0][0]) for i in ids])
-    foot_ids=[model.geom(n).id for n in ['FR','FL','RR','RL']];floor=model.geom('floor').id
-    start_time=float(data.time);runtime=UnifiedRuntime(root);samples=[];events=[];requests=[];video=None;next_render=0.
-    sequence=['stand_soft','stand_stiff','walk_mlp','walk_moe','stand'];requested=0;last_active=None;active_since=0.
+    from .observer import KinematicObserver
+    observer=KinematicObserver(model);foot_ids=observer.feet;floor=model.geom('floor').id
+    start_time=float(data.time);runtime=UnifiedRuntime(root,allow_research_stunts=a.atomic_cycle);samples=[];events=[];requests=[];video=None;next_render=0.
+    sequence=['stand','walk_moe','sideflip69','walk_moe','stand'] if a.atomic_cycle else ['stand_soft','stand_stiff','walk_mlp','walk_moe','stand'];requested=0;last_active=None;active_since=0.
+    native_peak=0.;flip_rotation=0.;maximum_speed_ratio=0.
     old_tau=None;old_kp=None;last_ref=None;naive=[];max_torque_step=0.;max_gain_step=0.;max_ref_step=0.;max_tilt=0.;min_height=1e9
     wall=time.monotonic();loop_gaps=[];last_wall=wall;passed=False;reason='time budget'
     def snapshot(t,i):
@@ -36,8 +51,8 @@ def main():
                 mujoco.mj_contactForce(model,data,index,contact_force);forces[foot_ids.index(other)]+=abs(contact_force[0])
         rot=env.rotation;velocity=np.zeros(6)
         mujoco.mj_objectVelocity(model,data,mujoco.mjtObj.mjOBJ_BODY,env.base_id,velocity,0)
-        return Snapshot(t,i,data.qpos[qids].copy(),data.qvel[dids].copy(),data.actuator_force[aids].copy(),
-            rot.T@velocity[:3],rot.T@np.array([0.,0.,-1.]),forces,rot.T@velocity[3:],data.qpos[3:7].copy())
+        return observer.enrich(Snapshot(t,i,data.qpos[qids].copy(),data.qvel[dids].copy(),data.actuator_force[aids].copy(),
+            rot.T@velocity[:3],rot.T@np.array([0.,0.,-1.]),forces,rot.T@velocity[3:],data.qpos[3:7].copy()))
     try:
         initial=snapshot(0.,0);runtime.arm(initial,0.);runtime.stage_async(sequence[0],initial);requested=1
         if a.video:
@@ -50,7 +65,7 @@ def main():
             current_id=c.active.id if c.active else None
             if c.phase=='ACTIVE' and current_id!=last_active:
                 last_active=current_id;active_since=t;events.append(dict(time=t,skill=current_id,position=data.qpos[:3].tolist()))
-            if c.phase=='ACTIVE' and t-active_since>=2.5 and requested<len(sequence) and runtime.future is None and runtime.next is None:
+            if c.phase=='ACTIVE' and t-active_since>=(.35 if current_id=='sideflip69' else 2.5) and requested<len(sequence) and runtime.future is None and runtime.next is None:
                 target=sequence[requested];profile=runtime.profile(target)[1]
                 raw=profile.to_sdk(profile.kp)*(profile.to_sdk(profile.default)-s.q)-profile.to_sdk(profile.kd)*s.dq
                 naive.append(dict(from_skill=current_id,to_skill=target,analytical_naive_torque_jump_Nm=float(np.max(abs(raw-c.servo.tau)))))
@@ -59,23 +74,31 @@ def main():
             if c.phase=='ACTIVE' and requested==len(sequence) and current_id==sequence[-1] and t-active_since>2:
                 passed=True;reason='all five profiles committed and settled';break
             command=runtime.step(s,t)
-            if old_tau is not None:max_torque_step=max(max_torque_step,float(np.max(abs(command.tau-old_tau))))
+            native=c.phase=='ACTIVE' and c.active and c.active.actuation=='native_pd'
+            if native:flip_rotation+=s.gyro[0]*.002
+            from .core import FREE_SPEED
+            maximum_speed_ratio=max(maximum_speed_ratio,float(np.max(abs(s.dq)/FREE_SPEED)))
+            if old_tau is not None:
+                change=float(np.max(abs(command.tau-old_tau)))
+                if native:native_peak=max(native_peak,change)
+                else:max_torque_step=max(max_torque_step,change)
             if old_kp is not None:max_gain_step=max(max_gain_step,float(np.max(abs(command.kp-old_kp))))
             if last_ref is not None:max_ref_step=max(max_ref_step,float(np.max(abs(command.qref-last_ref))))
             old_tau=command.tau.copy();old_kp=command.kp.copy();last_ref=command.qref.copy()
-            data.ctrl[aids]=command.tau;mujoco.mj_step(model,data)
+            data.ctrl[aids]=command.tau
+            for _ in range(round(.002/model.opt.timestep)):mujoco.mj_step(model,data)
             if abs(float(data.time)-start_time-t)>1e-7:raise RuntimeError('Physics time discontinuity/reset')
             tilt=float(np.arccos(np.clip(env.rotation[2,2],-1,1)));max_tilt=max(max_tilt,tilt);min_height=min(min_height,float(data.qpos[2]))
             samples.append(np.r_[t,command.tau,command.qref,command.kp,command.kd,s.q,s.dq,s.feet,tilt,data.qpos[:3]])
             if c.phase=='FAULT':reason=c.fault;break
-            if data.qpos[2]<.22 or tilt>.35:reason='posture envelope exceeded';break
+            if not native and (data.qpos[2]<(0.16 if a.asset=='source' else .22) or tilt>.35):reason='posture envelope exceeded';break
             if runtime.stage_error:reason='staging failure:'+runtime.stage_error;break
             if video is not None and t>=next_render:video.append_data(env.render());next_render=t+.1
             delay=.002-(time.monotonic()-before)
             if delay>0:time.sleep(delay)
         np.savez_compressed(a.output/'control_trace.npz',values=np.asarray(samples),
             columns=np.array(['time']+[f'{k}:{j}' for k in ['tau','qref','kp','kd','q','dq'] for j in SDK_JOINTS]+[f'force:{l}' for l in ['FR','FL','RR','RL']]+['tilt','x','y','z']))
-        report=dict(seed=a.seed,passed=bool(passed and max_torque_step<=.300001 and max_gain_step<=.030001),reason=reason,
+        report=dict(seed=a.seed,asset=a.asset,atomic_cycle=a.atomic_cycle,flip_rotation_rad=flip_rotation,native_motion_peak_torque_step_Nm=native_peak,maximum_joint_speed_ratio=maximum_speed_ratio,passed=bool(passed and (not a.atomic_cycle or abs(flip_rotation)>5.5) and max_torque_step<=.300001 and max_gain_step<=.030001),reason=reason,
             backend='MuJoCo real free-base hot-switch harness; commits/model hashes below define which actors were actually exercised',
             commits=events,requests=requests,controller_events=runtime.controller.events,
             max_torque_step_Nm=max_torque_step,max_kp_step=max_gain_step,max_reference_step_rad=max_ref_step,

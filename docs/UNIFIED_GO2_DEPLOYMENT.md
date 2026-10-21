@@ -69,3 +69,5 @@ export LD_LIBRARY_PATH="$CYCLONEDDS_HOME/lib:${LD_LIBRARY_PATH:-}"
 尚需完成：中立支撑与退出控制器诊断、多种子真实模型切换；完整符号/零位标定应用及电压/温度/掉线健康保护；真实500Hz发布循环时序、独立机载看门狗和故障恢复；69维参考yaw对齐、48维线速度估计与各特技约束验收。Python调度、DDS失联和硬件力矩响应无法由上述离线结果保证，实际接机前仍须逐阶段验证。
 
 官方接口依据：[固定SDK低层示例](https://github.com/unitreerobotics/unitree_sdk2_python/blob/814556d15970dd2ecf1c9984e845ca02ab07e206/example/go2/low_level/go2_stand_example.py)。本仓库没有将其自动释放服务/起立动作带入离线测试。
+
+开发快照还包含native_pd、运动学观测与`--atomic-cycle`研究仿真分支；这些增量仍未完成物理验收，不能用于硬件资格或替代首轮失败记录。
