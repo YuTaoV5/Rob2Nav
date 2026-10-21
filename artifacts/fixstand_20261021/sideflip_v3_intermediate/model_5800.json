@@ -1,0 +1,93 @@
+{
+  "args": {
+    "kind": "sideflip",
+    "seed": 8000,
+    "initialization": "settled",
+    "physics_hz": 1000,
+    "joint_limit_time_constant": null
+  },
+  "backend": "MuJoCo",
+  "successes": 0,
+  "total": 1,
+  "evaluator_sha256": "9956f1b48b53315f5d99fc802ceb779ad2899768538d94f9169470a4e06de1e9",
+  "episodes": [
+    {
+      "success": false,
+      "unwrapped_roll_rad": -3.1415239162959914,
+      "body_x_rotation_rad": -3.136366409096173,
+      "axis_dominance": 0.38649151328136433,
+      "terminal_upright": -0.9948958901577288,
+      "airtime_s": 0.21000000000000016,
+      "max_joint_speed_ratio": 1.0643634979971892,
+      "max_joint_limit_excess_rad": 0.1718172880424753,
+      "unexpected_body_ground_contact": true,
+      "action_completed": false,
+      "fixstand": {
+        "passed": false,
+        "initial": {
+          "passed": false,
+          "samples": 36,
+          "stable_fraction": 0.0,
+          "max_pose_error_rad": 0.18834745642566766
+        },
+        "terminal": {
+          "passed": false,
+          "samples": 51,
+          "stable_fraction": 0.0,
+          "max_pose_error_rad": 0.13064826160613394
+        },
+        "pose_tolerance_rad": 0.12,
+        "max_joint_speed_rad_s": 1.0,
+        "minimum_upright_cos": 0.98,
+        "required_stable_fraction": 0.95,
+        "terminal_hold_s": 1.0,
+        "base_height_range_m": [
+          0.26,
+          0.4
+        ],
+        "minimum_foot_force_N": 4.0
+      }
+    }
+  ],
+  "metrics": {
+    "unwrapped_roll_rad": -3.1415239162959914,
+    "body_x_rotation_rad": -3.136366409096173,
+    "axis_dominance": 0.38649151328136433,
+    "terminal_upright": -0.9948958901577288,
+    "airtime_s": 0.21000000000000016,
+    "max_joint_speed_ratio": 1.0643634979971892,
+    "max_joint_limit_excess_rad": 0.1718172880424753,
+    "unexpected_body_ground_contact": true,
+    "action_completed": false,
+    "fixstand": {
+      "passed": false,
+      "initial": {
+        "passed": false,
+        "samples": 36,
+        "stable_fraction": 0.0,
+        "max_pose_error_rad": 0.18834745642566766
+      },
+      "terminal": {
+        "passed": false,
+        "samples": 51,
+        "stable_fraction": 0.0,
+        "max_pose_error_rad": 0.13064826160613394
+      },
+      "pose_tolerance_rad": 0.12,
+      "max_joint_speed_rad_s": 1.0,
+      "minimum_upright_cos": 0.98,
+      "required_stable_fraction": 0.95,
+      "terminal_hold_s": 1.0,
+      "base_height_range_m": [
+        0.26,
+        0.4
+      ],
+      "minimum_foot_force_N": 4.0
+    }
+  },
+  "policy_sha256": "578d763cba0090f9b6a8a1530371a86ce9bc144a19c1f48b1209d4c311013e8f",
+  "root_state_writes": "initialization only; no root stabilization/weld/teleport during evaluation",
+  "hardware_connected": false,
+  "motor_model": "dc_linear_v1",
+  "hardware_constraints_pass": false
+}
