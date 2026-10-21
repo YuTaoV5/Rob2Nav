@@ -40,6 +40,31 @@ def main():
     spec=importlib.util.spec_from_file_location('_rob2nav_backflip_playback',file)
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
     module.SIM_DT=1./a.physics_hz;module.DECIMATION=a.physics_hz//50;module.POLICY_DT=.02
+    export_file=policy.parent/'export.json'
+    exported=json.loads(export_file.read_text()) if export_file.exists() else {}
+    contract=exported.get('fixstand_roundtrip') or {}
+    delayed=contract.get('action_parameterization')=='backflip_entry_v2'
+    if delayed:
+        if hashlib.sha256(policy.read_bytes()).hexdigest()!=exported['policy_sha256']:
+            raise ValueError('Backflip export hash mismatch')
+        if contract['entry_seconds']!=1. or contract['release_seconds']!=[1.,1.2]:
+            raise ValueError('Unsupported backflip entry contract')
+        module.PHASE_DURATION=3.
+        original_phase=module.phase_features
+        module.phase_features=lambda t:original_phase(min(t-1.,2.))
+        original_load=module.load_onnx
+        class EntrySession:
+            def __init__(self,session):self.session=session;self.calls=0
+            def run(self,*args,**kwargs):
+                from skills.fixstand import backflip_entry_weight
+                result=self.session.run(*args,**kwargs)
+                weight=float(backflip_entry_weight(self.calls*.02));self.calls+=1
+                result[0]=(1.-weight)*result[0]+weight*.4*np.tanh(result[0])
+                return result
+        def load(path):
+            session,inp,out,name=original_load(path)
+            return EntrySession(session),inp,out,name
+        module.load_onnx=load
     a.output.mkdir(parents=True,exist_ok=False)
     limits={j.attrib['name']:j.find('limit').attrib for j in ET.parse(source/'resources/robots/go2/urdf/go2_description.urdf').getroot().findall('joint') if j.attrib['name'] in module.JOINT_NAMES}
     rng=np.random.default_rng(a.seed);resets=0;trace=[];rotation=0.;angular_travel=0.
@@ -113,7 +138,7 @@ def main():
         terminal_upright=trace[-1]['upright'],unexpected_body_ground_contact=bad,max_joint_speed_ratio=max_speed,max_joint_limit_excess_rad=max_excess)
     if a.fixstand_roundtrip:
         from rob2nav.fixstand_validation import assess
-        metrics['action_completed']=bool(success);metrics['fixstand']=assess(trace,initial_end=.35)
+        metrics['action_completed']=bool(success);metrics['fixstand']=assess(trace,initial_end=.8 if delayed else .35)
         success=bool(success and metrics['fixstand']['passed'])
     summary=dict(args=dict(kind='backflip',seed=a.seed,physics_hz=a.physics_hz,initial_joint_noise=a.initial_joint_noise),backend='MuJoCo',
         role='locally trained Go2 backflip; pinned native observation/controller',successes=int(success),total=1,episodes=[dict(success=success,**metrics)],metrics=metrics,

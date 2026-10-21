@@ -49,6 +49,11 @@ class FixstandTests(unittest.TestCase):
         values=upright_endpoint_weight(torch.tensor([0.,.8,1.,1.25,1.5,4.9,5.,5.75,6.5,8.]))
         torch.testing.assert_close(values,torch.tensor([1.,1.,1.,.5,0.,0.,0.,.5,1.,1.]))
 
+    def test_backflip_entry_schedule(self):
+        from skills.fixstand import backflip_entry_weight
+        torch.testing.assert_close(backflip_entry_weight(torch.tensor([0.,.8,1.,1.1,1.2,3.])),
+                                   torch.tensor([1.,1.,1.,.5,0.,0.]))
+
     def test_walking_rejects_sliding_and_accepts_loaded_cycles(self):
         from rob2nav.fixstand_validation import walking_action
         trace=[dict(time=1.+i*.02,upright_walk_error=.1,position=[i*.003,0.,.5],

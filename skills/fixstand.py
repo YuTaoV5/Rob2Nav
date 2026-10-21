@@ -159,7 +159,8 @@ def configure_backflip(cfg):
     original=Go2BackflipEnv._get_rewards
     def rewards(self):
         base=original(self);t=self.episode_length_buf*self.step_dt
-        extra=((t<.35)|(t>=2.))*stance_score(self._robot)*25.*self.step_dt
+        delay=getattr(cfg,'entry_delay_seconds',0.)
+        extra=((t<(.35+delay))|(t>=2.+delay))*stance_score(self._robot)*25.*self.step_dt
         self.extras.setdefault('log',{})['Fixstand/endpoint_score']=extra.mean()/self.step_dt
         return base+extra
     Go2BackflipEnv._get_rewards=rewards
@@ -172,6 +173,33 @@ def configure_backflip(cfg):
             raise RuntimeError('Backflip default pose does not match the shared fixstand contract')
         return original_reset(self,env_ids)
     Go2BackflipEnv._reset_idx=reset
+
+
+def backflip_entry_weight(time):
+    import torch
+    x=torch.clamp((torch.as_tensor(time)-1.)/.2,0.,1.)
+    return 1.-x*x*(3.-2.*x)
+
+
+def configure_backflip_delayed_entry(cfg):
+    """Train an observed one-second entry; raw actor -> bounded hold -> original control."""
+    import torch
+    from isaaclab_backflip.tasks.go2_backflip.go2_backflip_env import Go2BackflipEnv
+    cfg.episode_length_s=5.
+    cfg.entry_delay_seconds=1.
+    original_pre=Go2BackflipEnv._pre_physics_step
+    def pre(self,actions):
+        raw_time=self.episode_length_buf.float()*self.step_dt
+        w=backflip_entry_weight(raw_time).unsqueeze(-1)
+        processed=torch.lerp(actions,.4*torch.tanh(actions),w)
+        return original_pre(self,processed)
+    def phases(self):
+        t=torch.clamp(self.episode_length_buf[:,None].float()*self.step_dt-1.,max=2.)
+        phase=torch.pi*t/2.
+        return tuple(f(phase/divisor) for divisor in (1.,2.,4.) for f in (torch.sin,torch.cos))
+    Go2BackflipEnv._pre_physics_step=pre
+    Go2BackflipEnv._phase_features=phases
+    Go2BackflipEnv._time=lambda self:self.episode_length_buf.float()*self.step_dt-1.
 
 
 def write_contract(path,skill,**extra):

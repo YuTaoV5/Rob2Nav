@@ -1,0 +1,111 @@
+{
+  "args": {
+    "kind": "backflip",
+    "seed": 9200,
+    "physics_hz": 1000,
+    "initial_joint_noise": 0.002
+  },
+  "backend": "MuJoCo",
+  "role": "locally trained Go2 backflip; pinned native observation/controller",
+  "successes": 0,
+  "total": 1,
+  "episodes": [
+    {
+      "success": false,
+      "body_y_rotation_rad": -6.220256428761594,
+      "axis_dominance": 0.653415381182109,
+      "airtime_s": 0.4220000000000003,
+      "max_height": 0.7242475148257097,
+      "terminal_upright": 0.9995599148395002,
+      "unexpected_body_ground_contact": true,
+      "max_joint_speed_ratio": 1.7249245394705597,
+      "max_joint_limit_excess_rad": 0.0,
+      "action_completed": false,
+      "fixstand": {
+        "passed": false,
+        "initial": {
+          "passed": false,
+          "samples": 35,
+          "stable_fraction": 0.0,
+          "max_pose_error_rad": 0.5726880723371428
+        },
+        "terminal": {
+          "passed": false,
+          "samples": 51,
+          "stable_fraction": 0.49019607843137253,
+          "max_pose_error_rad": 0.13427817707712464
+        },
+        "pose_tolerance_rad": 0.12,
+        "max_joint_speed_rad_s": 1.0,
+        "minimum_upright_cos": 0.98,
+        "required_stable_fraction": 0.95,
+        "terminal_hold_s": 1.0,
+        "base_height_range_m": [
+          0.26,
+          0.4
+        ],
+        "minimum_foot_force_N": 4.0
+      }
+    }
+  ],
+  "metrics": {
+    "body_y_rotation_rad": -6.220256428761594,
+    "axis_dominance": 0.653415381182109,
+    "airtime_s": 0.4220000000000003,
+    "max_height": 0.7242475148257097,
+    "terminal_upright": 0.9995599148395002,
+    "unexpected_body_ground_contact": true,
+    "max_joint_speed_ratio": 1.7249245394705597,
+    "max_joint_limit_excess_rad": 0.0,
+    "action_completed": false,
+    "fixstand": {
+      "passed": false,
+      "initial": {
+        "passed": false,
+        "samples": 35,
+        "stable_fraction": 0.0,
+        "max_pose_error_rad": 0.5726880723371428
+      },
+      "terminal": {
+        "passed": false,
+        "samples": 51,
+        "stable_fraction": 0.49019607843137253,
+        "max_pose_error_rad": 0.13427817707712464
+      },
+      "pose_tolerance_rad": 0.12,
+      "max_joint_speed_rad_s": 1.0,
+      "minimum_upright_cos": 0.98,
+      "required_stable_fraction": 0.95,
+      "terminal_hold_s": 1.0,
+      "base_height_range_m": [
+        0.26,
+        0.4
+      ],
+      "minimum_foot_force_N": 4.0
+    }
+  },
+  "policy_sha256": "038173c4edc01249aff94541d61a34778ba865d649fd002e3f745351544ddb20",
+  "source_commit": "954aa61ceb62c515689677f44a21e32109f6b62d",
+  "source_sha256": "f1f5a621008cbbef5490744649bbe25acd6fdfb91a6b67eea47d3eaf456e54c1",
+  "evaluator_sha256": "6c1830e9633394c5b33ed40be21f3b34d29ef197e00b9c1247af65bcf6a0163c",
+  "policy_hz": 50,
+  "physics_hz": 1000,
+  "joint_names": [
+    "FL_hip_joint",
+    "FL_thigh_joint",
+    "FL_calf_joint",
+    "FR_hip_joint",
+    "FR_thigh_joint",
+    "FR_calf_joint",
+    "RL_hip_joint",
+    "RL_thigh_joint",
+    "RL_calf_joint",
+    "RR_hip_joint",
+    "RR_thigh_joint",
+    "RR_calf_joint"
+  ],
+  "physical_resets": 1,
+  "root_state_writes": "initialization only; no in-flight reset/stabilizing force",
+  "hardware_constraints_pass": false,
+  "hardware_connected": false
+}

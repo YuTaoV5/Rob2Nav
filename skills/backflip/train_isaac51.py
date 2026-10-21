@@ -11,7 +11,9 @@ parser.add_argument('--source', required=True, type=Path)
 parser.add_argument('--entry', choices=['train', 'play'], default='train')
 parser.add_argument('--fixstand-roundtrip',action='store_true')
 parser.add_argument('--fixstand-output',type=Path)
+parser.add_argument('--delayed-entry',action='store_true')
 args, rest = parser.parse_known_args()
+if args.delayed_entry and not args.fixstand_roundtrip:raise ValueError('Delayed entry requires fixstand training')
 source = args.source.resolve()
 entry = source / (args.entry + '.py')
 text = entry.read_text()
@@ -38,6 +40,8 @@ if args.fixstand_roundtrip:
     for required in ('env_cfg = Go2BackflipEnvCfg()','init_at_random_ep_len=True'):
         if text.count(required)!=1:raise RuntimeError('Pinned training entry changed: '+required)
     text=text.replace('env_cfg = Go2BackflipEnvCfg()', 'env_cfg = Go2BackflipEnvCfg()\n    from skills.fixstand import configure_backflip\n    configure_backflip(env_cfg)')
+    if args.delayed_entry:
+        text=text.replace('configure_backflip(env_cfg)', 'configure_backflip(env_cfg)\n    from skills.fixstand import configure_backflip_delayed_entry\n    configure_backflip_delayed_entry(env_cfg)')
     text=text.replace('init_at_random_ep_len=True','init_at_random_ep_len=False')
     text=text.replace('runner.learn(agent_cfg.max_iterations, init_at_random_ep_len=False)',
         'runner.learn(agent_cfg.max_iterations, init_at_random_ep_len=False)\n    from skills.fixstand import write_completion\n    write_completion(log_dir,agent_cfg.max_iterations)')
@@ -46,6 +50,8 @@ if args.fixstand_roundtrip:
         if output.exists():raise FileExistsError(output)
         text=text.replace('log_dir = (log_root / run_dir_name).resolve()',f'log_dir = Path({str(output)!r})')
         text=text.replace('raw_env = gym.make(TASK_ID, cfg=env_cfg)',"from skills.fixstand import write_contract\n    write_contract(log_dir / 'fixstand.json','backflip',actor_observations=60)\n    raw_env = gym.make(TASK_ID, cfg=env_cfg)")
+        if args.delayed_entry:
+            text=text.replace("'backflip',actor_observations=60)","'backflip',actor_observations=60,action_parameterization='backflip_entry_v2',entry_seconds=1.,release_seconds=[1.,1.2],episode_seconds=5.)")
 if '--checkpoint' in rest:
     index=rest.index('--checkpoint')+1
     rest[index]=str(Path(rest[index]).expanduser().resolve())

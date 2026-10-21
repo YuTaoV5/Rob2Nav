@@ -35,9 +35,10 @@ def export(checkpoint,output):
     actual=session.run(None,{'obs':probe})[0]
     error=float(np.max(abs(actual-expected)))
     if not np.isfinite(actual).all() or actual.shape!=(16,12) or error>1e-5:raise RuntimeError('ONNX parity failed')
+    contract=json.loads((checkpoint.parent/'fixstand.json').read_text()) if (checkpoint.parent/'fixstand.json').exists() else None
     (output/'export.json').write_text(json.dumps(dict(checkpoint_sha256=hashlib.sha256(checkpoint.read_bytes()).hexdigest(),
         policy_sha256=hashlib.sha256((output/'policy.onnx').read_bytes()).hexdigest(),actor_input_dim=60,
-        actor_output_dim=12,onnx_max_error=error,capability_verified=False),indent=2)+'\n')
+        actor_output_dim=12,onnx_max_error=error,fixstand_roundtrip=contract,capability_verified=False),indent=2)+'\n')
 
 
 if __name__=='__main__':
