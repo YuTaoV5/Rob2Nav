@@ -75,7 +75,16 @@ def reset_standard(env,env_ids):
     robot.write_joint_state_to_sim(q,torch.zeros_like(q),env_ids=env_ids)
 
 
-def configure_upright(cfg):
+def upright_endpoint_weight(time):
+    import torch
+    t=torch.as_tensor(time)
+    release=torch.clamp((t-1.)/.5,0.,1.)
+    recover=torch.clamp((t-5.)/1.5,0.,1.)
+    smooth=lambda x:x*x*(3.-2.*x)
+    return torch.maximum(1.-smooth(release),smooth(recover))
+
+
+def configure_upright(cfg,endpoint_residual=False):
     from isaaclab.managers import ObservationTermCfg,RewardTermCfg,EventTermCfg
     cfg.episode_length_s=8.
     cfg.events.reset_base=EventTermCfg(func=reset_standard,mode='reset')
@@ -92,6 +101,11 @@ def configure_upright(cfg):
     cfg.commands.base_velocity.ranges.lin_vel_x=(0.,.15)
     cfg.commands.base_velocity.ranges.lin_vel_y=(0.,0.)
     cfg.commands.base_velocity.ranges.ang_vel_z=(0.,0.)
+    if endpoint_residual:
+        from .fixstand_actions import UprightEndpointAction
+        cfg.actions.joint_pos.class_type=UprightEndpointAction
+        cfg.commands.base_velocity.ranges.lin_vel_x=(.12,.20)
+        cfg.commands.base_velocity.rel_standing_envs=0.
 
 
 def configure_sideflip(cfg,contract,boundary_residual=False,residual_limit=.05):
