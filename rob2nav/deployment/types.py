@@ -1,5 +1,5 @@
 """Canonical SDK-order state and strict per-policy deployment contracts."""
-from dataclasses import dataclass
+from dataclasses import dataclass,asdict
 import hashlib
 import json
 from pathlib import Path
@@ -92,6 +92,7 @@ class Skill:
         values=vector(values)
         return np.array([values[SDK_JOINTS.index(n)] for n in self.joints])
     def entry_sdk(self):return self.to_sdk(self.entry_pose if self.entry_pose is not None else self.default)
+    def digest(self):return hashlib.sha256(json.dumps(asdict(self),sort_keys=True,separators=(',',':')).encode()).hexdigest()
 
     @classmethod
     def load(cls,path,root):

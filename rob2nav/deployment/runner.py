@@ -32,11 +32,11 @@ class UnifiedRuntime:
         if not id or any(x not in 'abcdefghijklmnopqrstuvwxyz0123456789_' for x in id):raise ValueError('Invalid profile ID')
         path=self.root/'deployment/skills'/(id+'.json')
         return path,Skill.load(path,self.root)
-    def stage_async(self,id,snapshot):
+    def stage_async(self,profile_id,snapshot):
         if self.future is not None or self.next is not None or self.queued is not None:raise ValueError('A switch transaction is already pending')
         self.stage_error=None
         def prepare():
-            path,skill=self.profile(id)
+            path,skill=self.profile(profile_id)
             if self.controller.hardware and not skill.hardware_qualified:raise ValueError('Hardware skill quarantined: '+skill.blocker)
             if not self.controller.hardware and not skill.simulation_enabled:
                 if self.allow_research_stunts and skill.atomic:skill=replace(skill,simulation_enabled=True)
@@ -59,13 +59,15 @@ class UnifiedRuntime:
                         worker.poll();time.sleep(.005)
                     if not worker.ready or worker.error:raise ValueError('Candidate load failure: '+str(worker.error))
                     while worker.inflight and time.monotonic()<deadline:worker.poll();time.sleep(.002)
+                    if worker.inflight:raise ValueError('Cached worker did not drain its previous output')
                     obs=observation(skill,snapshot,[0,0,0],action,action,reference=reference,reference_yaw=yaw)
-                    worker.submit(obs,-1,0.);deadline=time.monotonic()+3;result=None
+                    if not worker.submit(obs,-1,0.):raise ValueError('Candidate probe could not be submitted')
+                    deadline=time.monotonic()+3;result=None
                     while time.monotonic()<deadline:
                         result=worker.poll()
                         if result is not None:break
                         time.sleep(.002)
-                    if result is None or 'target' not in result or not np.isfinite(result['target']).all():raise ValueError('Candidate dry inference failed')
+                    if result is None or result.get('epoch')!=-1 or 'target' not in result or not np.isfinite(result['target']).all():raise ValueError('Candidate dry inference failed')
                     worker.pipe.send(dict(reset=True));deadline=time.monotonic()+2;reset=None
                     while time.monotonic()<deadline:
                         reset=worker.poll()

@@ -4,6 +4,8 @@ Uses measured joints/IMU/forces with a fixed Go2 model, never physics integratio
 Common-mode foot slip remains unobservable; no absolute position is invented.
 """
 from dataclasses import replace
+import hashlib
+from pathlib import Path
 import numpy as np
 from .types import SDK_JOINTS
 
@@ -36,6 +38,12 @@ class KinematicObserver:
             if named:self.feet.append(named[0]);continue
             body=model.body(leg+'_foot').id
             self.feet.append(next(i for i in range(model.ngeom) if model.geom_bodyid[i]==body and model.geom_contype[i]))
+        self.source_sha256=''
+    @classmethod
+    def from_xml(cls,path):
+        import mujoco
+        path=Path(path);observer=cls(mujoco.MjModel.from_xml_path(str(path)))
+        observer.source_sha256=hashlib.sha256(path.read_bytes()).hexdigest();return observer
     def enrich(self,s):
         if s.quaternion is None:return s
         m,d,mj=self.model,self.data,self.mj

@@ -42,10 +42,17 @@ class Go2SdkTransport:
     A manual qualification record is an operational gate, not a cryptographic proof.
     This transport is never instantiated by simulation or offline codec tests.
     """
-    def __init__(self,sdk_root,calibration=None):
+    def __init__(self,sdk_root,calibration=None,observer=None):
         self.sdk_root=Path(sdk_root).resolve();self.lock=threading.Lock();self.latest=None
         self.last_tick=None;self.publisher=None;self.lease=None;self.permit=None;self.connected=False
         self.calibration=(calibration or Calibration()).checked();self.health=None
+        self.observer=observer;self.allowed_epochs={}
+    def bundle_digest(self):
+        base=Path(__file__).parent
+        h=hashlib.sha256()
+        for name in ['core.py','types.py','runner.py','policies.py','observer.py','unitree.py','calibration.py']:
+            h.update(name.encode());h.update((base/name).read_bytes())
+        return h.hexdigest()
     def connect_readonly(self,interface):
         if self.connected:raise ValueError('DDS already initialized')
         pin=subprocess.check_output(['git','-C',str(self.sdk_root),'rev-parse','HEAD'],text=True).strip()
@@ -74,16 +81,23 @@ class Go2SdkTransport:
                 limits=self.permit['limits'];h=self.health
                 if not np.isfinite([h['voltage'],*h['temperature']]).all() or not limits['voltage_min']<=h['voltage']<=limits['voltage_max'] or max(h['temperature'])>limits['temperature_max']:raise ValueError('Battery/temperature health gate')
                 if any(((x-y)&0xffffffff)>limits['motor_lost_increment_max'] for x,y in zip(h['lost'],self.lost_baseline)):raise ValueError('Motor packet-loss health gate')
-            return self.latest.checked(time.monotonic())
+            snapshot=self.latest.checked(time.monotonic())
+        return self.observer.enrich(snapshot) if self.observer is not None else snapshot
+    def permit_skill(self,skill):
+        if not skill.hardware_qualified or skill.digest() not in self.permit['approved_contracts']:raise ValueError('This complete policy/PD/observation contract is not device approved')
+    def authorize_epoch(self,epoch,skill):
+        self.permit_skill(skill);self.allowed_epochs[epoch]=skill.digest()
     def claim_writer(self,record,skill,lock_path='/tmp/rob2nav-go2-lowcmd.lock'):
         if not self.connected:raise ValueError('Read-only state acquisition must run first')
         if not skill.hardware_qualified:raise ValueError('Policy is not hardware qualified: '+skill.blocker)
         self.read()
-        required=['robot_serial','firmware','sdk_commit','policy_sha256','calibration_sha256','watchdog_verified','reviewer','expires_unix','limits','recovery_kd']
+        required=['robot_serial','firmware','sdk_commit','approved_contracts','calibration_sha256','kinematics_sha256','runtime_bundle_sha256','watchdog_verified','reviewer','expires_unix','limits','recovery_kd']
         if any(k not in record for k in required):raise ValueError('Incomplete hardware qualification record')
-        if record['robot_serial']!=self.serial or record['sdk_commit']!=SDK_COMMIT or record['policy_sha256']!=skill.sha256:raise ValueError('Device/SDK/policy qualification differs')
+        if record['robot_serial']!=self.serial or record['sdk_commit']!=SDK_COMMIT or skill.digest() not in record['approved_contracts']:raise ValueError('Device/SDK/policy qualification differs')
         if not record['firmware'] or not record['reviewer'] or len(record['calibration_sha256'])!=64 or record['watchdog_verified'] is not True or record['expires_unix']<=time.time():raise ValueError('Expired/incomplete physical qualification')
         if not self.calibration.verified or record['calibration_sha256']!=self.calibration.digest():raise ValueError('Device calibration is unverified/different')
+        if self.observer is None or record['kinematics_sha256']!=self.observer.source_sha256 or not self.observer.source_sha256:raise ValueError('Physical kinematic/COM model is not approved')
+        if record['runtime_bundle_sha256']!=self.bundle_digest():raise ValueError('Deployment control code differs from the reviewed bundle')
         limits=record['limits']
         if not 0<limits['voltage_min']<limits['voltage_max'] or not 0<limits['temperature_max']<100 or not 0<=limits['motor_lost_increment_max']<=10 or not 0<record['recovery_kd']<=8:raise ValueError('Invalid device health/recovery limits')
         from unitree_sdk2py.comm.motion_switcher.motion_switcher_client import MotionSwitcherClient
@@ -105,6 +119,7 @@ class Go2SdkTransport:
         now=time.monotonic();self.read(ignore_health=command.phase=='FAULT')
         if not 0<=now-command.stamp<=.01:raise ValueError('Expired motor command')
         if self.permit['expires_unix']<=time.time():raise ValueError('Hardware permit expired')
+        if command.epoch and command.epoch not in self.allowed_epochs:raise ValueError('Policy generation has not been device approved')
         before=time.monotonic();self.publisher.Write(self.codec.encode(command))
         if time.monotonic()-before>.01:raise TimeoutError('SDK publisher exceeded control deadline; independent device watchdog is required')
     def emergency_damping(self):

@@ -1,9 +1,12 @@
 import dataclasses
 import unittest
+import tempfile,json,time
+from pathlib import Path
 import numpy as np
 from rob2nav.deployment.types import Snapshot,Skill,Intent,SDK_JOINTS
 from rob2nav.deployment.core import SwitchController,Servo,NEUTRAL
 from rob2nav.deployment.policies import observation
+from rob2nav.deployment.runner import UnifiedRuntime
 
 
 def state(t=0.,sequence=0,**kw):
@@ -17,6 +20,15 @@ def skill(id='stand',**kw):
 
 
 class DeploymentCoreTests(unittest.TestCase):
+    def test_asynchronous_stand_preparation_finishes_without_touching_control(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);folder=root/'deployment/skills';folder.mkdir(parents=True)
+            (folder/'stand.json').write_text(json.dumps(dataclasses.asdict(skill())))
+            r=UnifiedRuntime(root)
+            try:
+                r.stage_async('stand',state());prepared=r.future.result(timeout=2)
+                self.assertEqual(prepared.skill.id,'stand');self.assertEqual(r.controller.phase,'OFF')
+            finally:r.close()
     def test_mapping_is_by_name_and_requires_bijection(self):
         names=SDK_JOINTS[::-1];s=skill(joints=names)
         x=np.arange(12);np.testing.assert_array_equal(s.to_sdk(s.from_sdk(x)),x)
