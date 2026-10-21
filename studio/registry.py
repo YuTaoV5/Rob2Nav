@@ -38,7 +38,8 @@ def capabilities(catalog,jobs):
         if skill['id']=='navigation':
             skill['manuals'] += [dict(kind=kind,label=label,path=path,url='#reports?path='+quote(path,safe=''))
                 for kind,label,path in [('scan_simulation','SCAN仿真手册','skills/navigation/SCAN_SIMULATION.md'),
-                                        ('scan_deployment','SCAN实机部署手册','skills/navigation/SCAN_DEPLOYMENT.md')]
+                                        ('scan_deployment','SCAN实机部署手册','skills/navigation/SCAN_DEPLOYMENT.md'),
+                                        ('sensor_calibration','传感器安装与标定','docs/GO2_D435I_MID360_INSTALL_CALIBRATION.md')]
                 if any(r['path']==path for r in catalog.get('reports',[]))]
         selector=skill.get('evidence',{})
         related=[j for j in jobs if j['config'].get('capability_id')==skill['id']]
