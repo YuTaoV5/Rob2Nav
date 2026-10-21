@@ -1,5 +1,7 @@
 # Go2 stairs: SDK2 deployment plan
 
+> 2026-10-21统一框架更新：SDK消息编码与热切换实现见[统一部署框架](../../docs/UNIFIED_GO2_DEPLOYMENT.md)。本文保留单技能契约和源实现审计；多个单技能部署程序不能同时接管电机。当前仅离线/仿真验证，无真实机器人连接。
+
 Plan only. No robot was connected, no hardware commands were sent, and no physical validation is claimed. This plan concerns the Go2 body and SDK2; no arm is required. The terrain perception adapter and low-level sending loop still need implementation before hardware use.
 
 First pass [simulation](SIMULATION.md), fix the checkpoint/source hashes and retain failures. Install the official SDK on the robot control computer (installation only):

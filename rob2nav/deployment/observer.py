@@ -39,6 +39,7 @@ class KinematicObserver:
             body=model.body(leg+'_foot').id
             self.feet.append(next(i for i in range(model.ngeom) if model.geom_bodyid[i]==body and model.geom_contype[i]))
         self.source_sha256=''
+        self.contact_on=np.ones(4)*8.;self.contact_off=np.ones(4)*5.;self.contacts=np.zeros(4,dtype=bool)
     @classmethod
     def from_xml(cls,path):
         import mujoco
@@ -47,18 +48,33 @@ class KinematicObserver:
     def enrich(self,s):
         if s.quaternion is None:return s
         m,d,mj=self.model,self.data,self.mj
-        d.qpos[:3]=0.;d.qpos[3:7]=s.quaternion;d.qpos[self.qids]=s.q
+        # This separate MjData is FK only. Lift its arbitrary origin above the
+        # scene floor to avoid spending time solving irrelevant model contacts.
+        d.qpos[:3]=[0.,0.,3.];d.qpos[3:7]=s.quaternion;d.qpos[self.qids]=s.q
         d.qvel[:3]=0.;d.qvel[3:6]=s.gyro;d.qvel[self.dids]=s.dq;mj.mj_forward(m,d)
-        stance=np.flatnonzero(s.feet>12)
-        if len(stance)<2:return replace(s,velocity=None,support_margin=None)
-        velocities=[];positions=[];jac=np.zeros((3,m.nv));jacr=np.zeros_like(jac)
+        self.contacts=np.where(self.contacts,s.feet>self.contact_off,s.feet>self.contact_on)
+        stance=np.flatnonzero(self.contacts)
+        if len(stance)<2:return replace(s,velocity=None,support_margin=None,contact_mask=self.contacts.copy())
+        velocities=[];positions=[];jac=np.zeros((3,m.nv));jacr=np.zeros_like(jac);support=d.qfrc_bias[self.dids].copy()
         for index in stance:
             geom=self.feet[index];pos=d.geom_xpos[geom];mj.mj_jac(m,d,jac,jacr,pos,int(m.geom_bodyid[geom]))
             positions.append(pos.copy());velocities.append(jac@d.qvel)
+        # A balanced nominal load, rather than copying an already unloaded foot,
+        # helps the fourth foot regain contact during a slow neutral transition.
+        all_positions=np.asarray([d.geom_xpos[g].copy() for g in self.feet]);com=d.subtree_com[self.base]
+        a=np.vstack([np.ones(4),all_positions[:,0]-com[0],all_positions[:,1]-com[1]])
+        desired=np.array([float(m.body_subtreemass[self.base])*9.81,0.,0.]);available=list(range(4));loads=np.zeros(4)
+        while available:
+            solved=np.linalg.lstsq(a[:,available],desired,rcond=None)[0]
+            if np.min(solved)>=0:loads[available]=solved;break
+            available.pop(int(np.argmin(solved)))
+        for index,geom in enumerate(self.feet):
+            mj.mj_jac(m,d,jac,jacr,d.geom_xpos[geom],int(m.geom_bodyid[geom]))
+            support-=jac[:,self.dids].T@np.array([0.,0.,loads[index]])
         velocities=np.asarray(velocities);vbase=-np.average(velocities,axis=0,weights=s.feet[stance])
         residual=float(np.max(np.linalg.norm(velocities+vbase,axis=1)))
-        if residual>.05:return replace(s,velocity=None,support_margin=None)
+        if residual>.05:return replace(s,velocity=None,support_margin=None,contact_mask=self.contacts.copy())
         mj.mj_jacSubtreeCom(m,d,jac,self.base)
         velocity=d.xmat[self.base].reshape(3,3).T@(vbase+jac@d.qvel)
         margin=support_margin(positions,d.subtree_com[self.base,:2])
-        return replace(s,velocity=velocity,support_margin=margin)
+        return replace(s,velocity=velocity,support_margin=margin,support_torque=support,contact_mask=self.contacts.copy())

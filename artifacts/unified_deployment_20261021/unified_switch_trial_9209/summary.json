@@ -1,0 +1,95 @@
+{
+  "seed": 9209,
+  "asset": "robogauge",
+  "wire_mode": "hybrid_pd",
+  "atomic_cycle": false,
+  "flip_rotation_rad": 0.0,
+  "native_motion_peak_torque_step_Nm": 0.0,
+  "maximum_joint_speed_ratio": 0.016895084876788365,
+  "passed": false,
+  "reason": "entry pose/gain transition timeout",
+  "backend": "MuJoCo real free-base hot-switch harness; commits/model hashes below define which actors were actually exercised",
+  "commits": [],
+  "requests": [],
+  "controller_events": [
+    {
+      "time": 0.0,
+      "event": "capture_measured_state",
+      "phase": "CAPTURE",
+      "epoch": 0
+    },
+    {
+      "time": 1.0,
+      "event": "NEUTRAL",
+      "phase": "NEUTRAL",
+      "epoch": 0
+    },
+    {
+      "time": 3.0,
+      "event": "READY",
+      "phase": "READY",
+      "epoch": 0
+    },
+    {
+      "time": 3.0020000000000002,
+      "event": "request:stand_soft",
+      "phase": "READY",
+      "epoch": 0
+    },
+    {
+      "time": 3.3040000000000003,
+      "event": "ENTRY",
+      "phase": "ENTRY",
+      "epoch": 0
+    },
+    {
+      "time": 9.306000000000001,
+      "event": "fault:entry pose/gain transition timeout",
+      "phase": "FAULT",
+      "epoch": 0
+    }
+  ],
+  "max_torque_step_Nm": 0.3000000000001002,
+  "max_kp_step": 0.030000000000011795,
+  "max_reference_step_rad": 0.0005394303449518523,
+  "max_tilt_deg": 2.1014508799437515,
+  "min_base_height_m": 0.3178777743080798,
+  "steps": 4653,
+  "analytical_naive_switches": [],
+  "loop_wall_gap_ms_p99": 4.149159248918294,
+  "loop_wall_gap_ms_max": 211.2301141023636,
+  "timing_scope": "Simulation clock drives the controller; pacing/rendering IPC timing is recorded but is not a hard-real-time hardware certificate",
+  "model_sha256": {
+    "stand_soft": ""
+  },
+  "hardware_connected": false,
+  "root_writes": "env.reset initialization only; torque-only rollout, no stabilizing root force or weld",
+  "final_position": [
+    0.0050311183984911405,
+    -0.000273950632374838,
+    0.3179007397037907
+  ],
+  "source_sha256": {
+    "rob2nav/deployment/runner.py": "b5411278c35a478a57dd27bd4f858fc3f36f2e00c999a3864dc793033db849e8",
+    "rob2nav/deployment/verify_mujoco.py": "05b20b844437bb89f06523da9aca623f508b71adb8e8e3d6e47a6dc11331fb71",
+    "rob2nav/deployment/__main__.py": "8c539f87d09f9ea2461a32d1ef40bc55a1d1a4db84837a8f1d0e8da038dbf98a",
+    "rob2nav/deployment/core.py": "1a246dfc527ff7ba7743d1d37979720eac46eb920adbf7aa42e68af100ccff97",
+    "rob2nav/deployment/service.py": "a66efccaf9b9c2bb2187d21686fde082e316660e8c5727dd2f63bea059b77149",
+    "rob2nav/deployment/__init__.py": "fe519182f7cf5e8d6a3244d1b297b08aada027a7fe0c0ac67e757b75db51412e",
+    "rob2nav/deployment/unitree.py": "4ec5951511eefbc93eb8b7969f7ef0a1ae9aed32e6f2be51a861650de0d11760",
+    "rob2nav/deployment/calibration.py": "e1a41f21454c137a7860796092978798d0de98c1a1e4d7d4856eb884ffecc24e",
+    "rob2nav/deployment/observer.py": "3c9d51c6a8f33e5e99d68bd923e840689026b758322eafe9a71e26ed4a8755b8",
+    "rob2nav/deployment/types.py": "5e1cb467b5270d082604a1f3b494d1cdafa93bc086d0bc62695f694bd2d79b2e",
+    "rob2nav/deployment/policies.py": "5fed2f1dec9bd3f868683be1b62a7f8a5677ae5fa102ef7db3c049a17812b683"
+  },
+  "profile_sha256": {
+    "deployment/skills/walk_mlp.json": "90ea64b6db16306486bed125fa19cb0e3b468618441c7e33ba05e7ebcea7287c",
+    "deployment/skills/sideflip69.json": "d6bc4c102298f8fe0b9f1c43d9889b9e19833c468cd75b5f0ba3fa166db2f839",
+    "deployment/skills/stand.json": "2dfce941966d3438852a74b6d21e000d4f42ddc26ec0f155e6f5da23f22e9b4c",
+    "deployment/skills/walk_moe.json": "10ffd4467791389d8cb3b8a8512c20b4b7b99f9591811eab52c2715cc37e6239",
+    "deployment/skills/backflip60.json": "4e74272aa7c8616169b22744825e1a4fafaeaaac864b9c3f61e307598334ceb3",
+    "deployment/skills/upright48.json": "66f1c19ef2a03e5c78bf2562c602ddae5a12b9338b3cb6efa4b8cbf06432fba1",
+    "deployment/skills/stand_soft.json": "c779c9253872c6c9b8dcbbcff4c77e36033e0e1bd54f9e562a1eaaee7551d8d4",
+    "deployment/skills/stand_stiff.json": "f16156492ab584ec3c2e9a9003efb333fbf327e83da8f8a26da1ef018de0e75e"
+  }
+}

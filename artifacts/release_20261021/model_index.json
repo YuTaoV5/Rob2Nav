@@ -1,118 +1,151 @@
 {
-  "published_at": "2026-10-21T10:55:08.570660+08:00",
-  "selected_stunts": [
+  "created": "2026-10-21",
+  "models": [
     {
       "skill": "backflip",
-      "path": "weights/backflip/selected/exported/policy.onnx",
+      "path": "artifacts/release_20261021/weights/backflip/selected/exported/policy.onnx",
       "sha256": "63d1506863edb8b51ebdc699f863b96fb32ed07941e171d76b2c75c7828a4dc6",
-      "selection_basis": "final 5000-iteration representative; source-task flip/landing observed; strict landing and motor constraints fail",
+      "bytes": 789269,
+      "selection_basis": "Last full 5000-iteration locally trained candidate, not a globally optimal model",
+      "validation": "Original MuJoCo task passed; stricter landing/motor constraints failed",
       "hardware_qualified": false
     },
     {
       "skill": "sideflip",
-      "path": "weights/sideflip/selected/exported/policy.pt",
+      "path": "artifacts/release_20261021/weights/sideflip/selected/exported/policy.pt",
       "sha256": "7616e53e2c95434f824c2728621f8052e2d41a4e033fd00a25f316de211e07e1",
-      "selection_basis": "selected frozen 5200: task 8/8 on fixed-scene holdouts; rated-speed gate 0/8",
+      "bytes": 817170,
+      "selection_basis": "Frozen model_5200 selected before seeds3100-3107",
+      "validation": "MuJoCo task8/8; motor-speed gate0/8, max ratio1.08505",
       "hardware_qualified": false
     },
     {
       "skill": "upright_walk",
-      "path": "weights/upright_walk/representative_failed_baseline/exported/policy.pt",
+      "path": "artifacts/release_20261021/weights/upright_walk/representative_failed_baseline/exported/policy.pt",
       "sha256": "b44983998121a36fb6cdfc7693fcfb6b56ef5abc12a444d5fb669be49e0cf532",
-      "selection_basis": "no validated best walking policy; representative failed baseline; native sliding and MuJoCo failure",
+      "bytes": 774162,
+      "selection_basis": "Representative completed baseline; no walking-qualified best model exists",
+      "validation": "Native posture/travel with sliding; true stepping and MuJoCo task failed",
+      "hardware_qualified": false
+    },
+    {
+      "skill": "navigation",
+      "path": "skills/navigation/policy/navigation.zip",
+      "sha256": "078c784513ea7076b1d5b0306a2b609ce67a5670d8831107501497d780786f31",
+      "bytes": 2529076,
+      "selection_basis": "Locally trained100352-step PPO candidate",
+      "validation": "Fixed-layout independent evaluations8/8; no physical hardware validation",
+      "hardware_qualified": false
+    },
+    {
+      "skill": "stairs",
+      "path": "artifacts/capability_integration/retention_stairs_v2/model_199.pt",
+      "sha256": "bfee54b60826c2aff97c543f2d7ae84d21b5cea4236864148b244d886ff6ac38",
+      "bytes": 22750859,
+      "selection_basis": "Retained previously evaluated candidate; new manual reproductions are archived separately",
+      "validation": "See exact matching historical evaluation/config hashes; not a claim of global best",
+      "hardware_qualified": false
+    },
+    {
+      "skill": "platform",
+      "path": "artifacts/capability_integration/retention_platform_v2/model_199.pt",
+      "sha256": "b3b318a5a44c252778e0e3b7c4a041d117c64df535732b61caf0c4393151df0d",
+      "bytes": 22750859,
+      "selection_basis": "Retained previously evaluated candidate; new manual reproductions are archived separately",
+      "validation": "See exact matching historical evaluation/config hashes; not a claim of global best",
+      "hardware_qualified": false
+    },
+    {
+      "skill": "checkpoint",
+      "path": "artifacts/release_20261021/weights/upright_walk/dc_final_unvalidated/model_5998.pt",
+      "sha256": "80c81d6fdb1853066e58101fdb96557bd0b8e147b91ed5dce1351719b89c62ff",
+      "bytes": 4584373,
+      "selection_basis": "Reproducible resume checkpoint; subfolder distinguishes selected/native/final/snapshot",
+      "validation": "Use matching policy/config and evaluation. Unvalidated candidates are not automatically promoted",
+      "hardware_qualified": false
+    },
+    {
+      "skill": "checkpoint",
+      "path": "artifacts/release_20261021/weights/upright_walk/representative_failed_baseline/model_4999.pt",
+      "sha256": "a022b086e5d0ff9fad417ad20811f691f24b737c87dc4312c713b6f44e084b21",
+      "bytes": 4584373,
+      "selection_basis": "Reproducible resume checkpoint; subfolder distinguishes selected/native/final/snapshot",
+      "validation": "Use matching policy/config and evaluation. Unvalidated candidates are not automatically promoted",
+      "hardware_qualified": false
+    },
+    {
+      "skill": "checkpoint",
+      "path": "artifacts/release_20261021/weights/upright_walk/stepping_snapshot_unvalidated/model_5700.pt",
+      "sha256": "c6f1b2c1f666740c76d8bb2474c56edd18f2354fcbcf636ee9c66fe3513596c4",
+      "bytes": 4584437,
+      "selection_basis": "Reproducible resume checkpoint; subfolder distinguishes selected/native/final/snapshot",
+      "validation": "Use matching policy/config and evaluation. Unvalidated candidates are not automatically promoted",
+      "hardware_qualified": false
+    },
+    {
+      "skill": "checkpoint",
+      "path": "artifacts/release_20261021/weights/stairs/manual_reproduction/model_199.pt",
+      "sha256": "a3ce850d2281fe529f43ca43a455d19f4af0015187353dc4548ae5e7963b6211",
+      "bytes": 22750859,
+      "selection_basis": "Reproducible resume checkpoint; subfolder distinguishes selected/native/final/snapshot",
+      "validation": "Use matching policy/config and evaluation. Unvalidated candidates are not automatically promoted",
+      "hardware_qualified": false
+    },
+    {
+      "skill": "checkpoint",
+      "path": "artifacts/release_20261021/weights/sideflip/dc_final_unvalidated/model_5998.pt",
+      "sha256": "2c0d9a4de72dc681b6fdffb1226a3ed855e578aa4314aff2de7284bd7ddbb198",
+      "bytes": 5929909,
+      "selection_basis": "Reproducible resume checkpoint; subfolder distinguishes selected/native/final/snapshot",
+      "validation": "Use matching policy/config and evaluation. Unvalidated candidates are not automatically promoted",
+      "hardware_qualified": false
+    },
+    {
+      "skill": "checkpoint",
+      "path": "artifacts/release_20261021/weights/sideflip/native_5000/model_4999.pt",
+      "sha256": "c38d6876fae1ee32d967693ef204ebaa3313536705b3c3f8bca5bc7cffafefef",
+      "bytes": 5929909,
+      "selection_basis": "Reproducible resume checkpoint; subfolder distinguishes selected/native/final/snapshot",
+      "validation": "Use matching policy/config and evaluation. Unvalidated candidates are not automatically promoted",
+      "hardware_qualified": false
+    },
+    {
+      "skill": "checkpoint",
+      "path": "artifacts/release_20261021/weights/sideflip/selected/model_5200.pt",
+      "sha256": "5c53cb7d26bd210e995c8a937b2be2ea67e84bdbf3351291ef1290fd988e65f4",
+      "bytes": 5929909,
+      "selection_basis": "Reproducible resume checkpoint; subfolder distinguishes selected/native/final/snapshot",
+      "validation": "Use matching policy/config and evaluation. Unvalidated candidates are not automatically promoted",
+      "hardware_qualified": false
+    },
+    {
+      "skill": "checkpoint",
+      "path": "artifacts/release_20261021/weights/platform/manual_reproduction/model_199.pt",
+      "sha256": "5298d8057b2455b4e5b4aaf3827abc014658d9cc7664a540bd9e0fd3a9c80955",
+      "bytes": 22750859,
+      "selection_basis": "Reproducible resume checkpoint; subfolder distinguishes selected/native/final/snapshot",
+      "validation": "Use matching policy/config and evaluation. Unvalidated candidates are not automatically promoted",
+      "hardware_qualified": false
+    },
+    {
+      "skill": "checkpoint",
+      "path": "artifacts/release_20261021/weights/multiterrain/manual_reproduction/model_199.pt",
+      "sha256": "9b45897484433f4be93ff5aa2ab3cb2fa4fee8d5a88f04e3d809c9c5d8234473",
+      "bytes": 22750795,
+      "selection_basis": "Reproducible resume checkpoint; subfolder distinguishes selected/native/final/snapshot",
+      "validation": "Use matching policy/config and evaluation. Unvalidated candidates are not automatically promoted",
+      "hardware_qualified": false
+    },
+    {
+      "skill": "checkpoint",
+      "path": "artifacts/release_20261021/weights/backflip/selected/model_4999.pt",
+      "sha256": "3a368e238f541ee08a3117ff1d8eb2558db3b7bd94cc16a0246970f447a13baf",
+      "bytes": 5376949,
+      "selection_basis": "Reproducible resume checkpoint; subfolder distinguishes selected/native/final/snapshot",
+      "validation": "Use matching policy/config and evaluation. Unvalidated candidates are not automatically promoted",
       "hardware_qualified": false
     }
   ],
-  "candidates": [
-    {
-      "path": "weights/backflip/selected/model_4999.pt",
-      "sha256": "3a368e238f541ee08a3117ff1d8eb2558db3b7bd94cc16a0246970f447a13baf",
-      "bytes": 5376949
-    },
-    {
-      "path": "weights/backflip/selected/exported/policy.pt",
-      "sha256": "5d9db0c12c156a98a294303719df510a3627b9e9df452f56d2f68dc63e6ccdd2",
-      "bytes": 800018
-    },
-    {
-      "path": "weights/sideflip/selected/model_5200.pt",
-      "sha256": "5c53cb7d26bd210e995c8a937b2be2ea67e84bdbf3351291ef1290fd988e65f4",
-      "bytes": 5929909
-    },
-    {
-      "path": "weights/sideflip/selected/exported/policy.pt",
-      "sha256": "7616e53e2c95434f824c2728621f8052e2d41a4e033fd00a25f316de211e07e1",
-      "bytes": 817170
-    },
-    {
-      "path": "weights/sideflip/dc_final_unvalidated/model_5998.pt",
-      "sha256": "2c0d9a4de72dc681b6fdffb1226a3ed855e578aa4314aff2de7284bd7ddbb198",
-      "bytes": 5929909
-    },
-    {
-      "path": "weights/sideflip/native_5000/model_4999.pt",
-      "sha256": "c38d6876fae1ee32d967693ef204ebaa3313536705b3c3f8bca5bc7cffafefef",
-      "bytes": 5929909
-    },
-    {
-      "path": "weights/sideflip/native_5000/exported/policy.pt",
-      "sha256": "cb8bc1631090e924506e6536dd8a8a94c2fa641a6b78967a9d036c1b7b119ca3",
-      "bytes": 817170
-    },
-    {
-      "path": "weights/upright_walk/representative_failed_baseline/model_4999.pt",
-      "sha256": "a022b086e5d0ff9fad417ad20811f691f24b737c87dc4312c713b6f44e084b21",
-      "bytes": 4584373
-    },
-    {
-      "path": "weights/upright_walk/representative_failed_baseline/exported/policy.pt",
-      "sha256": "b44983998121a36fb6cdfc7693fcfb6b56ef5abc12a444d5fb669be49e0cf532",
-      "bytes": 774162
-    },
-    {
-      "path": "weights/upright_walk/dc_final_unvalidated/model_5998.pt",
-      "sha256": "80c81d6fdb1853066e58101fdb96557bd0b8e147b91ed5dce1351719b89c62ff",
-      "bytes": 4584373
-    },
-    {
-      "path": "weights/upright_walk/stepping_snapshot_unvalidated/model_5700.pt",
-      "sha256": "c6f1b2c1f666740c76d8bb2474c56edd18f2354fcbcf636ee9c66fe3513596c4",
-      "bytes": 4584437
-    },
-    {
-      "path": "weights/stairs/manual_reproduction/model_199.pt",
-      "sha256": "a3ce850d2281fe529f43ca43a455d19f4af0015187353dc4548ae5e7963b6211",
-      "bytes": 22750859
-    },
-    {
-      "path": "weights/platform/manual_reproduction/model_199.pt",
-      "sha256": "5298d8057b2455b4e5b4aaf3827abc014658d9cc7664a540bd9e0fd3a9c80955",
-      "bytes": 22750859
-    },
-    {
-      "path": "weights/multiterrain/manual_reproduction/model_199.pt",
-      "sha256": "9b45897484433f4be93ff5aa2ab3cb2fa4fee8d5a88f04e3d809c9c5d8234473",
-      "bytes": 22750795
-    }
-  ],
-  "existing_shared_resources": [
-    {
-      "path": "skills/navigation/policy/navigation.zip",
-      "sha256": "078c784513ea7076b1d5b0306a2b609ce67a5670d8831107501497d780786f31"
-    },
-    {
-      "path": "vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt",
-      "sha256": "2206659a6a23886446dcfc05d86888d6cdc9b8a4e31f44cbbc4e2d17ba3d6ead"
-    },
-    {
-      "path": "artifacts/capability_integration/retention_stairs_v2/model_199.pt",
-      "sha256": "bfee54b60826c2aff97c543f2d7ae84d21b5cea4236864148b244d886ff6ac38"
-    },
-    {
-      "path": "artifacts/capability_integration/retention_platform_v2/model_199.pt",
-      "sha256": "b3b318a5a44c252778e0e3b7c4a041d117c64df535732b61caf0c4393151df0d"
-    }
-  ],
-  "stepping_state": "Interrupted by container restart; last checkpoint model_5700.pt. No completion.json. No restart/resume performed.",
+  "scope": "Selected models and reproducible candidates; failed/unfinished skills are not called best-qualified",
   "hardware_connected": false
 }

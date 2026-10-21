@@ -21,20 +21,26 @@ class Servo:
     def match_bias(self,s,capture=False):
         if capture:self.q=s.q.copy();self.dq=np.zeros(12)
         self.bias=np.clip(self.tau-self.kp*(self.q-s.q)-self.kd*(self.dq-s.dq),-.5*EFFORT,.5*EFFORT)
-    def native(self,s,target,kp,kd,phase,epoch):
+    def native(self,s,target,kp,kd,phase,epoch,handover_dt=None):
         self.q=vector(target);self.dq=np.zeros(12);self.kp=vector(kp);self.kd=vector(kd);self.bias=np.zeros(12)
         speed=np.clip(s.dq,-2*FREE_SPEED,2*FREE_SPEED)
         low=np.maximum(EFFORT*(-1-speed/FREE_SPEED),-EFFORT);high=np.minimum(EFFORT*(1-speed/FREE_SPEED),EFFORT)
+        if handover_dt is not None:
+            low=np.maximum(low,self.tau-150*handover_dt);high=np.minimum(high,self.tau+150*handover_dt)
         self.tau=np.clip(self.kp*(self.q-s.q)-self.kd*s.dq,low,high)
         return MotorCommand(self.tau.copy(),self.q.copy(),self.dq.copy(),self.kp.copy(),self.kd.copy(),phase,epoch)
-    def step(self,s,target,kp,kd,dt,phase,epoch,fault='',integrate=False,bias_scale=1.):
+    def step(self,s,target,kp,kd,dt,phase,epoch,fault='',integrate=False,bias_scale=1.,stance_valid=False):
         target=np.clip(vector(target),LOW,HIGH)
         acceleration=np.clip(100*(target-self.q)-20*self.dq,-20,20)
         self.dq=np.clip(self.dq+dt*acceleration,-2.,2.)
         self.q=np.clip(self.q+dt*self.dq,LOW,HIGH)
         self.kp+=np.clip(vector(kp)-self.kp,-15*dt,15*dt)
         self.kd+=np.clip(vector(kd)-self.kd,-2*dt,2*dt)
-        if integrate and s.stable():self.bias=np.clip(self.bias+20*(self.q-s.q)*dt,-.5*EFFORT,.5*EFFORT)
+        if integrate and (stance_valid or s.stable() or s.safe_tripod()):
+            mask=np.repeat(s.contacts(),3)
+            correction=20*(self.q-s.q)*mask
+            if s.support_torque is not None:correction+=2*(s.support_torque-self.bias)
+            self.bias=np.clip(self.bias+correction*dt,-.5*EFFORT,.5*EFFORT)
         raw=self.kp*(self.q-s.q)+self.kd*(self.dq-s.dq)+self.bias*bias_scale
         speed=np.clip(s.dq,-2*FREE_SPEED,2*FREE_SPEED)
         low=np.maximum(EFFORT*(-1-speed/FREE_SPEED),-EFFORT)
@@ -46,7 +52,8 @@ class Servo:
             tau=np.clip(raw,low,high)
         else:tau=np.clip(raw,lo,hi)
         self.tau=tau
-        return MotorCommand(tau.copy(),self.q.copy(),self.dq.copy(),self.kp.copy(),self.kd.copy(),phase,epoch,fault)
+        pd=self.kp*(self.q-s.q)+self.kd*(self.dq-s.dq)
+        return MotorCommand(tau.copy(),self.q.copy(),self.dq.copy(),self.kp.copy(),self.kd.copy(),phase,epoch,fault,feedforward=(tau-pd).copy())
 
 
 class SwitchController:
@@ -56,7 +63,14 @@ class SwitchController:
         self.servo=None;self.last_tick=None;self.last_sequence=None;self.sequence_at=0.;self.stable_since=None
         self.phase_at=0.;self.fault='';self.events=[];self.start_pose=None;self.exit_ready=False;self.warm_since=None
         self.command=np.zeros(3);self.requested_command=np.zeros(3)
-    def set_velocity(self,command):self.requested_command=np.clip(vector(command,3),[-.5,-.25,-.7],[.5,.25,.7])
+        self.velocity_stamp=None
+        self.trigger_requested=False
+    def trigger(self):
+        if self.phase!='ARMED':raise ValueError('No atomic skill is armed')
+        self.trigger_requested=True
+    def set_velocity(self,command,stamp=None):
+        self.requested_command=np.clip(vector(command,3),[-.5,-.25,-.7],[.5,.25,.7])
+        self.velocity_stamp=self.last_tick if stamp is None else float(stamp)
     def event(self,now,name):self.events.append(dict(time=now,event=name,phase=self.phase,epoch=self.epoch))
     def arm(self,s,now):
         if self.phase!='OFF':raise ValueError('Already armed; fault reset needs a fresh runtime')
@@ -84,7 +98,8 @@ class SwitchController:
         if not np.isfinite(dt) or dt<=0:raise ValueError('Control clock must advance monotonically')
         if dt>.01:self.latch(now,'control deadline exceeded')
         dt=min(dt,.01);self.last_tick=now
-        velocity_goal=self.requested_command if self.phase=='ACTIVE' and self.pending is None else np.zeros(3)
+        fresh=self.velocity_stamp is not None and np.isfinite(self.velocity_stamp) and -.002<=now-self.velocity_stamp<=.25
+        velocity_goal=self.requested_command if fresh and self.phase=='ACTIVE' and self.pending is None else np.zeros(3)
         self.command+=np.clip(velocity_goal-self.command,-np.array([.5,.5,.7])*dt,np.array([.5,.5,.7])*dt)
         try:
             s.checked(now)
@@ -99,6 +114,8 @@ class SwitchController:
         target=self.servo.q.copy();kp=np.full(12,30.);kd=np.full(12,1.5)
         integrate=True;bias_scale=1.
         stable=s.stable()
+        entry_skill=self.pending if self.phase in ('ENTRY','WARMUP','BLEND') else self.active if self.phase=='ARMED' else None
+        if entry_skill is not None:stable=s.entry_stable(entry_skill) or (not entry_skill.atomic and s.safe_tripod())
         if stable:
             if self.stable_since is None:self.stable_since=now
         else:self.stable_since=None
@@ -137,10 +154,20 @@ class SwitchController:
             goal=self.pending.entry_sdk()
             target=self.start_pose+quintic(elapsed/2.)*(goal-self.start_pose)
             kp=self.pending.to_sdk(self.pending.kp);kd=self.pending.to_sdk(self.pending.kd)
-            if elapsed>=2. and settled and np.max(abs(s.q-goal))<.10:
+            if elapsed>=2. and settled and np.max(abs(s.q-goal))<self.pending.entry_tolerance:
                 self.epoch+=1;self.warm_since=None;self._phase('WARMUP',now)
             elif elapsed>6:self.latch(now,'entry pose/gain transition timeout')
+        elif self.phase=='ARMED':
+            target=self.active.entry_sdk();kp=self.active.to_sdk(self.active.kp);kd=self.active.to_sdk(self.active.kd)
+            if intent is None:self.latch(now,'missing armed atomic policy output')
+            else:
+                try:intent.checked(self.epoch,now)
+                except ValueError as exc:self.latch(now,str(exc))
+                if self.phase!='FAULT' and self.trigger_requested and settled and np.max(abs(s.q-target))<self.active.entry_tolerance:
+                    target=intent.target;integrate=False;bias_scale=0.;self.trigger_requested=False
+                    self._phase('ACTIVE',now);self.event(now,'atomic_trigger')
         elif self.phase in ('WARMUP','BLEND'):
+            warmup_limit=self.pending.warmup_s+3
             target=self.pending.entry_sdk();kp=self.pending.to_sdk(self.pending.kp);kd=self.pending.to_sdk(self.pending.kd)
             valid=False
             invalid_reason='no candidate output'
@@ -149,14 +176,17 @@ class SwitchController:
                     intent.checked(self.epoch,now)
                     baseline=target if self.phase=='WARMUP' else self.servo.q
                     delta=float(np.max(abs(intent.target-baseline)))
-                    valid=delta<.40;invalid_reason=f'candidate target step {delta:.4f} rad'
+                    valid=self.pending.atomic or delta<.40;invalid_reason=f'candidate target step {delta:.4f} rad'
                 except ValueError as exc:invalid_reason=str(exc)
             if self.phase=='WARMUP':
                 if valid and stable:
                     if self.warm_since is None:self.warm_since=now
-                    if now-self.warm_since>self.pending.warmup_s:self._phase('BLEND',now)
+                    if now-self.warm_since>self.pending.warmup_s:
+                        if self.pending.atomic:
+                            self.active=self.pending;self.pending=None;self._phase('ARMED',now);self.event(now,'commit:'+self.active.id)
+                        else:self._phase('BLEND',now)
                 else:self.warm_since=None
-                if elapsed>self.pending.warmup_s+3:self.latch(now,'shadow policy warmup failed')
+                if elapsed>warmup_limit:self.latch(now,'shadow policy warmup failed')
             elif not valid:self.latch(now,'candidate during blend: '+invalid_reason)
             else:
                 target=target+quintic(elapsed)*(intent.target-target)
@@ -165,7 +195,7 @@ class SwitchController:
                     self.active=self.pending;self.pending=None;self._phase('ACTIVE',now);self.event(now,'commit:'+self.active.id)
         if self.phase=='FAULT':target=s.q.copy();kp=np.zeros(12);kd=np.full(12,2.);integrate=False;bias_scale=0.
         if self.phase=='ACTIVE' and self.active.actuation=='native_pd':
-            command=self.servo.native(s,target,kp,kd,self.phase,self.epoch)
-        else:command=self.servo.step(s,target,kp,kd,dt,self.phase,self.epoch,self.fault,integrate=integrate,bias_scale=bias_scale)
+            command=self.servo.native(s,target,kp,kd,self.phase,self.epoch,handover_dt=dt if now-self.phase_at<.1 and not self.active.atomic else None)
+        else:command=self.servo.step(s,target,kp,kd,dt,self.phase,self.epoch,self.fault,integrate=integrate,bias_scale=bias_scale,stance_valid=s.controllable_support())
         if command.fault and self.phase!='FAULT':self.latch(now,command.fault)
         return replace(command,stamp=now)

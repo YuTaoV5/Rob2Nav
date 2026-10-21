@@ -23,11 +23,12 @@ class Prepared:
 
 
 class UnifiedRuntime:
-    def __init__(self,root,hardware=False,allow_research_stunts=False):
+    def __init__(self,root,hardware=False,allow_research_stunts=False,approval=None):
         self.root=Path(root).resolve();self.controller=SwitchController(hardware)
         self.executor=ThreadPoolExecutor(max_workers=1,thread_name_prefix='policy-staging')
         self.future=None;self.active=None;self.next=None;self.queued=None;self.stage_error=None;self.started=0.;self.prepared=[]
         self.allow_research_stunts=allow_research_stunts and not hardware
+        self.approval=approval
     def profile(self,id):
         if not id or any(x not in 'abcdefghijklmnopqrstuvwxyz0123456789_' for x in id):raise ValueError('Invalid profile ID')
         path=self.root/'deployment/skills'/(id+'.json')
@@ -37,7 +38,9 @@ class UnifiedRuntime:
         self.stage_error=None
         def prepare():
             path,skill=self.profile(profile_id)
+            if self.active is not None and self.active.skill==skill:raise ValueError('Requested contract is already active')
             if self.controller.hardware and not skill.hardware_qualified:raise ValueError('Hardware skill quarantined: '+skill.blocker)
+            if self.approval is not None:self.approval(skill)
             if not self.controller.hardware and not skill.simulation_enabled:
                 if self.allow_research_stunts and skill.atomic:skill=replace(skill,simulation_enabled=True)
                 else:raise ValueError('Simulation switch quarantined: '+skill.blocker)
@@ -53,7 +56,8 @@ class UnifiedRuntime:
                     live=rotation(snapshot.quaternion);ref=rotation(reference['body_quat_w'][0,0]);yaw=float(np.arctan2(live[1,0],live[0,0])-np.arctan2(ref[1,0],ref[0,0]))
                 action=(snapshot.q-skill.to_sdk(skill.default))/skill.scale
                 if skill.policy:
-                    cached=next((p for p in reversed(self.prepared) if p.skill==skill and p.worker is not None and p.worker.process.is_alive() and p is not self.active),None)
+                    active_worker=self.active.worker if self.active is not None else None
+                    cached=next((p for p in reversed(self.prepared) if p.skill==skill and p.worker is not None and p.worker is not active_worker and p.worker.process.is_alive()),None)
                     worker=cached.worker if cached is not None else PolicyProcess(path,self.root);deadline=time.monotonic()+15
                     while time.monotonic()<deadline and not worker.ready and not worker.error:
                         worker.poll();time.sleep(.005)
@@ -98,7 +102,8 @@ class UnifiedRuntime:
             try:c.request(self.queued.skill,now);self.next=self.queued
             except ValueError as exc:self.stage_error=str(exc);c.event(now,'switch_rejected:'+str(exc))
             self.queued=None
-        candidate=self.next if c.phase in ('WARMUP','BLEND') else self.active if c.phase=='ACTIVE' else None
+        before_phase=c.phase
+        candidate=self.next if c.phase in ('WARMUP','BLEND') else self.active if c.phase in ('ACTIVE','ARMED') else None
         intent=None
         if candidate:
             skill=candidate.skill
@@ -109,19 +114,27 @@ class UnifiedRuntime:
                 if result and 'error' in result:c.latch(now,'policy process failed:'+result['error'])
                 elif result and 'target' in result:
                     candidate.intent=Intent(result['epoch'],result['stamp'],np.asarray(result['target']),finished=now-self.started>skill.atomic_duration_s+skill.recovery_s)
-                if now>=candidate.next_inference and c.phase!='FAULT':
+                if now+1e-9>=candidate.next_inference and c.phase!='FAULT':
                     effective=(c.servo.q-skill.to_sdk(skill.default))/skill.scale
+                    if skill.atomic and c.phase!='ACTIVE':effective=np.zeros(12)
                     elapsed=max(0.,now-self.started) if c.phase=='ACTIVE' else 0.
                     try:
                         obs=observation(skill,snapshot,c.command,effective,candidate.last,phase=elapsed,reference=candidate.reference,reference_yaw=candidate.reference_yaw)
-                        if candidate.worker.submit(obs,c.epoch,now):candidate.previous=candidate.last.copy();candidate.last=effective.copy();candidate.next_inference=now+1/skill.policy_hz
+                        if candidate.worker.submit(obs,c.epoch,now):
+                            candidate.previous=candidate.last.copy();candidate.last=effective.copy()
+                            period=1/skill.policy_hz
+                            candidate.next_inference=candidate.next_inference+period if candidate.next_inference>0 else now+period
+                            if candidate.next_inference<=now+1e-9:candidate.next_inference=now+period
                     except ValueError as exc:c.latch(now,'observation adapter:'+str(exc))
                 intent=candidate.intent
         command=c.tick(snapshot,now,intent)
-        if c.phase=='ACTIVE' and self.next is not None and c.active is self.next.skill:
+        if c.phase in ('ACTIVE','ARMED') and self.next is not None and c.active is self.next.skill:
             previous=self.active;self.active=self.next;self.next=None;self.started=now
             # Retain at most one inactive model for fast return after an atomic skill.
             # Preparation evicts extra inactive workers off the control thread.
+        if before_phase=='ARMED' and c.phase=='ACTIVE':
+            self.started=now
+            if self.active is not None:self.active.next_inference=now+1/self.active.skill.policy_hz
         return command
     def close(self):
         self.executor.shutdown(wait=True,cancel_futures=True)

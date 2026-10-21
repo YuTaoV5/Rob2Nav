@@ -1,31 +1,21 @@
-# 2026-10-21 资源与权重快照
+# 2026-10-21 实验资源快照
 
-此目录发布权重、导出模型、训练配置/日志、成功和失败的评估摘要、轨迹与视频。原始服务器快照597文件，共265,722,077字节；另附统一部署验证记录和索引。来源与每个文件SHA见[manifest.json](manifest.json)，模型选择依据见[model_index.json](model_index.json)。
+本目录包含597份从实际服务器复制并逐项核对SHA256的原始资源，共265,722,077字节；另有本README与model_index.json选取索引。并非所有模型都通过了能力或实机验收。
 
-| 技能 | 本次选择 | 边界 |
-|---|---|---|
-| 后空翻 | [5000轮ONNX](weights/backflip/selected/exported/policy.onnx)、同目录TorchScript和完整model_4999 | 代表复现模型；严格落地/电机约束未通过，不是可直接上机的最佳模型 |
-| 侧空翻 | [固定5200 TorchScript](weights/sideflip/selected/exported/policy.pt)、完整model_5200与policy.json | 固定场景动作8/8；额定速度门限未通过；5998仅未评估候选 |
-| 站立行走 | [5000轮代表基线](weights/upright_walk/representative_failed_baseline/exported/policy.pt) | 尚无通过真实迈步/MuJoCo验收的最佳权重；原生前移伴滑移 |
-| 新增迈步奖励 | weights/upright_walk/stepping_snapshot_unvalidated/model_5700.pt | 容器重启中断，无完成标志，无技能验收，不自动续训 |
-| 阶梯/高台/多地形 | weights/<技能>/manual_reproduction/model_199.pt | 独立手册复跑：阶梯32/32、高台18/32、多地形flat31/32+stairs32/32+platform32/32；不是全局最优声明 |
+- `weights/backflip/selected`：本地5000轮最终检查点、TorchScript/ONNX、训练参数；存在落地/电机约束失败。
+- `weights/sideflip/selected`：固定5200检查点与导出器契约，对应MuJoCo动作8/8；额定速度仍失败。
+- `weights/sideflip/native_5000`、`dc_final_unvalidated`：原生基线和适配最终候选，不覆盖选定模型。
+- `weights/upright_walk/representative_failed_baseline`：可重现的失败基线，不是“行走最佳”。DC最终候选、迈步重训检查点另外保留，未验证者明确标注。
+- `weights/{stairs,platform,multiterrain}/manual_reproduction`：公开手册新复跑的训练检查点、配置与逐轮数据；阶梯32/32，高台18/32，多地形flat31/32、stairs32/32、platform32/32。不可用历史其他模型分数替换。
+- `evaluations`：仿真摘要、轨迹、视频、浏览器验证，以及相关失败对照。
+- `logs`：完整训练日志与退出码，包含快照时尚在训练的记录。
+- `source_patches`：SCAN Jazzy兼容补丁。
+- `provenance`：参考动作FK对齐核对。
 
-所有恢复训练检查点保留优化器等训练状态，不可直接当作TorchScript推理模型加载。各exported/policy.json记录输入项、顺序、缩放、默认姿态、SHA。后空翻使用原60维源码契约。新网站优先读取此目录的对应导出模型；参考动作NPZ仍按固定来源单独准备，未打包上游无许可声明的原始CSV或第三方缓存。
-
-## 数据目录
-
-- `evaluations/`：所有本次选择的特技诊断、独立侧翻8回合、导航/SCAN/托爪、地形评估、网页验收；包含失败与修复前结果。
-- `logs/`：完整5000轮及DC适配日志、地形复跑和未完成迈步训练的日志快照。
-- `weights/`：选定权重、原始5000轮、DC5998候选、5700中断快照及配置。
-- `validation/`：统一控制核心/SDK离线检查、首轮真实MuJoCo切换失败。`switch_trial_9201_summary.json`中没有任何MLP/MoE提交，backend描述仅为测试计划，不能当作已运行这些模型。
-- `source_patches/`：SCAN/Jazzy兼容补丁；原项目固定提交及许可说明见各技能手册和docs/GO2_SDK2_SOURCE_REVIEW.md。
-
-## 校验与复现
+`manifest.json`记录597个原始文件的源路径、字节数及SHA256。`model_index.json`链接本目录与既有保留模型、导航权重，说明选择依据；“selected”只表示本次选取，不代表全局最优或允许实机运行。
 
 ```bash
 python scripts/verify_release_resources.py
-python -m rob2nav.deployment profiles
-python -m rob2nav.deployment plan --from walk_moe --to backflip60
 ```
 
-训练与推理环境要求见skills/<技能>/TRAINING.md、SIMULATION.md；统一部署仍在验证中，见[方案与失败边界](../../docs/UNIFIED_GO2_DEPLOYMENT.md)。本发布不包含凭据、虚拟环境、node_modules、外部源码缓存或全部中间检查点。原始第三方运动数据通过固定URL及SHA在训练手册中获取；本次训练得到的模型和本次产生的仿真轨迹均保留。
+原始运动CSV、外部源码缓存和机器凭据没有打包；参考数据按各技能手册从固定提交获取和处理。统一SDK热切换说明见 `docs/UNIFIED_GO2_DEPLOYMENT.md`，发布时最新状态见 `handover.md`。

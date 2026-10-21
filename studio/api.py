@@ -31,6 +31,8 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
     mount_navigation_live(app, root)
     from .live_skills import mount_live_skills
     mount_live_skills(app,root,mujoco_python)
+    from .unified_deployment_routes import mount_unified_deployment
+    mount_unified_deployment(app,root)
 
     @app.get('/api/deployment')
     def deployment_framework():
@@ -39,7 +41,7 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
         return {'version':__version__,'profiles':profiles(),'states':['standby','armed','active','fault','stopped'],
             'backends':[{'id':'mujoco','status':'source-policy inference connected'},
                         {'id':'isaac','status':'MoE training/checkpoint inference connected'},
-                        {'id':'ros','status':'adapter pending'}, {'id':'unitree_dds','status':'not implemented / no hardware control'}],
+                        {'id':'ros','status':'adapter pending'}, {'id':'unitree_dds','status':'gated SDK2 transport implemented; offline IDL/CRC only; no hardware connection'}],
             'layers':['robot/policy contracts','asset integrity','lifecycle and command gate','inference backends','navigation adapters','recording / evidence','Studio API / UI'],
             'hardware_enabled':False}
 

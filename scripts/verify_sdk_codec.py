@@ -22,6 +22,14 @@ def main():
         assert all(m.kp==0 and m.kd==0 for m in msg.motor_cmd), 'PD would be applied twice'
         assert all(m.tau==0 for m in msg.motor_cmd[12:])
         assert msg.crc==codec.crc.Crc(msg)
+        from dataclasses import replace
+        hybrid=LowCmdCodec(mode='hybrid_pd')
+        measured=NEUTRAL-.02;pd=np.ones(12)*40*(NEUTRAL-measured)
+        hc=replace(c,feedforward=tau-pd)
+        hm=hybrid.encode(hc)
+        effective=np.array([m.kp*(m.q-measured[i])+m.kd*(m.dq-0.)+m.tau for i,m in enumerate(hm.motor_cmd[:12])])
+        np.testing.assert_allclose(effective,tau,atol=1e-8)
+        assert hm.crc==hybrid.crc.Crc(hm)
         crc=int(msg.crc);msg.motor_cmd[0].tau+=.1;assert codec.crc.Crc(msg)!=crc
         from unitree_sdk2py.idl.default import unitree_go_msg_dds__LowState_
         transport=Go2SdkTransport(a.sdk_root);state=unitree_go_msg_dds__LowState_();state.tick=1
@@ -35,6 +43,7 @@ def main():
             start=time.perf_counter();codec.encode(c);durations.append(time.perf_counter()-start)
         report=dict(real_sdk_idl=True,real_sdk_crc=True,wire_motors=len(msg.motor_cmd),serialized_bytes=len(msg.serialize()),
             double_pd=False,crc_detected_mutation=True,duplicate_lowstate_rejected=True,
+            hybrid_pd_feedforward_verified=True,wire_mode_fixed_per_session=True,
             codec_milliseconds_p99=float(np.percentile(durations,99)*1000),codec_milliseconds_max=max(durations)*1000,
             channel_factory_calls=0,publisher_calls=0,hardware_connected=False)
     a.output.parent.mkdir(parents=True,exist_ok=True);a.output.write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report))

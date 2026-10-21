@@ -1,5 +1,5 @@
 """Canonical SDK-order state and strict per-policy deployment contracts."""
-from dataclasses import dataclass,asdict
+from dataclasses import dataclass,asdict,field
 import hashlib
 import json
 from pathlib import Path
@@ -28,6 +28,8 @@ class Snapshot:
     velocity:np.ndarray|None=None
     quaternion:np.ndarray|None=None
     support_margin:float|None=None
+    support_torque:np.ndarray|None=None
+    contact_mask:np.ndarray|None=None
 
     def checked(self,now,ttl=.03):
         if not np.isfinite([self.stamp,now]).all() or not -.002<=now-self.stamp<=ttl:raise ValueError('stale/future state')
@@ -35,14 +37,26 @@ class Snapshot:
         if not .9<=np.linalg.norm(self.gravity)<=1.1:raise ValueError('invalid gravity normalization')
         if self.velocity is not None:vector(self.velocity,3)
         if self.quaternion is not None and abs(np.linalg.norm(vector(self.quaternion,4))-1)>.01:raise ValueError('invalid quaternion')
+        if self.support_torque is not None:vector(self.support_torque)
+        if self.contact_mask is not None and not np.isin(vector(self.contact_mask,4),[0,1]).all():raise ValueError('invalid contact mask')
         return self
+    def contacts(self):return np.asarray(self.contact_mask,dtype=bool) if self.contact_mask is not None else self.feet>8
+    def entry_stable(self,skill):
+        goal=np.array(skill.entry_gravity)
+        return bool(np.all(self.contacts()) and np.linalg.norm(self.gyro)<.25 and np.max(abs(self.dq))<.8 and
+            np.linalg.norm(self.gravity-goal)<skill.entry_gravity_tolerance and
+            (self.velocity is None and not skill.atomic or self.velocity is not None and np.linalg.norm(self.velocity[:2])<.12))
     def safe_tripod(self):
         return bool(self.support_margin is not None and np.isfinite(self.support_margin) and self.support_margin>.015 and
-            np.count_nonzero(self.feet>12)>=3 and self.velocity is not None and np.linalg.norm(self.velocity[:2])<.08 and
+            np.count_nonzero(self.contacts())>=3 and self.velocity is not None and np.linalg.norm(self.velocity[:2])<.08 and
             np.linalg.norm(self.gyro)<.18 and np.max(abs(self.dq))<2. and self.gravity[2]<-.99)
+    def controllable_support(self):
+        return bool(self.support_margin is not None and self.support_margin>.015 and np.count_nonzero(self.contacts())>=3 and
+            self.velocity is not None and np.linalg.norm(self.velocity[:2])<.12 and np.linalg.norm(self.gyro)<.35 and
+            np.max(abs(self.dq))<2. and self.gravity[2]<-.94)
 
     def stable(self):
-        return bool(np.all(self.feet>12) and np.linalg.norm(self.gyro)<.25 and np.max(abs(self.dq))<.8 and
+        return bool(np.all(self.contacts()) and np.linalg.norm(self.gyro)<.25 and np.max(abs(self.dq))<.8 and
             self.gravity[2]<-.98 and (self.velocity is None or np.linalg.norm(self.velocity[:2])<.12))
 
 
@@ -70,6 +84,9 @@ class Skill:
     atomic_duration_s:float=0.
     recovery_s:float=2.
     entry_pose:tuple[float,...]|None=None
+    entry_tolerance:float=.1
+    entry_gravity:tuple[float,...]=(0.,0.,-1.)
+    entry_gravity_tolerance:float=.12
 
     def checked(self):
         if len(self.joints)!=12 or set(self.joints)!=set(SDK_JOINTS):raise ValueError('Joint-name mapping must be a complete Go2 bijection')
@@ -82,6 +99,8 @@ class Skill:
         if self.actuation not in ('bounded_pd','native_pd'):raise ValueError('Unknown motor execution contract')
         if not np.isfinite([self.atomic_duration_s,self.recovery_s]).all() or self.atomic_duration_s<0 or self.recovery_s<1:raise ValueError('Invalid atomic phase duration')
         if self.entry_pose is not None:vector(self.entry_pose)
+        if not np.isfinite(self.entry_tolerance) or not .005<=self.entry_tolerance<=.15:raise ValueError('Invalid entry state tolerance')
+        if abs(np.linalg.norm(vector(self.entry_gravity,3))-1)>.01 or not .03<=self.entry_gravity_tolerance<=.2:raise ValueError('Invalid gravity entry contract')
         return self
 
     def to_sdk(self,values):
@@ -130,3 +149,4 @@ class MotorCommand:
     epoch:int
     fault:str=''
     stamp:float=0.
+    feedforward:np.ndarray=field(default_factory=lambda:np.zeros(12))
