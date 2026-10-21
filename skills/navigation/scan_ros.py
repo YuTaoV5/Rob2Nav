@@ -48,15 +48,19 @@ class Bridge(Node):
                 except subprocess.TimeoutExpired:os.killpg(p.pid,signal.SIGKILL);p.wait()
         self.children=[]
         if self.log:self.log.close();self.log=None
-    def restart(self,session):
+    def restart(self,session,dynamic_task=False):
         self.stop_children();self.session=session;self.cmd=[0.,0.,0.];self.cmd_at=0.;self.plans=0;self.command_count=0;self.goal_key=None
         self.goal_at=0.;self.goal_plan_baseline=0;self.goal_attempts=0
         folder=Path('/root/gpufree-data/Rob2Nav/outputs/scan_web');folder.mkdir(parents=True,exist_ok=True)
         self.log=(folder/'planner.log').open('ab',buffering=0)
         config=SOURCE/'install/scan_planner/share/scan_planner/config'
         binary=SOURCE/'install/scan_planner/lib/scan_planner'
+        self.map_timeout=2.0 if dynamic_task else 0.0
+        if dynamic_task:
+            source=(SOURCE/'src/planner/plan_env/src/grid_map.cpp').read_text()
+            if 'rob2nav_occupancy_timeout_' not in source:raise RuntimeError('Apply and build deployment/patch_scan_dynamic_map.py first')
         commands=[
-            [str(binary/'scan_planner_node'),'--ros-args','--params-file',str(config/'planner.yaml'),'-r','body_pose:=/quad_0/body_pose','-r','sensor_pose:=/quad_0/lidar_pose','-r','cloud:=/quad_0/cloud'],
+            [str(binary/'scan_planner_node'),'--ros-args','--params-file',str(config/'planner.yaml'),'-p',f'grid_map.rob2nav_occupancy_timeout:={self.map_timeout}','-r','body_pose:=/quad_0/body_pose','-r','sensor_pose:=/quad_0/lidar_pose','-r','cloud:=/quad_0/cloud'],
             [str(binary/'closed_loop_controller'),'--ros-args','--params-file',str(config/'controllers.yaml'),'-r','body_pose:=/quad_0/body_pose','-r','cmd_vel:=/quad_0/cmd_vel']]
         self.children=[subprocess.Popen(c,stdout=self.log,stderr=subprocess.STDOUT,start_new_session=True) for c in commands]
         self.started=time.monotonic()
@@ -70,7 +74,7 @@ class Bridge(Node):
             if self.children and time.monotonic()-self.last_packet>10:self.stop_children();self.session=None
             return
         d,peer=packet;self.last_packet=time.monotonic()
-        if d['session']!=self.session:self.restart(d['session'])
+        if d['session']!=self.session:self.restart(d['session'],d.get('dynamic_task',False))
         stamp=self.get_clock().now().to_msg()
         odom=Odometry();odom.header.stamp=stamp;odom.header.frame_id='world';odom.child_frame_id='base'
         p,q=d['position'],d['quaternion']
@@ -84,17 +88,17 @@ class Bridge(Node):
         cloud.fields=[PointField(name=n,offset=4*i,datatype=PointField.FLOAT32,count=1) for i,n in enumerate(['x','y','z'])]
         cloud.point_step=12;cloud.row_step=12*len(points);cloud.is_dense=True
         cloud.data=b''.join(struct.pack('<fff',*p) for p in points);self.cloud.publish(cloud)
-        key=tuple(d['goal'])
+        key=tuple(d['goal'])+(d.get('goal_height',.3),d.get('goal_epoch',0))
         changed=key!=self.goal_key
         retry=self.plans<=self.goal_plan_baseline and time.monotonic()-self.goal_at>2
         if d['active'] and (changed or retry) and time.monotonic()-self.started>2 and self.goal.get_subscription_count()>0:
             goal=PoseStamped();goal.header=odom.header
-            goal.pose.position.x,goal.pose.position.y=d['goal'];goal.pose.position.z=.3;goal.pose.orientation.w=1.
+            goal.pose.position.x,goal.pose.position.y=d['goal'];goal.pose.position.z=float(d.get('goal_height',.3));goal.pose.orientation.w=1.
             if changed:self.goal_plan_baseline=self.plans;self.goal_attempts=0
             self.goal.publish(goal);self.goal_key=key;self.goal_at=time.monotonic();self.goal_attempts+=1
         age=time.monotonic()-self.cmd_at
         reply=dict(session=self.session,command=self.cmd if age<.3 and d['active'] else [0.,0.,0.],command_age=age if self.cmd_at else None,
-            plans=self.plans,commands=self.command_count,source_commit=PIN,ready=all(p.poll() is None for p in self.children),
+            plans=self.plans,commands=self.command_count,source_commit=PIN,map_occupancy_timeout_s=self.map_timeout,source_variant='rob2nav_dynamic_map_v1',ready=all(p.poll() is None for p in self.children),
             sensor_points=len(points),goal_published=self.goal_key is not None,goal_attempts=self.goal_attempts,
             goal_subscribers=self.goal.get_subscription_count(),goal_acknowledged=self.plans>self.goal_plan_baseline)
         self.sock.sendto(json.dumps(reply).encode(),peer)

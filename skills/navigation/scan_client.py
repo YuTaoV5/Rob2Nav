@@ -13,12 +13,17 @@ class ScanClient:
     def reset(self):self.session=uuid.uuid4().hex;self.telemetry={};self.received=0.
     def act(self,env,goal,active):
         points=env.points
+        if getattr(env,'people',[]) and len(env.lidar_free_dirs):
+            # True no-return beams, not dropped measurements. SCAN truncates
+            # beyond max_ray_length as free space instead of occupied endpoints.
+            free=np.asarray(env.cfg['lidar_position'])+env.lidar_free_dirs*(env.cfg['max_range']+.2)
+            points=np.concatenate([points,free])
         if len(points)>450:points=points[np.linspace(0,len(points)-1,450,dtype=int)]
         rot=env.rotation
         world=env.data.xpos[env.base_id]+points@rot.T
         sensor=env.data.xpos[env.base_id]+rot@np.asarray(env.cfg['lidar_position'])
-        payload=dict(session=self.session,position=env.data.qpos[:3].tolist(),quaternion=env.data.qpos[3:7].tolist(),
-            velocity=env.data.qvel[:3].tolist(),sensor_position=sensor.tolist(),points=world.tolist(),goal=goal.tolist(),active=bool(active))
+        payload=dict(session=self.session,dynamic_task=bool(getattr(env,'people',[])),position=env.data.qpos[:3].tolist(),quaternion=env.data.qpos[3:7].tolist(),
+            velocity=env.data.qvel[:3].tolist(),sensor_position=sensor.tolist(),points=world.tolist(),goal=goal.tolist(),goal_height=(.35+env.ground(float(goal[0]))) if getattr(env,'people',[]) else .3,active=bool(active),goal_epoch=int(env.data.time//4) if getattr(env,'people',[]) else 0)
         self.sock.sendto(json.dumps(payload).encode(),('127.0.0.1',8771))
         while True:
             try:

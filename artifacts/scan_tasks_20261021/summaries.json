@@ -1,0 +1,890 @@
+{
+  "scan_tasks_flat_long_20261021": {
+    "episodes": [
+      {
+        "scene": "follow_obstacles",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 1.8501851535897005,
+        "robot_displacement_m": 1.5833972679554673,
+        "plans": 7,
+        "max_robot_x_m": 1.5794218770426787,
+        "terrain_progress": {},
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.5690992994112278,
+          "follow_mean_abs_error": 1.1569177359176634,
+          "follow_samples": 510,
+          "lost_samples": 38,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "flat",
+        "samples": 217,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      }
+    ],
+    "hardware_enabled": false,
+    "person_source": "simulated labelled tracks with line-of-sight",
+    "sand": "rough rigid friction approximation only"
+  },
+  "scan_tasks_static_post_patch_20261021": {
+    "backend": "MuJoCo / RoboGauge MoE / native SCAN ROS2",
+    "scope": "Two fixed scenes and goals; integration checks, not independent-seed robustness",
+    "episodes": [
+      {
+        "scene": "empty",
+        "requested_goal": [
+          2.0,
+          0.0
+        ],
+        "phase": "ARRIVED",
+        "distance": 0.38256193033365693,
+        "collision": false,
+        "fallen": false,
+        "scan": {
+          "session": "25116cde972241a1a8ed104e3a1b92de",
+          "command": [
+            0.4840360420610512,
+            0.004407684444893563,
+            0.02498979038126995
+          ],
+          "command_age": 0.0013039070181548595,
+          "plans": 3,
+          "commands": 645,
+          "source_commit": "d0b921c9b05a6d291d144d60882b2e0e88d2c0e0",
+          "map_occupancy_timeout_s": 0.0,
+          "source_variant": "rob2nav_dynamic_map_v1",
+          "ready": true,
+          "sensor_points": 233,
+          "goal_published": true,
+          "goal_attempts": 1,
+          "goal_subscribers": 1,
+          "goal_acknowledged": true
+        },
+        "samples": 33,
+        "success": true,
+        "hardware_enabled": false
+      },
+      {
+        "scene": "slalom",
+        "requested_goal": [
+          6.0,
+          1.6
+        ],
+        "phase": "ARRIVED",
+        "distance": 0.3704309880815268,
+        "collision": false,
+        "fallen": false,
+        "scan": {
+          "session": "ac0f7061a4034c84b99b3ebfb722cb41",
+          "command": [
+            0.6260782621664457,
+            0.04453467988613273,
+            0.1501355135611496
+          ],
+          "command_age": 0.002304950263351202,
+          "plans": 10,
+          "commands": 1590,
+          "source_commit": "d0b921c9b05a6d291d144d60882b2e0e88d2c0e0",
+          "map_occupancy_timeout_s": 0.0,
+          "source_variant": "rob2nav_dynamic_map_v1",
+          "ready": true,
+          "sensor_points": 381,
+          "goal_published": true,
+          "goal_attempts": 1,
+          "goal_subscribers": 1,
+          "goal_acknowledged": true
+        },
+        "samples": 80,
+        "success": true,
+        "hardware_enabled": false
+      }
+    ],
+    "successes": 2,
+    "total": 2,
+    "hardware_enabled": false
+  },
+  "scan_tasks_static_regression_20261021": {
+    "backend": "MuJoCo / RoboGauge MoE / native SCAN ROS2",
+    "scope": "Two fixed scenes and goals; integration checks, not independent-seed robustness",
+    "episodes": [
+      {
+        "scene": "empty",
+        "requested_goal": [
+          2.0,
+          0.0
+        ],
+        "phase": "ARRIVED",
+        "distance": 0.39061096087872754,
+        "collision": false,
+        "fallen": false,
+        "scan": {
+          "session": "039024da51d840518d1591ed0b769905",
+          "command": [
+            0.4936182605583407,
+            0.004524791572602156,
+            0.024962670191419966
+          ],
+          "command_age": 0.0015704520046710968,
+          "plans": 3,
+          "commands": 641,
+          "source_commit": "d0b921c9b05a6d291d144d60882b2e0e88d2c0e0",
+          "ready": true,
+          "sensor_points": 235,
+          "goal_published": true,
+          "goal_attempts": 1,
+          "goal_subscribers": 1,
+          "goal_acknowledged": true
+        },
+        "samples": 33,
+        "success": true,
+        "hardware_enabled": false
+      },
+      {
+        "scene": "slalom",
+        "requested_goal": [
+          6.0,
+          1.6
+        ],
+        "phase": "ARRIVED",
+        "distance": 0.3755435769290206,
+        "collision": false,
+        "fallen": false,
+        "scan": {
+          "session": "906087c4d15242bca357ab17bc654f82",
+          "command": [
+            0.6115097062127658,
+            0.013059845377780828,
+            0.042119339833236194
+          ],
+          "command_age": 0.0016651097685098648,
+          "plans": 10,
+          "commands": 1449,
+          "source_commit": "d0b921c9b05a6d291d144d60882b2e0e88d2c0e0",
+          "ready": true,
+          "sensor_points": 382,
+          "goal_published": true,
+          "goal_attempts": 1,
+          "goal_subscribers": 1,
+          "goal_acknowledged": true
+        },
+        "samples": 73,
+        "success": true,
+        "hardware_enabled": false
+      }
+    ],
+    "successes": 2,
+    "total": 2,
+    "hardware_enabled": false
+  },
+  "scan_tasks_ui_20261021": {
+    "identity_lock_lost_stop": true,
+    "other_visible_person_not_substituted": true,
+    "zero_command_when_selected_person_unseen": true,
+    "scene_options": 8,
+    "person_02_selection": true,
+    "camera_drag": true,
+    "page_errors": [],
+    "hardware_enabled": false
+  },
+  "scan_tasks_validation_20261021": {
+    "episodes": [
+      {
+        "scene": "rooms_dynamic",
+        "task": "navigate",
+        "phase": "RUNNING",
+        "distance": 8.123624021239516,
+        "robot_displacement_m": 0.01343439618075452,
+        "plans": 1,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.568583924993488,
+          "follow_mean_abs_error": null,
+          "follow_samples": 0,
+          "lost_samples": 0,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "flat",
+        "samples": 254,
+        "reached_goal": false,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      },
+      {
+        "scene": "follow_obstacles",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 3.2711308824559215,
+        "robot_displacement_m": 2.4236230539966788,
+        "plans": 9,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.638582118444879,
+          "follow_mean_abs_error": 1.6633507412648125,
+          "follow_samples": 207,
+          "lost_samples": 13,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "flat",
+        "samples": 87,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      },
+      {
+        "scene": "follow_stairs",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 5.017645992746776,
+        "robot_displacement_m": 1.7270913816842455,
+        "plans": 7,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.7039171703568103,
+          "follow_mean_abs_error": 2.096608193108376,
+          "follow_samples": 238,
+          "lost_samples": 26,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "rigid stairs: 4 x 0.025m, tread0.35m; not standard staircase qualification",
+        "samples": 103,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      },
+      {
+        "scene": "follow_sand",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 3.856318895969326,
+        "robot_displacement_m": 2.975349769794284,
+        "plans": 18,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.2804171691938318,
+          "follow_mean_abs_error": 1.9387026441416346,
+          "follow_samples": 236,
+          "lost_samples": 26,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "flat; sand approximation: rough rigid tiles, friction0.38, no particles/sinkage",
+        "samples": 102,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      },
+      {
+        "scene": "follow_mixed",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 6.637382090970881,
+        "robot_displacement_m": 2.3024162942215614,
+        "plans": 8,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.7039432375728158,
+          "follow_mean_abs_error": 2.5560706641983155,
+          "follow_samples": 280,
+          "lost_samples": 43,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "rigid stairs: 4 x 0.025m, tread0.35m; not standard staircase qualification; sand approximation: rough rigid tiles, friction0.38, no particles/sinkage",
+        "samples": 127,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      }
+    ],
+    "hardware_enabled": false,
+    "person_source": "simulated labelled tracks with line-of-sight",
+    "sand": "rough rigid friction approximation only"
+  },
+  "scan_tasks_validation_v2b_20261021": {
+    "episodes": [
+      {
+        "scene": "rooms_dynamic",
+        "task": "navigate",
+        "phase": "RUNNING",
+        "distance": 0.7126020625337699,
+        "robot_displacement_m": 7.590297219282987,
+        "plans": 21,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 0.7777800144146497,
+          "follow_mean_abs_error": null,
+          "follow_samples": 0,
+          "lost_samples": 0,
+          "route_failures": 1
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "flat",
+        "samples": 256,
+        "reached_goal": false,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      },
+      {
+        "scene": "follow_obstacles",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 1.3001729059819076,
+        "robot_displacement_m": 1.7669861210395066,
+        "plans": 6,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.7039432375728158,
+          "follow_mean_abs_error": 1.0479291824074242,
+          "follow_samples": 204,
+          "lost_samples": 13,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "flat",
+        "samples": 87,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      },
+      {
+        "scene": "follow_stairs",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 1.3035136600028012,
+        "robot_displacement_m": 1.5338193124132615,
+        "plans": 6,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.7039432375728158,
+          "follow_mean_abs_error": 1.063180736448887,
+          "follow_samples": 247,
+          "lost_samples": 10,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "rigid stairs: 4 x 0.025m, tread0.35m; not standard staircase qualification",
+        "samples": 102,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      },
+      {
+        "scene": "follow_sand",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 1.3024843450317516,
+        "robot_displacement_m": 1.5993858867797943,
+        "plans": 5,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.703945909672604,
+          "follow_mean_abs_error": 1.0664221213803464,
+          "follow_samples": 246,
+          "lost_samples": 14,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "flat; sand approximation: rough rigid tiles, friction0.38, no particles/sinkage",
+        "samples": 103,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      },
+      {
+        "scene": "follow_mixed",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 1.3108477701180525,
+        "robot_displacement_m": 1.590760921402588,
+        "plans": 5,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.703933396879709,
+          "follow_mean_abs_error": 1.1117048902038908,
+          "follow_samples": 295,
+          "lost_samples": 23,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "rigid stairs: 4 x 0.025m, tread0.35m; not standard staircase qualification; sand approximation: rough rigid tiles, friction0.38, no particles/sinkage",
+        "samples": 126,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      }
+    ],
+    "hardware_enabled": false,
+    "person_source": "simulated labelled tracks with line-of-sight",
+    "sand": "rough rigid friction approximation only"
+  },
+  "scan_tasks_validation_v3_20261021": {
+    "episodes": [
+      {
+        "scene": "rooms_dynamic",
+        "task": "navigate",
+        "phase": "ARRIVED",
+        "distance": 0.36748617417818197,
+        "robot_displacement_m": 8.86292112852519,
+        "plans": 28,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.0808372082518036,
+          "follow_mean_abs_error": null,
+          "follow_samples": 0,
+          "lost_samples": 0,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "flat",
+        "samples": 121,
+        "reached_goal": true,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      },
+      {
+        "scene": "follow_obstacles",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 0.9948277707932045,
+        "robot_displacement_m": 3.3935156875781765,
+        "plans": 42,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 0.9500184283681518,
+          "follow_mean_abs_error": 0.6958436511734056,
+          "follow_samples": 212,
+          "lost_samples": 5,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "flat",
+        "samples": 87,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      },
+      {
+        "scene": "follow_stairs",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 1.3012581938832413,
+        "robot_displacement_m": 2.2915331929901384,
+        "plans": 30,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.415710758917539,
+          "follow_mean_abs_error": 0.8379516371456944,
+          "follow_samples": 242,
+          "lost_samples": 16,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "rigid stairs: 4 x 0.025m, tread0.35m; not standard staircase qualification",
+        "samples": 103,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      },
+      {
+        "scene": "follow_sand",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 1.3040027347549232,
+        "robot_displacement_m": 1.7641425500817576,
+        "plans": 27,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.424691273036488,
+          "follow_mean_abs_error": 0.9506354878291717,
+          "follow_samples": 244,
+          "lost_samples": 15,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "flat; sand approximation: rough rigid tiles, friction0.38, no particles/sinkage",
+        "samples": 103,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      },
+      {
+        "scene": "follow_mixed",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 1.3026641047923555,
+        "robot_displacement_m": 2.365736296383637,
+        "plans": 26,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.4122126039643657,
+          "follow_mean_abs_error": 0.9925934446235298,
+          "follow_samples": 295,
+          "lost_samples": 27,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "rigid stairs: 4 x 0.025m, tread0.35m; not standard staircase qualification; sand approximation: rough rigid tiles, friction0.38, no particles/sinkage",
+        "samples": 127,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      }
+    ],
+    "hardware_enabled": false,
+    "person_source": "simulated labelled tracks with line-of-sight",
+    "sand": "rough rigid friction approximation only"
+  },
+  "scan_tasks_validation_v4_mixed_20261021": {
+    "episodes": [
+      {
+        "scene": "follow_mixed",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 1.8552812313659566,
+        "robot_displacement_m": 1.7172818472063782,
+        "plans": 13,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.4462770910873195,
+          "follow_mean_abs_error": 1.2001093437175485,
+          "follow_samples": 799,
+          "lost_samples": 100,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "rigid stairs: 4 x 0.025m, tread0.35m; not standard staircase qualification; sand approximation: rough rigid tiles, friction0.38, no particles/sinkage",
+        "samples": 355,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      }
+    ],
+    "hardware_enabled": false,
+    "person_source": "simulated labelled tracks with line-of-sight",
+    "sand": "rough rigid friction approximation only"
+  },
+  "scan_tasks_validation_v5_mixed_20261021": {
+    "episodes": [
+      {
+        "scene": "follow_mixed",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 1.8528619415035117,
+        "robot_displacement_m": 1.7645493803290293,
+        "plans": 11,
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.400840334283444,
+          "follow_mean_abs_error": 1.1655947422984294,
+          "follow_samples": 628,
+          "lost_samples": 69,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "rigid stairs: 4 x 0.025m, tread0.35m; not standard staircase qualification; sand approximation: rough rigid tiles, friction0.38, no particles/sinkage",
+        "samples": 276,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      }
+    ],
+    "hardware_enabled": false,
+    "person_source": "simulated labelled tracks with line-of-sight",
+    "sand": "rough rigid friction approximation only"
+  },
+  "scan_tasks_validation_v6_20261021": {
+    "episodes": [
+      {
+        "scene": "follow_obstacles",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 1.5015331116068287,
+        "robot_displacement_m": 1.661235169682829,
+        "plans": 20,
+        "max_robot_x_m": 1.6573341536907757,
+        "terrain_progress": {},
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.3728243020167326,
+          "follow_mean_abs_error": 1.1084148319729614,
+          "follow_samples": 452,
+          "lost_samples": 46,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "flat",
+        "samples": 197,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      },
+      {
+        "scene": "follow_mixed",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 1.5031336740282617,
+        "robot_displacement_m": 2.0773297007246248,
+        "plans": 23,
+        "max_robot_x_m": 2.0733980514809716,
+        "terrain_progress": {
+          "stairs": {
+            "entered": false,
+            "exited": false
+          },
+          "sand_approximation": {
+            "entered": false,
+            "exited": false
+          }
+        },
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.3982377145255234,
+          "follow_mean_abs_error": 1.0734977547715092,
+          "follow_samples": 452,
+          "lost_samples": 46,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "rigid stairs: 4 x 0.025m, tread0.35m; not standard staircase qualification; sand approximation: rough rigid tiles, friction0.38, no particles/sinkage",
+        "samples": 197,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      }
+    ],
+    "hardware_enabled": false,
+    "person_source": "simulated labelled tracks with line-of-sight",
+    "sand": "rough rigid friction approximation only"
+  },
+  "scan_tasks_validation_v7_flat_rooms_20261021": {
+    "episodes": [
+      {
+        "scene": "rooms_dynamic",
+        "task": "navigate",
+        "phase": "ARRIVED",
+        "distance": 0.3677154863644943,
+        "robot_displacement_m": 8.860703195900824,
+        "plans": 27,
+        "max_robot_x_m": 8.63371120424495,
+        "terrain_progress": {},
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 0.9859505352061653,
+          "follow_mean_abs_error": null,
+          "follow_samples": 0,
+          "lost_samples": 0,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "flat",
+        "samples": 119,
+        "reached_goal": true,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      },
+      {
+        "scene": "follow_obstacles",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 0.048864905268698036,
+        "robot_displacement_m": 7.208320716561902,
+        "plans": 221,
+        "max_robot_x_m": 7.204390194175137,
+        "terrain_progress": {},
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 0.9442935844784124,
+          "follow_mean_abs_error": 0.2695740581365756,
+          "follow_samples": 544,
+          "lost_samples": 5,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "flat",
+        "samples": 217,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      }
+    ],
+    "hardware_enabled": false,
+    "person_source": "simulated labelled tracks with line-of-sight",
+    "sand": "rough rigid friction approximation only"
+  },
+  "scan_tasks_validation_v7_mixed_20261021": {
+    "episodes": [
+      {
+        "scene": "follow_mixed",
+        "task": "follow",
+        "phase": "RUNNING",
+        "distance": 0.050711610506685115,
+        "robot_displacement_m": 7.202544108080457,
+        "plans": 221,
+        "max_robot_x_m": 7.198606448846917,
+        "terrain_progress": {
+          "stairs": {
+            "entered": true,
+            "exited": true
+          },
+          "sand_approximation": {
+            "entered": true,
+            "exited": false
+          }
+        },
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 0.9413799170895744,
+          "follow_mean_abs_error": 0.27477134400398834,
+          "follow_samples": 692,
+          "lost_samples": 5,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "rigid stairs: 4 x 0.025m, tread0.35m; not standard staircase qualification; sand approximation: rough rigid tiles, friction0.38, no particles/sinkage",
+        "samples": 275,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      }
+    ],
+    "hardware_enabled": false,
+    "person_source": "simulated labelled tracks with line-of-sight",
+    "sand": "rough rigid friction approximation only"
+  },
+  "scan_tasks_validation_v8_mixed_20261021": {
+    "episodes": [
+      {
+        "scene": "follow_mixed",
+        "task": "follow",
+        "seed": 200,
+        "difficulty": 2,
+        "phase": "RUNNING",
+        "distance": 0.5700333893552053,
+        "robot_displacement_m": 9.491442112695252,
+        "plans": 278,
+        "max_robot_x_m": 9.350253347505278,
+        "max_robot_z_m": 0.4657969026781797,
+        "terrain_progress": {
+          "stairs": {
+            "entered": true,
+            "exited": true,
+            "exit_root_x_threshold_m": 6.75
+          },
+          "sand_approximation": {
+            "entered": true,
+            "exited": true,
+            "exit_root_x_threshold_m": 7.949999999999999
+          }
+        },
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 0.8683494959812609,
+          "follow_mean_abs_error": 0.3448024111577557,
+          "follow_samples": 648,
+          "lost_samples": 0,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "rigid stairs: 4 x 0.025m, tread0.35m; not standard staircase qualification; sand approximation: rough rigid tiles, friction0.38, no particles/sinkage",
+        "samples": 256,
+        "reached_goal": null,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      }
+    ],
+    "hardware_enabled": false,
+    "person_source": "simulated labelled tracks with line-of-sight",
+    "sand": "rough rigid friction approximation only"
+  },
+  "scan_tasks_validation_v8_rooms_hard_20261021": {
+    "episodes": [
+      {
+        "scene": "rooms_dynamic",
+        "task": "navigate",
+        "seed": 201,
+        "difficulty": 3,
+        "phase": "ARRIVED",
+        "distance": 0.36477567862041527,
+        "robot_displacement_m": 8.86120862242073,
+        "plans": 26,
+        "max_robot_x_m": 8.639245269886091,
+        "max_robot_z_m": 0.36687184657712674,
+        "terrain_progress": {},
+        "collision": false,
+        "fallen": false,
+        "metrics": {
+          "min_person_center_distance": 1.5778576492395116,
+          "follow_mean_abs_error": null,
+          "follow_samples": 0,
+          "lost_samples": 0,
+          "route_failures": 0
+        },
+        "selected_ids": [
+          "person_01"
+        ],
+        "terrain": "flat",
+        "samples": 119,
+        "reached_goal": true,
+        "scope": "Fixed-seed bounded integration run; not robustness or hardware qualification"
+      }
+    ],
+    "hardware_enabled": false,
+    "person_source": "simulated labelled tracks with line-of-sight",
+    "sand": "rough rigid friction approximation only"
+  }
+}

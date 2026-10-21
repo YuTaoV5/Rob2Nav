@@ -24,7 +24,12 @@ class Control(BaseModel):
     action: Literal['goal', 'start', 'stop', 'reset', 'camera']
     goal: list[float] | None = Field(default=None, min_length=2, max_length=2)
     camera: dict[str,float] | None = None
-    scene: Literal['empty', 'slalom', 'blocked'] | None = None
+    scene: Literal['empty', 'slalom', 'blocked','rooms_dynamic','follow_obstacles','follow_stairs','follow_sand','follow_mixed'] | None = None
+    task: Literal['navigate','follow'] | None = None
+    person_id: Literal['person_01','person_02','person_03'] = 'person_01'
+    follow_distance: float = Field(default=1.2,ge=.9,le=2.5)
+    difficulty: int = Field(default=2,ge=1,le=3)
+    seed: int = Field(default=200,ge=0,le=999999)
 
 
 class Engine:
@@ -42,7 +47,9 @@ class Engine:
         self.thread.start()
 
     def loop(self):
-        from go2_nav.env import Go2MaplessEnv, load_config
+        from go2_nav.env import load_config
+        from .task_env import TaskEnvironment as Go2MaplessEnv
+        from .tasks import TASK_SCENES,StaticRoute,follow_goal,pedestrian_guard
         from go2_nav.planner import ReactivePlanner
         from .controller import action as navigation_action
         env = None
@@ -51,7 +58,11 @@ class Engine:
             cfg = load_config(self.config or Path(__file__).with_name('config.json'))
             config_sha = hashlib.sha256(json.dumps(cfg, sort_keys=True).encode()).hexdigest()
             cfg.update(max_seconds=1e9)
-            scene = 'empty'
+            scene = 'rooms_dynamic' if self.planner_backend=='scan' else 'empty'
+            task_mode='navigate';person_id='person_01';spacing=1.2
+            tracking='not_requested';safety_reason='';last_seen=-1e9
+            route=[];route_at=-1e9;route_goal=None;local_goal=None;local_at=-1e9
+            min_person_distance=None;follow_errors=[];lost_samples=0;route_failures=0
             env = Go2MaplessEnv(cfg, scene=scene, sensor_mode='lidar')
             _, info = env.reset(seed=200)
             planner = ReactivePlanner(cfg)
@@ -74,7 +85,7 @@ class Engine:
                 scan=ScanClient()
             phase = 'READY'
             reason = ''
-            goal = np.array([2., 0.])
+            goal = env.goal.copy() if scene in TASK_SCENES else np.array([2., 0.])
             env.goal[:] = goal
             path = []
             events = []
@@ -89,14 +100,12 @@ class Engine:
                 return [dict(name=env.model.geom(i).name,
                     x=float(env.model.geom_pos[i, 0]), y=float(env.model.geom_pos[i, 1]),
                     sx=float(env.model.geom_size[i, 0]), sy=float(env.model.geom_size[i, 1]))
-                    for i in sorted(env.obstacle_ids)]
+                    for i in sorted(env.obstacle_ids) if env.model.geom_bodyid[i]==0]
 
             def valid(p):
-                return (-1.4 <= p[0] <= 9.3 and -2.45 <= p[1] <= 2.45 and
-                    all(not (abs(p[0]-b['x']) < b['sx']+.38 and
-                        abs(p[1]-b['y']) < b['sy']+.38) for b in boxes))
+                return router.free(p)
 
-            boxes = geometry()
+            boxes = geometry();router=StaticRoute(boxes)
             while not self.closed.is_set():
                 while not self.commands.empty():
                     cmd = self.commands.get_nowait()
@@ -106,10 +115,16 @@ class Engine:
                     if cmd.action == 'reset':
                         if scan:scan.reset()
                         scene = cmd.scene or scene
+                        task_mode=cmd.task or ('follow' if scene.startswith('follow_') else 'navigate')
+                        person_id=cmd.person_id;spacing=cmd.follow_distance
+                        cfg['task_difficulty']=cmd.difficulty
+                        tracking='not_requested';last_seen=-1e9;local_goal=None;route_goal=None;route=[];route_at=-1e9
+                        min_person_distance=None;follow_errors=[];lost_samples=0;route_failures=0
                         env.close()
                         env = Go2MaplessEnv(cfg, scene=scene, sensor_mode='lidar')
-                        _, info = env.reset(seed=200)
-                        boxes = geometry()
+                        _, info = env.reset(seed=cmd.seed)
+                        boxes = geometry();router=StaticRoute(boxes)
+                        if scene in TASK_SCENES:goal=env.goal.copy()
                         env.goal[:] = goal
                         phase, reason, path = 'READY', 'scene_reset', []
                         wall = time.monotonic()
@@ -118,9 +133,13 @@ class Engine:
                         planner = ReactivePlanner(cfg)
                     elif cmd.action == 'goal':
                         requested = np.asarray(cmd.goal, dtype=float)
+                        if task_mode=='follow':
+                            reason='follow_target_is_identity_locked'
+                            continue
                         if not valid(requested):
                             reason = 'goal_outside_free_workspace'
                         elif phase != 'FAULT':
+                            route_goal=None;local_goal=None
                             goal = requested.copy()
                             env.goal[:] = goal
                             planner = ReactivePlanner(cfg)
@@ -139,17 +158,58 @@ class Engine:
                     phase, reason = 'STOPPED', 'client_timeout'
                 if phase == 'RUNNING' and float(env.data.time)-started > 120:
                     phase, reason = 'STOPPED', 'navigation_timeout'
-                if scan is not None:
-                    action=scan.act(env,goal,phase=='RUNNING')
-                elif phase == 'RUNNING':
-                    # Planner sees ray returns, odometry and target only. Display boxes never enter act().
-                    action = navigation_action(env, planner, policy)
+                tracks=env.observations();env.actors_active=phase=='RUNNING'
+                env.follow_mode=task_mode=='follow';env.selected_person=person_id;env.guide_gap=spacing+1.3
+                enabled=phase=='RUNNING';safety_reason='';person_distance=None
+                if task_mode=='follow':
+                    target=next((p for p in tracks if p['id']==person_id and p['visible']),None)
+                    if target is not None:
+                        last_seen=float(env.data.time);tracking='locked_simulated_id'
+                        desired,person_distance=follow_goal(env.data.qpos[:2],target['position'],target['velocity'],max(.95,spacing-.20))
+                        # A forward tracking carrot; the independent measured
+                        # person-distance hold still enforces requested spacing.
+                        if phase=='RUNNING':follow_errors.append(abs(person_distance-spacing));follow_errors=follow_errors[-2400:]
+                        if router.free(desired):goal=desired;env.goal[:]=goal
+                        else:enabled=False;safety_reason='follow_goal_not_in_free_map'
+                        if person_distance<=spacing+.15:enabled=False;safety_reason='follow_distance_hold'
+                    else:
+                        enabled=False
+                        if phase=='RUNNING':lost_samples+=1
+                        tracking='occluded_stop' if env.data.time-last_seen<.8 else 'lost_stop'
+                        safety_reason='selected_person_not_observed'
+                if scene in TASK_SCENES and enabled:
+                    now=float(env.data.time)
+                    if route_goal is None or np.linalg.norm(goal-route_goal)>.4 or now-route_at>2.:
+                        route=router.path(env.data.qpos[:2],goal);route_goal=goal.copy();route_at=now
+                        if not route:route_failures+=1
+                    while len(route)>1 and np.linalg.norm(np.asarray(route[1])-env.data.qpos[:2])<.5:route.pop(0)
+                    if len(route)>1:
+                        if local_goal is None or now-local_at>1.:
+                            desired=router.carrot(env.data.qpos[:2],route)
+                            if local_goal is None or np.linalg.norm(desired-local_goal)>.35:local_goal=desired
+                            local_at=now
+                    elif router.line(env.data.qpos[:2],goal):local_goal=goal.copy()
+                    else:enabled=False;safety_reason='no_global_route'
                 else:
-                    action = np.zeros(3)
+                    if scene not in TASK_SCENES:local_goal=goal.copy()
+                if scan is not None:
+                    action=scan.act(env,local_goal if local_goal is not None else goal,enabled)
+                elif enabled:
+                    action=navigation_action(env,planner,policy)
+                else:action=np.zeros(3)
+                if scene in TASK_SCENES:
+                    limits=np.array([cfg['max_vx'],cfg['max_vy'],cfg['max_wz']])
+                    physical=np.clip(action*limits,[-.35,-.20,-.8],[.45,.20,.8])
+                    physical,guard_reason=pedestrian_guard(physical,env.rotation,env.data.qpos[:2],tracks)
+                    if guard_reason:safety_reason=guard_reason
+                    action=physical/limits
+                    for person in tracks:
+                        distance=float(np.linalg.norm(np.asarray(person['position'])-env.data.qpos[:2]))
+                        min_person_distance=distance if min_person_distance is None else min(min_person_distance,distance)
                 _, _, _, _, info = env.step(action)
                 if info['collision'] or info['fallen']:
                     phase, reason = 'FAULT', 'collision' if info['collision'] else 'fallen'
-                elif phase == 'RUNNING' and info['success']:
+                elif phase == 'RUNNING' and task_mode=='navigate' and info['success']:
                     phase, reason = 'ARRIVED', 'within_goal_tolerance'
                 if not path or np.linalg.norm(np.asarray(path[-1])-env.data.qpos[:2]) > .04:
                     path.append(env.data.qpos[:2].tolist())
@@ -174,8 +234,15 @@ class Engine:
                         realtime_factor=(float(env.data.time)-sim_start)/max(elapsed, .01),
                         backend='MuJoCo / RoboGauge MoE / '+('SCAN ROS2 native planner' if scan else 'PPO navigation' if policy else 'sensor-only reactive planner'),
                         scan=scan.telemetry if scan else None,
+                        task=task_mode,people=tracks,selected_person=person_id,tracking=tracking,follow_distance=spacing,
+                        person_distance=person_distance,safety_reason=safety_reason,route=route,local_goal=local_goal.tolist() if local_goal is not None else None,
+                        task_metrics=dict(min_person_center_distance=min_person_distance,follow_mean_abs_error=float(np.mean(follow_errors)) if follow_errors else None,
+                                          follow_samples=len(follow_errors),lost_samples=lost_samples,route_failures=route_failures),
+                        terrain=getattr(env,'terrain_meta',{}).get('terrain','flat'),
+                        terrain_surfaces=getattr(env,'terrain_meta',{}).get('surfaces',[]),sand_region=getattr(env,'terrain_meta',{}).get('sand_region'),
+                        person_observation='simulator-labelled identity and pose with lidar-origin line-of-sight; not RGB/ReID',
                         camera=camera_settings.copy(),policy_sha256=policy_sha,
-                        planner_inputs='simulated lidar returns, odometry, selected goal; no obstacle metadata')
+                        planner_inputs=('static building map A* subgoals + SCAN ray pointcloud + visible simulated person tracks' if scene in TASK_SCENES else 'simulated lidar returns, odometry, selected goal; no obstacle metadata'))
                     with self.lock:
                         self.state, self.jpeg = snap, buf.getvalue()
                     next_render = float(env.data.time)+.10
@@ -222,6 +289,8 @@ def create_app(config=None, checkpoint=None,planner_backend="ppo"):
             from studio.live_skills import Camera
             try:cmd.camera=Camera(**(cmd.camera or {})).model_dump()
             except ValueError as exc:raise HTTPException(422,str(exc))
+        if (cmd.scene in ('rooms_dynamic','follow_obstacles','follow_stairs','follow_sand','follow_mixed') or cmd.task=='follow') and planner_backend!='scan':
+            raise HTTPException(422,'Task scenarios require the SCAN worker')
         if engine.error:
             raise HTTPException(503, engine.error)
         try:

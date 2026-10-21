@@ -123,6 +123,10 @@ class Go2MaplessEnv(gym.Env):
                 self.obstacle_names.append("course_block")
             if "goal" in self.terrain_meta:
                 self.goal = np.asarray(self.terrain_meta["goal"], dtype=float)
+        elif self.scene in ('rooms_dynamic','follow_obstacles','follow_stairs','follow_sand','follow_mixed'):
+            from skills.navigation.tasks import populate
+            self.terrain_meta=populate(world,self.scene,self.cfg,self.obstacle_names)
+            self.goal=np.asarray(self.terrain_meta['goal'],dtype=float)
         elif self.scene != "empty":
             raise ValueError(f"Unknown scene: {self.scene}")
         if self.cfg.get("goal") is not None:
@@ -200,10 +204,13 @@ class Go2MaplessEnv(gym.Env):
         for i, direction in enumerate(world_dirs):
             distance = mujoco.mj_ray(self.model, self.data, point, direction, self.ray_groups, 1, -1, geom)
             ranges[i] = distance if distance >= 0 else self.cfg["max_range"]
-        valid = ranges < self.cfg["max_range"]
+        misses = ranges >= self.cfg["max_range"]
+        valid = ~misses
         ranges += self.np_random.normal(0, noise, ranges.shape)
         ranges = np.clip(ranges, .05, self.cfg["max_range"])
-        valid &= self.np_random.random(len(ranges)) > self.cfg["sensor_dropout"]
+        kept = self.np_random.random(len(ranges)) > self.cfg["sensor_dropout"]
+        self._last_miss_mask = misses & kept
+        valid &= kept
         ranges[~valid] = self.cfg["max_range"]
         points_body = np.asarray(origin) + dirs * ranges[:, None]
         points_world = self.data.xpos[self.base_id] + points_body @ rot.T
@@ -213,6 +220,7 @@ class Go2MaplessEnv(gym.Env):
 
     def _sense(self):
         self.lidar_ranges, lp = self._rays(self.cfg["lidar_position"], self.lidar_dirs, self.cfg["lidar_noise_std"])
+        self.lidar_free_dirs = self.lidar_dirs[self._last_miss_mask].copy()
         dd = self.depth_dirs @ self.depth_rotation.T
         dr, dp = self._rays(self.cfg["depth_position"], dd, self.cfg["depth_noise_std"])
         # Optical-axis Z depth, not Euclidean ray length. Sensor frame +X is optical forward here.
