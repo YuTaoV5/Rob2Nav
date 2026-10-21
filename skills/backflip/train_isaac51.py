@@ -15,10 +15,14 @@ parser.add_argument('--delayed-entry',action='store_true')
 parser.add_argument('--entry-hold-scale',type=float,default=.4)
 parser.add_argument('--urdf-speed-limits',action='store_true')
 parser.add_argument('--fast-safety-curriculum',action='store_true')
+parser.add_argument('--safety-start',type=float)
+parser.add_argument('--finetune-learning-rate',type=float)
 args, rest = parser.parse_known_args()
 if args.delayed_entry and not args.fixstand_roundtrip:raise ValueError('Delayed entry requires fixstand training')
 if not 0.<=args.entry_hold_scale<=.4 or (args.entry_hold_scale!=.4 and not args.delayed_entry):raise ValueError('Entry hold scale requires delayed entry and [0, 0.4]')
 if args.fast_safety_curriculum and not args.urdf_speed_limits:raise ValueError('Fast safety curriculum requires URDF speed limits')
+if args.safety_start is not None and (not args.fast_safety_curriculum or not 0.<=args.safety_start<=1.):raise ValueError('Safety start requires fast curriculum and [0,1]')
+if args.finetune_learning_rate is not None and not 0.<args.finetune_learning_rate<=.001:raise ValueError('Invalid finetune learning rate')
 source = args.source.resolve()
 entry = source / (args.entry + '.py')
 text = entry.read_text()
@@ -47,6 +51,13 @@ if args.fixstand_roundtrip:
     text=text.replace('env_cfg = Go2BackflipEnvCfg()',
         'env_cfg = Go2BackflipEnvCfg()\n    from skills.fixstand import configure_backflip\n    '
         + f'configure_backflip(env_cfg,{str(source)!r} if {args.urdf_speed_limits!r} else None,{args.fast_safety_curriculum!r})')
+    if args.safety_start is not None:
+        text=text.replace('agent_cfg = Go2BackflipPPORunnerCfg()',
+            f'env_cfg.rewards.safety_curriculum_start={args.safety_start!r}\n    agent_cfg = Go2BackflipPPORunnerCfg()')
+    if args.finetune_learning_rate is not None:
+        needle='agent_cfg = Go2BackflipPPORunnerCfg()'
+        if text.count(needle)!=1:raise RuntimeError('Pinned agent config entry changed')
+        text=text.replace(needle,needle+f'\n    agent_cfg.algorithm.learning_rate={args.finetune_learning_rate!r}\n    agent_cfg.algorithm.schedule="fixed"')
     if args.delayed_entry:
         text=text.replace('configure_backflip(env_cfg)', f'configure_backflip(env_cfg)\n    from skills.fixstand import configure_backflip_delayed_entry\n    configure_backflip_delayed_entry(env_cfg,{args.entry_hold_scale!r})')
     text=text.replace('init_at_random_ep_len=True','init_at_random_ep_len=False')

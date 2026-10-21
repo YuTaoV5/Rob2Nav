@@ -139,7 +139,7 @@ class UnifiedRuntime:
                     candidate.intent=Intent(result['epoch'],result['stamp'],np.asarray(result['target']),
                         finished=c.phase=='ACTIVE' and now-self.started>skill.atomic_duration_s+skill.recovery_s)
                     if skill.action_parameterization!='joint_offset_v1' and result['epoch']==c.epoch and c.phase=='ACTIVE':
-                        candidate.previous=candidate.last.copy();candidate.last=np.asarray(result['raw_action'])
+                        candidate.previous=candidate.last.copy();candidate.last=np.asarray(result['history_action'])
                 if now+1e-9>=candidate.next_inference and c.phase!='FAULT':
                     effective=(c.servo.q-skill.to_sdk(skill.default))/skill.scale
                     if skill.atomic and c.phase!='ACTIVE':effective=np.zeros(12)

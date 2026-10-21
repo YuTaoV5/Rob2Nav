@@ -1,0 +1,164 @@
+{
+  "args": {
+    "kind": "backflip",
+    "seed": 9621,
+    "physics_hz": 1000,
+    "initial_joint_noise": 0.002
+  },
+  "backend": "MuJoCo",
+  "role": "locally trained Go2 backflip; pinned native observation/controller",
+  "successes": 0,
+  "total": 1,
+  "episodes": [
+    {
+      "success": false,
+      "body_y_rotation_rad": -9.29793292640913,
+      "axis_dominance": 0.8204448212017349,
+      "airtime_s": 0.45100000000000035,
+      "max_height": 0.6846915204857645,
+      "terminal_upright": -0.9568388605213363,
+      "unexpected_body_ground_contact": true,
+      "max_joint_speed_ratio": 0.7934585008618977,
+      "max_joint_limit_excess_rad": 0.3017989968135857,
+      "action_completed": false,
+      "fixstand": {
+        "passed": false,
+        "initial": {
+          "passed": false,
+          "samples": 35,
+          "stable_fraction": 0.0,
+          "max_pose_error_rad": 0.1970561111616156
+        },
+        "terminal": {
+          "passed": false,
+          "samples": 51,
+          "stable_fraction": 0.0,
+          "max_pose_error_rad": 2.5851596814936775
+        },
+        "pose_tolerance_rad": 0.12,
+        "max_joint_speed_rad_s": 1.0,
+        "minimum_upright_cos": 0.98,
+        "required_stable_fraction": 0.95,
+        "terminal_hold_s": 1.0,
+        "base_height_range_m": [
+          0.26,
+          0.4
+        ],
+        "minimum_foot_force_N": 4.0
+      }
+    }
+  ],
+  "metrics": {
+    "body_y_rotation_rad": -9.29793292640913,
+    "axis_dominance": 0.8204448212017349,
+    "airtime_s": 0.45100000000000035,
+    "max_height": 0.6846915204857645,
+    "terminal_upright": -0.9568388605213363,
+    "unexpected_body_ground_contact": true,
+    "max_joint_speed_ratio": 0.7934585008618977,
+    "max_joint_limit_excess_rad": 0.3017989968135857,
+    "action_completed": false,
+    "fixstand": {
+      "passed": false,
+      "initial": {
+        "passed": false,
+        "samples": 35,
+        "stable_fraction": 0.0,
+        "max_pose_error_rad": 0.1970561111616156
+      },
+      "terminal": {
+        "passed": false,
+        "samples": 51,
+        "stable_fraction": 0.0,
+        "max_pose_error_rad": 2.5851596814936775
+      },
+      "pose_tolerance_rad": 0.12,
+      "max_joint_speed_rad_s": 1.0,
+      "minimum_upright_cos": 0.98,
+      "required_stable_fraction": 0.95,
+      "terminal_hold_s": 1.0,
+      "base_height_range_m": [
+        0.26,
+        0.4
+      ],
+      "minimum_foot_force_N": 4.0
+    }
+  },
+  "policy_sha256": "c634ed478e4b48c57d41f29aac6a6ab11d08fb71585072061d5c92d2967a5cb9",
+  "source_commit": "954aa61ceb62c515689677f44a21e32109f6b62d",
+  "source_sha256": "f1f5a621008cbbef5490744649bbe25acd6fdfb91a6b67eea47d3eaf456e54c1",
+  "evaluator_sha256": "d2db713abdd11f277baf19e448b732a786327bfea3f284ef548b0cecca087138",
+  "policy_hz": 50,
+  "physics_hz": 1000,
+  "joint_names": [
+    "FL_hip_joint",
+    "FL_thigh_joint",
+    "FL_calf_joint",
+    "FR_hip_joint",
+    "FR_thigh_joint",
+    "FR_calf_joint",
+    "RL_hip_joint",
+    "RL_thigh_joint",
+    "RL_calf_joint",
+    "RR_hip_joint",
+    "RR_thigh_joint",
+    "RR_calf_joint"
+  ],
+  "physical_resets": 1,
+  "root_state_writes": "initialization only; no in-flight reset/stabilizing force",
+  "hardware_constraints_pass": false,
+  "hardware_connected": false,
+  "control_contract": {
+    "schema_version": 1,
+    "joint_names": [
+      "FL_hip_joint",
+      "FL_thigh_joint",
+      "FL_calf_joint",
+      "FR_hip_joint",
+      "FR_thigh_joint",
+      "FR_calf_joint",
+      "RL_hip_joint",
+      "RL_thigh_joint",
+      "RL_calf_joint",
+      "RR_hip_joint",
+      "RR_thigh_joint",
+      "RR_calf_joint"
+    ],
+    "action_scale": 0.5,
+    "action_clip": 8.0,
+    "stiffness": 40.0,
+    "damping": 1.0,
+    "motor_velocity_x1": 13.5,
+    "motor_torque_y1": 20.2,
+    "motor_torque_y2": 23.4,
+    "joint_velocity_limits": [
+      30.1,
+      30.1,
+      15.7,
+      30.1,
+      30.1,
+      15.7,
+      30.1,
+      30.1,
+      15.7,
+      30.1,
+      30.1,
+      15.7
+    ],
+    "target_velocity_limits": [
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5
+    ]
+  },
+  "control_parameter_source": "exported_training_config"
+}

@@ -39,6 +39,18 @@ class FixstandTests(unittest.TestCase):
         data.projected_gravity_b[0,2]=-1.
         self.assertAlmostEqual(float(stance_score(robot)[0]),1.)
 
+    def test_peak_objective_detects_one_bad_joint_and_speed_excess(self):
+        from skills.fixstand import peak_pose_score,urdf_speed_penalty
+        data=SimpleNamespace(joint_pos=torch.tensor([list(POSE.values())]),joint_vel=torch.zeros(1,12))
+        robot=SimpleNamespace(data=data,joint_names=list(POSE),device='cpu')
+        data.joint_pos[0,0]=.15
+        self.assertLess(float(peak_pose_score(robot)[0]),.04)
+        env=SimpleNamespace(scene={'robot':robot})
+        limits={name:10. for name in POSE}
+        self.assertEqual(float(urdf_speed_penalty(env,limits)[0]),0.)
+        data.joint_vel[0,0]=11.
+        self.assertAlmostEqual(float(urdf_speed_penalty(env,limits)[0]),.04,places=5)
+
     def test_phase_is_observable_for_start_action_and_return(self):
         env=SimpleNamespace(episode_length_buf=torch.tensor([0,100,300]),step_dt=.02)
         result=upright_phase(env)

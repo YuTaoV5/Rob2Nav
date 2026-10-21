@@ -5,7 +5,7 @@ import numpy as np
 
 from rob2nav.deployment.core import NEUTRAL
 from rob2nav.deployment.keys import key_request
-from rob2nav.deployment.policies import action_target,observation,reference_action_frame
+from rob2nav.deployment.policies import action_target,observation,reference_action_frame,history_action
 from rob2nav.deployment.types import Skill,SDK_JOINTS,Snapshot
 
 
@@ -28,6 +28,13 @@ class FixstandDeploymentTests(unittest.TestCase):
         self.assertAlmostEqual(float(obs[-6]),-1.)
         quiet=replace(s,action_parameterization='backflip_entry_v3',entry_hold_scale=.1).checked()
         np.testing.assert_allclose(action_target(quiet,raw,0.),NEUTRAL+.05*np.tanh(raw))
+        np.testing.assert_allclose(history_action(quiet,raw,0.),.1*np.tanh(raw))
+        np.testing.assert_allclose(action_target(quiet,np.ones(12)*20,2.),NEUTRAL+4.)
+
+    def test_actor_history_is_converted_to_sdk_order_once(self):
+        s=replace(skill('upright_endpoint_v3','upright52'),joints=tuple(reversed(SDK_JOINTS))).checked()
+        raw=np.arange(12,dtype=float)
+        np.testing.assert_equal(s.from_sdk(history_action(s,raw,3.)),raw)
 
     def test_upright_stance_action_and_phase(self):
         s=skill('upright_endpoint_v2','upright52');raw=np.ones(12)

@@ -1,0 +1,92 @@
+{
+  "checkpoint_sha256": "3e1ebc8717a2e8f55bc8d083b68aed8445dc931bd15b0a25e0e7d49d09cb1134",
+  "policy_sha256": "c634ed478e4b48c57d41f29aac6a6ab11d08fb71585072061d5c92d2967a5cb9",
+  "actor_input_dim": 60,
+  "actor_output_dim": 12,
+  "onnx_max_error": 2.980232238769531e-07,
+  "fixstand_roundtrip": {
+    "skill": "backflip",
+    "objective": "standard four-foot stance -> action -> standard four-foot stance",
+    "standard_pose": {
+      "FR_hip_joint": 0.0,
+      "FR_thigh_joint": 0.8,
+      "FR_calf_joint": -1.5,
+      "FL_hip_joint": 0.0,
+      "FL_thigh_joint": 0.8,
+      "FL_calf_joint": -1.5,
+      "RR_hip_joint": 0.0,
+      "RR_thigh_joint": 1.0,
+      "RR_calf_joint": -1.5,
+      "RL_hip_joint": 0.0,
+      "RL_thigh_joint": 1.0,
+      "RL_calf_joint": -1.5
+    },
+    "terminal_hold_s": 1.0,
+    "reset_only_state_writes": true,
+    "hardware_connected": false,
+    "shared_objective_sha256": "a6f50c6a3b90bda6d97006a5aaeb0192c58dd0bddf25746f48f2be3e33d527cf",
+    "independently_validated": false,
+    "actor_observations": 60,
+    "action_parameterization": "backflip_entry_v3",
+    "entry_hold_scale": 0.1,
+    "entry_seconds": 1.0,
+    "release_seconds": [
+      1.0,
+      1.2
+    ],
+    "episode_seconds": 5.0
+  },
+  "control_contract": {
+    "schema_version": 1,
+    "joint_names": [
+      "FL_hip_joint",
+      "FL_thigh_joint",
+      "FL_calf_joint",
+      "FR_hip_joint",
+      "FR_thigh_joint",
+      "FR_calf_joint",
+      "RL_hip_joint",
+      "RL_thigh_joint",
+      "RL_calf_joint",
+      "RR_hip_joint",
+      "RR_thigh_joint",
+      "RR_calf_joint"
+    ],
+    "action_scale": 0.5,
+    "action_clip": 8.0,
+    "stiffness": 40.0,
+    "damping": 1.0,
+    "motor_velocity_x1": 13.5,
+    "motor_torque_y1": 20.2,
+    "motor_torque_y2": 23.4,
+    "joint_velocity_limits": [
+      30.1,
+      30.1,
+      15.7,
+      30.1,
+      30.1,
+      15.7,
+      30.1,
+      30.1,
+      15.7,
+      30.1,
+      30.1,
+      15.7
+    ],
+    "target_velocity_limits": [
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5
+    ]
+  },
+  "capability_verified": false
+}

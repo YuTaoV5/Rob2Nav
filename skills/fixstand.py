@@ -40,6 +40,36 @@ def stance_score(robot):
     return pose*velocity*upright*still
 
 
+def peak_pose_score(robot):
+    import torch
+    error=torch.max(torch.abs(robot.data.joint_pos-target_pose(robot)),dim=-1).values
+    return torch.exp(-(error/.08)**2)
+
+
+def endpoint_peak_reward(env,start=1.,end=5.):
+    t=phase_time(env)
+    return ((t<start)|(t>=end))*peak_pose_score(env.scene['robot'])*four_feet(env)
+
+
+def urdf_speed_penalty(env,limits,margin=.9):
+    import torch
+    robot=env.scene['robot']
+    velocity=torch.tensor([limits[name] for name in robot.joint_names],device=robot.device)
+    ratio=torch.max(torch.abs(robot.data.joint_vel)/velocity,dim=-1).values
+    return torch.clamp(ratio-margin,min=0.)**2
+
+
+def configure_sideflip_peak_objective(cfg,source,duration):
+    from xml.etree import ElementTree as ET
+    from isaaclab.managers import RewardTermCfg
+    from isaaclab.envs import mdp
+    urdf=Path(source)/'resources/robots/go2/urdf/go2_description.urdf'
+    limits={j.attrib['name']:float(j.find('limit').attrib['velocity']) for j in ET.parse(urdf).getroot().findall('joint') if j.find('limit') is not None}
+    cfg.rewards.fixstand_peak_pose=RewardTermCfg(func=endpoint_peak_reward,weight=25.,params={'start':1.,'end':duration-1.})
+    cfg.rewards.fixstand_speed_margin=RewardTermCfg(func=urdf_speed_penalty,weight=-10.,params={'limits':limits})
+    cfg.rewards.fixstand_joint_limits=RewardTermCfg(func=mdp.joint_pos_limits,weight=-20.)
+
+
 def four_feet(env):
     import torch
     sensor=env.scene['contact_forces']

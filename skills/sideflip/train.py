@@ -20,6 +20,9 @@ p.add_argument('--boundary-residual',action='store_true')
 p.add_argument('--boundary-residual-limit',type=float,default=.05)
 p.add_argument('--boundary-bridge-limit',type=float)
 p.add_argument('--boundary-terminal-hip-taper-frames',type=int,default=0)
+p.add_argument('--peak-endpoint-objective',action='store_true')
+p.add_argument('--finetune-learning-rate',type=float)
+p.add_argument('--reset-std',type=float)
 AppLauncher.add_app_launcher_args(p)
 args = p.parse_args()
 if args.boundary_residual and not args.fixstand_roundtrip:p.error('--boundary-residual requires --fixstand-roundtrip')
@@ -28,6 +31,9 @@ if args.boundary_bridge_limit is not None and (not args.boundary_residual or not
     p.error('Boundary bridge limit requires residual mode and value in [.01, hold limit]')
 if args.boundary_terminal_hip_taper_frames and (not args.boundary_residual or not 2<=args.boundary_terminal_hip_taper_frames<=50):
     p.error('Terminal hip taper requires residual mode and 2..50 frames')
+if args.peak_endpoint_objective and not args.fixstand_roundtrip:p.error('Peak endpoint objective requires FIXSTAND')
+if args.finetune_learning_rate is not None and not 0.<args.finetune_learning_rate<=.001:p.error('Invalid finetune learning rate')
+if args.reset_std is not None and not .01<=args.reset_std<=1.:p.error('Invalid reset std')
 args.kit_args = (args.kit_args+' --enable isaacsim.asset.importer.urdf').strip()
 app = AppLauncher(args).app
 
@@ -61,6 +67,9 @@ def main():
     if args.fixstand_roundtrip:
         from skills.fixstand import configure_sideflip
         configure_sideflip(cfg,contract,args.boundary_residual,args.boundary_residual_limit,args.boundary_bridge_limit,args.boundary_terminal_hip_taper_frames)
+    if args.peak_endpoint_objective:
+        from skills.fixstand import configure_sideflip_peak_objective
+        configure_sideflip_peak_objective(cfg,source,contract['frames']/contract['fps'])
     bodies = contract['body_names']
     anchor = cfg.commands.motion.anchor_body_name
     feet = cfg.terminations.ee_body_pos.params['body_names']
@@ -70,6 +79,9 @@ def main():
     agent.max_iterations = args.iterations
     agent.save_interval = 100
     agent.experiment_name = 'rob2nav_go2_sideflip'
+    if args.finetune_learning_rate is not None:
+        agent.algorithm.learning_rate=args.finetune_learning_rate
+        agent.algorithm.schedule='fixed'
     args.output.mkdir(parents=True, exist_ok=False)
     if args.fixstand_roundtrip:
         from skills.fixstand import write_contract
@@ -77,7 +89,8 @@ def main():
             action_parameterization=('reference_residual_v3' if args.boundary_terminal_hip_taper_frames else 'reference_residual_v2') if args.boundary_residual else 'joint_offset_v1',
             padded_region_frames=90,residual_limit_rad=args.boundary_residual_limit,
             bridge_residual_limit_rad=args.boundary_bridge_limit if args.boundary_bridge_limit is not None else args.boundary_residual_limit,
-            terminal_hip_taper_frames=args.boundary_terminal_hip_taper_frames)
+            terminal_hip_taper_frames=args.boundary_terminal_hip_taper_frames,
+            peak_endpoint_objective=args.peak_endpoint_objective)
     dump_yaml(str(args.output/'env.yaml'), cfg)
     dump_yaml(str(args.output/'agent.yaml'), agent)
     write_json(args.output/'contract.json', dict(robot='Go2', role='real PhysX PPO training, not FK replay',
@@ -96,7 +109,13 @@ def main():
         runner_cfg['obs_groups'] = {'policy':['policy'], 'critic':['critic']}
         runner = OnPolicyRunner(wrapped, runner_cfg, log_dir=str(args.output), device=cfg.sim.device)
         if args.resume:
-            runner.load(str(args.resume))
+            runner.load(str(args.resume),load_optimizer=args.finetune_learning_rate is None)
+        if args.reset_std is not None:
+            import math
+            parameters=dict(runner.alg.policy.named_parameters());key='log_std' if 'log_std' in parameters else 'std'
+            if key not in parameters:raise RuntimeError('Unsupported policy noise parameter')
+            with torch.no_grad():parameters[key].fill_(math.log(args.reset_std) if key=='log_std' else args.reset_std)
+            runner.alg.optimizer.state.pop(parameters[key],None)
         runner.learn(num_learning_iterations=args.iterations, init_at_random_ep_len=False)
         write_json(args.output/'completion.json', dict(execution_complete=True,
             requested_iterations=args.iterations, capability_verified=False, hardware_connected=False))

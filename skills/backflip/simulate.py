@@ -42,6 +42,10 @@ def main():
     module.SIM_DT=1./a.physics_hz;module.DECIMATION=a.physics_hz//50;module.POLICY_DT=.02
     export_file=policy.parent/'export.json'
     exported=json.loads(export_file.read_text()) if export_file.exists() else {}
+    controller=None
+    if 'control_contract' in exported:
+        from .control import configure_playback
+        controller=configure_playback(module,exported['control_contract'])
     contract=exported.get('fixstand_roundtrip') or {}
     delayed=contract.get('action_parameterization') in ('backflip_entry_v2','backflip_entry_v3')
     if delayed:
@@ -147,7 +151,8 @@ def main():
         policy_sha256=hashlib.sha256(policy.read_bytes()).hexdigest(),source_commit=PIN,source_sha256=hashlib.sha256(file.read_bytes()).hexdigest(),
         evaluator_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),policy_hz=50,physics_hz=a.physics_hz,
         joint_names=list(module.JOINT_NAMES),physical_resets=resets,root_state_writes='initialization only; no in-flight reset/stabilizing force',
-        hardware_constraints_pass=max_speed<=1. and max_excess<=.001,hardware_connected=False)
+        hardware_constraints_pass=max_speed<=1. and max_excess<=.001,hardware_connected=False,
+        control_contract=controller,control_parameter_source='exported_training_config' if controller else 'legacy_pinned_native_defaults')
     (a.output/'trace.json').write_text(json.dumps(trace))
     (a.output/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
     print(json.dumps(summary),flush=True)

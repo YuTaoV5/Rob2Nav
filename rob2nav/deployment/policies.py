@@ -23,14 +23,23 @@ def reference_action_frame(reference,phase):
     return dict(frame=frame,count=count,joint_pos=np.asarray(reference['joint_pos'][frame]).tolist())
 
 
+def history_action(skill,raw,phase=0.):
+    """Training history, expressed in SDK order for the observation adapter."""
+    raw=vector(raw)
+    if skill.action_parameterization in ('backflip_entry_v2','backflip_entry_v3'):
+        hold=1.-_smooth((phase-1.)/.2)
+        raw=np.clip((1.-hold)*raw+hold*skill.entry_hold_scale*np.tanh(raw),-8.,8.)
+    elif skill.action_parameterization!='joint_offset_v1':raw=np.clip(raw,-100.,100.)
+    return skill.to_sdk(raw)
+
+
 def action_target(skill,raw,phase=0.,reference=None):
     """Apply the exact time-dependent action mapping used by FIXSTAND training."""
     raw=vector(raw)
     mode=skill.action_parameterization
     target=vector(skill.default)+skill.scale*raw
     if mode in ('backflip_entry_v2','backflip_entry_v3'):
-        hold=1.-_smooth((phase-1.)/.2)
-        target=vector(skill.default)+skill.scale*((1.-hold)*raw+hold*skill.entry_hold_scale*np.tanh(raw))
+        target=vector(skill.default)+skill.scale*skill.from_sdk(history_action(skill,raw,phase))
     elif mode in ('upright_endpoint_v2','upright_endpoint_v3'):
         weight=max(1.-_smooth((phase-1.)/.5),_smooth((phase-5.)/1.5))
         target=(1.-weight)*target+weight*(vector(skill.default)+skill.endpoint_residual_limit_rad*np.tanh(raw))
@@ -108,7 +117,9 @@ def _worker(pipe,manifest,root):
             obs=vector(request['observation'],{'robogauge45':45,'backflip60':60,'upright48':48,'upright52':52,'mimic69':69}[skill.observation]).astype(np.float32)
             started=time.monotonic();action=vector(infer(obs));duration=time.monotonic()-started
             target=action_target(skill,action,float(request.get('phase',0.)),request.get('reference'))
-            pipe.send(dict(epoch=request['epoch'],stamp=request['stamp'],target=target.tolist(),raw_action=action.tolist(),inference_s=duration))
+            history=history_action(skill,action,float(request.get('phase',0.)))
+            pipe.send(dict(epoch=request['epoch'],stamp=request['stamp'],target=target.tolist(),raw_action=action.tolist(),
+                history_action=history.tolist(),inference_s=duration))
     except (EOFError,BrokenPipeError):return
     except Exception as exc:
         try:pipe.send(dict(error=repr(exc)))

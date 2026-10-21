@@ -61,6 +61,8 @@ ACTIVE → [满足完整动作结束和稳定站立] → ENTRY 或 EXIT → ENTR
 
 训练导出后核对 `policy.json`、`fixstand.json`、模型和参考轨迹哈希，生成新 `deployment/skills/<id>.json`。`action_parameterization` 必须与训练一致：侧翻 `reference_residual_v2` 需要 `reference`、`residual_limit_rad`、`bridge_residual_limit_rad`；髋关节末段衰减续训的 `reference_residual_v3` 还需 `terminal_hip_taper_frames`。后翻 `backflip_entry_v2` 或低扰动 `backflip_entry_v3`（后者还需 `entry_hold_scale`）；直立 `upright_endpoint_v2` 或收紧首尾残差的 `upright_endpoint_v3`（后者还需 `endpoint_residual_limit_rad`），观测都是 `upright52`。每个新模型先做四脚标准站姿起点、动作完成、回到标准站姿及独立种子复核，同时要求关节速度与硬限位通过，再以统一运行器验证 `stand → 动作 → stand` 和 MoE 长任务切换。模型未通过时保持 `simulation_enabled=false` / `hardware_qualified=false`，网页和实机都不得展示为已验收。当前续训和未达标证据见 [FIXSTAND 续训报告](FIXSTAND_CONTINUATION_20261022.md)。
 
+后翻模型还需核对`export.json.control_contract`中的逐关节速度曲线、目标速度、动作截断8和PD增益；不能用上游默认所有关节30 rad/s、动作截断100替代本轮训练配置。统一工作进程将动作历史转为SDK顺序传递，观测适配器再取回策略顺序；后翻入口历史包括训练时的入场缩放和截断。该适配仍须随最终合格权重进行动态切换复核。
+
 离线回归：
 
 ```bash
