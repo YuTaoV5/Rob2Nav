@@ -116,11 +116,11 @@ def mount_live_skills(app,root,python):
         for cycle in range(a.cycles):
             steps.extend(s.model_dump() for s in a.steps if cycle==0 or s is not a.steps[0])
         if len(steps)>32:raise HTTPException(422,'最多32个展开步骤')
-        for raw in steps:
+        for index,raw in enumerate(steps):
             if raw['skill'] not in allowed or raw['skill'] not in profiles:raise HTTPException(422,'技能未接入统一MuJoCo编排或仍在隔离中')
             if raw['trigger']!=bool(profiles[raw['skill']].get('atomic')):raise HTTPException(422,'原子技能需要显式触发，普通技能不能触发')
             try:Step(**raw).checked()
-            except (ValueError,TypeError) as exc:raise HTTPException(422,str(exc)) from exc
+            except (ValueError,TypeError) as exc:raise HTTPException(422,f'第 {index+1} 步 {raw["skill"]}：{exc}') from exc
         budget=min(1800.,max(30.,sum(s['seconds'] for s in steps)+len(steps)*8+15))
         with lock:
             stop();key=uuid.uuid4().hex[:12];out=root/'outputs/live_skills'/key

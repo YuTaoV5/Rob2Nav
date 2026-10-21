@@ -16,7 +16,7 @@ class Step:
         if not self.skill or any(x not in 'abcdefghijklmnopqrstuvwxyz0123456789_' for x in self.skill):raise ValueError('Invalid sequence skill ID')
         if not np.isfinite(self.seconds) or not 0<self.seconds<=120:raise ValueError('Invalid sequence dwell time')
         command=vector(self.velocity,3)
-        if np.any(abs(command)>np.array([.5,.25,.7])):raise ValueError('Sequence velocity exceeds command workspace')
+        if np.any(abs(command)>np.array([.5,.25,.7])):raise ValueError(f'速度 {tuple(self.velocity)} 超出指令范围：前后 ±0.5 m/s、左右 ±0.25 m/s、转向 ±0.7 rad/s')
         if type(self.trigger) is not bool:raise ValueError('Sequence trigger must be boolean')
         return self
 
