@@ -17,6 +17,21 @@ class Launch(BaseModel):
     skill:Literal['stairs','platform','multiterrain','backflip','sideflip','upright_walk']
 
 
+class CompositionStep(BaseModel):
+    model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
+    skill:str=Field(min_length=1,max_length=64)
+    seconds:float=Field(default=2.5,gt=0,le=120)
+    velocity:tuple[float,float,float]=(0.,0.,0.)
+    trigger:bool=False
+
+
+class Composition(BaseModel):
+    model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
+    steps:list[CompositionStep]=Field(min_length=2,max_length=8)
+    cycles:int=Field(default=1,ge=1,le=4)
+    research_stunts:bool=False
+
+
 class Camera(BaseModel):
     model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
     azimuth:float=Field(default=130,ge=-720,le=720)
@@ -88,6 +103,38 @@ def mount_live_skills(app,root,python):
             last_client=time.monotonic()
             return {k:v for k,v in current.items() if k!='stream'}
 
+    @app.post('/api/live-skills/composition/start')
+    def start_composition(a:Composition):
+        nonlocal proc,last_client
+        from rob2nav.deployment.sequence import Step
+        profiles={p.stem:read(p,{}) for p in (root/'deployment/skills').glob('*.json')}
+        if a.steps[0].skill!='stand' or a.steps[-1].skill!='stand':raise HTTPException(422,'编排必须从 stand 开始并以 stand 结束')
+        if a.cycles>1 and any(s.skill=='sideflip69' for s in a.steps) and not a.research_stunts:
+            raise HTTPException(422,'侧翻重复演示需要显式开启研究仿真')
+        allowed={'stand','stand_soft','stand_stiff','walk_mlp','walk_moe'}|({'sideflip69'} if a.research_stunts else set())
+        steps=[]
+        for cycle in range(a.cycles):
+            steps.extend(s.model_dump() for s in a.steps if cycle==0 or s is not a.steps[0])
+        if len(steps)>32:raise HTTPException(422,'最多32个展开步骤')
+        for raw in steps:
+            if raw['skill'] not in allowed or raw['skill'] not in profiles:raise HTTPException(422,'技能未接入统一MuJoCo编排或仍在隔离中')
+            if raw['trigger']!=bool(profiles[raw['skill']].get('atomic')):raise HTTPException(422,'原子技能需要显式触发，普通技能不能触发')
+            try:Step(**raw).checked()
+            except (ValueError,TypeError) as exc:raise HTTPException(422,str(exc)) from exc
+        budget=min(300.,max(30.,sum(s['seconds'] for s in steps)+len(steps)*8+15))
+        with lock:
+            stop();key=uuid.uuid4().hex[:12];out=root/'outputs/live_skills'/key
+            stream=out/'stream';stream.mkdir(parents=True)
+            sequence=out/'sequence.json';sequence.write_text(json.dumps({'steps':steps},ensure_ascii=False))
+            args=['--root',str(root),'--output',str(out/'evaluation'),'--asset','source','--sequence',str(sequence),'--max-seconds',str(budget),'--seed','9315']
+            if a.research_stunts:args.append('--atomic-cycle')
+            log=(out/'process.log').open('wb')
+            try:proc=subprocess.Popen([str(python),'-m','studio.live_runner','--stream',str(stream),'--module','rob2nav.deployment.verify_mujoco','--',*args],cwd=root,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+            finally:log.close()
+            current.clear();current.update(id=key,skill='composition',phase='STARTING',note='统一控制器真实MuJoCo编排；侧翻仅研究仿真，所有配置均未获实机资格。',stream=str(stream),hardware_enabled=False,steps=len(steps),cycles=a.cycles)
+            last_client=time.monotonic()
+            return {k:v for k,v in current.items() if k!='stream'}
+
     @app.get('/api/live-skills/state')
     def state():
         nonlocal last_client
@@ -99,6 +146,7 @@ def mount_live_skills(app,root,python):
             result=read(Path(current['stream']).parent/'evaluation/summary.json',{})
             if result:
                 s['result']={k:result[k] for k in ['successes','total','hardware_constraints_pass','metrics','collisions','falls'] if k in result}
+                if current.get('skill')=='composition':s['result'].update({k:result[k] for k in ['passed','reason','sequence','max_torque_step_Nm','maximum_joint_speed_ratio','commits'] if k in result})
                 if 'total' not in s['result'] and isinstance(result.get('episodes'),int):s['result']['total']=result['episodes']
             if proc is not None and proc.poll() is not None:
                 s['exit_code']=proc.returncode

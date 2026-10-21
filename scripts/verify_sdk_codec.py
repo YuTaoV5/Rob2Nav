@@ -38,12 +38,18 @@ def main():
         transport._receive(state);first=transport.latest.stamp
         transport._receive(state);assert transport.latest.stamp==first,'duplicate tick refreshed stale state'
         assert transport.read().stable()
+        transport.permit={'robot_serial':transport.serial,'firmware_version':list(transport.firmware_version)}
+        state.tick=2;state.version[0]+=1;transport._receive(state)
+        try:transport.read(ignore_health=True)
+        except ValueError as exc:assert 'identity/firmware' in str(exc)
+        else:raise AssertionError('Changed firmware bypassed device identity gate')
         durations=[]
         for _ in range(1000):
             start=time.perf_counter();codec.encode(c);durations.append(time.perf_counter()-start)
         report=dict(real_sdk_idl=True,real_sdk_crc=True,wire_motors=len(msg.motor_cmd),serialized_bytes=len(msg.serialize()),
             double_pd=False,crc_detected_mutation=True,duplicate_lowstate_rejected=True,
             hybrid_pd_feedforward_verified=True,wire_mode_fixed_per_session=True,
+            firmware_change_rejected=True,
             codec_milliseconds_p99=float(np.percentile(durations,99)*1000),codec_milliseconds_max=max(durations)*1000,
             channel_factory_calls=0,publisher_calls=0,hardware_connected=False)
     a.output.parent.mkdir(parents=True,exist_ok=True);a.output.write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report))

@@ -87,6 +87,7 @@ class Skill:
     entry_tolerance:float=.1
     entry_gravity:tuple[float,...]=(0.,0.,-1.)
     entry_gravity_tolerance:float=.12
+    support_model_gain:float=0.
 
     def checked(self):
         if len(self.joints)!=12 or set(self.joints)!=set(SDK_JOINTS):raise ValueError('Joint-name mapping must be a complete Go2 bijection')
@@ -101,6 +102,7 @@ class Skill:
         if self.entry_pose is not None:vector(self.entry_pose)
         if not np.isfinite(self.entry_tolerance) or not .005<=self.entry_tolerance<=.15:raise ValueError('Invalid entry state tolerance')
         if abs(np.linalg.norm(vector(self.entry_gravity,3))-1)>.01 or not .03<=self.entry_gravity_tolerance<=.2:raise ValueError('Invalid gravity entry contract')
+        if not np.isfinite(self.support_model_gain) or not 0<=self.support_model_gain<=4:raise ValueError('Invalid entry load-model gain')
         return self
 
     def to_sdk(self,values):

@@ -22,16 +22,23 @@ def preflight(root,profile,record,calibration,model_sha,bundle_sha):
     return skill
 
 
-def run(root,profile,interface,sdk_root,calibration_path,qualification_path,model_path,output,duration=3600.):
+def run(root,profile,interface,sdk_root,calibration_path,qualification_path,model_path,output,duration=3600.,sequence_path=None):
     root=Path(root).resolve()
     if not profile or any(x not in 'abcdefghijklmnopqrstuvwxyz0123456789_' for x in profile):raise ValueError('Invalid profile ID')
     # All static gates are evaluated before any ChannelFactoryInitialize call.
     calibration=Calibration.load(Path(calibration_path));record=json.loads(Path(qualification_path).read_text())
-    observer=KinematicObserver.from_xml(model_path);transport=Go2SdkTransport(sdk_root,calibration,observer)
+    observer=KinematicObserver.from_xml(model_path);transport=Go2SdkTransport(sdk_root,calibration,observer,wire_mode=record.get('wire_mode','hybrid_pd'))
     skill=preflight(root,profile,record,calibration,observer.source_sha256,transport.bundle_digest())
     def approved(s):
         if not s.hardware_qualified or s.digest() not in record['approved_contracts']:raise ValueError('Switch target not in device-qualified contract set')
     runtime=UnifiedRuntime(root,hardware=True,approval=approved);commands=queue.Queue(maxsize=4)
+    from .sequence import SkillSequence,load_steps
+    choreography=None
+    if sequence_path is not None:
+        steps=load_steps(sequence_path)
+        choreography=SkillSequence(runtime,steps)
+        # Check all steps, including the appended final stand, before DDS opens.
+        for step in choreography.steps:approved(runtime.profile(step.skill)[1])
     def input_loop():
         for line in sys.stdin:
             try:commands.put_nowait(json.loads(line))
@@ -54,14 +61,19 @@ def run(root,profile,interface,sdk_root,calibration_path,qualification_path,mode
         threading.Thread(target=input_loop,daemon=True).start();start=now;fault_at=None;index=0
         while time.monotonic()-start<duration:
             now=time.monotonic();snapshot=transport.read(ignore_health=runtime.controller.phase=='FAULT')
+            if choreography is not None:choreography.tick(snapshot,now)
             while not commands.empty():
                 request=commands.get_nowait()
                 if not isinstance(request,dict):continue
                 if request.get('stop') is True:runtime.controller.latch(now,'operator_stop')
+                elif choreography is not None:
+                    runtime.controller.event(now,'manual_request_rejected:sequence_owns_commands')
                 elif request.get('trigger') is True:
                     try:runtime.controller.trigger()
                     except ValueError as exc:runtime.controller.event(now,'trigger_rejected:'+str(exc))
-                elif set(request)=={'velocity'}:runtime.controller.set_velocity(request['velocity'])
+                elif set(request)=={'velocity'}:
+                    try:runtime.controller.set_velocity(request['velocity'],now)
+                    except (ValueError,TypeError) as exc:runtime.controller.event(now,'velocity_rejected:'+str(exc))
                 elif set(request)=={'switch'}:
                     try:runtime.stage_async(request['switch'],snapshot)
                     except ValueError as exc:runtime.controller.event(now,'request_rejected:'+str(exc))

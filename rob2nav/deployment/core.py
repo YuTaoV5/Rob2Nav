@@ -29,7 +29,7 @@ class Servo:
             low=np.maximum(low,self.tau-150*handover_dt);high=np.minimum(high,self.tau+150*handover_dt)
         self.tau=np.clip(self.kp*(self.q-s.q)-self.kd*s.dq,low,high)
         return MotorCommand(self.tau.copy(),self.q.copy(),self.dq.copy(),self.kp.copy(),self.kd.copy(),phase,epoch)
-    def step(self,s,target,kp,kd,dt,phase,epoch,fault='',integrate=False,bias_scale=1.,stance_valid=False):
+    def step(self,s,target,kp,kd,dt,phase,epoch,fault='',integrate=False,bias_scale=1.,stance_valid=False,model_gain=0.):
         target=np.clip(vector(target),LOW,HIGH)
         acceleration=np.clip(100*(target-self.q)-20*self.dq,-20,20)
         self.dq=np.clip(self.dq+dt*acceleration,-2.,2.)
@@ -39,7 +39,11 @@ class Servo:
         if integrate and (stance_valid or s.stable() or s.safe_tripod()):
             mask=np.repeat(s.contacts(),3)
             correction=20*(self.q-s.q)*mask
-            if s.support_torque is not None:correction+=2*(s.support_torque-self.bias)
+            # Nominal load regularization is a skill entry contract, not a
+            # universal leak: soft poses can have a materially different static
+            # load distribution; aggressive integral-only entry can unload a
+            # foot. Both configurations must be physically verified separately.
+            if s.support_torque is not None:correction+=model_gain*(s.support_torque-self.bias)
             self.bias=np.clip(self.bias+correction*dt,-.5*EFFORT,.5*EFFORT)
         raw=self.kp*(self.q-s.q)+self.kd*(self.dq-s.dq)+self.bias*bias_scale
         speed=np.clip(s.dq,-2*FREE_SPEED,2*FREE_SPEED)
@@ -196,6 +200,9 @@ class SwitchController:
         if self.phase=='FAULT':target=s.q.copy();kp=np.zeros(12);kd=np.full(12,2.);integrate=False;bias_scale=0.
         if self.phase=='ACTIVE' and self.active.actuation=='native_pd':
             command=self.servo.native(s,target,kp,kd,self.phase,self.epoch,handover_dt=dt if now-self.phase_at<.1 and not self.active.atomic else None)
-        else:command=self.servo.step(s,target,kp,kd,dt,self.phase,self.epoch,self.fault,integrate=integrate,bias_scale=bias_scale,stance_valid=s.controllable_support())
+        else:
+            support_skill=entry_skill or self.active
+            model_gain=support_skill.support_model_gain if support_skill is not None else 0.
+            command=self.servo.step(s,target,kp,kd,dt,self.phase,self.epoch,self.fault,integrate=integrate,bias_scale=bias_scale,stance_valid=s.controllable_support(),model_gain=model_gain)
         if command.fault and self.phase!='FAULT':self.latch(now,command.fault)
         return replace(command,stamp=now)

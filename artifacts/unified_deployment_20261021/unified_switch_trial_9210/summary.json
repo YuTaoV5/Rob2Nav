@@ -1,0 +1,370 @@
+{
+  "seed": 9210,
+  "asset": "robogauge",
+  "wire_mode": "hybrid_pd",
+  "atomic_cycle": false,
+  "flip_rotation_rad": 0.0,
+  "native_motion_peak_torque_step_Nm": 3.3902263900964993,
+  "maximum_joint_speed_ratio": 0.3818546201383568,
+  "passed": true,
+  "reason": "all five profiles committed and settled",
+  "backend": "MuJoCo real free-base hot-switch harness; commits/model hashes below define which actors were actually exercised",
+  "commits": [
+    {
+      "time": 7.8,
+      "skill": "stand_soft",
+      "position": [
+        -0.02867330145087114,
+        0.002333274912784288,
+        0.3069467387805951
+      ]
+    },
+    {
+      "time": 16.308,
+      "skill": "stand_stiff",
+      "position": [
+        -0.03738982318985838,
+        -0.005823400034921956,
+        0.3465184905763649
+      ]
+    },
+    {
+      "time": 29.848,
+      "skill": "walk_mlp",
+      "position": [
+        0.0010692083149395695,
+        0.015532679386812614,
+        0.3129338512581328
+      ]
+    },
+    {
+      "time": 40.31,
+      "skill": "walk_moe",
+      "position": [
+        0.16024126423962462,
+        0.0385588460680157,
+        0.3266942274869704
+      ]
+    },
+    {
+      "time": 49.538000000000004,
+      "skill": "stand",
+      "position": [
+        0.28767264864209013,
+        0.053080395482190464,
+        0.3264663669437987
+      ]
+    }
+  ],
+  "requests": [
+    {
+      "time": 10.3,
+      "to_skill": "stand_stiff"
+    },
+    {
+      "time": 18.808,
+      "to_skill": "walk_mlp"
+    },
+    {
+      "time": 32.348,
+      "to_skill": "walk_moe"
+    },
+    {
+      "time": 42.81,
+      "to_skill": "stand"
+    }
+  ],
+  "controller_events": [
+    {
+      "time": 0.0,
+      "event": "capture_measured_state",
+      "phase": "CAPTURE",
+      "epoch": 0
+    },
+    {
+      "time": 1.0,
+      "event": "NEUTRAL",
+      "phase": "NEUTRAL",
+      "epoch": 0
+    },
+    {
+      "time": 3.488,
+      "event": "READY",
+      "phase": "READY",
+      "epoch": 0
+    },
+    {
+      "time": 3.49,
+      "event": "request:stand_soft",
+      "phase": "READY",
+      "epoch": 0
+    },
+    {
+      "time": 3.7920000000000003,
+      "event": "ENTRY",
+      "phase": "ENTRY",
+      "epoch": 0
+    },
+    {
+      "time": 5.7940000000000005,
+      "event": "WARMUP",
+      "phase": "WARMUP",
+      "epoch": 1
+    },
+    {
+      "time": 6.798,
+      "event": "BLEND",
+      "phase": "BLEND",
+      "epoch": 1
+    },
+    {
+      "time": 7.798,
+      "event": "ACTIVE",
+      "phase": "ACTIVE",
+      "epoch": 1
+    },
+    {
+      "time": 7.798,
+      "event": "commit:stand_soft",
+      "phase": "ACTIVE",
+      "epoch": 1
+    },
+    {
+      "time": 10.302,
+      "event": "request:stand_stiff",
+      "phase": "ACTIVE",
+      "epoch": 1
+    },
+    {
+      "time": 10.302,
+      "event": "EXIT",
+      "phase": "EXIT",
+      "epoch": 1
+    },
+    {
+      "time": 12.302,
+      "event": "ENTRY",
+      "phase": "ENTRY",
+      "epoch": 1
+    },
+    {
+      "time": 14.302,
+      "event": "WARMUP",
+      "phase": "WARMUP",
+      "epoch": 2
+    },
+    {
+      "time": 15.306000000000001,
+      "event": "BLEND",
+      "phase": "BLEND",
+      "epoch": 2
+    },
+    {
+      "time": 16.306,
+      "event": "ACTIVE",
+      "phase": "ACTIVE",
+      "epoch": 2
+    },
+    {
+      "time": 16.306,
+      "event": "commit:stand_stiff",
+      "phase": "ACTIVE",
+      "epoch": 2
+    },
+    {
+      "time": 20.146,
+      "event": "request:walk_mlp",
+      "phase": "ACTIVE",
+      "epoch": 2
+    },
+    {
+      "time": 20.146,
+      "event": "EXIT",
+      "phase": "EXIT",
+      "epoch": 2
+    },
+    {
+      "time": 22.146,
+      "event": "ENTRY",
+      "phase": "ENTRY",
+      "epoch": 2
+    },
+    {
+      "time": 27.66,
+      "event": "WARMUP",
+      "phase": "WARMUP",
+      "epoch": 3
+    },
+    {
+      "time": 28.846,
+      "event": "BLEND",
+      "phase": "BLEND",
+      "epoch": 3
+    },
+    {
+      "time": 29.846,
+      "event": "ACTIVE",
+      "phase": "ACTIVE",
+      "epoch": 3
+    },
+    {
+      "time": 29.846,
+      "event": "commit:walk_mlp",
+      "phase": "ACTIVE",
+      "epoch": 3
+    },
+    {
+      "time": 33.828,
+      "event": "request:walk_moe",
+      "phase": "ACTIVE",
+      "epoch": 3
+    },
+    {
+      "time": 33.828,
+      "event": "EXIT",
+      "phase": "EXIT",
+      "epoch": 3
+    },
+    {
+      "time": 36.296,
+      "event": "ENTRY",
+      "phase": "ENTRY",
+      "epoch": 3
+    },
+    {
+      "time": 38.296,
+      "event": "WARMUP",
+      "phase": "WARMUP",
+      "epoch": 4
+    },
+    {
+      "time": 39.308,
+      "event": "BLEND",
+      "phase": "BLEND",
+      "epoch": 4
+    },
+    {
+      "time": 40.308,
+      "event": "ACTIVE",
+      "phase": "ACTIVE",
+      "epoch": 4
+    },
+    {
+      "time": 40.308,
+      "event": "commit:walk_moe",
+      "phase": "ACTIVE",
+      "epoch": 4
+    },
+    {
+      "time": 42.812,
+      "event": "request:stand",
+      "phase": "ACTIVE",
+      "epoch": 4
+    },
+    {
+      "time": 43.148,
+      "event": "EXIT",
+      "phase": "EXIT",
+      "epoch": 4
+    },
+    {
+      "time": 45.532000000000004,
+      "event": "ENTRY",
+      "phase": "ENTRY",
+      "epoch": 4
+    },
+    {
+      "time": 47.532000000000004,
+      "event": "WARMUP",
+      "phase": "WARMUP",
+      "epoch": 5
+    },
+    {
+      "time": 48.536,
+      "event": "BLEND",
+      "phase": "BLEND",
+      "epoch": 5
+    },
+    {
+      "time": 49.536,
+      "event": "ACTIVE",
+      "phase": "ACTIVE",
+      "epoch": 5
+    },
+    {
+      "time": 49.536,
+      "event": "commit:stand",
+      "phase": "ACTIVE",
+      "epoch": 5
+    }
+  ],
+  "max_torque_step_Nm": 0.30000000000036753,
+  "max_kp_step": 0.030000000000036664,
+  "max_reference_step_rad": 0.3826560459662095,
+  "max_tilt_deg": 4.253352000458578,
+  "min_base_height_m": 0.30637473668123744,
+  "steps": 25769,
+  "analytical_naive_switches": [
+    {
+      "from_skill": "stand_soft",
+      "to_skill": "stand_stiff",
+      "analytical_naive_torque_jump_Nm": 12.189388857885582
+    },
+    {
+      "from_skill": "stand_stiff",
+      "to_skill": "walk_mlp",
+      "analytical_naive_torque_jump_Nm": 9.747071146396166
+    },
+    {
+      "from_skill": "walk_mlp",
+      "to_skill": "walk_moe",
+      "analytical_naive_torque_jump_Nm": 10.6645355771515
+    },
+    {
+      "from_skill": "walk_moe",
+      "to_skill": "stand",
+      "analytical_naive_torque_jump_Nm": 14.200067317817162
+    }
+  ],
+  "loop_wall_gap_ms_p99": 4.204820590093732,
+  "loop_wall_gap_ms_max": 212.34291698783636,
+  "timing_scope": "Simulation clock drives the controller; pacing/rendering IPC timing is recorded but is not a hard-real-time hardware certificate",
+  "model_sha256": {
+    "stand_soft": "",
+    "stand_stiff": "",
+    "walk_mlp": "9128cb63007bae3a120b47bb8f350b67f3b015c87a9686281d6c8f119fc203c7",
+    "walk_moe": "2206659a6a23886446dcfc05d86888d6cdc9b8a4e31f44cbbc4e2d17ba3d6ead",
+    "stand": ""
+  },
+  "hardware_connected": false,
+  "root_writes": "initialization only; actuator rollout in reported wire_mode, no stabilizing root force or weld",
+  "final_position": [
+    0.28062354903508013,
+    0.05767617540575938,
+    0.3291457753028589
+  ],
+  "source_sha256": {
+    "rob2nav/deployment/runner.py": "62187270e46984b44f486232d0f53c84b6f1c753c135a53229b11d4a4bb66316",
+    "rob2nav/deployment/verify_mujoco.py": "d9b7dc5c35ec1986a817d08f916209d3d179192fa4b2f8c4bcb29450d3e261d0",
+    "rob2nav/deployment/__main__.py": "8c539f87d09f9ea2461a32d1ef40bc55a1d1a4db84837a8f1d0e8da038dbf98a",
+    "rob2nav/deployment/core.py": "7d2392306fb416f28c3346aa323f7528f6ca6365f68236c42e1867e15ac6f667",
+    "rob2nav/deployment/sequence.py": "e1b76d4e71bbde4cdc591f85e94d21c4a5d66ec52c290326cecb8d0830467032",
+    "rob2nav/deployment/service.py": "a66efccaf9b9c2bb2187d21686fde082e316660e8c5727dd2f63bea059b77149",
+    "rob2nav/deployment/__init__.py": "fe519182f7cf5e8d6a3244d1b297b08aada027a7fe0c0ac67e757b75db51412e",
+    "rob2nav/deployment/unitree.py": "4ec5951511eefbc93eb8b7969f7ef0a1ae9aed32e6f2be51a861650de0d11760",
+    "rob2nav/deployment/calibration.py": "e1a41f21454c137a7860796092978798d0de98c1a1e4d7d4856eb884ffecc24e",
+    "rob2nav/deployment/observer.py": "3c9d51c6a8f33e5e99d68bd923e840689026b758322eafe9a71e26ed4a8755b8",
+    "rob2nav/deployment/types.py": "5e1cb467b5270d082604a1f3b494d1cdafa93bc086d0bc62695f694bd2d79b2e",
+    "rob2nav/deployment/policies.py": "5fed2f1dec9bd3f868683be1b62a7f8a5677ae5fa102ef7db3c049a17812b683"
+  },
+  "profile_sha256": {
+    "deployment/skills/walk_mlp.json": "90ea64b6db16306486bed125fa19cb0e3b468618441c7e33ba05e7ebcea7287c",
+    "deployment/skills/sideflip69.json": "d6bc4c102298f8fe0b9f1c43d9889b9e19833c468cd75b5f0ba3fa166db2f839",
+    "deployment/skills/stand.json": "2dfce941966d3438852a74b6d21e000d4f42ddc26ec0f155e6f5da23f22e9b4c",
+    "deployment/skills/walk_moe.json": "10ffd4467791389d8cb3b8a8512c20b4b7b99f9591811eab52c2715cc37e6239",
+    "deployment/skills/backflip60.json": "4e74272aa7c8616169b22744825e1a4fafaeaaac864b9c3f61e307598334ceb3",
+    "deployment/skills/upright48.json": "66f1c19ef2a03e5c78bf2562c602ddae5a12b9338b3cb6efa4b8cbf06432fba1",
+    "deployment/skills/stand_soft.json": "c779c9253872c6c9b8dcbbcff4c77e36033e0e1bd54f9e562a1eaaee7551d8d4",
+    "deployment/skills/stand_stiff.json": "f16156492ab584ec3c2e9a9003efb333fbf327e83da8f8a26da1ef018de0e75e"
+  }
+}

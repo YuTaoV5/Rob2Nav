@@ -62,13 +62,17 @@ class Go2SdkTransport:
     def bundle_digest(self):
         base=Path(__file__).parent
         h=hashlib.sha256()
-        for name in ['core.py','types.py','runner.py','policies.py','observer.py','unitree.py','calibration.py','service.py','__main__.py']:
+        for name in ['core.py','types.py','runner.py','policies.py','observer.py','unitree.py','calibration.py','sequence.py','service.py','__main__.py']:
             h.update(name.encode());h.update((base/name).read_bytes())
         return h.hexdigest()
     def connect_readonly(self,interface):
         if self.connected:raise ValueError('DDS already initialized')
         pin=subprocess.check_output(['git','-C',str(self.sdk_root),'rev-parse','HEAD'],text=True).strip()
         if pin!=SDK_COMMIT:raise ValueError('Unreviewed SDK revision')
+        if subprocess.run(['git','-C',str(self.sdk_root),'diff','--quiet','HEAD','--','unitree_sdk2py'],check=False).returncode:
+            raise ValueError('Pinned SDK source has local modifications')
+        import unitree_sdk2py.core.channel as channel
+        if not Path(channel.__file__).resolve().is_relative_to(self.sdk_root):raise ValueError('Imported SDK differs from the reviewed checkout')
         from unitree_sdk2py.core.channel import ChannelFactoryInitialize,ChannelSubscriber
         from unitree_sdk2py.idl.unitree_go.msg.dds_ import LowState_
         ChannelFactoryInitialize(0,interface)
@@ -82,6 +86,7 @@ class Go2SdkTransport:
             from .policies import rotation
             quat=vector(msg.imu_state.quaternion,4);rot=rotation(quat)
             self.serial='-'.join(map(str,msg.sn))
+            self.firmware_version=tuple(int(x) for x in msg.version)
             self.health=dict(voltage=float(msg.power_v),temperature=[x.temperature for x in msg.motor_state[:12]],lost=[int(x.lost) for x in msg.motor_state[:12]])
             self.latest=Snapshot(time.monotonic(),tick,self.calibration.position_from_sdk([x.q for x in msg.motor_state[:12]]),
                 self.calibration.vector_from_sdk([x.dq for x in msg.motor_state[:12]]),self.calibration.vector_from_sdk([x.tau_est for x in msg.motor_state[:12]]),
@@ -89,6 +94,8 @@ class Go2SdkTransport:
     def read(self,ignore_health=False):
         with self.lock:
             if self.latest is None:raise ValueError('No LowState received')
+            if self.permit and (self.serial!=self.permit['robot_serial'] or self.firmware_version!=tuple(self.permit['firmware_version'])):
+                raise ValueError('LowState robot identity/firmware changed')
             if self.permit and not ignore_health:
                 limits=self.permit['limits'];h=self.health
                 if not np.isfinite([h['voltage'],*h['temperature']]).all() or not limits['voltage_min']<=h['voltage']<=limits['voltage_max'] or max(h['temperature'])>limits['temperature_max']:raise ValueError('Battery/temperature health gate')
@@ -103,9 +110,10 @@ class Go2SdkTransport:
         if not self.connected:raise ValueError('Read-only state acquisition must run first')
         if not skill.hardware_qualified:raise ValueError('Policy is not hardware qualified: '+skill.blocker)
         self.read()
-        required=['robot_serial','firmware','sdk_commit','approved_contracts','calibration_sha256','kinematics_sha256','runtime_bundle_sha256','watchdog_verified','reviewer','expires_unix','limits','recovery_kd','wire_mode']
+        required=['robot_serial','firmware','firmware_version','sdk_commit','approved_contracts','calibration_sha256','kinematics_sha256','runtime_bundle_sha256','watchdog_verified','reviewer','expires_unix','limits','recovery_kd','wire_mode']
         if any(k not in record for k in required):raise ValueError('Incomplete hardware qualification record')
         if record['robot_serial']!=self.serial or record['sdk_commit']!=SDK_COMMIT or skill.digest() not in record['approved_contracts']:raise ValueError('Device/SDK/policy qualification differs')
+        if tuple(record['firmware_version'])!=self.firmware_version:raise ValueError('Reported LowState firmware version differs from qualification')
         if not record['firmware'] or not record['reviewer'] or len(record['calibration_sha256'])!=64 or record['watchdog_verified'] is not True or record['expires_unix']<=time.time():raise ValueError('Expired/incomplete physical qualification')
         if not self.calibration.verified or record['calibration_sha256']!=self.calibration.digest():raise ValueError('Device calibration is unverified/different')
         if self.observer is None or record['kinematics_sha256']!=self.observer.source_sha256 or not self.observer.source_sha256:raise ValueError('Physical kinematic/COM model is not approved')
@@ -133,10 +141,12 @@ class Go2SdkTransport:
         if not 0<=now-command.stamp<=.01:raise ValueError('Expired motor command')
         if self.permit['expires_unix']<=time.time():raise ValueError('Hardware permit expired')
         if command.epoch and command.epoch not in self.allowed_epochs:raise ValueError('Policy generation has not been device approved')
-        before=time.monotonic();self.publisher.Write(self.codec.encode(command))
+        before=time.monotonic();sent=self.publisher.Write(self.codec.encode(command))
+        if sent is not True:raise IOError('SDK publisher rejected motor command')
         if time.monotonic()-before>.01:raise TimeoutError('SDK publisher exceeded control deadline; independent device watchdog is required')
     def emergency_damping(self):
         if self.publisher is None or self.permit is None:raise ValueError('No qualified writer exists')
+        if self.serial!=self.permit['robot_serial'] or self.firmware_version!=tuple(self.permit['firmware_version']):raise ValueError('Damping writer identity differs from qualification')
         self.publisher.Write(self.codec.damping(self.permit['recovery_kd']))
     def close(self):
         # Closing a publisher is not a substitute for a device-qualified recovery.

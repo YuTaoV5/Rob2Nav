@@ -37,9 +37,11 @@ def mount_unified_deployment(app,root):
         def mapped(s,key):return [s[key][s['joints'].index(n)] for n in common]
         route=['异步准备候选；失败时保留当前策略',
             '等待当前原子动作结束并落地站稳' if old.get('atomic') else '速度渐归零，等待有效低速支撑窗口',
-            '实测力矩/姿态接管 → 中立站姿','入口姿态与PD渐变','新历史预热 → 输出渐入','提交新epoch，拒绝旧响应']
+            '实测力矩/姿态接管 → 中立站姿','入口姿态与PD渐变','新历史预热',
+            '提交为ARMED，显式trigger启动原子动作，拒绝旧响应' if new.get('atomic') else '输出渐入 → 提交新epoch，拒绝旧响应']
         return dict(source=a.source,target=a.target,route=route,
             max_default_pose_difference_rad=max(abs(x-y) for x,y in zip(mapped(old,'default'),mapped(new,'default'))),
+            max_entry_pose_difference_rad=max(abs(x-y) for x,y in zip(mapped({**old,'entry':old.get('entry_pose') or old['default']},'entry'),mapped({**new,'entry':new.get('entry_pose') or new['default']},'entry'))),
             max_kp_difference=max(abs(x-y) for x,y in zip(mapped(old,'kp'),mapped(new,'kp'))),
             target_simulation_enabled=new.get('simulation_enabled',True),target_hardware_qualified=new.get('hardware_qualified',False),
             blocker=new.get('blocker'),executed=False,hardware_connected=False)

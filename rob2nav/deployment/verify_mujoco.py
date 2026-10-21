@@ -16,15 +16,26 @@ from .runner import UnifiedRuntime
 def main():
     p=argparse.ArgumentParser();p.add_argument('--root',type=Path,default=Path(__file__).resolve().parents[2]);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--wire-mode',choices=['torque','hybrid_pd'],default='hybrid_pd');p.add_argument('--asset',choices=['robogauge','source'],default='robogauge');p.add_argument('--atomic-cycle',action='store_true')
-    p.add_argument('--seed',type=int,default=9201);p.add_argument('--video',action='store_true');a=p.parse_args()
+    p.add_argument('--seed',type=int,default=9201);p.add_argument('--video',action='store_true')
+    p.add_argument('--sequence',type=Path,help='Use the same state-driven sequence component as the device service')
+    p.add_argument('--source-model',type=Path,help='Exact Go2 MuJoCo source XML; defaults to packaged deployment/models/go2_isaac.xml')
+    p.add_argument('--initial-yaw-deg',type=float,default=0.)
+    p.add_argument('--max-seconds',type=float,default=80.,help='Whole sequence budget; individual entry/exit deadlines are unchanged')
+    a=p.parse_args()
+    if not np.isfinite(a.initial_yaw_deg) or abs(a.initial_yaw_deg)>180:p.error('Invalid initial yaw')
+    if not np.isfinite(a.max_seconds) or not 1<=a.max_seconds<=300:p.error('Invalid simulation duration')
+    if a.initial_yaw_deg and a.asset!='source':p.error('Initial yaw variation currently requires the source asset')
     root=a.root.resolve();a.output.mkdir(parents=True,exist_ok=False)
     from go2_nav.env import Go2MaplessEnv,load_config
     cfg=load_config(root/'skills/navigation/config.json');cfg.update(max_seconds=1e9)
     env=Go2MaplessEnv(cfg,scene='empty',sensor_mode='lidar');env.reset(seed=a.seed)
     if a.asset=='source':
-        env.model=mujoco.MjModel.from_xml_path('/root/gpufree-data/Rob2Nav-upstreams/GO2_backflip/mujoco/go2/go2_isaac.xml')
+        source_model=(a.source_model or root/'deployment/models/go2_isaac.xml').resolve()
+        if not source_model.is_file():raise FileNotFoundError(f'Missing exact Go2 source model: {source_model}')
+        env.model=mujoco.MjModel.from_xml_path(str(source_model))
         env.model.opt.timestep=.001;env.data=mujoco.MjData(env.model);env.base_id=env.model.body('base').id
-        env.data.qpos[:3]=[0,0,.32];env.data.qpos[3:7]=[1,0,0,0]
+        yaw=np.radians(a.initial_yaw_deg)
+        env.data.qpos[:3]=[0,0,.32];env.data.qpos[3:7]=[np.cos(yaw/2),0,0,np.sin(yaw/2)]
         from .core import NEUTRAL
         for k,n in enumerate(SDK_JOINTS):env.data.qpos[env.model.jnt_qposadr[env.model.joint(n).id]]=NEUTRAL[k]
         mujoco.mj_forward(env.model,env.data)
@@ -40,6 +51,11 @@ def main():
     observer=KinematicObserver(model);foot_ids=observer.feet;floor=model.geom('floor').id
     start_time=float(data.time);runtime=UnifiedRuntime(root,allow_research_stunts=a.atomic_cycle);samples=[];events=[];requests=[];video=None;next_render=0.
     sequence=['stand','walk_moe','sideflip69','walk_moe','stand'] if a.atomic_cycle else ['stand_soft','stand_stiff','walk_mlp','walk_moe','stand'];requested=0;last_active=None;active_since=0.
+    choreography=None
+    if a.sequence:
+        from .sequence import SkillSequence,load_steps
+        choreography=SkillSequence(runtime,load_steps(a.sequence))
+        sequence=[step.skill for step in choreography.steps]
     native_peak=0.;flip_rotation=0.;maximum_speed_ratio=0.
     old_tau=None;old_kp=None;last_ref=None;naive=[];max_torque_step=0.;max_gain_step=0.;max_ref_step=0.;max_tilt=0.;min_height=1e9
     wall=time.monotonic();loop_gaps=[];last_wall=wall;passed=False;reason='time budget'
@@ -58,22 +74,24 @@ def main():
         if a.video:
             import imageio.v2 as imageio
             video=imageio.get_writer(a.output/'switches.mp4',fps=10,macro_block_size=1)
-        for i in range(1,40001):
+        for i in range(1,round(a.max_seconds/.002)+1):
             t=i*.002;before=time.monotonic();loop_gaps.append(before-last_wall);last_wall=before
             s=snapshot(t,i)
             c=runtime.controller
+            if choreography is not None:choreography.tick(s,t)
             current_id=c.active.id if c.active else None
-            if c.phase=='ARMED' and t-c.phase_at>.5 and not c.trigger_requested:c.trigger()
+            if choreography is None and c.phase=='ARMED' and t-c.phase_at>.5 and not c.trigger_requested:c.trigger()
             if c.phase=='ACTIVE' and current_id!=last_active:
                 last_active=current_id;active_since=t;events.append(dict(time=t,skill=current_id,position=data.qpos[:3].tolist()))
-            if c.phase=='ACTIVE' and t-active_since>=(.35 if current_id=='sideflip69' else 2.5) and requested<len(sequence) and runtime.future is None and runtime.next is None:
+            if choreography is None and c.phase=='ACTIVE' and t-active_since>=(.35 if current_id=='sideflip69' else 2.5) and requested<len(sequence) and runtime.future is None and runtime.next is None:
                 target=sequence[requested];profile=runtime.profile(target)[1]
                 raw=profile.to_sdk(profile.kp)*(profile.to_sdk(profile.default)-s.q)-profile.to_sdk(profile.kd)*s.dq
                 naive.append(dict(from_skill=current_id,to_skill=target,analytical_naive_torque_jump_Nm=float(np.max(abs(raw-c.servo.tau)))))
                 runtime.stage_async(target,s);requests.append(dict(time=t,to_skill=target));requested+=1
-            c.set_velocity([.18,0,0] if c.phase=='ACTIVE' and current_id in ('walk_mlp','walk_moe') and t-active_since>.4 and runtime.next is None and runtime.future is None else [0,0,0])
-            if c.phase=='ACTIVE' and requested==len(sequence) and current_id==sequence[-1] and t-active_since>2:
-                passed=True;reason='all five profiles committed and settled';break
+            if choreography is None:c.set_velocity([.18,0,0] if c.phase=='ACTIVE' and current_id in ('walk_mlp','walk_moe') and t-active_since>.4 and runtime.next is None and runtime.future is None else [0,0,0])
+            complete=choreography.done if choreography is not None else requested==len(sequence) and t-active_since>2
+            if c.phase=='ACTIVE' and complete and current_id==sequence[-1]:
+                passed=True;reason='all requested profiles committed and settled';break
             command=runtime.step(s,t)
             native=c.phase=='ACTIVE' and c.active and c.active.actuation=='native_pd'
             if native and current_id=='sideflip69':flip_rotation+=s.gyro[0]*.002
@@ -101,12 +119,13 @@ def main():
             if c.phase=='FAULT':reason=c.fault;break
             if not native and (data.qpos[2]<(0.16 if a.asset=='source' else .22) or tilt>.35):reason='posture envelope exceeded';break
             if runtime.stage_error:reason='staging failure:'+runtime.stage_error;break
+            if choreography is not None and choreography.error:reason='sequence failure:'+choreography.error;break
             if video is not None and t>=next_render:video.append_data(env.render());next_render=t+.1
             delay=.002-(time.monotonic()-before)
             if delay>0:time.sleep(delay)
         np.savez_compressed(a.output/'control_trace.npz',values=np.asarray(samples),
             columns=np.array(['time']+[f'{k}:{j}' for k in ['tau','qref','kp','kd','q','dq'] for j in SDK_JOINTS]+[f'force:{l}' for l in ['FR','FL','RR','RL']]+['tilt','x','y','z']))
-        report=dict(seed=a.seed,asset=a.asset,wire_mode=a.wire_mode,atomic_cycle=a.atomic_cycle,flip_rotation_rad=flip_rotation,native_motion_peak_torque_step_Nm=native_peak,maximum_joint_speed_ratio=maximum_speed_ratio,passed=bool(passed and (not a.atomic_cycle or abs(flip_rotation)>5.5) and max_torque_step<=.300001 and max_gain_step<=.030001),reason=reason,
+        report=dict(seed=a.seed,asset=a.asset,wire_mode=a.wire_mode,sequence=sequence,shared_sequencer=choreography is not None,initial_yaw_deg=a.initial_yaw_deg,atomic_cycle=a.atomic_cycle,flip_rotation_rad=flip_rotation,native_motion_peak_torque_step_Nm=native_peak,maximum_joint_speed_ratio=maximum_speed_ratio,passed=bool(passed and (not a.atomic_cycle or abs(flip_rotation)>5.5) and max_torque_step<=.300001 and max_gain_step<=.030001),reason=reason,
             backend='MuJoCo real free-base hot-switch harness; commits/model hashes below define which actors were actually exercised',
             commits=events,requests=requests,controller_events=runtime.controller.events,
             max_torque_step_Nm=max_torque_step,max_kp_step=max_gain_step,max_reference_step_rad=max_ref_step,
@@ -114,8 +133,8 @@ def main():
             analytical_naive_switches=naive,loop_wall_gap_ms_p99=float(np.percentile(loop_gaps,99)*1000),
             loop_wall_gap_ms_max=max(loop_gaps)*1000,
             timing_scope='Simulation clock drives the controller; pacing/rendering IPC timing is recorded but is not a hard-real-time hardware certificate',
-            model_sha256={p.skill.id:p.skill.sha256 for p in runtime.prepared},hardware_connected=False,
-            root_writes='env.reset initialization only; torque-only rollout, no stabilizing root force or weld',final_position=data.qpos[:3].tolist())
+            model_sha256=dict(runtime.model_history),retained_prepared_entries=len(runtime.prepared),hardware_connected=False,
+            root_writes='initialization only; actuator rollout in reported wire_mode, no stabilizing root force or weld',final_position=data.qpos[:3].tolist())
         report['source_sha256']={str(f.relative_to(root)):hashlib.sha256(f.read_bytes()).hexdigest() for f in (root/'rob2nav/deployment').glob('*.py')}
         report['profile_sha256']={str(f.relative_to(root)):hashlib.sha256(f.read_bytes()).hexdigest() for f in (root/'deployment/skills').glob('*.json')}
         (a.output/'summary.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report),flush=True)

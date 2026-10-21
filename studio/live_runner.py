@@ -14,19 +14,22 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--stream',type=Path,required=True)
     p.add_argument('--module',required=True);p.add_argument('args',nargs=argparse.REMAINDER)
     a=p.parse_args()
-    if a.module not in ('rob2nav.mujoco_skill','skills.backflip.simulate','go2_nav.terrain_run'):
+    if a.module not in ('rob2nav.mujoco_skill','skills.backflip.simulate','go2_nav.terrain_run','rob2nav.deployment.verify_mujoco'):
         raise ValueError('Unknown simulation module')
     import mujoco
     from PIL import Image
     stream=a.stream;stream.mkdir(parents=True,exist_ok=True)
     original=mujoco.mj_step;renderer=None;camera=mujoco.MjvCamera()
     camera.distance=3.;camera.azimuth=130.;camera.elevation=-25.
-    start_wall=None;start_sim=None;next_frame=0.;count=0;last=None
+    start_wall=None;start_sim=None;next_frame=0.;count=0;last=None;last_model=None
     def atomic(name,payload):
         tmp=stream/(name+'.tmp');tmp.write_bytes(payload);tmp.replace(stream/name)
     def step(model,data,*args,**kw):
-        nonlocal renderer,start_sim,start_wall,next_frame,count,last
+        nonlocal renderer,start_sim,start_wall,next_frame,count,last,last_model
         result=original(model,data,*args,**kw)
+        if model is not last_model:
+            if renderer is not None:renderer.close();renderer=None
+            last_model=model;start_sim=None;next_frame=0.
         if start_sim is None:start_sim=float(data.time);start_wall=time.monotonic()
         last=(model,data)
         elapsed=float(data.time)-start_sim

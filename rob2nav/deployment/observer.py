@@ -10,6 +10,14 @@ import numpy as np
 from .types import SDK_JOINTS
 
 
+def model_fingerprint(model,source):
+    import mujoco
+    blob=np.empty(mujoco.mj_sizeModel(model),dtype=np.uint8)
+    mujoco.mj_saveModel(model,buffer=blob)
+    h=hashlib.sha256();h.update(mujoco.__version__.encode());h.update(source);h.update(blob.tobytes())
+    return h.hexdigest()
+
+
 def support_margin(points,com):
     points=sorted(set(tuple(map(float,p)) for p in np.asarray(points)[:,:2]))
     if len(points)<3:return None
@@ -44,7 +52,9 @@ class KinematicObserver:
     def from_xml(cls,path):
         import mujoco
         path=Path(path);observer=cls(mujoco.MjModel.from_xml_path(str(path)))
-        observer.source_sha256=hashlib.sha256(path.read_bytes()).hexdigest();return observer
+        # Hash the compiled model too: hashing only the root XML would miss
+        # changed included masses, COMs, collision assets or actuator parameters.
+        observer.source_sha256=model_fingerprint(observer.model,path.read_bytes());return observer
     def enrich(self,s):
         if s.quaternion is None:return s
         m,d,mj=self.model,self.data,self.mj

@@ -1,5 +1,7 @@
 """State-driven gait/atomic/gait choreography; it never owns a motor publisher."""
 from dataclasses import dataclass
+import json
+from pathlib import Path
 import numpy as np
 from .types import vector
 
@@ -13,7 +15,17 @@ class Step:
     def checked(self):
         if not self.skill or any(x not in 'abcdefghijklmnopqrstuvwxyz0123456789_' for x in self.skill):raise ValueError('Invalid sequence skill ID')
         if not np.isfinite(self.seconds) or not 0<self.seconds<=120:raise ValueError('Invalid sequence dwell time')
-        vector(self.velocity,3);return self
+        command=vector(self.velocity,3)
+        if np.any(abs(command)>np.array([.5,.25,.7])):raise ValueError('Sequence velocity exceeds command workspace')
+        if type(self.trigger) is not bool:raise ValueError('Sequence trigger must be boolean')
+        return self
+
+
+def load_steps(path):
+    data=json.loads(Path(path).read_text(encoding='utf-8'))
+    if not isinstance(data,dict) or set(data)!={'steps'} or not isinstance(data['steps'],list) or not 1<=len(data['steps'])<=32:
+        raise ValueError('Expected 1..32 explicit sequence steps')
+    return [Step(**item).checked() for item in data['steps']]
 
 
 class SkillSequence:
@@ -21,6 +33,9 @@ class SkillSequence:
         self.runtime=runtime;self.steps=[s.checked() for s in steps]
         if not self.steps:raise ValueError('Empty skill sequence')
         if self.steps[-1].skill!='stand':self.steps.append(Step('stand'))
+        for step in self.steps:
+            _,contract=runtime.profile(step.skill)
+            if contract.atomic!=step.trigger:raise ValueError('Atomic sequence steps require an explicit trigger; gait steps must not trigger')
         self.index=0;self.requested=False;self.started=None;self.done=False;self.error=None
     def tick(self,snapshot,now):
         r=self.runtime;c=r.controller
@@ -28,7 +43,10 @@ class SkillSequence:
         if c.phase=='FAULT' or r.stage_error:self.error=c.fault or r.stage_error;c.set_velocity([0,0,0],now);return
         step=self.steps[self.index]
         if not self.requested:
-            if r.future is None and r.next is None and r.queued is None:r.stage_async(step.skill,snapshot);self.requested=True
+            if c.phase=='ACTIVE' and c.active is not None and c.active.id==step.skill:
+                self.requested=True
+            elif r.future is None and r.next is None and r.queued is None:
+                r.stage_async(step.skill,snapshot);self.requested=True
         current=c.active.id if c.active is not None else None
         if current!=step.skill or c.phase not in ('ACTIVE','ARMED'):c.set_velocity([0,0,0],now);return
         if c.phase=='ARMED':

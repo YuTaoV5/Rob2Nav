@@ -20,6 +20,7 @@ class Prepared:
     next_inference:float=0.
     reference:object=None
     reference_yaw:float=0.
+    entry_epoch:int|None=None
 
 
 class UnifiedRuntime:
@@ -27,6 +28,7 @@ class UnifiedRuntime:
         self.root=Path(root).resolve();self.controller=SwitchController(hardware)
         self.executor=ThreadPoolExecutor(max_workers=1,thread_name_prefix='policy-staging')
         self.future=None;self.active=None;self.next=None;self.queued=None;self.stage_error=None;self.started=0.;self.prepared=[]
+        self.model_history={}
         self.allow_research_stunts=allow_research_stunts and not hardware
         self.approval=approval
     def profile(self,id):
@@ -80,12 +82,23 @@ class UnifiedRuntime:
                     if not reset or not reset.get('reset_done'):raise ValueError('Candidate recurrent-state reset failed')
                     # The initial probe is discarded. Actual state/history observations warm
                     # the candidate before commit; no model output is sent to motors here.
-                prepared=Prepared(skill,worker,action.copy(),action.copy(),reference=reference,reference_yaw=yaw);self.prepared.append(prepared)
-                keep={id(worker),id(self.active.worker) if self.active else None};inactive=[]
+                prepared=Prepared(skill,worker,action.copy(),action.copy(),reference=reference,reference_yaw=yaw)
+                self.model_history[skill.id]=skill.sha256
+                keep_entries=[p for p in [self.active,prepared] if p is not None]
+                keep_workers={id(p.worker) for p in keep_entries if p.worker is not None}
+                # Bound reference handles and Prepared histories as well as
+                # processes. Repeated flip/gait cycles must not keep every old
+                # NpzFile open until the service eventually exits.
                 for old in reversed(self.prepared):
-                    if old.worker is not None and id(old.worker) not in keep and old.worker.process.is_alive():
-                        if len(inactive)<1:inactive.append(old.worker);keep.add(id(old.worker))
-                        else:old.worker.close()
+                    if old.worker is not None and id(old.worker) not in keep_workers and old.worker.process.is_alive():
+                        keep_entries.append(old);keep_workers.add(id(old.worker));break
+                closed=set()
+                for old in self.prepared:
+                    if any(old is entry for entry in keep_entries):continue
+                    if old.worker is not None and id(old.worker) not in keep_workers and id(old.worker) not in closed:
+                        old.worker.close();closed.add(id(old.worker))
+                    if old.reference is not None:old.reference.close()
+                self.prepared=keep_entries
                 return prepared
             except Exception:
                 if worker:worker.close()
@@ -107,6 +120,15 @@ class UnifiedRuntime:
         intent=None
         if candidate:
             skill=candidate.skill
+            if c.phase=='WARMUP' and candidate.entry_epoch!=c.epoch:
+                # Preloading can happen while the previous gait still turns.
+                # Anchor the reference to the actual entry orientation, not a
+                # stale orientation captured when the file started loading.
+                if candidate.reference is not None:
+                    from .policies import rotation
+                    live=rotation(snapshot.quaternion);ref=rotation(candidate.reference['body_quat_w'][0,0])
+                    candidate.reference_yaw=float(np.arctan2(live[1,0],live[0,0])-np.arctan2(ref[1,0],ref[0,0]))
+                candidate.entry_epoch=c.epoch
             if candidate.worker is None:intent=Intent(c.epoch,now,skill.to_sdk(skill.default))
             else:
                 try:result=candidate.worker.poll()
