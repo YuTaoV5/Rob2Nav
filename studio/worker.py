@@ -134,8 +134,19 @@ def execute(jobs,job,root,python,mujoco_python=None):
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--root',required=True);parser.add_argument('--python',required=True);parser.add_argument('--mujoco-python',default=os.environ.get('CPU_PY',sys.executable))
+    parser.add_argument('--job',help='Internal claimed-job child; parent retains the GPU lock')
     args=parser.parse_args();root=Path(args.root).resolve();jobs=Jobs(root)
     if os.name!='posix':raise SystemExit('Training worker requires a Linux simulator host')
+    if args.job:
+        job=jobs.get(args.job)
+        if job['state']!='preflight':raise RuntimeError('Isolated execution requires an already claimed job')
+        try:execute(jobs,job,root,args.python,args.mujoco_python)
+        except InterruptedError as e:jobs.update(job['id'],'canceled',{'reason':str(e)})
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            jobs.update(job['id'],'failed',{'reason':str(e)})
+        return
     import fcntl
     with (jobs.directory/'gpu.lock').open('a') as lock:
         try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
@@ -144,7 +155,20 @@ def main():
         for job in jobs.all():
             if job['state'] in ('running','preflight','evaluating'):
                 jobs.update(job['id'],'unknown',{'reason':'Worker restarted; inspect process metadata before taking action. Not automatically resumed.'})
-        drain_queue(jobs,lambda job:execute(jobs,job,root,args.python,args.mujoco_python))
+        drain_queue(jobs,lambda job:run_isolated(jobs,job,root,args.python,args.mujoco_python))
+
+
+def run_isolated(jobs,job,root,python,cpu_python):
+    """Load current schemas/trainers for EACH job, without restarting a busy parent.
+
+    The parent keeps the single-GPU flock; only its already claimed job is sent
+    to the child. Existing training children continue using their original code.
+    """
+    cmd=[sys.executable,'-m','studio.worker','--root',str(root),'--python',str(python),
+         '--mujoco-python',str(cpu_python),'--job',job['id']]
+    subprocess.run(cmd,cwd=root,check=True)
+    if jobs.get(job['id'])['state'] not in ('succeeded','failed','canceled'):
+        raise RuntimeError('Isolated job returned without a terminal execution record')
 
 
 def drain_queue(jobs,run,clock=time.monotonic,sleep=time.sleep,idle_seconds=60):

@@ -5,6 +5,8 @@ import argparse
 import os
 from pathlib import Path
 import sys
+ROOT=Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
 
 parser = argparse.ArgumentParser(add_help=False)
 parser.add_argument('--source', required=True, type=Path)
@@ -20,7 +22,11 @@ parser.add_argument('--finetune-learning-rate',type=float)
 parser.add_argument('--flip-direction',choices=['back','front'],default='back')
 parser.add_argument('--initial-std',type=float)
 parser.add_argument('--peak-contact-forces',action='store_true')
+parser.add_argument('--reward-scales-json',default='{}')
 args, rest = parser.parse_known_args()
+from skills.backflip.reward_options import parse_scales
+reward_scales=parse_scales(args.reward_scales_json)
+if reward_scales and not args.fixstand_roundtrip:raise ValueError('Reward overrides require FIXSTAND training')
 if args.peak_contact_forces and not args.fixstand_roundtrip:raise ValueError('Peak contacts require FIXSTAND training')
 if args.delayed_entry and not args.fixstand_roundtrip:raise ValueError('Delayed entry requires fixstand training')
 if not 0.<=args.entry_hold_scale<=.4 or (args.entry_hold_scale!=.4 and not args.delayed_entry):raise ValueError('Entry hold scale requires delayed entry and [0, 0.4]')
@@ -56,7 +62,7 @@ if args.fixstand_roundtrip:
         if text.count(required)!=1:raise RuntimeError('Pinned training entry changed: '+required)
     from skills.backflip.launcher_patch import configure_fixstand_source
     text=configure_fixstand_source(text,source,args.urdf_speed_limits,args.fast_safety_curriculum,
-        args.delayed_entry,args.entry_hold_scale,args.flip_direction,args.peak_contact_forces)
+        args.delayed_entry,args.entry_hold_scale,args.flip_direction,args.peak_contact_forces,reward_scales)
     if args.safety_start is not None:
         text=text.replace('agent_cfg = Go2BackflipPPORunnerCfg()',
             f'env_cfg.rewards.safety_curriculum_start={args.safety_start!r}\n    agent_cfg = Go2BackflipPPORunnerCfg()')

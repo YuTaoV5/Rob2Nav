@@ -2,7 +2,7 @@
 
 
 def configure_fixstand_source(text,source,urdf_speed_limits=False,fast_safety_curriculum=False,
-                              delayed_entry=False,entry_hold_scale=.4,flip_direction='back',peak_contact_forces=False):
+                              delayed_entry=False,entry_hold_scale=.4,flip_direction='back',peak_contact_forces=False,reward_scales=None):
     if flip_direction not in ('back','front'):raise ValueError('Unknown flip direction')
     needle='env_cfg = Go2BackflipEnvCfg()'
     if text.count(needle)!=1:raise RuntimeError('Pinned environment config entry changed')
@@ -20,4 +20,9 @@ def configure_fixstand_source(text,source,urdf_speed_limits=False,fast_safety_cu
     if flip_direction=='front':
         block.extend(['from skills.frontflip.task import configure as configure_frontflip',
                       f'configure_frontflip(env_cfg,{str(source)!r})'])
+    if reward_scales:
+        from .reward_options import parse_scales
+        import json
+        values=parse_scales(json.dumps(reward_scales))
+        block.extend(['from skills.backflip.reward_options import apply_scales',f'apply_scales(env_cfg,{values!r})'])
     return text.replace(needle,'\n    '.join(block))

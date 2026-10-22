@@ -40,6 +40,7 @@ SCHEMAS = {
         'reset_std': field('重设策略噪声（0保留）', 0., 0., 1.),
     },
     'backflip_native_ppo': {**COMMON,
+        'reward_scales_json': field('前后翻奖励权重JSON（如 {"lin_vel_z":60}）', '{}'),
         'peak_contact_forces': field('物理子步接触峰值', False),
         'flip_direction': field('空翻方向', 'back', choices=['back', 'front']),
         'delayed_entry': field('稳定承重后进入动作', False),
@@ -101,6 +102,8 @@ def validate(rid, options):
     for key in ('reset_std', 'initial_std', 'min_action_std', 'max_action_std'):
         requires(key, o.get(key, 0) >= .01)
     if rid in ('backflip_native_ppo', 'frontflip_native_ppo'):
+        from skills.backflip.reward_options import parse_scales
+        if parse_scales(o['reward_scales_json']) and not o['fixstand_roundtrip']:raise ValueError('Native reward overrides require FIXSTAND')
         if o['flip_direction'] == 'front' and not (o['fixstand_roundtrip'] and o['delayed_entry']):
             raise ValueError('Frontflip requires FIXSTAND and delayed entry')
         if o['entry_hold_scale'] != .4 and not o['delayed_entry']:
@@ -122,6 +125,7 @@ def arguments(rid, options):
         if key == 'motion':
             continue  # resolved against the trusted project roots separately
         if key == 'evaluation_seed_start':continue  # evaluator option, never a trainer argument
+        if key=='reward_scales_json' and value.strip()=='{}':continue
         if key == 'in_place_airtime_weight' and not options.get('in_place_airtime'):continue
         if key in ('finetune_learning_rate', 'reset_std', 'initial_std', 'min_action_std', 'max_action_std', 'boundary_bridge_limit') and value == 0:
             continue

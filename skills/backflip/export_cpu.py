@@ -44,6 +44,7 @@ def export(checkpoint,output):
     (output/'export.json').write_text(json.dumps(dict(checkpoint_sha256=hashlib.sha256(checkpoint.read_bytes()).hexdigest(),
         policy_sha256=hashlib.sha256((output/'policy.onnx').read_bytes()).hexdigest(),actor_input_dim=60,
         actor_output_dim=12,onnx_max_error=error,fixstand_roundtrip=contract,control_contract=controller,
+        reward_scale_overrides=env.get('reward_scale_overrides',{}),actual_reward_scales=env['rewards']['scales'],
         entry_training_contract_verified=True,capability_verified=False),indent=2)+'\n')
 
 
