@@ -21,8 +21,8 @@ from .registry import registry,capabilities
 
 def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None):
     root=Path(root or Path(__file__).resolve().parents[1]).resolve()
-    sim_python=Path(sim_python or '/root/isaacsim/python.sh')
-    mujoco_python=Path(mujoco_python or '/root/gpufree-data/envs/go2-mapless/bin/python')
+    sim_python=Path(sim_python or os.environ.get('ISAAC_PY') or root.parent/'isaacsim/python.sh')
+    mujoco_python=Path(mujoco_python or os.environ.get('CPU_PY') or root.parent/'envs/go2-skills-cpu/bin/python')
     catalog=Catalog(root);jobs=Jobs(root)
     app=FastAPI(title='Rob2Nav Studio',version='0.1.0')
     from .paw_routes import mount_handshake
@@ -299,7 +299,7 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--root');p.add_argument('--host',default='127.0.0.1');p.add_argument('--port',type=int,default=8765)
-    p.add_argument('--allow-training',action='store_true');p.add_argument('--sim-python',default='/root/isaacsim/python.sh');p.add_argument('--mujoco-python',default='/root/gpufree-data/envs/go2-mapless/bin/python');a=p.parse_args()
+    p.add_argument('--allow-training',action='store_true');p.add_argument('--sim-python');p.add_argument('--mujoco-python');a=p.parse_args()
     if a.allow_training and a.host not in ('127.0.0.1','localhost','::1'):
         p.error('Training control must bind to loopback; use an authenticated SSH tunnel/reverse proxy.')
     import uvicorn

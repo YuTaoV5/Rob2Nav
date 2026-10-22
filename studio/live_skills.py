@@ -1,5 +1,6 @@
 """One bounded, CPU-only live skill process. No arbitrary paths or robot transport."""
 import json
+import os
 from pathlib import Path
 import signal
 import subprocess
@@ -45,7 +46,7 @@ def mount_live_skills(app,root,python):
     from .checkpoint_live import mount_checkpoint_live
     mount_checkpoint_live(app,root)
     root=Path(root);lock=threading.RLock();current={};proc=None;last_client=0.
-    source=Path('/root/gpufree-data/Rob2Nav-upstreams/GO2_backflip')
+    source=Path(os.environ.get('ROB2NAV_UPSTREAMS',str(root.parent/'Rob2Nav-upstreams')))/'GO2_backflip'
     def resource(relative,fallback):
         packaged=root/'artifacts/release_20261021/weights'/relative
         return packaged if packaged.is_file() else fallback

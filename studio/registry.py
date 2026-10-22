@@ -4,6 +4,7 @@ import copy
 import json
 from pathlib import Path
 from .catalog import read_json, clean
+from .documents import indexed_manual,indexed_path
 
 REGISTRY=Path(__file__).with_name('skill_registry.json')
 
@@ -34,12 +35,13 @@ def capabilities(catalog,jobs):
     for skill in result['capabilities']:
         skill['manuals']=[dict(kind=kind,label=label,path=path,url='#reports?path='+quote(path,safe=''))
             for kind,label in [('training','训练手册'),('simulation','仿真手册'),('deployment','部署手册')]
-            for path in [f"skills/{skill['id']}/{kind.upper()}.md"] if any(r['path']==path for r in catalog.get('reports',[]))]
+            for path in [indexed_manual(catalog.get('reports',[]),skill['id'],kind)] if any(r['path']==path for r in catalog.get('reports',[]))]
         if skill['id']=='navigation':
             skill['manuals'] += [dict(kind=kind,label=label,path=path,url='#reports?path='+quote(path,safe=''))
-                for kind,label,path in [('scan_simulation','SCAN仿真手册','skills/navigation/SCAN_SIMULATION.md'),
+                for kind,label,old_path in [('scan_simulation','SCAN仿真手册','skills/navigation/SCAN_SIMULATION.md'),
                                         ('scan_deployment','SCAN实机部署手册','skills/navigation/SCAN_DEPLOYMENT.md'),
                                         ('sensor_calibration','传感器安装与标定','docs/GO2_D435I_MID360_INSTALL_CALIBRATION.md')]
+                for path in [indexed_path(catalog.get('reports',[]),old_path)]
                 if any(r['path']==path for r in catalog.get('reports',[]))]
         selector=skill.get('evidence',{})
         related=[j for j in jobs if j['config'].get('capability_id')==skill['id']]

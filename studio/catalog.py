@@ -131,11 +131,15 @@ class Catalog:
                     models.append({'id':key,'name':path.name,'group':path.parent.name,'path':self.relative(path),'bytes':path.stat().st_size})
         report_paths=list(self.root.glob('*.md'))+list((self.root/'docs').rglob('*.md'))+list((self.root/'skills').rglob('*.md'))+list((self.root/'go2_nav/paw_contact').glob('*.md'))
         if (self.root/'studio/README.md').exists():report_paths.append(self.root/'studio/README.md')
+        from .documents import aliases
+        doc_aliases=aliases(self.root)
         for path in sorted(report_paths):
+            if self.relative(path) in doc_aliases and (self.root/doc_aliases[self.relative(path)]).is_file():continue
             key=ident(path); records[key]=path
             text=path.read_text(encoding='utf-8-sig', errors='replace')
             title=next((s.lstrip('# ').strip() for s in text.splitlines() if s.startswith('# ')),path.stem)
-            reports.append({'id':key,'name':title,'path':self.relative(path),'bytes':path.stat().st_size})
+            reports.append({'id':key,'name':title,'path':self.relative(path),'bytes':path.stat().st_size,
+                'aliases':[old for old,new in doc_aliases.items() if new==self.relative(path)]})
         from .model_registry import inventory
         models,model_issues=inventory(self.root,models,evaluations)
         issues.extend(model_issues)

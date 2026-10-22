@@ -1,6 +1,7 @@
 """Pinned external-cache contracts. Unlicensed upstream assets are not vendored."""
 import hashlib
 import json
+import os
 from pathlib import Path
 
 LOCK=Path(__file__).resolve().parents[1]/'deployment/upstream_lock.json'
@@ -10,7 +11,8 @@ def source(root,project):
     entries=json.loads(LOCK.read_text(encoding='utf-8'))
     if project not in entries:raise ValueError('This reviewed upstream cache is not installed yet')
     entry=entries[project]
-    folder=(Path(root).resolve().parent/'Rob2Nav-upstreams'/entry['folder']).resolve()
+    cache=Path(os.environ.get('ROB2NAV_UPSTREAMS',str(Path(root).resolve().parent/'Rob2Nav-upstreams')))
+    folder=(cache/entry['folder']).resolve()
     if not folder.is_dir():raise ValueError('Upstream private cache is missing; follow docs/UNIFIED_CAPABILITIES.md')
     for name,digest in entry['sha256'].items():
         p=(folder/name).resolve()
@@ -21,7 +23,7 @@ def source(root,project):
     return folder,entry
 
 
-def pie_python(root):return Path(root).resolve().parent/'envs/go2-pie/bin/python'
+def pie_python(root):return Path(os.environ.get('ROB2NAV_ENVS',str(Path(root).resolve().parent/'envs')))/'go2-pie/bin/python'
 
 
 if __name__=='__main__':

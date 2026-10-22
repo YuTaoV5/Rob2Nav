@@ -18,7 +18,7 @@ from geometry_msgs.msg import PoseStamped,Twist
 from sensor_msgs.msg import PointCloud2,PointField
 from scan_planner_msgs.msg import Bspline
 
-SOURCE=Path('/root/gpufree-data/scan-reproduction/upstream')
+SOURCE=Path(os.environ.get('SCAN_WS',str(Path(__file__).resolve().parents[3]/'scan-reproduction/upstream')))
 PIN='d0b921c9b05a6d291d144d60882b2e0e88d2c0e0'
 
 
@@ -51,7 +51,7 @@ class Bridge(Node):
     def restart(self,session,dynamic_task=False,low_steps=False):
         self.stop_children();self.session=session;self.cmd=[0.,0.,0.];self.cmd_at=0.;self.plans=0;self.command_count=0;self.goal_key=None
         self.goal_at=0.;self.goal_plan_baseline=0;self.goal_attempts=0
-        folder=Path('/root/gpufree-data/Rob2Nav/outputs/scan_web');folder.mkdir(parents=True,exist_ok=True)
+        folder=Path(os.environ.get('ROB2NAV_ROOT',str(Path(__file__).resolve().parents[2])))/'outputs/scan_web';folder.mkdir(parents=True,exist_ok=True)
         self.log=(folder/'planner.log').open('ab',buffering=0)
         config=SOURCE/'install/scan_planner/share/scan_planner/config'
         binary=SOURCE/'install/scan_planner/lib/scan_planner'

@@ -1,15 +1,4 @@
-# Studio 创建实验：技能训练复刻
+<!-- rob2nav-doc-alias: docs/实验训练方案说明.md -->
+# 文档已迁移
 
-在工作台“创建实验”选择训练方案，会填入手册对应的默认预算、种子和专用参数。选择后仍可修改通用字段及该技能开放的参数；保存只创建草稿，预检通过后需在任务队列提交。任务使用服务端固定的 Python 模块及参数白名单，不接收任意 Shell 命令。
-
-| 方案 | 执行器 | 页面可改参数 | 必需输入 | 完成标记 |
-| --- | --- | --- | --- | --- |
-| 地形 MoE：楼梯、平台、混合 | Isaac `moe_perceptive.train` | 原有 PPO、奖励、感知、课程等 | 固定 MoE 基座与选定权重 | `completed.json` 和最终检查点 |
-| 导航 PPO 速度头 | MuJoCo `go2_nav.train` | 场景、传感器、环境数、步数、种子、断点 | `skills/navigation/config.json`、RoboGauge | `navigation.zip`、`manifest.json`、配置快照 |
-| 侧空翻动作模仿 | Isaac `skills.sideflip.train` | 环境数、轮数、种子、DC 电机模型、断点 | 固定上游源码、Unitree 源码、参考动作 NPZ | `completion.json`、模型 |
-| 后腿站立行走 | Isaac `skills.upright_walk.train` | 环境数、轮数、种子、DC 电机模型、断点 | 固定上游源码、Unitree 源码 | `completion.json`、模型 |
-| 后空翻 PPO | Isaac `skills/backflip/train_isaac51.py` | 环境数、轮数、种子 | 固定上游源码 | 上游训练目录中的模型 |
-
-预检会显示实际解析命令、缺失解释器或资源。断点路径只接受项目 `outputs/`、`artifacts/`、`skills/` 下现有的 `.pt` 或 `.zip` 文件。侧空翻参考动作需先按[训练手册](../skills/sideflip/TRAINING.md)生成；上游源码需按各手册固定提交准备。后空翻启动器尚未提供可靠的 Studio 断点接口，因此页面只开放从头训练。
-
-任务“执行完成”仅表示所需训练产物已生成。动作通过率、关节速度、接触安全与跨仿真能力须按对应 `skills/<技能>/SIMULATION.md` 用独立种子评估，不能从训练日志推断。站立行走应从四足姿态起评；导航还需核对观测/底层 MoE 合约。新增技能时，扩展 `studio/skill_registry.json` 的配方、`studio/recipe_training.py` 的选项白名单与命令，并增加产物检查和独立仿真手册；通用的草稿、预检、队列和日志流程无需重写。
+请阅读[实验训练方案说明](实验训练方案说明.md)。这是中文正式文档；旧地址仅为现有书签与代码引用保留。新环境先按环境准备说明设置自己的路径，不使用原服务器位置。
