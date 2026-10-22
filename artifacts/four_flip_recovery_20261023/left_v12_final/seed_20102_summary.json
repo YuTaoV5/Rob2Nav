@@ -1,0 +1,125 @@
+{
+  "args": {
+    "kind": "sideflip",
+    "seed": 20102,
+    "initialization": "settled",
+    "physics_hz": 1000,
+    "joint_limit_time_constant": null
+  },
+  "backend": "MuJoCo",
+  "successes": 0,
+  "total": 1,
+  "evaluator_sha256": "9fddc20706544bcc028bfc4e1a2f96f091808c332d232eb7fc81e250732d3c95",
+  "episodes": [
+    {
+      "success": false,
+      "unwrapped_roll_rad": -6.275163446632069,
+      "body_x_rotation_rad": -6.237007963675047,
+      "axis_dominance": 0.7735505864424098,
+      "terminal_upright": 0.9999573605027753,
+      "airtime_s": 0.35400000000000026,
+      "expected_direction": "left",
+      "direction_pass": true,
+      "max_joint_speed_ratio": 1.0624336851834355,
+      "max_joint_limit_excess_rad": 0.08376178672610823,
+      "unexpected_body_ground_contact": true,
+      "ground_contact_rule": "foot spheres and contact points inside their own anatomical foot region",
+      "ground_contact_rule_sha256": "803b0c9f2ee2d00129fc4550e25e05accc982f07768f42218261de9fa1c9d34f",
+      "action_completed": false,
+      "fixstand": {
+        "passed": false,
+        "initial": {
+          "passed": false,
+          "samples": 36,
+          "stable_fraction": 0.7777777777777778,
+          "max_pose_error_rad": 0.1290685381058194
+        },
+        "terminal": {
+          "passed": false,
+          "samples": 51,
+          "stable_fraction": 0.0,
+          "max_pose_error_rad": 0.1316235273246627
+        },
+        "pose_tolerance_rad": 0.12,
+        "max_joint_speed_rad_s": 1.0,
+        "minimum_upright_cos": 0.98,
+        "required_stable_fraction": 0.95,
+        "terminal_hold_s": 1.0,
+        "base_height_range_m": [
+          0.26,
+          0.4
+        ],
+        "minimum_foot_force_N": 4.0
+      },
+      "preparation": {
+        "end_s": 2.4,
+        "max_target_step_rad": 0.04692154070636878,
+        "max_joint_speed_rad_s": 1.6402596860303886,
+        "max_body_angular_speed_rad_s": 0.5209710355408095,
+        "limits": {
+          "max_target_step_rad": 0.08,
+          "max_joint_speed_rad_s": 3.0,
+          "max_body_angular_speed_rad_s": 1.0
+        },
+        "passed": true
+      }
+    }
+  ],
+  "metrics": {
+    "unwrapped_roll_rad": -6.275163446632069,
+    "body_x_rotation_rad": -6.237007963675047,
+    "axis_dominance": 0.7735505864424098,
+    "terminal_upright": 0.9999573605027753,
+    "airtime_s": 0.35400000000000026,
+    "expected_direction": "left",
+    "direction_pass": true,
+    "max_joint_speed_ratio": 1.0624336851834355,
+    "max_joint_limit_excess_rad": 0.08376178672610823,
+    "unexpected_body_ground_contact": true,
+    "ground_contact_rule": "foot spheres and contact points inside their own anatomical foot region",
+    "ground_contact_rule_sha256": "803b0c9f2ee2d00129fc4550e25e05accc982f07768f42218261de9fa1c9d34f",
+    "action_completed": false,
+    "fixstand": {
+      "passed": false,
+      "initial": {
+        "passed": false,
+        "samples": 36,
+        "stable_fraction": 0.7777777777777778,
+        "max_pose_error_rad": 0.1290685381058194
+      },
+      "terminal": {
+        "passed": false,
+        "samples": 51,
+        "stable_fraction": 0.0,
+        "max_pose_error_rad": 0.1316235273246627
+      },
+      "pose_tolerance_rad": 0.12,
+      "max_joint_speed_rad_s": 1.0,
+      "minimum_upright_cos": 0.98,
+      "required_stable_fraction": 0.95,
+      "terminal_hold_s": 1.0,
+      "base_height_range_m": [
+        0.26,
+        0.4
+      ],
+      "minimum_foot_force_N": 4.0
+    },
+    "preparation": {
+      "end_s": 2.4,
+      "max_target_step_rad": 0.04692154070636878,
+      "max_joint_speed_rad_s": 1.6402596860303886,
+      "max_body_angular_speed_rad_s": 0.5209710355408095,
+      "limits": {
+        "max_target_step_rad": 0.08,
+        "max_joint_speed_rad_s": 3.0,
+        "max_body_angular_speed_rad_s": 1.0
+      },
+      "passed": true
+    }
+  },
+  "policy_sha256": "d74c8e6e8c7e865ae50989a746e03ea4b2a101d5c911d098d8e0097fa55d30e3",
+  "root_state_writes": "initialization only; no root stabilization/weld/teleport during evaluation",
+  "hardware_connected": false,
+  "motor_model": "dc_linear_v1",
+  "hardware_constraints_pass": false
+}
