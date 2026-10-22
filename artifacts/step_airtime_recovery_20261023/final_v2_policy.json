@@ -1,0 +1,161 @@
+{
+  "robot": "Go2",
+  "asset_commit": "954aa61ceb62c515689677f44a21e32109f6b62d",
+  "runner_source_commit": "4960b84732b0c2ec593dccbfe963fda1bcd7b1e3",
+  "role": "real PhysX PPO training, no root stabilization force",
+  "reset_distribution": "50% standard four-foot, 50% balanced upright action-phase",
+  "command_frame": "horizontal forward is projected negative body Z when upright",
+  "target_projected_gravity": [
+    -1,
+    0,
+    0
+  ],
+  "actor_observations": 52,
+  "action_dim": 12,
+  "joint_names": [
+    "FL_hip_joint",
+    "FR_hip_joint",
+    "RL_hip_joint",
+    "RR_hip_joint",
+    "FL_thigh_joint",
+    "FR_thigh_joint",
+    "RL_thigh_joint",
+    "RR_thigh_joint",
+    "FL_calf_joint",
+    "FR_calf_joint",
+    "RL_calf_joint",
+    "RR_calf_joint"
+  ],
+  "default_joint_pos": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.8,
+    0.8,
+    1.0,
+    1.0,
+    -1.5,
+    -1.5,
+    -1.5,
+    -1.5
+  ],
+  "action_scale": 0.5,
+  "kp": 40,
+  "kd": 1,
+  "policy_hz": 50,
+  "physics_hz": 500,
+  "motor_model": "dc_linear_v1",
+  "seed": 56,
+  "reward_version": "in_place_stepping_v2",
+  "reset_std": 0.08,
+  "num_envs": 2048,
+  "requested_iterations": 200,
+  "source_sha256": {
+    "in_place.py": "212f3f82ae978aad8afaec863974184b20ec116724face227673b73ae2bafc71",
+    "evaluate_isaac.py": "8afe1e7bf4b646c09a489aa00e907b16f860985521808a0162d1cc3802409538",
+    "stationary.py": "65a9d9f4d87e1905caa78cb4b3b3b3c8765fa6a0d6cd48d68b95fc1431be8374",
+    "__init__.py": "c215378ac6bb1df62937e0b421c09fbb8fc5138026cfad8ddf1bada34ea7d803",
+    "airtime.py": "93cddad1be41fe203a1789c9ef9d763659ca6984dbd662020b3217cb3d401298",
+    "task.py": "7b949602600af366e054733dea174c80884702a0ffbc599cc9ce9cb06b2b135f",
+    "train.py": "5732400e6ee4c1c14c78f3ac928933034576ea6fee4229065f1eeb0746e6ee0a"
+  },
+  "shared_asset_source_sha256": "49aa4b92f14991c72b99ae7363412c269a9103f0f2b7f5540bf3ea9f22525eaa",
+  "hardware_connected": false,
+  "fixstand_roundtrip": {
+    "skill": "upright",
+    "objective": "standard four-foot stance -> action -> standard four-foot stance",
+    "standard_pose": {
+      "FR_hip_joint": 0.0,
+      "FR_thigh_joint": 0.8,
+      "FR_calf_joint": -1.5,
+      "FL_hip_joint": 0.0,
+      "FL_thigh_joint": 0.8,
+      "FL_calf_joint": -1.5,
+      "RR_hip_joint": 0.0,
+      "RR_thigh_joint": 1.0,
+      "RR_calf_joint": -1.5,
+      "RL_hip_joint": 0.0,
+      "RL_thigh_joint": 1.0,
+      "RL_calf_joint": -1.5
+    },
+    "terminal_hold_s": 1.0,
+    "reset_only_state_writes": true,
+    "hardware_connected": false,
+    "shared_objective_sha256": "069c44e4b7a73ad8d5b4985d1e830423f06b179577209ca298db0324fda86316",
+    "independently_validated": false,
+    "actor_observations": 52,
+    "phase_seconds": [
+      1.0,
+      5.0,
+      6.5,
+      8.0
+    ],
+    "action_parameterization": "upright_endpoint_v3",
+    "residual_limit_rad": 0.05,
+    "release_seconds": [
+      1.0,
+      1.5
+    ],
+    "recovery_seconds": [
+      5.0,
+      6.5
+    ],
+    "upright_reset_fraction": 0.5,
+    "alternating_rear_gait": true,
+    "stationary_upright": false,
+    "in_place_stepping": true,
+    "qualifying_in_place_airtime": true,
+    "in_place_airtime_weight": 60.0,
+    "gait_objective_sha256": "5288ce18076a322d6a02bf5bcd58ee49da63a3fc6801cc59612d8098a9b0a141"
+  },
+  "actor_input_dim": 52,
+  "actor_output_dim": 12,
+  "normalization": "identity",
+  "actor_observation_terms": [
+    {
+      "name": "base_lin_vel",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "base_ang_vel",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "projected_gravity",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "velocity_commands",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "joint_pos",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "joint_vel",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "actions",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "fixstand_phase",
+      "scale": null,
+      "clip": null
+    }
+  ],
+  "checkpoint_sha256": "c776c38cab4f08b1a02b3279e57334ce91edc928d4e6995e07b17f1dbcf133f6",
+  "policy_sha256": "4da0a4e95249666f6f4d2cb560182ed6fb2fb0e161c4ae7b3b6c2a49849d2959",
+  "export_verified_finite": true,
+  "capability_verified": false
+}

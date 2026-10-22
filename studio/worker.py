@@ -125,14 +125,20 @@ def main():
         for job in jobs.all():
             if job['state'] in ('running','preflight','evaluating'):
                 jobs.update(job['id'],'unknown',{'reason':'Worker restarted; inspect process metadata before taking action. Not automatically resumed.'})
-        idle=time.monotonic()
-        while time.monotonic()-idle<60:
-            job=jobs.claim()
-            if job:
-                idle=time.monotonic()
-                try:execute(jobs,job,root,args.python,args.mujoco_python)
-                except InterruptedError as e:jobs.update(job['id'],'canceled',{'reason':str(e)})
-                except Exception as e:jobs.update(job['id'],'failed',{'reason':str(e)})
-            else:time.sleep(1)
+        drain_queue(jobs,lambda job:execute(jobs,job,root,args.python,args.mujoco_python))
+
+
+def drain_queue(jobs,run,clock=time.monotonic,sleep=time.sleep,idle_seconds=60):
+    """Only time with no claimed work counts toward worker idle shutdown."""
+    idle=clock()
+    while clock()-idle<idle_seconds:
+        job=jobs.claim()
+        if job:
+            try:run(job)
+            except InterruptedError as e:jobs.update(job['id'],'canceled',{'reason':str(e)})
+            except Exception as e:jobs.update(job['id'],'failed',{'reason':str(e)})
+            # A training run can take hours; start idle timing AFTER it returns.
+            idle=clock()
+        else:sleep(1)
 
 if __name__=='__main__':main()
