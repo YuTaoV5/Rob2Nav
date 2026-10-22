@@ -7,7 +7,7 @@ import sys
 
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--kind',choices=['sideflip','backflip','upright_walk'],required=True)
+    p=argparse.ArgumentParser();p.add_argument('--kind',choices=['sideflip','backflip','upright_walk','upright_stand'],required=True)
     p.add_argument('--run',type=Path,required=True);p.add_argument('--seed-start',type=int,required=True)
     a=p.parse_args();run=a.run
     if not (run/'completion.json').is_file():raise ValueError('Training has not completed')
@@ -21,7 +21,7 @@ def main():
         else:
             cmd=['rob2nav.mujoco_skill','--kind',a.kind,'--policy',str(run/'exported/policy.pt'),'--backflip-source',source,'--seconds','8']
             if a.kind=='sideflip':cmd+=['--motion','outputs/fixstand_finetune_20261021/sideflip.npz']
-            else:cmd+=['--command','.15','0','0']
+            else:cmd+=['--command',*(['0','0','0'] if a.kind=='upright_stand' else ['.15','0','0'])]
         subprocess.run([sys.executable,'-m',*cmd,'--physics-hz','1000','--fixstand-roundtrip','--diagnostics',
             '--seed',str(seed),'--output',str(out),*(['--video'] if seed==a.seed_start else [])],check=True)
         d=json.loads((out/'summary.json').read_text());reports.append(dict(seed=seed,motion_pass=d['successes']==d['total'],

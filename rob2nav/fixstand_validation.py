@@ -2,6 +2,32 @@
 import numpy as np
 
 
+def rotation_matches(turn,direction):
+    if direction not in ('left','right','front','back'):raise ValueError('Unknown flip direction')
+    return bool(turn*(-1. if direction in ('left','back') else 1.)>4.5)
+
+
+def stationary_upright(trace):
+    """Require a quiet, loaded rear-foot hold, never forward travel or steps."""
+    hold=[x for x in trace if 2.<=x['time']<5.]
+    if len(hold)<140:return dict(passed=False,reason='insufficient 2–5 second hold coverage')
+    dt=float(np.median(np.diff([x['time'] for x in hold])))
+    good=[];longest=0.;continuous=0.;steps=[]
+    for i,x in enumerate(hold):
+        rear=all(x['foot_forces_N'][leg]>4. for leg in ('RR','RL'))
+        front=all(x['foot_forces_N'][leg]<4. for leg in ('FR','FL'))
+        step=float(np.max(abs(np.asarray(x['target'])-hold[i-1]['target']))) if i else 0.
+        steps.append(step)
+        ok=(x['upright_walk_error']<.35 and x['position'][2]>.42 and rear and front and
+            x['speed']<=.08 and x['angular_speed']<=.5 and x['max_joint_speed']<=2. and step<=.06)
+        good.append(ok);continuous=continuous+dt if ok else 0.;longest=max(longest,continuous)
+    points=np.array([x['position'][:2] for x in hold]);drift=float(np.max(np.linalg.norm(points-points[0],axis=1)))
+    fraction=float(np.mean(good));passed=fraction>=.95 and longest>=2. and drift<=.10 and max(steps)<=.06
+    return dict(passed=bool(passed),stable_fraction=fraction,longest_stable_hold_s=longest,
+                maximum_horizontal_drift_m=drift,max_target_step_rad=max(steps),required_hold_s=2.,
+                hold_window_s=[2.,5.],maximum_drift_m=.10)
+
+
 def walking_action(trace):
     """Require loaded rear-foot lift/landing cycles, not merely body displacement."""
     active=[x for x in trace if 1.<=x['time']<5. and x['upright_walk_error']<.45 and x['position'][2]>.42]

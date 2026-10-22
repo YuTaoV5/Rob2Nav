@@ -19,14 +19,17 @@ p.add_argument('--endpoint-residual',action='store_true')
 p.add_argument('--endpoint-residual-limit',type=float,default=.2)
 p.add_argument('--upright-reset-fraction',type=float,default=0.)
 p.add_argument('--alternating-rear-gait',action='store_true')
+p.add_argument('--stationary-upright',action='store_true')
 p.add_argument('--finetune-learning-rate',type=float)
 AppLauncher.add_app_launcher_args(p)
 args = p.parse_args()
-if args.endpoint_residual and not (args.fixstand_roundtrip and args.stepping_gait):
-    p.error('--endpoint-residual requires --fixstand-roundtrip and --stepping-gait')
+if args.endpoint_residual and not (args.fixstand_roundtrip and (args.stepping_gait or args.stationary_upright)):
+    p.error('--endpoint-residual requires FIXSTAND with stepping gait or stationary upright')
 if not .01<=args.endpoint_residual_limit<=.2 or (args.endpoint_residual_limit!=.2 and not args.endpoint_residual):
     p.error('--endpoint-residual-limit requires endpoint residual and a value in [0.01, 0.2]')
 if args.stepping_gait and not args.transfer_motors:p.error('--stepping-gait requires --transfer-motors')
+if args.stationary_upright and (not args.transfer_motors or not args.fixstand_roundtrip or args.stepping_gait or args.alternating_rear_gait):
+    p.error('Stationary upright requires transfer motors and FIXSTAND, without walking rewards')
 if args.alternating_rear_gait and not (args.stepping_gait and args.fixstand_roundtrip):p.error('Rear alternation requires stepping FIXSTAND')
 if args.finetune_learning_rate is not None and not 0.<args.finetune_learning_rate<=.001:p.error('Invalid learning rate')
 if args.reset_std is not None and not .01<=args.reset_std<=1.:p.error('--reset-std must be in [0.01,1]')
@@ -61,6 +64,9 @@ def main():
     if args.alternating_rear_gait:
         from skills.gait_objectives import configure_rear_alternation
         configure_rear_alternation(cfg)
+    if args.stationary_upright:
+        from .stationary import configure
+        configure(cfg,source)
     agent = BasePPORunnerCfg()
     agent.seed,agent.device = args.seed,cfg.sim.device
     agent.max_iterations,agent.save_interval = args.iterations,100
@@ -76,6 +82,7 @@ def main():
             action_parameterization=('upright_endpoint_v2' if args.endpoint_residual_limit==.2 else 'upright_endpoint_v3') if args.endpoint_residual else 'joint_offset_v1',
             residual_limit_rad=args.endpoint_residual_limit,release_seconds=[1.,1.5],recovery_seconds=[5.,6.5],
             upright_reset_fraction=args.upright_reset_fraction,alternating_rear_gait=args.alternating_rear_gait,
+            stationary_upright=args.stationary_upright,
             gait_objective_sha256=sha(Path(__file__).parents[1]/'gait_objectives.py') if args.alternating_rear_gait else None)
     dump_yaml(str(args.output/'env.yaml'),cfg)
     dump_yaml(str(args.output/'agent.yaml'),agent)
@@ -92,7 +99,7 @@ def main():
             joint_names=env.scene['robot'].joint_names,default_joint_pos=env.scene['robot'].data.default_joint_pos[0].tolist(),
             action_scale=.5,kp=40,kd=1,policy_hz=round(1/(cfg.sim.dt*cfg.decimation)),physics_hz=round(1/cfg.sim.dt),
             motor_model='dc_linear_v1' if args.transfer_motors else 'ideal_pd',seed=args.seed,
-            reward_version='stepping_v1' if args.stepping_gait else 'upright_velocity_v1',reset_std=args.reset_std,
+            reward_version='stationary_upright_v1' if args.stationary_upright else 'stepping_v1' if args.stepping_gait else 'upright_velocity_v1',reset_std=args.reset_std,
             num_envs=args.num_envs,requested_iterations=args.iterations,
             source_sha256={f.name:sha(f) for f in Path(__file__).parent.glob('*.py')},
             shared_asset_source_sha256=sha(Path(__file__).parents[1]/'sideflip'/'common.py'),hardware_connected=False))

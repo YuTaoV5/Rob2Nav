@@ -40,7 +40,7 @@ def motor_torque(target,q,dq,effort,velocity_limit,motor_model='ideal_pd'):
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument('--kind',choices=['sideflip','upright_walk'],required=True)
+    p.add_argument('--kind',choices=['sideflip','upright_walk','upright_stand'],required=True)
     p.add_argument('--policy',required=True,type=Path)
     p.add_argument('--backflip-source',required=True,type=Path)
     p.add_argument('--motion',type=Path)
@@ -56,6 +56,7 @@ def main():
         help='reference_state is an explicit training-reset parity diagnostic, not standing-start acceptance')
     p.add_argument('--output',required=True,type=Path)
     args=p.parse_args()
+    if args.kind=='upright_stand' and any(args.command):raise ValueError('Stationary upright requires --command 0 0 0')
     if not 0<args.seconds<=60:
         raise ValueError('Expected a finite duration in (0,60] seconds')
     meta=json.loads(args.policy.with_suffix('.json').read_text())
@@ -271,6 +272,12 @@ def main():
             all(x['upright']>.90 and x['position'][2]>.22 and x['speed']<.25 and x['angular_speed']<1. for x in last_window))
         metrics=dict(unwrapped_roll_rad=turn,body_x_rotation_rad=signed_x_rotation,axis_dominance=axis_dominance,
             terminal_upright=trace[-1]['upright'],airtime_s=max_airtime)
+        if meta.get('sideflip_direction') is not None:
+            from .fixstand_validation import rotation_matches
+            direction=meta['sideflip_direction']
+            if direction not in ('left','right'):raise ValueError('Sideflip direction must be left or right')
+            metrics.update(expected_direction=direction,direction_pass=rotation_matches(signed_x_rotation,direction))
+            success=bool(success and metrics['direction_pass'])
     else:
         duration=sum(x['upright_walk_error']<.45 and x['position'][2]>.42 for x in trace)*.02
         distance=float(np.linalg.norm(np.array(trace[-1]['position'][:2])-trace[0]['position'][:2]))
@@ -289,6 +296,10 @@ def main():
             from .fixstand_validation import walking_action
             metrics['walking']=walking_action(trace)
             success=bool(metrics['walking']['passed'] and not bad_floor_contact)
+        elif args.kind=='upright_stand':
+            from .fixstand_validation import stationary_upright
+            metrics['standing']=stationary_upright(trace)
+            success=bool(metrics['standing']['passed'] and not bad_floor_contact)
         metrics['action_completed']=bool(success)
         metrics['fixstand']=endpoints;success=bool(success and endpoints['passed'])
     if args.kind=='sideflip':

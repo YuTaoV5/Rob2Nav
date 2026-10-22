@@ -318,11 +318,11 @@
         "unitree_mimic_go2",
         "go2_backflip_native"
       ],
-      "description": "旧权重起立后滑移，无双后足真实承重周期。当前从更好的v3重训，加入RR/RL交替承重与足端离地目标；不使用Go1权重冒充Go2验证。",
+      "description": "按用户最新目标停止直立行走v5，保留检查点。正在独立训练原地双后足直立static v1，速度指令全零、无迈步奖励；当前旧演示仍未验收，不能当作原地直立成功。",
       "acceptance": "四足自行起立；真实后足交替离地和落地，保持姿态并前进；禁止用滑移代替迈步。实机仅方案。",
       "recipe": "upright_walk_ppo",
       "training_entry": "manual",
-      "local_status": "无真实承重迈步；v5交替步态重训中",
+      "local_status": "行走训练已停止；当前训练原地直立",
       "evidence": {
         "prefixes": [
           "outputs/upright_walk_",
