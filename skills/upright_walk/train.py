@@ -20,9 +20,12 @@ p.add_argument('--endpoint-residual-limit',type=float,default=.2)
 p.add_argument('--upright-reset-fraction',type=float,default=0.)
 p.add_argument('--alternating-rear-gait',action='store_true')
 p.add_argument('--stationary-upright',action='store_true')
+p.add_argument('--in-place-stepping',action='store_true')
 p.add_argument('--finetune-learning-rate',type=float)
 AppLauncher.add_app_launcher_args(p)
 args = p.parse_args()
+if args.in_place_stepping and not (args.transfer_motors and args.fixstand_roundtrip and args.stepping_gait and args.alternating_rear_gait and not args.stationary_upright):
+    p.error('In-place stepping requires transfer motors, FIXSTAND and rear alternation, without static balance')
 if args.endpoint_residual and not (args.fixstand_roundtrip and (args.stepping_gait or args.stationary_upright)):
     p.error('--endpoint-residual requires FIXSTAND with stepping gait or stationary upright')
 if not .01<=args.endpoint_residual_limit<=.2 or (args.endpoint_residual_limit!=.2 and not args.endpoint_residual):
@@ -67,6 +70,9 @@ def main():
     if args.stationary_upright:
         from .stationary import configure
         configure(cfg,source)
+    if args.in_place_stepping:
+        from .in_place import configure
+        configure(cfg)
     agent = BasePPORunnerCfg()
     agent.seed,agent.device = args.seed,cfg.sim.device
     agent.max_iterations,agent.save_interval = args.iterations,100
@@ -83,6 +89,7 @@ def main():
             residual_limit_rad=args.endpoint_residual_limit,release_seconds=[1.,1.5],recovery_seconds=[5.,6.5],
             upright_reset_fraction=args.upright_reset_fraction,alternating_rear_gait=args.alternating_rear_gait,
             stationary_upright=args.stationary_upright,
+            in_place_stepping=args.in_place_stepping,
             gait_objective_sha256=sha(Path(__file__).parents[1]/'gait_objectives.py') if args.alternating_rear_gait else None)
     dump_yaml(str(args.output/'env.yaml'),cfg)
     dump_yaml(str(args.output/'agent.yaml'),agent)
@@ -99,7 +106,7 @@ def main():
             joint_names=env.scene['robot'].joint_names,default_joint_pos=env.scene['robot'].data.default_joint_pos[0].tolist(),
             action_scale=.5,kp=40,kd=1,policy_hz=round(1/(cfg.sim.dt*cfg.decimation)),physics_hz=round(1/cfg.sim.dt),
             motor_model='dc_linear_v1' if args.transfer_motors else 'ideal_pd',seed=args.seed,
-            reward_version='stationary_upright_v1' if args.stationary_upright else 'stepping_v1' if args.stepping_gait else 'upright_velocity_v1',reset_std=args.reset_std,
+            reward_version='in_place_stepping_v1' if args.in_place_stepping else 'stationary_upright_v1' if args.stationary_upright else 'stepping_v1' if args.stepping_gait else 'upright_velocity_v1',reset_std=args.reset_std,
             num_envs=args.num_envs,requested_iterations=args.iterations,
             source_sha256={f.name:sha(f) for f in Path(__file__).parent.glob('*.py')},
             shared_asset_source_sha256=sha(Path(__file__).parents[1]/'sideflip'/'common.py'),hardware_connected=False))

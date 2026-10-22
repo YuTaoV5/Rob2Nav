@@ -187,7 +187,7 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
         errors=[];warnings=[]
         output=root/'outputs/studio/runs/PREVIEW'
         from .upstreams import pie_python
-        manual=config.task=='train' and config.recipe_id in ('navigation_ppo','sideflip_native_ppo','upright_walk_ppo','backflip_native_ppo')
+        manual=config.task=='train' and config.recipe_id in ('navigation_ppo','sideflip_native_ppo','upright_walk_ppo','backflip_native_ppo','frontflip_native_ppo')
         runtime=pie_python(root) if config.task=='simulation' and config.simulation_policy=='pie' else mujoco_python if (config.task=='simulation' and config.simulation_policy!='checkpoint') or config.recipe_id=='navigation_ppo' else sim_python
         try:cmd=simulation_command(config,root,output,runtime) if config.task=='simulation' else command(config,root,output,root/'outputs/studio/PREVIEW.json',sim_python,mujoco_python)
         except ValueError as e:cmd=[];errors.append(str(e))

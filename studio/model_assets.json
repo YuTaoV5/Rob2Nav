@@ -725,7 +725,7 @@
     {
       "skill": "backflip",
       "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/model_1999.pt",
-      "role": "selected",
+      "role": "archive",
       "selection_basis": "开源6000_actor精确初始化后本服务器2000更新；本轮独立完整验收4/4",
       "validation": "后翻v7：独立四种子完整动作、首尾FIXSTAND与URDF速度/限位4/4；无机身触地，最大速度比0.7722–0.7888。仅单技能仿真；实机未验证，统一热切换严格1/4，未通过。",
       "sha256": "7d16e73e5826149f19e50b00b5f1e77accbcdae09bbcd4bfe36d3e18992fa971",
@@ -776,7 +776,7 @@
     {
       "skill": "backflip",
       "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/exported/policy.onnx",
-      "role": "selected",
+      "role": "archive",
       "selection_basis": "开源6000_actor精确初始化后本服务器2000更新；本轮独立完整验收4/4",
       "validation": "后翻v7：独立四种子完整动作、首尾FIXSTAND与URDF速度/限位4/4；无机身触地，最大速度比0.7722–0.7888。仅单技能仿真；实机未验证，统一热切换严格1/4，未通过。",
       "sha256": "73a56f68c90b1164346f6dce812e769e668b376f610c8984b869858ec495935b",
@@ -827,7 +827,7 @@
     {
       "skill": "backflip",
       "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/exported/policy.pt",
-      "role": "selected",
+      "role": "archive",
       "selection_basis": "开源6000_actor精确初始化后本服务器2000更新；本轮独立完整验收4/4",
       "validation": "后翻v7：独立四种子完整动作、首尾FIXSTAND与URDF速度/限位4/4；无机身触地，最大速度比0.7722–0.7888。仅单技能仿真；实机未验证，统一热切换严格1/4，未通过。",
       "sha256": "69f7dffa7d296bf70a6c79c8a5ac613e70df31c0cd435be1957f2ec9e4c4c12a",
@@ -872,6 +872,159 @@
         {
           "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/seed_12403/summary.json",
           "label": "summary.json"
+        }
+      ]
+    },
+    {
+      "skill": "backflip",
+      "path": "artifacts/backflip_v8_2200_verified_20261022/model_2200.pt",
+      "role": "selected",
+      "selection_basis": "既有v8训练中期保存点，经预先固定抽样筛选，再做新独立种子与连续流程验收；非全局最优",
+      "validation": "后翻v8 model2200：既有训练中期权重，本轮独立单技能4/4、连续流程四朝向4/4；无机身触地、首尾稳定，1000Hz关节约束通过，全流程最大参考步长约0.027rad。仅仿真；实机未验证。",
+      "sha256": "bf218a18e0fc6aa44534f7b32a20aae742ad9da2795af1bab034147451ed0bb1",
+      "bytes": 5376949,
+      "resources": [
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/provenance.json",
+          "label": "provenance.json",
+          "sha256": "38c4184e7c40f280ae76b0786e0d03050f35ba7e20e51a3bec74472e6279d3c6"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/fixstand.json",
+          "label": "fixstand.json",
+          "sha256": "2172ab06b41f7a5f44ad447a280441f87be5c78f39ecdf0f775ddef2ee26175d"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/params/env.yaml",
+          "label": "env.yaml",
+          "sha256": "684bd2af6c7f2854a1baaca50fae903e68264305ffdd43738008b15c6075c5ce"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/params/agent.yaml",
+          "label": "agent.yaml",
+          "sha256": "ce0c5e0db8a15250c6fb7c5b3a45a6a28020e1e7f4b58d4af3f267fe4cb33a70"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/exported/export.json",
+          "label": "export.json",
+          "sha256": "932fdad9881bfa5aa0b77fa42565d617495f1e18d44bb6d4cb41aefb6e925a80"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/native/evaluation.json",
+          "label": "evaluation.json",
+          "sha256": "e4d52119077377155ad628d99fbe68701cd3bec64ba935b00665350184b72698"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/unified/evaluation.json",
+          "label": "evaluation.json",
+          "sha256": "07b9e693773f5c3a2f050b960f69232d3b0a5ba15bf488c86c0db9bdd9073edb"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/unified/executed_core.py",
+          "label": "executed_core.py",
+          "sha256": "37b60e3c008a27332469d3938e689da9e206f02df04c770fd653bb30f358acc7"
+        }
+      ]
+    },
+    {
+      "skill": "backflip",
+      "path": "artifacts/backflip_v8_2200_verified_20261022/exported/policy.pt",
+      "role": "selected",
+      "selection_basis": "既有v8训练中期保存点，经预先固定抽样筛选，再做新独立种子与连续流程验收；非全局最优",
+      "validation": "后翻v8 model2200：既有训练中期权重，本轮独立单技能4/4、连续流程四朝向4/4；无机身触地、首尾稳定，1000Hz关节约束通过，全流程最大参考步长约0.027rad。仅仿真；实机未验证。",
+      "sha256": "d2f6ca25e67eee02f3f2a8ee3a73568c0c210ed929e13f552054861e06d3e2c9",
+      "bytes": 798874,
+      "resources": [
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/provenance.json",
+          "label": "provenance.json",
+          "sha256": "38c4184e7c40f280ae76b0786e0d03050f35ba7e20e51a3bec74472e6279d3c6"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/fixstand.json",
+          "label": "fixstand.json",
+          "sha256": "2172ab06b41f7a5f44ad447a280441f87be5c78f39ecdf0f775ddef2ee26175d"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/params/env.yaml",
+          "label": "env.yaml",
+          "sha256": "684bd2af6c7f2854a1baaca50fae903e68264305ffdd43738008b15c6075c5ce"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/params/agent.yaml",
+          "label": "agent.yaml",
+          "sha256": "ce0c5e0db8a15250c6fb7c5b3a45a6a28020e1e7f4b58d4af3f267fe4cb33a70"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/exported/export.json",
+          "label": "export.json",
+          "sha256": "932fdad9881bfa5aa0b77fa42565d617495f1e18d44bb6d4cb41aefb6e925a80"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/native/evaluation.json",
+          "label": "evaluation.json",
+          "sha256": "e4d52119077377155ad628d99fbe68701cd3bec64ba935b00665350184b72698"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/unified/evaluation.json",
+          "label": "evaluation.json",
+          "sha256": "07b9e693773f5c3a2f050b960f69232d3b0a5ba15bf488c86c0db9bdd9073edb"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/unified/executed_core.py",
+          "label": "executed_core.py",
+          "sha256": "37b60e3c008a27332469d3938e689da9e206f02df04c770fd653bb30f358acc7"
+        }
+      ]
+    },
+    {
+      "skill": "backflip",
+      "path": "artifacts/backflip_v8_2200_verified_20261022/exported/policy.onnx",
+      "role": "selected",
+      "selection_basis": "既有v8训练中期保存点，经预先固定抽样筛选，再做新独立种子与连续流程验收；非全局最优",
+      "validation": "后翻v8 model2200：既有训练中期权重，本轮独立单技能4/4、连续流程四朝向4/4；无机身触地、首尾稳定，1000Hz关节约束通过，全流程最大参考步长约0.027rad。仅仿真；实机未验证。",
+      "sha256": "c8adf96a70cdb9e68f7aa7fe02271ae36908b6c8ab29ad967d03c73a58eaa82d",
+      "bytes": 788939,
+      "resources": [
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/provenance.json",
+          "label": "provenance.json",
+          "sha256": "38c4184e7c40f280ae76b0786e0d03050f35ba7e20e51a3bec74472e6279d3c6"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/fixstand.json",
+          "label": "fixstand.json",
+          "sha256": "2172ab06b41f7a5f44ad447a280441f87be5c78f39ecdf0f775ddef2ee26175d"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/params/env.yaml",
+          "label": "env.yaml",
+          "sha256": "684bd2af6c7f2854a1baaca50fae903e68264305ffdd43738008b15c6075c5ce"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/params/agent.yaml",
+          "label": "agent.yaml",
+          "sha256": "ce0c5e0db8a15250c6fb7c5b3a45a6a28020e1e7f4b58d4af3f267fe4cb33a70"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/exported/export.json",
+          "label": "export.json",
+          "sha256": "932fdad9881bfa5aa0b77fa42565d617495f1e18d44bb6d4cb41aefb6e925a80"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/native/evaluation.json",
+          "label": "evaluation.json",
+          "sha256": "e4d52119077377155ad628d99fbe68701cd3bec64ba935b00665350184b72698"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/unified/evaluation.json",
+          "label": "evaluation.json",
+          "sha256": "07b9e693773f5c3a2f050b960f69232d3b0a5ba15bf488c86c0db9bdd9073edb"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/unified/executed_core.py",
+          "label": "executed_core.py",
+          "sha256": "37b60e3c008a27332469d3938e689da9e206f02df04c770fd653bb30f358acc7"
         }
       ]
     }

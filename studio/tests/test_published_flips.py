@@ -7,7 +7,7 @@ from studio.published_flips import live_flip
 ROOT=Path(__file__).resolve().parents[2]
 
 
-@pytest.mark.parametrize('skill,version,seconds',[('sideflip','peak_pose_v8','8'),('backflip','upstream_actor_v7','5')])
+@pytest.mark.parametrize('skill,version,seconds',[('sideflip','peak_pose_v8','8'),('backflip','backflip_v8_2200_verified_20261022','5')])
 def test_published_contract_and_native_launch(skill,version,seconds):
     module,args,policy,note=live_flip(ROOT,skill,Path('/pinned/source'))
     assert version in str(policy)
@@ -26,7 +26,7 @@ def test_published_contract_and_native_launch(skill,version,seconds):
         assert module=='skills.backflip.simulate'
         assert metadata['entry_training_contract_verified']
         assert metadata['control_contract']['action_clip']==8
-        assert metadata['fixstand_roundtrip']['entry_hold_scale']==.1
+        assert metadata['fixstand_roundtrip']['entry_hold_scale']==.15
 
 
 def test_published_resources_fail_closed_on_mismatch(tmp_path):
@@ -43,6 +43,6 @@ def test_catalog_selects_current_candidates_only():
     for skill in ('sideflip','backflip'):
         rows=[m for m in data['models'] if m['skill']==skill and m['role']=='selected']
         assert rows
-        assert all(('fixstand_best_flips_20261022' if skill=='sideflip' else 'backflip_v7_verified_20261022') in m['path'] for m in rows)
+        assert all(('fixstand_best_flips_20261022' if skill=='sideflip' else 'backflip_v8_2200_verified_20261022') in m['path'] for m in rows)
         assert all(('0/4' if skill=='sideflip' else '4/4') in m['validation'] for m in rows)
         assert all((ROOT/r['path']).is_file() for m in rows for r in m['resources'])

@@ -243,12 +243,14 @@
       "projects": [
         "go2_backflip_native"
       ],
-      "description": "开源6000_actor精确初始化后本服务器完成v7训练。独立12400–12403完成整周翻转、无机身触地，首尾FIXSTAND及URDF速度/限位联合4/4；当前网站演示v7，统一连续热切换严格1/4，未通过，实机未验证。",
+      "description": "后翻v8 model2200：既有训练中期权重，本轮独立单技能4/4、连续流程四朝向4/4；无机身触地、首尾稳定，1000Hz关节约束通过，全流程最大参考步长约0.027rad。仅仿真；实机未验证。",
       "acceptance": "本次训练模型需独立完成完整俯仰翻转、稳定落地、多条件重复及关节/力矩/速度约束；实机仅方案。",
       "recipe": "backflip_native_ppo",
-      "local_status": "v7单技能完整验收4/4；统一热切换严格1/4，未通过",
+      "local_status": "单技能4/4；连续四朝向4/4；全程参考连续性已复验；仅仿真",
       "evidence": {
         "prefixes": [
+          "artifacts/backflip_v8_2200_verified_20261022/native",
+          "artifacts/backflip_v8_2200_verified_20261022/unified",
           "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022",
           "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022"
         ],
@@ -256,12 +258,23 @@
       },
       "curated_media": [
         {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/native/seed_14300/episode_0.mp4",
+          "title": "后翻v8 model2200 · 完整翻转与首尾稳定",
+          "label": "后翻v8 model2200：既有训练中期权重，本轮独立单技能4/4、连续流程四朝向4/4；无机身触地、首尾稳定，1000Hz关节约束通过，全流程最大参考步长约0.027rad。仅仿真；实机未验证。"
+        },
+        {
+          "path": "artifacts/backflip_v8_2200_verified_20261022/unified/seed_14700/switches.mp4",
+          "title": "后翻连续流程 · 站立—行走—后翻—行走—站立",
+          "label": "后翻v8 model2200：既有训练中期权重，本轮独立单技能4/4、连续流程四朝向4/4；无机身触地、首尾稳定，1000Hz关节约束通过，全流程最大参考步长约0.027rad。仅仿真；实机未验证。"
+        },
+        {
           "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/seed_12400/episode_0.mp4",
           "title": "后翻v7 · 完整动作与首尾FIXSTAND · seed12400",
           "label": "后翻v7：独立四种子完整动作、首尾FIXSTAND与URDF速度/限位4/4；无机身触地，最大速度比0.7722–0.7888。仅单技能仿真；实机未验证，统一热切换严格1/4，未通过。"
         }
       ],
-      "training_entry": "manual"
+      "training_entry": "manual",
+      "preferred_video": "artifacts/backflip_v8_2200_verified_20261022/native/seed_14300/episode_0.mp4"
     },
     {
       "id": "sideflip",
@@ -330,6 +343,23 @@
         ],
         "kinds": []
       }
+    },
+    {
+      "id": "frontflip",
+      "name": "前空翻",
+      "category": "敏捷技能",
+      "projects": [
+        "go2_backflip_native"
+      ],
+      "description": "独立正俯仰整周前翻；训练候选须从四足稳定起止独立验证。",
+      "acceptance": "正俯仰整周、无机身触地、URDF速度与限位、动作连续性及首尾站姿联合通过。",
+      "recipe": "frontflip_native_ppo",
+      "local_status": "候选未通过完整验收",
+      "evidence": {
+        "prefixes": [],
+        "kinds": []
+      },
+      "training_entry": "manual"
     }
   ],
   "recipes": [
@@ -606,8 +636,22 @@
         "iterations": 5000,
         "seed": 43,
         "recipe_options": {
+          "fixstand_roundtrip": false,
+          "finetune_learning_rate": 0.0,
+          "motion": "",
+          "boundary_residual": false,
+          "boundary_residual_limit": 0.05,
+          "boundary_bridge_limit": 0.0,
+          "boundary_terminal_hip_taper_frames": 0,
+          "boundary_blend_frames": 0,
+          "quiet_preparation": false,
+          "peak_endpoint_objective": false,
+          "landing_constraints": false,
+          "substep_objective": false,
+          "reset_std": 0.0,
           "device": "cuda:0",
-          "transfer_motors": false
+          "transfer_motors": false,
+          "sideflip_direction": "left"
         },
         "auto_evaluate": false
       },
@@ -617,17 +661,148 @@
         "--headless",
         "--device cuda:0"
       ],
-      "note": "专用训练器已接入Studio。已归档的侧空翻动作8/8与关节速度未通过仅适用于对应固定权重；新任务须独立验证。",
+      "note": "专用训练器已接入Studio。已归档的侧空翻动作8/8与关节速度未通过仅适用于对应固定权重；新任务须独立验证。 稳定性参数可在创建实验中配置；烟测也必须经网页提交。训练产物不自动替换工作台已发布技能。",
       "workflow": [
         "锁定两个上游提交并准备参考动作NPZ",
         "先用32环境×2轮做接口检查",
         "训练5000轮或从已核对检查点继续",
         "核对completion.json与模型，再做独立MuJoCo验证"
-      ]
+      ],
+      "option_schema": {
+        "fixstand_roundtrip": {
+          "label": "四足稳定起止",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "finetune_learning_rate": {
+          "label": "微调学习率（0沿用训练器）",
+          "default": 0.0,
+          "min": 0.0,
+          "max": 0.001,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "motion": {
+          "label": "项目内参考动作NPZ（空白使用原参考）",
+          "default": "",
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "string",
+          "step": "any"
+        },
+        "boundary_residual": {
+          "label": "边界残差控制",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "boundary_residual_limit": {
+          "label": "边界残差上限 rad",
+          "default": 0.05,
+          "min": 0.01,
+          "max": 0.3,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "boundary_bridge_limit": {
+          "label": "衔接残差上限（0沿用训练器）",
+          "default": 0.0,
+          "min": 0.0,
+          "max": 0.3,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "boundary_terminal_hip_taper_frames": {
+          "label": "末段髋关节渐收帧数",
+          "default": 0,
+          "min": 0,
+          "max": 50,
+          "choices": null,
+          "type": "number",
+          "step": 1
+        },
+        "boundary_blend_frames": {
+          "label": "边界连续混合帧数",
+          "default": 0,
+          "min": 0,
+          "max": 20,
+          "choices": null,
+          "type": "number",
+          "step": 1
+        },
+        "quiet_preparation": {
+          "label": "准备段消抖",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "peak_endpoint_objective": {
+          "label": "起止峰值约束",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "landing_constraints": {
+          "label": "落地约束",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "substep_objective": {
+          "label": "逐物理子步峰值约束",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "reset_std": {
+          "label": "重设策略噪声（0保留）",
+          "default": 0.0,
+          "min": 0.0,
+          "max": 1.0,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "sideflip_direction": {
+          "label": "侧翻方向",
+          "default": "left",
+          "min": null,
+          "max": null,
+          "choices": [
+            "left",
+            "right"
+          ],
+          "type": "string",
+          "step": "any"
+        }
+      }
     },
     {
       "id": "upright_walk_ppo",
-      "name": "Go2站立行走 · 起立与双足PPO",
+      "name": "Go2站立踏步 / 静态直立 · 动平衡PPO",
       "project": "unitree_mimic_go2",
       "adapter": "robogauge",
       "algorithm": "upright_velocity_ppo",
@@ -653,6 +828,16 @@
         "iterations": 5000,
         "seed": 44,
         "recipe_options": {
+          "fixstand_roundtrip": false,
+          "finetune_learning_rate": 0.0,
+          "stepping_gait": false,
+          "alternating_rear_gait": false,
+          "stationary_upright": false,
+          "in_place_stepping": false,
+          "endpoint_residual": false,
+          "endpoint_residual_limit": 0.2,
+          "upright_reset_fraction": 0.0,
+          "reset_std": 0.0,
           "device": "cuda:0",
           "transfer_motors": false
         },
@@ -664,17 +849,109 @@
         "--headless",
         "--device cuda:0"
       ],
-      "note": "专用训练器已接入Studio。已有起立前移记录仍有滑移；新任务须从四足起步独立验证。",
+      "note": "专用训练器已接入Studio。已有起立前移记录仍有滑移；新任务须从四足起步独立验证。 稳定性参数可在创建实验中配置；烟测也必须经网页提交。训练产物不自动替换工作台已发布技能。",
       "workflow": [
         "核对上游源码和Go2资产",
         "先运行32环境×2轮接口检查",
         "训练4096环境×5000轮",
         "从四足起步做独立MuJoCo起立行走评估"
-      ]
+      ],
+      "option_schema": {
+        "fixstand_roundtrip": {
+          "label": "四足稳定起止",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "finetune_learning_rate": {
+          "label": "微调学习率（0沿用训练器）",
+          "default": 0.0,
+          "min": 0.0,
+          "max": 0.001,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "stepping_gait": {
+          "label": "踏步动平衡奖励",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "alternating_rear_gait": {
+          "label": "后足交替踏步",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "stationary_upright": {
+          "label": "静态直立（与踏步互斥）",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "in_place_stepping": {
+          "label": "原地踏步（零位移指令）",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "endpoint_residual": {
+          "label": "起止残差控制",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "endpoint_residual_limit": {
+          "label": "起止残差上限 rad",
+          "default": 0.2,
+          "min": 0.01,
+          "max": 0.2,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "upright_reset_fraction": {
+          "label": "直立阶段初始化比例",
+          "default": 0.0,
+          "min": 0.0,
+          "max": 0.5,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "reset_std": {
+          "label": "重设策略噪声（0保留）",
+          "default": 0.0,
+          "min": 0.0,
+          "max": 1.0,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        }
+      }
     },
     {
       "id": "backflip_native_ppo",
-      "name": "Go2 · 原生后空翻PPO",
+      "name": "Go2后空翻 · 续训与稳定起止PPO",
       "project": "go2_backflip_native",
       "adapter": "robogauge",
       "algorithm": "backflip_ppo",
@@ -700,7 +977,20 @@
         "iterations": 5000,
         "seed": 1,
         "recipe_options": {
-          "device": "cuda:0"
+          "fixstand_roundtrip": false,
+          "finetune_learning_rate": 0.0,
+          "flip_direction": "back",
+          "delayed_entry": false,
+          "entry_hold_scale": 0.4,
+          "urdf_speed_limits": false,
+          "fast_safety_curriculum": false,
+          "safety_start": -1.0,
+          "initial_std": 0.0,
+          "reset_optimizer": false,
+          "min_action_std": 0.0,
+          "max_action_std": 0.0,
+          "device": "cuda:0",
+          "peak_contact_forces": false
         },
         "auto_evaluate": false
       },
@@ -710,13 +1000,314 @@
         "--headless",
         "--device cuda:0"
       ],
-      "note": "专用训练器已接入Studio。既有动作通过记录仍有关键关节约束问题；新任务须独立验证。",
+      "note": "专用训练器已接入Studio。既有动作通过记录仍有关键关节约束问题；新任务须独立验证。 稳定性参数可在创建实验中配置；烟测也必须经网页提交。训练产物不自动替换工作台已发布技能。",
       "workflow": [
         "锁定GO2_backflip的PPO-backflip提交",
         "先运行32环境×2轮接口检查",
         "执行4096环境×5000轮训练",
-        "核对上游日志和检查点，导出后独立仿真"
-      ]
+        "核对模型与完成记录，按所选前/后方向独立验收；前翻不可当作后翻发布"
+      ],
+      "option_schema": {
+        "fixstand_roundtrip": {
+          "label": "四足稳定起止",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "finetune_learning_rate": {
+          "label": "微调学习率（0沿用训练器）",
+          "default": 0.0,
+          "min": 0.0,
+          "max": 0.001,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "flip_direction": {
+          "label": "空翻方向",
+          "default": "back",
+          "min": null,
+          "max": null,
+          "choices": [
+            "back"
+          ],
+          "type": "string",
+          "step": "any"
+        },
+        "delayed_entry": {
+          "label": "稳定承重后进入动作",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "entry_hold_scale": {
+          "label": "入口残差幅度",
+          "default": 0.4,
+          "min": 0.0,
+          "max": 0.4,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "urdf_speed_limits": {
+          "label": "URDF关节速度约束",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "fast_safety_curriculum": {
+          "label": "快速约束课程",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "safety_start": {
+          "label": "约束课程起点（-1沿用）",
+          "default": -1.0,
+          "min": -1.0,
+          "max": 1.0,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "initial_std": {
+          "label": "初始策略噪声（0沿用）",
+          "default": 0.0,
+          "min": 0.0,
+          "max": 1.0,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "reset_optimizer": {
+          "label": "续训重置优化器",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "min_action_std": {
+          "label": "策略噪声下限（0沿用）",
+          "default": 0.0,
+          "min": 0.0,
+          "max": 1.0,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "max_action_std": {
+          "label": "策略噪声上限（0沿用）",
+          "default": 0.0,
+          "min": 0.0,
+          "max": 1.0,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "peak_contact_forces": {
+          "label": "物理子步接触峰值",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        }
+      }
+    },
+    {
+      "id": "frontflip_native_ppo",
+      "name": "Go2前空翻 · 独立正俯仰PPO",
+      "project": "go2_backflip_native",
+      "adapter": "robogauge",
+      "algorithm": "backflip_ppo",
+      "robot": "go2",
+      "execution": "manual_cli",
+      "manual_url": "#reports?path=skills%2Ffrontflip%2FTRAINING.md",
+      "capabilities": [
+        "frontflip"
+      ],
+      "runtime": "IsaacSim5.1 / IsaacLab2.3 / MuJoCo3.2.3",
+      "blocker": "提交前需通过依赖预检；训练完成后仍需按手册独立评估。",
+      "observation": "60维actor、165维特权critic；由固定原生源码定义，不复用69维LSD接口",
+      "action": "12关节偏移；50Hz控制与原生Go2资产；正俯仰方向，完整动作尚未通过。",
+      "defaults": {
+        "recipe_id": "frontflip_native_ppo",
+        "capability_id": "frontflip",
+        "adapter": "robogauge",
+        "algorithm_id": "backflip_ppo",
+        "robot_id": "go2",
+        "initialization": "base",
+        "checkpoint": "",
+        "num_envs": 4096,
+        "iterations": 5000,
+        "seed": 49,
+        "recipe_options": {
+          "fixstand_roundtrip": true,
+          "finetune_learning_rate": 0.0,
+          "flip_direction": "front",
+          "delayed_entry": true,
+          "entry_hold_scale": 0.4,
+          "urdf_speed_limits": true,
+          "fast_safety_curriculum": false,
+          "safety_start": -1.0,
+          "initial_std": 0.0,
+          "reset_optimizer": false,
+          "min_action_std": 0.0,
+          "max_action_std": 0.0,
+          "device": "cuda:0",
+          "peak_contact_forces": true
+        },
+        "auto_evaluate": false
+      },
+      "parameters": [
+        "--num-envs 4096",
+        "--iterations 5000",
+        "--headless",
+        "--device cuda:0"
+      ],
+      "note": "独立正俯仰训练任务；无已验收权重。 稳定性参数可在创建实验中配置；烟测也必须经网页提交。训练产物不自动替换工作台已发布技能。",
+      "workflow": [
+        "核对固定上游源码及Go2资产",
+        "通过创建实验提交32环境×2更新烟测",
+        "核对实际配置后通过创建实验提交正式训练",
+        "导出后按正俯仰整周与首尾站姿独立验收"
+      ],
+      "option_schema": {
+        "fixstand_roundtrip": {
+          "label": "四足稳定起止",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "finetune_learning_rate": {
+          "label": "微调学习率（0沿用训练器）",
+          "default": 0.0,
+          "min": 0.0,
+          "max": 0.001,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "flip_direction": {
+          "label": "空翻方向",
+          "default": "front",
+          "min": null,
+          "max": null,
+          "choices": [
+            "front"
+          ],
+          "type": "string",
+          "step": "any"
+        },
+        "delayed_entry": {
+          "label": "稳定承重后进入动作",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "entry_hold_scale": {
+          "label": "入口残差幅度",
+          "default": 0.4,
+          "min": 0.0,
+          "max": 0.4,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "urdf_speed_limits": {
+          "label": "URDF关节速度约束",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "fast_safety_curriculum": {
+          "label": "快速约束课程",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "safety_start": {
+          "label": "约束课程起点（-1沿用）",
+          "default": -1.0,
+          "min": -1.0,
+          "max": 1.0,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "initial_std": {
+          "label": "初始策略噪声（0沿用）",
+          "default": 0.0,
+          "min": 0.0,
+          "max": 1.0,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "reset_optimizer": {
+          "label": "续训重置优化器",
+          "default": false,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        },
+        "min_action_std": {
+          "label": "策略噪声下限（0沿用）",
+          "default": 0.0,
+          "min": 0.0,
+          "max": 1.0,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "max_action_std": {
+          "label": "策略噪声上限（0沿用）",
+          "default": 0.0,
+          "min": 0.0,
+          "max": 1.0,
+          "choices": null,
+          "type": "number",
+          "step": "any"
+        },
+        "peak_contact_forces": {
+          "label": "物理子步接触峰值",
+          "default": true,
+          "min": null,
+          "max": null,
+          "choices": null,
+          "type": "boolean",
+          "step": "any"
+        }
+      }
     }
   ],
   "archived_recipes": [

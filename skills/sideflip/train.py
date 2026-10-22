@@ -9,6 +9,7 @@ p = argparse.ArgumentParser()
 p.add_argument('--backflip-source', required=True)
 p.add_argument('--unitree-source', required=True)
 p.add_argument('--motion', required=True, type=Path)
+p.add_argument('--sideflip-direction',choices=['left','right'],default='left')
 p.add_argument('--output', required=True, type=Path)
 p.add_argument('--num-envs', type=int, default=4096)
 p.add_argument('--iterations', type=int, default=5000)
@@ -64,6 +65,8 @@ def main():
     from unitree_rl_lab.tasks.mimic.robots.g1_29dof.dance_102.tracking_env_cfg import RobotEnvCfg
     from unitree_rl_lab.tasks.mimic.agents.rsl_rl_ppo_cfg import BasePPORunnerCfg
     contract = json.loads(args.motion.with_suffix('.json').read_text())
+    from .direction import require_reference_direction
+    require_reference_direction(contract,args.sideflip_direction)
     if contract['npz_sha256'] != sha(args.motion) or contract['asset_commit'] != BACKFLIP_COMMIT:
         raise RuntimeError('Reference/asset hash mismatch')
     from .task import make_cfg
@@ -100,7 +103,7 @@ def main():
     args.output.mkdir(parents=True, exist_ok=False)
     if args.fixstand_roundtrip:
         from skills.fixstand import write_contract
-        write_contract(args.output/'fixstand.json','sideflip',reference_sha256=sha(args.motion),actor_observations=69,
+        write_contract(args.output/'fixstand.json','sideflip',reference_sha256=sha(args.motion),actor_observations=69,sideflip_direction=args.sideflip_direction,
             action_parameterization=('reference_residual_v4' if args.boundary_blend_frames else 'reference_residual_v3' if args.boundary_terminal_hip_taper_frames else 'reference_residual_v2') if args.boundary_residual else 'joint_offset_v1',
             padded_region_frames=90,residual_limit_rad=args.boundary_residual_limit,
             bridge_residual_limit_rad=args.boundary_bridge_limit if args.boundary_bridge_limit is not None else args.boundary_residual_limit,
@@ -117,6 +120,7 @@ def main():
     write_json(args.output/'contract.json', dict(robot='Go2', role='real PhysX PPO training, not FK replay',
         unitree_commit=UNITREE_COMMIT, backflip_asset_commit=BACKFLIP_COMMIT,
         reference_sha256=sha(args.motion), source_sha256={f.name:sha(f) for f in Path(__file__).parent.glob('*.py')},
+        sideflip_direction=args.sideflip_direction,
         joint_names=contract['joint_names'], body_names=bodies, anchor=anchor, distal_bodies=feet,
         action_scale=.5, kp=40, kd=1, actor_observations=69, action_dim=12,
         policy_hz=round(1/(cfg.sim.dt*cfg.decimation)), physics_hz=round(1/cfg.sim.dt),

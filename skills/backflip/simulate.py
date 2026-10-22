@@ -28,6 +28,7 @@ def main():
     p.add_argument('--initial-yaw-deg',type=float,default=0.)
     p.add_argument('--initial-state',type=Path,help='Read-only captured-entry diagnostic; applied only at initialization')
     p.add_argument('--direction',choices=['back','front'],default='back')
+    p.add_argument('--entry-hold-diagnostic',type=float,help='Counterfactual entry residual limit; changes the trained contract and cannot qualify a policy')
     p.add_argument('--video',action='store_true')
     p.add_argument('--fixstand-roundtrip',action='store_true')
     p.add_argument('--diagnostics',action='store_true',help='Record read-only per-substep failure diagnostics')
@@ -59,6 +60,9 @@ def main():
     contract=exported.get('fixstand_roundtrip') or {}
     if a.direction!=contract.get('flip_direction','back'):raise ValueError('Requested direction does not match the trained actor contract')
     delayed=contract.get('action_parameterization') in ('backflip_entry_v2','backflip_entry_v3')
+    if a.entry_hold_diagnostic is not None and (not delayed or not 0.<=a.entry_hold_diagnostic<=.4):
+        raise ValueError('Entry counterfactual requires delayed-entry playback and [0,.4]')
+    entry_policy_trace=[]
     if delayed:
         if hashlib.sha256(policy.read_bytes()).hexdigest()!=exported['policy_sha256']:
             raise ValueError('Backflip export hash mismatch')
@@ -66,6 +70,7 @@ def main():
             raise ValueError('Unsupported backflip entry contract')
         hold_scale=float(contract.get('entry_hold_scale',.4))
         if not 0.<=hold_scale<=.4:raise ValueError('Unsupported backflip hold scale')
+        if a.entry_hold_diagnostic is not None:hold_scale=a.entry_hold_diagnostic
         module.PHASE_DURATION=3.
         original_phase=module.phase_features
         module.phase_features=lambda t:original_phase(min(t-1.,2.))
@@ -75,8 +80,12 @@ def main():
             def run(self,*args,**kwargs):
                 from skills.fixstand import backflip_entry_weight
                 result=self.session.run(*args,**kwargs)
-                weight=float(backflip_entry_weight(self.calls*.02));self.calls+=1
+                time=self.calls*.02;weight=float(backflip_entry_weight(time));self.calls+=1
+                raw=result[0].copy()
                 result[0]=(1.-weight)*result[0]+weight*hold_scale*np.tanh(result[0])
+                if a.diagnostics and time<=1.2:
+                    entry_policy_trace.append(dict(time=time,raw_action=raw.reshape(-1).tolist(),
+                        processed_action=result[0].reshape(-1).tolist()))
                 return result
         def load(path):
             session,inp,out,name=original_load(path)
@@ -88,6 +97,7 @@ def main():
     diagnostics=MotionDiagnostics(module.JOINT_NAMES,[float(limits[n]['velocity']) for n in module.JOINT_NAMES],1) if a.diagnostics else None
     rng=np.random.default_rng(a.seed);resets=0;trace=[];rotation=0.;angular_travel=0.
     max_speed=0.;max_excess=0.;air=0.;max_air=0.;bad=False;minimum_up=1.;max_height=0.
+    ground_reader=None
     original_reset=module.reset_robot;original_step=mujoco.mj_step
     writer=None;renderer=None;next_trace=0.;next_frame=0.
     def reset(model,data,qids):
@@ -106,7 +116,7 @@ def main():
             data.qpos[qids]+=rng.uniform(-a.initial_joint_noise,a.initial_joint_noise,12)
         mujoco.mj_forward(model,data)
     def step(model,data,*args,**kwargs):
-        nonlocal rotation,angular_travel,max_speed,max_excess,air,max_air,bad,minimum_up,max_height,writer,renderer,next_trace,next_frame
+        nonlocal rotation,angular_travel,max_speed,max_excess,air,max_air,bad,minimum_up,max_height,writer,renderer,next_trace,next_frame,ground_reader
         before_step=float(data.time)
         result=original_step(model,data,*args,**kwargs)
         assert_physics_step(data,before_step,model.opt.timestep)
@@ -118,20 +128,12 @@ def main():
         max_speed=max(max_speed,float(np.max(np.abs(data.qvel[dids])/velocity)))
         ids=np.array([model.joint(n).id for n in module.JOINT_NAMES])
         max_excess=max(max_excess,float(max(0,np.max(np.maximum(data.qpos[qids]-model.jnt_range[ids,1],model.jnt_range[ids,0]-data.qpos[qids])))))
-        ground={i for i in range(model.ngeom) if model.geom_bodyid[i]==0};contacts=[]
-        foot_forces={leg:0. for leg in ('FR','FL','RR','RL')};contact_force=np.zeros(6)
-        for ci,c in enumerate(data.contact):
-            x,y=int(c.geom1),int(c.geom2)
-            name=None
-            if x in ground and y not in ground:name=model.body(int(model.geom_bodyid[y])).name
-            elif y in ground and x not in ground:name=model.body(int(model.geom_bodyid[x])).name
-            if name is not None:
-                contacts.append(name)
-                for leg in foot_forces:
-                    if name.startswith(leg+'_'):
-                        mujoco.mj_contactForce(model,data,ci,contact_force);foot_forces[leg]+=abs(float(contact_force[0]))
+        if ground_reader is None:
+            from rob2nav.ground_contacts import GroundContactReader
+            ground_reader=GroundContactReader(model)
+        contact_frame=ground_reader.sample(data);contacts=contact_frame.bodies;foot_forces=contact_frame.forces
         air=0. if contacts else air+model.opt.timestep;max_air=max(max_air,air)
-        bad|=any('foot' not in n and 'calf' not in n for n in contacts)
+        bad|=bool(contact_frame.unexpected)
         up=float(data.xmat[model.body('base').id].reshape(3,3)[2,2]);minimum_up=min(minimum_up,up);max_height=max(max_height,float(data.qpos[2]))
         if data.time>=next_trace:
             trace.append(dict(time=float(data.time),position=data.qpos[:3].tolist(),quaternion=data.qpos[3:7].tolist(),
@@ -167,14 +169,18 @@ def main():
     metrics=dict(body_y_rotation_rad=rotation,axis_dominance=dominance,airtime_s=max_air,max_height=max_height,
         terminal_upright=trace[-1]['upright'],unexpected_body_ground_contact=bad,max_joint_speed_ratio=max_speed,max_joint_limit_excess_rad=max_excess)
     metrics.update(expected_direction=a.direction,direction_pass=direction_pass)
+    metrics['ground_contact_rule']='foot spheres and contact points inside their own anatomical foot region'
+    metrics['ground_contact_rule_sha256']=ground_reader.rule_sha256
     if a.fixstand_roundtrip:
         from rob2nav.fixstand_validation import assess
         metrics['action_completed']=bool(success);metrics['fixstand']=assess(trace,initial_end=.8 if delayed else .35)
         success=bool(success and metrics['fixstand']['passed'])
+    if entry_policy_trace:(a.output/'entry_policy_trace.json').write_text(json.dumps(entry_policy_trace,indent=2)+'\n')
     summary=dict(args=dict(kind=a.direction+'flip',seed=a.seed,physics_hz=a.physics_hz,initial_joint_noise=a.initial_joint_noise,initial_yaw_deg=a.initial_yaw_deg,
         initial_state_sha256=hashlib.sha256(a.initial_state.read_bytes()).hexdigest() if a.initial_state else None),backend='MuJoCo',
         role='locally trained Go2 '+a.direction+'flip; pinned native observation/controller',successes=int(success),total=1,episodes=[dict(success=success,**metrics)],metrics=metrics,
         policy_sha256=hashlib.sha256(policy.read_bytes()).hexdigest(),source_commit=PIN,source_sha256=hashlib.sha256(file.read_bytes()).hexdigest(),
+        entry_hold_diagnostic=a.entry_hold_diagnostic,trained_execution_contract=a.entry_hold_diagnostic is None,
         evaluator_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),policy_hz=50,physics_hz=a.physics_hz,
         joint_names=list(module.JOINT_NAMES),physical_resets=resets,root_state_writes='initialization only; no in-flight reset/stabilizing force',
         hardware_constraints_pass=max_speed<=1. and max_excess<=.001,hardware_connected=False,

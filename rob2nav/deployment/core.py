@@ -19,9 +19,17 @@ class Servo:
         self.q=s.q.copy();self.dq=s.dq.copy();self.kp=np.zeros(12);self.kd=np.zeros(12)
         self.tau=np.clip(s.tau,-EFFORT,EFFORT);self.bias=self.tau.copy();self.envelope_conflicts=0
         self.native_entry_bias=np.zeros(12)
+        self.wire_q=self.q.copy();self.wire_dq=self.dq.copy();self.recentering=False
     def match_bias(self,s,capture=False):
-        if capture:self.q=s.q.copy();self.dq=np.zeros(12)
+        if capture:
+            # Preserve the proven loaded-state controller internally, but slew
+            # the transmitted reference instead of jumping it to measured q.
+            self.q=s.q.copy();self.dq=np.zeros(12);self.recentering=True
         self.bias=np.clip(self.tau-self.kp*(self.q-s.q)-self.kd*(self.dq-s.dq),-.5*EFFORT,.5*EFFORT)
+    def slew_wire(self,dt):
+        acceleration=np.clip(100*(self.q-self.wire_q)-20*self.wire_dq,-20,20)
+        self.wire_dq=np.clip(self.wire_dq+dt*acceleration,-2.,2.)
+        self.wire_q+=dt*self.wire_dq
     def native(self,s,target,kp,kd,phase,epoch,handover_dt=None,motor_control=None,dt=.002,entry_blend_s=0.,entry_elapsed=0.):
         if motor_control is not None:
             from skills.backflip.control import JOINT_NAMES,motor_torque
@@ -30,6 +38,7 @@ class Servo:
         else:self.q=vector(target)
         self.dq=np.zeros(12);self.kp=vector(kp);self.kd=vector(kd);self.bias=np.zeros(12)
         if motor_control is not None:
+            self.wire_q=self.q.copy();self.wire_dq=self.dq.copy();self.recentering=False
             raw=self.kp*(self.q-s.q)-self.kd*s.dq
             if entry_blend_s and entry_elapsed<=1e-9:self.native_entry_bias=self.tau-raw
             feedforward=self.native_entry_bias*(1-quintic(entry_elapsed/entry_blend_s)) if entry_blend_s else np.zeros(12)
@@ -40,7 +49,11 @@ class Servo:
         if handover_dt is not None:
             low=np.maximum(low,self.tau-150*handover_dt);high=np.minimum(high,self.tau+150*handover_dt)
         self.tau=np.clip(self.kp*(self.q-s.q)-self.kd*s.dq,low,high)
-        return MotorCommand(self.tau.copy(),self.q.copy(),self.dq.copy(),self.kp.copy(),self.kd.copy(),phase,epoch)
+        self.slew_wire(dt);self.recentering=True
+        pd=self.kp*(self.wire_q-s.q)+self.kd*(self.wire_dq-s.dq)
+        # Honor the torque envelope/rate in hybrid PD too, while keeping the
+        # command references continuous when a walking policy is committed.
+        return MotorCommand(self.tau.copy(),self.wire_q.copy(),self.wire_dq.copy(),self.kp.copy(),self.kd.copy(),phase,epoch,feedforward=(self.tau-pd).copy())
     def step(self,s,target,kp,kd,dt,phase,epoch,fault='',integrate=False,bias_scale=1.,stance_valid=False,model_gain=0.):
         target=np.clip(vector(target),LOW,HIGH)
         acceleration=np.clip(100*(target-self.q)-20*self.dq,-20,20)
@@ -68,8 +81,14 @@ class Servo:
             tau=np.clip(raw,low,high)
         else:tau=np.clip(raw,lo,hi)
         self.tau=tau
-        pd=self.kp*(self.q-s.q)+self.kd*(self.dq-s.dq)
-        return MotorCommand(tau.copy(),self.q.copy(),self.dq.copy(),self.kp.copy(),self.kd.copy(),phase,epoch,fault,feedforward=(tau-pd).copy())
+        if self.recentering:
+            self.slew_wire(dt)
+        else:
+            self.wire_q=self.q.copy();self.wire_dq=self.dq.copy()
+        pd=self.kp*(self.wire_q-s.q)+self.kd*(self.wire_dq-s.dq)
+        # At any physical q/dq, this PD plus feedforward has exactly the same
+        # raw torque as the existing controller, also between control ticks.
+        return MotorCommand(tau.copy(),self.wire_q.copy(),self.wire_dq.copy(),self.kp.copy(),self.kd.copy(),phase,epoch,fault,feedforward=(tau-pd).copy())
 
 
 class SwitchController:

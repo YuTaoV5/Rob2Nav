@@ -59,6 +59,11 @@ def main():
         choreography=SkillSequence(runtime,load_steps(a.sequence))
         sequence=[step.skill for step in choreography.steps]
     native_peak=0.;flip_rotation=0.;maximum_speed_ratio=0.
+    from .atomic_validation import JointConstraintValidation
+    from .core import FREE_SPEED
+    joint_constraints=JointConstraintValidation(model,SDK_JOINTS,FREE_SPEED)
+    from rob2nav.ground_contacts import GroundContactValidation
+    ground_constraints=GroundContactValidation(model)
     backflip_checks=[];check=None;check_epoch=None
     old_tau=None;old_kp=None;last_ref=None;naive=[];max_torque_step=0.;max_gain_step=0.;max_ref_step=0.;max_tilt=0.;min_height=1e9
     wall=time.monotonic();loop_gaps=[];last_wall=wall;passed=False;reason='time budget'
@@ -136,6 +141,8 @@ def main():
                         data.ctrl[aids]=motor_torque(raw,data.qvel[dids],c.active.motor_control,SDK_JOINTS)
                     else:data.ctrl[aids]=np.clip(raw,lower,upper)
                 mujoco.mj_step(model,data)
+                joint_constraints.sample(data)
+                ground_constraints.sample(data)
                 if check is not None:check.sample(model,data,float(data.time)-start_time)
             if abs(float(data.time)-start_time-t)>1e-7:raise RuntimeError('Physics time discontinuity/reset')
             tilt=float(np.arccos(np.clip(env.rotation[2,2],-1,1)));max_tilt=max(max_tilt,tilt);min_height=min(min_height,float(data.qpos[2]))
@@ -169,8 +176,13 @@ def main():
         expected_backflips=sum(runtime.profile(step.skill)[1].observation=='backflip60' for step in choreography.steps) if choreography else 0
         report['backflip_validation']=atomic_reports
         report['backflip_validation_complete']=len(atomic_reports)==expected_backflips
-        report['passed']=bool(report['passed'] and maximum_speed_ratio<=1. and report['backflip_validation_complete'] and all(item['passed'] for item in atomic_reports))
-        if passed and not report['passed']:report['reason']='strict atomic/velocity acceptance failed; inspect backflip_validation'
+        whole=joint_constraints.report(len(samples)*round(.002/model.opt.timestep))
+        report['whole_sequence_joint_constraints']=whole
+        ground=ground_constraints.report(len(samples)*round(.002/model.opt.timestep))
+        report['whole_sequence_ground_contacts']=ground
+        report['maximum_joint_speed_ratio']=max(maximum_speed_ratio,whole['max_joint_speed_ratio'])
+        report['passed']=bool(report['passed'] and whole['passed'] and ground['passed'] and maximum_speed_ratio<=1. and report['backflip_validation_complete'] and all(item['passed'] for item in atomic_reports))
+        if passed and not report['passed']:report['reason']='strict atomic/joint/ground-contact acceptance failed; inspect complete reports'
         for index,item in enumerate(backflip_checks):
             (a.output/f'backflip_{index}_trace.json').write_text(json.dumps(item.trace)+'\n')
         passed=report['passed'];publish_progress(t,finished=True)

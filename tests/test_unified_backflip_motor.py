@@ -49,6 +49,8 @@ class UnifiedBackflipMotorTests(unittest.TestCase):
     def test_completed_switch_cannot_hide_incomplete_flip_or_bad_physics(self):
         # Synthetic measured summaries exercise the independent acceptance gate.
         check=BackflipValidation.__new__(BackflipValidation)
+        from rob2nav.ground_contacts import RULE_SHA256
+        check.ground_reader=SimpleNamespace(rule_sha256=RULE_SHA256)
         check.skill=SimpleNamespace(id='backflip',atomic_duration_s=5.,motor_control=contract())
         check.start=10.;check.elapsed=5.;check.rotation=-2*np.pi;check.travel=2*np.pi
         check.max_air=.3;check.height=.6;check.minimum_up=-1.;check.bad=False;check.speed=.8;check.excess=0.

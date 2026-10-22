@@ -2,12 +2,16 @@
 
 
 def configure_fixstand_source(text,source,urdf_speed_limits=False,fast_safety_curriculum=False,
-                              delayed_entry=False,entry_hold_scale=.4,flip_direction='back'):
+                              delayed_entry=False,entry_hold_scale=.4,flip_direction='back',peak_contact_forces=False):
     if flip_direction not in ('back','front'):raise ValueError('Unknown flip direction')
     needle='env_cfg = Go2BackflipEnvCfg()'
     if text.count(needle)!=1:raise RuntimeError('Pinned environment config entry changed')
     block=[needle,'from skills.fixstand import configure_backflip',
         f'configure_backflip(env_cfg,{str(source)!r} if {urdf_speed_limits!r} else None,{fast_safety_curriculum!r})']
+    if peak_contact_forces:
+        block.extend(['env_cfg.rewards.use_peak_contact_forces=True',
+                      'env_cfg.contact_sensor.update_period=env_cfg.sim.dt',
+                      'env_cfg.contact_sensor.history_length=max(env_cfg.contact_sensor.history_length,env_cfg.decimation)'])
     if delayed_entry:
         block.extend(['from skills.fixstand import configure_backflip_delayed_entry',
             f'configure_backflip_delayed_entry(env_cfg,{entry_hold_scale!r})',

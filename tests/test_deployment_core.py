@@ -25,6 +25,59 @@ def skill(id='stand',**kw):
 
 
 class DeploymentCoreTests(unittest.TestCase):
+    def test_native_walking_commit_slews_reference_and_applies_torque_rate_in_pd(self):
+        measured=state();servo=Servo(measured)
+        old_q,old_dq,old_tau=servo.wire_q.copy(),servo.wire_dq.copy(),servo.tau.copy()
+        target=NEUTRAL.copy();target[3]+=.3
+        cmd=servo.native(measured,target,np.full(12,20.),np.full(12,.5),'ACTIVE',1,handover_dt=.002,dt=.002)
+        self.assertLessEqual(float(np.max(abs(cmd.qref-old_q))),.004001)
+        self.assertLessEqual(float(np.max(abs(cmd.dqref-old_dq))),.040001)
+        self.assertLessEqual(float(np.max(abs(cmd.tau-old_tau))),.300001)
+        actual=cmd.kp*(cmd.qref-measured.q)+cmd.kd*(cmd.dqref-measured.dq)+cmd.feedforward
+        np.testing.assert_allclose(actual,cmd.tau,atol=1e-12)
+
+    def test_native_recapture_preserves_transmitted_reference_state(self):
+        measured=state(q=NEUTRAL.copy(),dq=np.full(12,.1))
+        servo=Servo(measured);servo.kp[:]=20.;servo.kd[:]=.5
+        servo.q[3]-=.458;servo.dq[:]=.12
+        servo.wire_q=servo.q.copy();servo.wire_dq=servo.dq.copy()
+        servo.tau=servo.kp*(servo.q-measured.q)+servo.kd*(servo.dq-measured.dq)
+        q,dq,physical_q=servo.q.copy(),servo.dq.copy(),measured.q.copy()
+        servo.match_bias(measured,capture=True)
+        np.testing.assert_array_equal(servo.wire_q,q)
+        np.testing.assert_array_equal(servo.wire_dq,dq)
+        np.testing.assert_array_equal(measured.q,physical_q)
+        np.testing.assert_allclose(servo.kp*(servo.q-measured.q)+servo.kd*(servo.dq-measured.dq)+servo.bias,servo.tau)
+
+    def test_recapture_wire_pd_and_feedforward_preserve_substep_torque(self):
+        measured=state();servo=Servo(measured)
+        servo.kp[:]=20.;servo.kd[:]=.5;servo.q[3]-=.458
+        servo.wire_q=servo.q.copy();servo.wire_dq[:]=0.
+        servo.tau=servo.kp*(servo.q-measured.q)
+        servo.match_bias(measured,capture=True)
+        command=servo.step(measured,NEUTRAL,np.full(12,20.),np.full(12,.5),.002,'EXIT',1)
+        internal_pd=servo.kp*(servo.q-measured.q)+servo.kd*(servo.dq-measured.dq)
+        original_ff=command.tau-internal_pd
+        for offset in (-.01,0.,.01):
+            actual_q=measured.q+offset;actual_dq=measured.dq+3*offset
+            expected=servo.kp*(servo.q-actual_q)+servo.kd*(servo.dq-actual_dq)+original_ff
+            actual=command.kp*(command.qref-actual_q)+command.kd*(command.dqref-actual_dq)+command.feedforward
+            np.testing.assert_allclose(actual,expected,atol=1e-12)
+
+    def test_native_exit_tick_has_no_measured_position_capture_jump(self):
+        measured=state(.002,1,q=NEUTRAL.copy())
+        c=SwitchController();c.arm(state(),0.)
+        c.phase='ACTIVE';c.phase_at=-3.;c.stable_since=-1.;c.active=skill('walk_moe',actuation='native_pd',kp=(20.,)*12,kd=(.5,)*12)
+        c.pending=skill('stand');c.servo.kp[:]=20.;c.servo.kd[:]=.5
+        c.servo.q[3]-=.458
+        c.servo.wire_q=c.servo.q.copy();c.servo.wire_dq[:]=0.
+        c.servo.tau=c.servo.kp*(c.servo.q-measured.q)-c.servo.kd*measured.dq
+        previous_q,previous_tau=c.servo.q.copy(),c.servo.tau.copy()
+        cmd=c.tick(measured,.002,Intent(0,.002,previous_q.copy()))
+        self.assertEqual(c.phase,'EXIT')
+        self.assertLessEqual(float(np.max(abs(cmd.qref-previous_q))),.004001)
+        self.assertLessEqual(float(np.max(abs(cmd.tau-previous_tau))),.300001)
+
     def test_compact_switch_enters_candidate_without_neutral_detour(self):
         c=SwitchController(compact_transitions=True);c.arm(state(),0)
         c.phase='ACTIVE';c.active=skill('stand');c.pending=skill('walk_moe',default=tuple(NEUTRAL+.03),actuation='native_pd')

@@ -12,6 +12,7 @@ p.add_argument('--output',required=True,type=Path)
 p.add_argument('--seconds',default=6.,type=float)
 p.add_argument('--seed',default=1000,type=int)
 p.add_argument('--substep-diagnostics',action='store_true')
+p.add_argument('--target-limit-diagnostic',action='store_true',help='Counterfactual clamp of joint targets; NOT the trained actor execution contract')
 AppLauncher.add_app_launcher_args(p)
 args=p.parse_args()
 args.kit_args=(args.kit_args+' --enable isaacsim.asset.importer.urdf').strip()
@@ -73,6 +74,20 @@ def main():
         import xml.etree.ElementTree as ET
         from scipy.spatial.transform import Rotation
         limits={j.attrib['name']:j.find('limit').attrib for j in ET.parse(source/'resources/robots/go2/urdf/go2_description.urdf').getroot().findall('joint') if j.attrib['name'] in robot.joint_names}
+        target_limit_changes=0
+        if args.target_limit_diagnostic:
+            term=env.action_manager.get_term('JointPositionAction')
+            names=term._joint_names
+            lower=torch.tensor([float(limits[n]['lower']) for n in names],device=cfg.sim.device)
+            upper=torch.tensor([float(limits[n]['upper']) for n in names],device=cfg.sim.device)
+            original_process=env.action_manager.process_action
+            def limited_target(actions):
+                nonlocal target_limit_changes
+                original_process(actions)
+                before=term._processed_actions.clone()
+                term._processed_actions[:]=torch.maximum(lower,torch.minimum(upper,before))
+                target_limit_changes+=int(torch.any(before!=term._processed_actions).item())
+            env.action_manager.process_action=limited_target
         trace=[];subtrace=[];physical=None
         if args.substep_diagnostics:
             def sample_substep(dt):
@@ -148,6 +163,8 @@ def main():
             hardware_constraints_pass=speed_ratio<=1. and excess<=.001,hardware_connected=False,
             control_frame_constraints=control_constraints,substep_constraints=physical,
             constraint_sampling_hz=1./cfg.sim.dt if args.substep_diagnostics else 1./env.step_dt,
+            target_limit_counterfactual=args.target_limit_diagnostic,target_limit_changed_control_frames=target_limit_changes,
+            trained_execution_contract=not args.target_limit_diagnostic,
             constraint_scope='every physical substep' if args.substep_diagnostics else 'control-frame diagnostic; not all physics substeps'))
     finally:
         env.scene.update=original_scene_update

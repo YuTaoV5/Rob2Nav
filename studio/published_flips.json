@@ -13,14 +13,21 @@
     }
   },
   "backflip": {
-    "policy": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/exported/policy.onnx",
+    "policy": "artifacts/backflip_v8_2200_verified_20261022/exported/policy.onnx",
     "seconds": 5,
-    "seed": 12400,
-    "note": "后翻v7：独立四种子完整动作、首尾FIXSTAND与URDF速度/限位4/4；无机身触地，最大速度比0.7722–0.7888。仅单技能仿真；实机未验证，统一热切换严格1/4，未通过。",
+    "seed": 14300,
+    "note": "后翻v8 model2200：既有训练中期权重，本轮独立单技能4/4、连续流程四朝向4/4；无机身触地、首尾稳定，1000Hz关节约束通过，全流程最大参考步长约0.027rad。仅仿真；实机未验证。",
     "hardware_qualified": false,
     "sha256": {
-      "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/exported/policy.onnx": "73a56f68c90b1164346f6dce812e769e668b376f610c8984b869858ec495935b",
-      "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/exported/export.json": "7a9a2e73b3cb441bed8cc90c4d0d3119c44983d9d8b54d62bd979b60a31542b6"
-    }
+      "artifacts/backflip_v8_2200_verified_20261022/exported/policy.onnx": "c8adf96a70cdb9e68f7aa7fe02271ae36908b6c8ab29ad967d03c73a58eaa82d",
+      "artifacts/backflip_v8_2200_verified_20261022/exported/export.json": "932fdad9881bfa5aa0b77fa42565d617495f1e18d44bb6d4cb41aefb6e925a80"
+    },
+    "verification": {
+      "native": "artifacts/backflip_v8_2200_verified_20261022/native/evaluation.json",
+      "unified": "artifacts/backflip_v8_2200_verified_20261022/unified/evaluation.json",
+      "controller_sha256": "37b60e3c008a27332469d3938e689da9e206f02df04c770fd653bb30f358acc7",
+      "scope": "fixed flat simulation, four independent native seeds and four headings"
+    },
+    "status": "仿真验收：单技能4/4；连续四朝向4/4"
   }
 }

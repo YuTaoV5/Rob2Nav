@@ -22,6 +22,7 @@ def simulation_library(root):
         if ident in ('backflip','sideflip'):
             try:
                 manifest=json.loads((root/'studio/published_flips.json').read_text(encoding='utf-8'))[ident]
+                status=manifest.get('status',status)
                 resources=[root/p for p in manifest['sha256']]
             except (OSError,ValueError,KeyError):resources=[root/'missing-published-manifest']
         elif ident=='upright_walk':resources=[root/'artifacts/release_20261021/weights/upright_walk/representative_failed_baseline/exported/policy.pt']

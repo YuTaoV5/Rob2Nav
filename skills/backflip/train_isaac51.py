@@ -19,7 +19,9 @@ parser.add_argument('--safety-start',type=float)
 parser.add_argument('--finetune-learning-rate',type=float)
 parser.add_argument('--flip-direction',choices=['back','front'],default='back')
 parser.add_argument('--initial-std',type=float)
+parser.add_argument('--peak-contact-forces',action='store_true')
 args, rest = parser.parse_known_args()
+if args.peak_contact_forces and not args.fixstand_roundtrip:raise ValueError('Peak contacts require FIXSTAND training')
 if args.delayed_entry and not args.fixstand_roundtrip:raise ValueError('Delayed entry requires fixstand training')
 if not 0.<=args.entry_hold_scale<=.4 or (args.entry_hold_scale!=.4 and not args.delayed_entry):raise ValueError('Entry hold scale requires delayed entry and [0, 0.4]')
 if args.fast_safety_curriculum and not args.urdf_speed_limits:raise ValueError('Fast safety curriculum requires URDF speed limits')
@@ -54,7 +56,7 @@ if args.fixstand_roundtrip:
         if text.count(required)!=1:raise RuntimeError('Pinned training entry changed: '+required)
     from skills.backflip.launcher_patch import configure_fixstand_source
     text=configure_fixstand_source(text,source,args.urdf_speed_limits,args.fast_safety_curriculum,
-        args.delayed_entry,args.entry_hold_scale,args.flip_direction)
+        args.delayed_entry,args.entry_hold_scale,args.flip_direction,args.peak_contact_forces)
     if args.safety_start is not None:
         text=text.replace('agent_cfg = Go2BackflipPPORunnerCfg()',
             f'env_cfg.rewards.safety_curriculum_start={args.safety_start!r}\n    agent_cfg = Go2BackflipPPORunnerCfg()')
@@ -77,6 +79,10 @@ if args.fixstand_roundtrip:
             text=text.replace("'backflip',actor_observations=60)",f"'backflip',actor_observations=60,action_parameterization='{version}',entry_hold_scale={args.entry_hold_scale!r},entry_seconds=1.,release_seconds=[1.,1.2],episode_seconds=5.)")
         if args.flip_direction=='front':
             text=text.replace("'backflip',actor_observations=60", "'frontflip',actor_observations=60,flip_direction='front'")
+        if args.peak_contact_forces:
+            needle='actor_observations=60'
+            if text.count(needle)!=1:raise RuntimeError('Pinned FIXSTAND contract entry changed')
+            text=text.replace(needle,needle+',peak_contact_forces=True')
 if '--checkpoint' in rest:
     index=rest.index('--checkpoint')+1
     rest[index]=str(Path(rest[index]).expanduser().resolve())

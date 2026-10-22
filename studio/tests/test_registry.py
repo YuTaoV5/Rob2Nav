@@ -72,14 +72,15 @@ def test_skill_manual_links_resolve_only_indexed_reports(tmp_path):
 def test_retained_capabilities_have_three_real_manuals_and_no_archived_recipe():
     from pathlib import Path
     from studio.registry import REGISTRY
+    from studio.documents import manual
     root=REGISTRY.parent.parent
     data=registry()
     archived={r['id'] for r in data.get('archived_recipes',[])}
     for skill in data['capabilities']:
         assert skill['recipe'] not in archived
-        folder=root/'skills'/skill['id']
-        for name in ('TRAINING.md','SIMULATION.md','DEPLOYMENT.md'):
-            source=(folder/name).read_text(encoding='utf-8')
+        for kind in ('training','simulation','deployment'):
+            name=manual(root,skill['id'],kind)
+            source=(root/name).read_text(encoding='utf-8')
             assert len(source)>200, (skill['id'],name)
 
 
