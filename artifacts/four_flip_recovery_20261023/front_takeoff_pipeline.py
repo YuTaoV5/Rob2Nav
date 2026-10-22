@@ -4,8 +4,8 @@ from studio.jobs import Jobs
 root=Path.cwd();out=root/'artifacts/four_flip_recovery_20261023';jobs=Jobs(root)
 base='http://127.0.0.1:8765/api/'
 def api(path,data=None):
- req=urllib.request.Request(base+path,data=None if data is None else json.dumps(data).encode(),headers={'Content-Type':'application/json','X-Studio-Request':'1'})
- with urllib.request.urlopen(req,timeout=30) as f:return json.load(f)
+ from studio.pipeline_api import request
+ return request(path,data,base)
 def submit(cfg,label):
  check=api('preflight',cfg);(out/(label+'_preflight.json')).write_text(json.dumps(check,ensure_ascii=False,indent=2))
  if not check['valid']:raise RuntimeError(str(check))

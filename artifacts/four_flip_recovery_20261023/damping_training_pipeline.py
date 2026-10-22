@@ -4,13 +4,13 @@ from pathlib import Path
 import subprocess
 import time
 import urllib.request
+import sys
 
 root=Path.cwd(); out=root/'artifacts/four_flip_recovery_20261023'
+sys.path.insert(0,str(root))
+from studio.pipeline_api import request
 def api(path,data=None):
-    req=urllib.request.Request('http://127.0.0.1:8765/api/'+path,
-        data=None if data is None else json.dumps(data).encode(),
-        headers={'Content-Type':'application/json','X-Studio-Request':'1'})
-    return json.load(urllib.request.urlopen(req,timeout=30))
+    return request(path,data)
 
 while True:
     jobs=api('jobs'); smoke=next(j for j in jobs if j['id']=='df310a187da04c32')
