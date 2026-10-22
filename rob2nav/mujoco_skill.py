@@ -313,6 +313,9 @@ def main():
         metrics['preparation']=preparation
         if meta.get('fixstand_roundtrip',{}).get('quiet_preparation_seconds'):
             success=bool(success and preparation['passed'])
+        from .target_continuity import assess as assess_target_continuity
+        metrics['target_continuity']=assess_target_continuity(trace,names,velocity_limits)
+        success=bool(success and metrics['target_continuity']['passed'])
     (args.output/'trace.json').write_text(json.dumps(trace))
     if diagnostics is not None:(args.output/'diagnostics.json').write_text(json.dumps(diagnostics.report(),indent=2)+'\n')
     summary=dict(args=dict(kind=args.kind,seed=args.seed,initialization=args.initialization,physics_hz=args.physics_hz,joint_limit_time_constant=args.joint_limit_time_constant),backend='MuJoCo',successes=int(success),total=1,

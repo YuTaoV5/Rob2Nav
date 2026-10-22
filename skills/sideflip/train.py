@@ -30,10 +30,15 @@ p.add_argument('--finetune-learning-rate',type=float)
 p.add_argument('--reset-std',type=float)
 p.add_argument('--joint-kp',type=float,default=40.)
 p.add_argument('--joint-kd',type=float,default=1.)
+p.add_argument('--target-rate-weight',type=float,default=0.)
+p.add_argument('--target-rate-margin',type=float,default=.8)
 AppLauncher.add_app_launcher_args(p)
 args = p.parse_args()
 from .gains import checked as checked_gains
 checked_gains(args.joint_kp,args.joint_kd)
+from .continuity import validate as validate_continuity
+validate_continuity(args.target_rate_weight,args.target_rate_margin)
+if args.target_rate_weight and not args.boundary_residual:p.error('Target rate objective requires boundary residual action statistics')
 if args.boundary_residual and not args.fixstand_roundtrip:p.error('--boundary-residual requires --fixstand-roundtrip')
 if not .01<=args.boundary_residual_limit<=.3:p.error('Boundary residual limit must be in [.01,.3] rad')
 if args.boundary_bridge_limit is not None and (not args.boundary_residual or not .01<=args.boundary_bridge_limit<=args.boundary_residual_limit):
@@ -94,6 +99,8 @@ def main():
         from skills.gait_objectives import configure_sideflip_landing
         configure_sideflip_landing(cfg,source)
     if args.substep_objective:cfg.scene.contact_forces.update_period=cfg.sim.dt
+    from .continuity import configure as configure_continuity
+    configure_continuity(cfg,source,contract['joint_names'],args.target_rate_weight,args.target_rate_margin)
     bodies = contract['body_names']
     anchor = cfg.commands.motion.anchor_body_name
     feet = cfg.terminations.ee_body_pos.params['body_names']
@@ -129,6 +136,7 @@ def main():
         sideflip_direction=args.sideflip_direction,
         joint_names=contract['joint_names'], body_names=bodies, anchor=anchor, distal_bodies=feet,
         action_scale=.5, kp=args.joint_kp, kd=args.joint_kd, actor_observations=69, action_dim=12,
+        target_rate_weight=args.target_rate_weight,target_rate_margin=args.target_rate_margin,
         policy_hz=round(1/(cfg.sim.dt*cfg.decimation)), physics_hz=round(1/cfg.sim.dt),
         motor_model='dc_linear_v1' if args.transfer_motors else 'ideal_pd', seed=args.seed, requested_iterations=args.iterations,
         num_envs=args.num_envs, hardware_connected=False))

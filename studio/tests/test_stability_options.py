@@ -29,6 +29,14 @@ def test_sideflip_web_gain_edits_reach_trainer(tmp_path):
     with pytest.raises(ValueError):validate('sideflip_native_ppo',{'joint_kd':float('nan')})
 
 
+def test_sideflip_mapped_target_rate_options(tmp_path):
+    c=config('sideflip_native_ppo',recipe_options={'fixstand_roundtrip':True,'boundary_residual':True,'target_rate_weight':5.,'target_rate_margin':.8})
+    cmd=command(c,tmp_path,tmp_path/'outputs/studio/runs/PREVIEW',tmp_path/'preview.json','/isaac/python.sh')
+    assert cmd[cmd.index('--target-rate-weight')+1]=='5.0'
+    assert cmd[cmd.index('--target-rate-margin')+1]=='0.8'
+    with pytest.raises(ValueError):validate('sideflip_native_ppo',{'target_rate_weight':5.})
+
+
 def test_sideflip_substep_resume_contract(tmp_path):
     ck = tmp_path/'outputs/parent/model_10.pt'; ck.parent.mkdir(parents=True); ck.write_bytes(b'parent')
     motion = ck.parent/'reference.npz'; motion.write_bytes(b'motion')

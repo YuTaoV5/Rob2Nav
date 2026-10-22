@@ -16,6 +16,8 @@ SCHEMAS = {
     'sideflip_native_ppo': {**COMMON,
         'joint_kp': field('关节位置增益 Kp', 40., 1., 80.),
         'joint_kd': field('关节阻尼增益 Kd', 1., 0., 8.),
+        'target_rate_weight': field('全动作目标变化率惩罚权重（0关闭）', 0., 0., 100.),
+        'target_rate_margin': field('目标变化率相对URDF速度的起罚比例', .8, .1, 1.),
         'sideflip_direction': field('侧翻方向', 'left', choices=['left','right']),
         'motion': field('项目内参考动作NPZ（空白使用原参考）', ''),
         'boundary_residual': field('边界残差控制', False),
@@ -88,6 +90,7 @@ def validate(rid, options):
     requires('peak_contact_forces', o.get('fixstand_roundtrip'))
     requires('fast_safety_curriculum', o.get('urdf_speed_limits'))
     requires('boundary_residual', o.get('fixstand_roundtrip'))
+    requires('target_rate_weight',o.get('boundary_residual'))
     requires('peak_endpoint_objective', o.get('fixstand_roundtrip'))
     requires('quiet_preparation', o.get('boundary_blend_frames'))
     requires('landing_constraints', o.get('peak_endpoint_objective'))
