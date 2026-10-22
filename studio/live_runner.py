@@ -14,13 +14,14 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--stream',type=Path,required=True)
     p.add_argument('--module',required=True);p.add_argument('args',nargs=argparse.REMAINDER)
     a=p.parse_args()
-    if a.module not in ('rob2nav.mujoco_skill','skills.backflip.simulate','go2_nav.terrain_run','rob2nav.deployment.verify_mujoco'):
+    if a.module not in ('rob2nav.mujoco_skill','skills.backflip.simulate','go2_nav.terrain_run','rob2nav.deployment.verify_mujoco','studio.jump_demo'):
         raise ValueError('Unknown simulation module')
     import mujoco
     from PIL import Image
+    from .sim_visuals import reference_ground
     stream=a.stream;stream.mkdir(parents=True,exist_ok=True)
     original=mujoco.mj_step;renderer=None;camera=mujoco.MjvCamera()
-    camera.distance=3.;camera.azimuth=130.;camera.elevation=-25.
+    camera.distance=2.2;camera.azimuth=130.;camera.elevation=-25.
     start_wall=None;start_sim=None;next_frame=0.;count=0;last=None;last_model=None
     def atomic(name,payload):
         tmp=stream/(name+'.tmp');tmp.write_bytes(payload);tmp.replace(stream/name)
@@ -37,11 +38,15 @@ def main():
             try:settings=json.loads((stream/'camera.json').read_text())
             except (OSError,ValueError):settings={}
             camera.azimuth=settings.get('azimuth',130.);camera.elevation=settings.get('elevation',-25.)
-            camera.distance=settings.get('distance',3.)
+            camera.distance=settings.get('distance',2.2)
             camera.lookat[:]=data.qpos[:3]
             camera.lookat[0]+=settings.get('pan_x',0.);camera.lookat[1]+=settings.get('pan_y',0.)
-            if renderer is None:renderer=mujoco.Renderer(model,height=480,width=640)
+            if renderer is None:
+                model.vis.global_.offwidth=max(960,model.vis.global_.offwidth)
+                model.vis.global_.offheight=max(640,model.vis.global_.offheight)
+                renderer=mujoco.Renderer(model,height=640,width=960)
             renderer.update_scene(data,camera=camera)
+            reference_ground(renderer.scene,model,data)
             out=io.BytesIO();Image.fromarray(renderer.render()).save(out,format='JPEG',quality=82)
             atomic('frame.jpg',out.getvalue());count+=1
             atomic('state.json',json.dumps(dict(phase='RUNNING',time=elapsed,frames=count,
@@ -60,9 +65,10 @@ def main():
             try:settings=json.loads((stream/'camera.json').read_text())
             except (OSError,ValueError):settings={}
             camera.azimuth=settings.get('azimuth',130.);camera.elevation=settings.get('elevation',-25.)
-            camera.distance=settings.get('distance',3.);camera.lookat[:]=data.qpos[:3]
+            camera.distance=settings.get('distance',2.2);camera.lookat[:]=data.qpos[:3]
             camera.lookat[0]+=settings.get('pan_x',0.);camera.lookat[1]+=settings.get('pan_y',0.)
             renderer.update_scene(data,camera=camera)
+            reference_ground(renderer.scene,model,data)
             out=io.BytesIO();Image.fromarray(renderer.render()).save(out,format='JPEG',quality=82)
             atomic('frame.jpg',out.getvalue())
             atomic('state.json',json.dumps(dict(phase='COMPLETED',time=float(data.time)-start_sim,frames=count,

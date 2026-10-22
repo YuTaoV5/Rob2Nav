@@ -1,7 +1,7 @@
 """Physical terrain geometry. Metadata is for evaluation, never a planner input."""
 import xml.etree.ElementTree as ET
 
-TERRAIN_SCENES = ("water", "stairs", "platform", "gap", "mixed", "course")
+TERRAIN_SCENES = ("water", "stairs", "platform", "gap", "mixed", "course", "hurdles")
 
 
 def populate(world, scene, cfg):
@@ -41,6 +41,15 @@ def populate(world, scene, cfg):
         slab("approach", -2, 3., 0)
         slab("platform", 3., 10, h, color="0.60 0.40 0.20 1")
         meta["goal_height"] = h
+    elif scene == "hurdles":
+        slab('approach',-2,1.5,0.)
+        slab('low_step',1.5,2.15,.08,color='.68 .52 .32 1')
+        slab('between',2.15,3.2,0.)
+        slab('narrow_hurdle',3.2,3.65,.10,color='.66 .42 .26 1')
+        slab('recovery',3.65,4.7,0.)
+        slab('wide_step',4.7,5.5,.12,color='.68 .52 .32 1')
+        slab('landing',5.5,10,0.)
+        meta['goal']=[6.5,0.]
     elif scene == "gap":
         start = float(cfg.get("gap_start", 3.))
         slab("approach", -2, start, 0)

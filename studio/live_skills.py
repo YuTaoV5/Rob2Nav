@@ -14,7 +14,7 @@ from typing import Literal
 
 class Launch(BaseModel):
     model_config=ConfigDict(extra='forbid')
-    skill:Literal['stairs','platform','multiterrain','backflip','sideflip','upright_walk']
+    skill:Literal['stairs','platform','multiterrain','backflip','sideflip','upright_walk','jump','obstacles']
 
 
 class CompositionStep(BaseModel):
@@ -72,6 +72,12 @@ def mount_live_skills(app,root,python):
                 if proc is not None and proc.poll() is None and time.monotonic()-last_client>8:stop()
     threading.Thread(target=watchdog,daemon=True).start()
 
+    @app.get('/api/live-skills/library')
+    def library():
+        from .skill_library import simulation_library
+        return dict(skills=simulation_library(root),hardware_enabled=False,
+            scope='独立场景技能使用各自模型与控制器；连续热切换仍由下方编排合约限定。')
+
     @app.post('/api/live-skills/start')
     def start(a:Launch):
         nonlocal proc,last_client
@@ -79,10 +85,14 @@ def mount_live_skills(app,root,python):
             stop();key=uuid.uuid4().hex[:12];out=root/'outputs/live_skills'/key
             stream=out/'stream';stream.mkdir(parents=True)
             note='';policy=None
-            if a.skill in ('stairs','platform','multiterrain'):
+            if a.skill=='jump':
+                module='studio.jump_demo';args=['--root',str(root),'--output',str(out/'evaluation')]
+                note='原地跳跃关节动作原语：仅施加有界关节力矩，不施加机身外力；高度与腾空时间以本次评估为准。'
+            elif a.skill in ('stairs','platform','multiterrain','obstacles'):
                 module='go2_nav.terrain_run'
-                args=['--scene',{'multiterrain':'mixed'}.get(a.skill,a.skill),'--locomotion','moe','--max-seconds','45','--episodes','1','--seed','801','--no-jump','--output',str(out/'evaluation')]
-                note='RoboGauge预训练MoE + 感知地形控制；不是Isaac感知微调检查点的迁移验收。'
+                from .terrain_profiles import terrain_launch
+                args,note=terrain_launch(a.skill)
+                args+=['--output',str(out/'evaluation')]
             elif a.skill in ('backflip','sideflip'):
                 from .published_flips import live_flip
                 try:module,args,policy,note=live_flip(root,a.skill,source)

@@ -1,0 +1,211 @@
+{
+  "website_passed": true,
+  "skills": [
+    {
+      "skill": "jump",
+      "phase": "COMPLETED",
+      "frames": 70,
+      "time": 6.999000000000672,
+      "evaluation": {
+        "successes": 1,
+        "total": 1,
+        "metrics": {
+          "airtime_s": 0.20400000000000015,
+          "base_height_gain_m": 0.12508596192352028,
+          "peak_base_height_m": 0.4262511143040486,
+          "terminal_stance": true,
+          "nonfoot_contact": false,
+          "max_joint_speed_ratio": 1.042692358295217
+        }
+      },
+      "scope": "full rollout"
+    },
+    {
+      "skill": "backflip",
+      "phase": "COMPLETED",
+      "frames": 50,
+      "time": 4.999000000000004,
+      "evaluation": {
+        "successes": 0,
+        "total": 1,
+        "hardware_constraints_pass": false,
+        "metrics": {
+          "body_y_rotation_rad": -6.288938518886397,
+          "axis_dominance": 0.8004036070515929,
+          "airtime_s": 0.2980000000000002,
+          "max_height": 0.6136660894323052,
+          "terminal_upright": 0.9998614571253123,
+          "unexpected_body_ground_contact": true,
+          "max_joint_speed_ratio": 1.1069494185489512,
+          "max_joint_limit_excess_rad": 0.0,
+          "action_completed": false,
+          "fixstand": {
+            "passed": true,
+            "initial": {
+              "passed": true,
+              "samples": 35,
+              "stable_fraction": 1.0,
+              "max_pose_error_rad": 0.1105757502959579
+            },
+            "terminal": {
+              "passed": true,
+              "samples": 51,
+              "stable_fraction": 1.0,
+              "max_pose_error_rad": 0.06365915256529409
+            },
+            "pose_tolerance_rad": 0.12,
+            "max_joint_speed_rad_s": 1.0,
+            "minimum_upright_cos": 0.98,
+            "required_stable_fraction": 0.95,
+            "terminal_hold_s": 1.0,
+            "base_height_range_m": [
+              0.26,
+              0.4
+            ],
+            "minimum_foot_force_N": 4.0
+          }
+        },
+        "policy_sha256": "e7748f3b2dc33b58c20e1cdd1d89e8fd511f1860689f21d0727fce5ceffe86a4"
+      },
+      "scope": "full rollout"
+    },
+    {
+      "skill": "sideflip",
+      "phase": "COMPLETED",
+      "frames": 85,
+      "time": 8.499000000000729,
+      "evaluation": {
+        "successes": 0,
+        "total": 1,
+        "hardware_constraints_pass": false,
+        "metrics": {
+          "unwrapped_roll_rad": -6.2661693493197035,
+          "body_x_rotation_rad": -6.228973961461516,
+          "axis_dominance": 0.7247074988154858,
+          "terminal_upright": 0.999634782665258,
+          "airtime_s": 0.36400000000000027,
+          "max_joint_speed_ratio": 1.0870727097710404,
+          "max_joint_limit_excess_rad": 0.0,
+          "unexpected_body_ground_contact": false,
+          "action_completed": false,
+          "fixstand": {
+            "passed": true,
+            "initial": {
+              "passed": true,
+              "samples": 36,
+              "stable_fraction": 1.0,
+              "max_pose_error_rad": 0.11797586888185148
+            },
+            "terminal": {
+              "passed": true,
+              "samples": 51,
+              "stable_fraction": 1.0,
+              "max_pose_error_rad": 0.11478718428626482
+            },
+            "pose_tolerance_rad": 0.12,
+            "max_joint_speed_rad_s": 1.0,
+            "minimum_upright_cos": 0.98,
+            "required_stable_fraction": 0.95,
+            "terminal_hold_s": 1.0,
+            "base_height_range_m": [
+              0.26,
+              0.4
+            ],
+            "minimum_foot_force_N": 4.0
+          },
+          "preparation": {
+            "end_s": 2.4,
+            "max_target_step_rad": 0.7086081504821777,
+            "max_joint_speed_rad_s": 14.663706985367348,
+            "max_body_angular_speed_rad_s": 6.5592031344291915,
+            "limits": {
+              "max_target_step_rad": 0.08,
+              "max_joint_speed_rad_s": 3.0,
+              "max_body_angular_speed_rad_s": 1.0
+            },
+            "passed": false
+          }
+        },
+        "policy_sha256": "c3394814b2447bb87fd83ba914136dbb4f827c551a332afe7605a099073bd87d"
+      },
+      "scope": "full rollout"
+    },
+    {
+      "skill": "upright_walk",
+      "phase": "COMPLETED",
+      "frames": 105,
+      "time": 10.49899999999962,
+      "evaluation": {
+        "successes": 0,
+        "total": 1,
+        "hardware_constraints_pass": false,
+        "metrics": {
+          "upright_seconds": 0.06,
+          "travel_m": 0.4412364689494611,
+          "upright_travel_m": 0.20587909368644877,
+          "rear_support_fraction": 0.56,
+          "started_on_four_feet": true,
+          "max_joint_speed_ratio": 4.024167090016933,
+          "max_joint_limit_excess_rad": 0.48456928855896164,
+          "unexpected_body_ground_contact": true
+        },
+        "policy_sha256": "b44983998121a36fb6cdfc7693fcfb6b56ef5abc12a444d5fb669be49e0cf532"
+      },
+      "scope": "full rollout"
+    },
+    {
+      "skill": "stairs",
+      "phase": "RUNNING",
+      "frames": 6,
+      "time": 0.5000000000000003,
+      "evaluation": null,
+      "scope": "startup and live frame smoke only"
+    },
+    {
+      "skill": "platform",
+      "phase": "RUNNING",
+      "frames": 6,
+      "time": 0.5000000000000003,
+      "evaluation": null,
+      "scope": "startup and live frame smoke only"
+    },
+    {
+      "skill": "obstacles",
+      "phase": "COMPLETED",
+      "frames": 158,
+      "time": 15.898000000001979,
+      "evaluation": {
+        "successes": 1,
+        "collisions": 0,
+        "falls": 0,
+        "total": 1
+      },
+      "scope": "full rollout"
+    },
+    {
+      "skill": "multiterrain",
+      "phase": "RUNNING",
+      "frames": 6,
+      "time": 0.5000000000000003,
+      "evaluation": null,
+      "scope": "startup and live frame smoke only"
+    }
+  ],
+  "handshake": [
+    {
+      "leg": "FR",
+      "state": "HOLD",
+      "force": 2.3275466470395028,
+      "dragged": true
+    },
+    {
+      "leg": "FL",
+      "state": "HOLD",
+      "force": 1.5981196472597088,
+      "dragged": true
+    }
+  ],
+  "page_errors": [],
+  "visual_ground": "world-fixed 0.25m grid and checker tiles, scene-only geoms",
+  "hardware_connected": false
+}

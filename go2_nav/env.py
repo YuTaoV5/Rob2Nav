@@ -116,7 +116,7 @@ class Go2MaplessEnv(gym.Env):
                 box(f"obstacle_{i}", x, self.np_random.uniform(-1.4, 1.4), 0.25, self.np_random.uniform(.25, .55))
         elif self.scene == "blocked":
             box("blocking_wall", 3, 0, .15, 3)
-        elif self.scene in ("water", "stairs", "platform", "gap", "mixed", "course"):
+        elif self.scene in ("water", "stairs", "platform", "gap", "mixed", "course", "hurdles"):
             from .terrains import populate
             self.terrain_meta = populate(world, self.scene, self.cfg)
             if self.scene == "course":

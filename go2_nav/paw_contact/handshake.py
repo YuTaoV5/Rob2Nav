@@ -367,6 +367,8 @@ class PawSimulation:
             cam.lookat[0]+=camera_settings["pan_x"];cam.lookat[1]+=camera_settings["pan_y"]
         opt = mujoco.MjvOption();opt.geomgroup[3]=0
         self.renderer.update_scene(self.data,camera=cam,scene_option=opt)
+        from studio.sim_visuals import reference_ground
+        reference_ground(self.renderer.scene,self.model,self.data)
         return self.renderer.render().copy()
 
     def close(self):
