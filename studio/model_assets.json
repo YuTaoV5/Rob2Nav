@@ -514,7 +514,7 @@
     {
       "skill": "backflip",
       "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/model_9495.pt",
-      "role": "selected",
+      "role": "archive",
       "selection_basis": "FIXSTAND 首尾优先候选 v6；固定权重四种子评估，非全局最优或实机合格权重",
       "validation": "后翻 v6：首尾 FIXSTAND 各4/4；关节速度比1.0986–1.1092，非足端接地4/4，完整验收0/4；仅研究仿真。",
       "sha256": "e2be04ae535f11b2a15a17ffa97b7c830f43a8084a4447091027197165e1a9a8",
@@ -569,7 +569,7 @@
     {
       "skill": "backflip",
       "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/exported/policy.onnx",
-      "role": "selected",
+      "role": "archive",
       "selection_basis": "FIXSTAND 首尾优先候选 v6；固定权重四种子评估，非全局最优或实机合格权重",
       "validation": "后翻 v6：首尾 FIXSTAND 各4/4；关节速度比1.0986–1.1092，非足端接地4/4，完整验收0/4；仅研究仿真。",
       "sha256": "e7748f3b2dc33b58c20e1cdd1d89e8fd511f1860689f21d0727fce5ceffe86a4",
@@ -624,7 +624,7 @@
     {
       "skill": "backflip",
       "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/exported/policy.pt",
-      "role": "selected",
+      "role": "archive",
       "selection_basis": "FIXSTAND 首尾优先候选 v6；固定权重四种子评估，非全局最优或实机合格权重",
       "validation": "后翻 v6：首尾 FIXSTAND 各4/4；关节速度比1.0986–1.1092，非足端接地4/4，完整验收0/4；仅研究仿真。",
       "sha256": "296166dabf30167cc872e252e68970cee5db1317702411b9332a1864261c09ba",
@@ -719,6 +719,159 @@
         {
           "path": "docs/CAPABILITY_RECOVERY_20261022.md",
           "label": "重验与重训说明"
+        }
+      ]
+    },
+    {
+      "skill": "backflip",
+      "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/model_1999.pt",
+      "role": "selected",
+      "selection_basis": "开源6000_actor精确初始化后本服务器2000更新；本轮独立完整验收4/4",
+      "validation": "后翻v7：独立四种子完整动作、首尾FIXSTAND与URDF速度/限位4/4；无机身触地，最大速度比0.7722–0.7888。仅单技能仿真；实机未验证，统一热切换严格1/4，未通过。",
+      "sha256": "7d16e73e5826149f19e50b00b5f1e77accbcdae09bbcd4bfe36d3e18992fa971",
+      "bytes": 5376949,
+      "resources": [
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/completion.json",
+          "label": "completion.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/evaluation.json",
+          "label": "evaluation.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/fixstand.json",
+          "label": "fixstand.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/params/env.yaml",
+          "label": "env.yaml"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/params/agent.yaml",
+          "label": "agent.yaml"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/exported/export.json",
+          "label": "export.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/seed_12400/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/seed_12401/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/seed_12402/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/seed_12403/summary.json",
+          "label": "summary.json"
+        }
+      ]
+    },
+    {
+      "skill": "backflip",
+      "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/exported/policy.onnx",
+      "role": "selected",
+      "selection_basis": "开源6000_actor精确初始化后本服务器2000更新；本轮独立完整验收4/4",
+      "validation": "后翻v7：独立四种子完整动作、首尾FIXSTAND与URDF速度/限位4/4；无机身触地，最大速度比0.7722–0.7888。仅单技能仿真；实机未验证，统一热切换严格1/4，未通过。",
+      "sha256": "73a56f68c90b1164346f6dce812e769e668b376f610c8984b869858ec495935b",
+      "bytes": 788939,
+      "resources": [
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/completion.json",
+          "label": "completion.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/evaluation.json",
+          "label": "evaluation.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/fixstand.json",
+          "label": "fixstand.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/params/env.yaml",
+          "label": "env.yaml"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/params/agent.yaml",
+          "label": "agent.yaml"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/exported/export.json",
+          "label": "export.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/seed_12400/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/seed_12401/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/seed_12402/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/seed_12403/summary.json",
+          "label": "summary.json"
+        }
+      ]
+    },
+    {
+      "skill": "backflip",
+      "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/exported/policy.pt",
+      "role": "selected",
+      "selection_basis": "开源6000_actor精确初始化后本服务器2000更新；本轮独立完整验收4/4",
+      "validation": "后翻v7：独立四种子完整动作、首尾FIXSTAND与URDF速度/限位4/4；无机身触地，最大速度比0.7722–0.7888。仅单技能仿真；实机未验证，统一热切换严格1/4，未通过。",
+      "sha256": "69f7dffa7d296bf70a6c79c8a5ac613e70df31c0cd435be1957f2ec9e4c4c12a",
+      "bytes": 798738,
+      "resources": [
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/completion.json",
+          "label": "completion.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/evaluation.json",
+          "label": "evaluation.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/fixstand.json",
+          "label": "fixstand.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/params/env.yaml",
+          "label": "env.yaml"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/params/agent.yaml",
+          "label": "agent.yaml"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/exported/export.json",
+          "label": "export.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/seed_12400/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/seed_12401/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/seed_12402/summary.json",
+          "label": "summary.json"
+        },
+        {
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/seed_12403/summary.json",
+          "label": "summary.json"
         }
       ]
     }

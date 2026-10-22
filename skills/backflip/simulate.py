@@ -25,12 +25,14 @@ def main():
     p.add_argument('--seconds',type=float,default=6.)
     p.add_argument('--seed',type=int,default=1000)
     p.add_argument('--initial-joint-noise',type=float,default=.002)
+    p.add_argument('--initial-yaw-deg',type=float,default=0.)
     p.add_argument('--video',action='store_true')
     p.add_argument('--fixstand-roundtrip',action='store_true')
     p.add_argument('--diagnostics',action='store_true',help='Record read-only per-substep failure diagnostics')
     p.add_argument('--output',required=True,type=Path)
     a=p.parse_args()
     if not 0<a.seconds<=60 or not 0<=a.initial_joint_noise<=.05:raise ValueError('Invalid evaluation duration/noise')
+    if not np.isfinite(a.initial_yaw_deg) or abs(a.initial_yaw_deg)>180:raise ValueError('Invalid initial heading')
     source=a.source.resolve();policy=a.onnx.resolve()
     if subprocess.check_output(['git','-C',str(source),'rev-parse','HEAD'],text=True).strip()!=PIN:
         raise ValueError('Wrong upstream commit')
@@ -85,6 +87,8 @@ def main():
         resets+=1
         if resets>1:raise RuntimeError('Unexpected physical reset during policy rollout')
         original_reset(model,data,qids)
+        yaw=np.radians(a.initial_yaw_deg)
+        data.qpos[3:7]=[np.cos(yaw/2),0.,0.,np.sin(yaw/2)]
         data.qpos[qids]+=rng.uniform(-a.initial_joint_noise,a.initial_joint_noise,12)
         mujoco.mj_forward(model,data)
     def step(model,data,*args,**kwargs):
@@ -150,7 +154,7 @@ def main():
         from rob2nav.fixstand_validation import assess
         metrics['action_completed']=bool(success);metrics['fixstand']=assess(trace,initial_end=.8 if delayed else .35)
         success=bool(success and metrics['fixstand']['passed'])
-    summary=dict(args=dict(kind='backflip',seed=a.seed,physics_hz=a.physics_hz,initial_joint_noise=a.initial_joint_noise),backend='MuJoCo',
+    summary=dict(args=dict(kind='backflip',seed=a.seed,physics_hz=a.physics_hz,initial_joint_noise=a.initial_joint_noise,initial_yaw_deg=a.initial_yaw_deg),backend='MuJoCo',
         role='locally trained Go2 backflip; pinned native observation/controller',successes=int(success),total=1,episodes=[dict(success=success,**metrics)],metrics=metrics,
         policy_sha256=hashlib.sha256(policy.read_bytes()).hexdigest(),source_commit=PIN,source_sha256=hashlib.sha256(file.read_bytes()).hexdigest(),
         evaluator_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),policy_hz=50,physics_hz=a.physics_hz,

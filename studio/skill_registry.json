@@ -243,21 +243,22 @@
       "projects": [
         "go2_backflip_native"
       ],
-      "description": "已实测5个原项目ONNX和LeggedSkillDeploy后翻。原6000_actor动作完整、无机身接地，但首尾与速度失败；已用其网络初始化v7。网页仍为v6研究候选。",
+      "description": "开源6000_actor精确初始化后本服务器完成v7训练。独立12400–12403完成整周翻转、无机身触地，首尾FIXSTAND及URDF速度/限位联合4/4；当前网站演示v7，统一连续热切换严格1/4，未通过，实机未验证。",
       "acceptance": "本次训练模型需独立完成完整俯仰翻转、稳定落地、多条件重复及关节/力矩/速度约束；实机仅方案。",
       "recipe": "backflip_native_ppo",
-      "local_status": "开源actor已选定并启动v7续训；完整验收未过",
+      "local_status": "v7单技能完整验收4/4；统一热切换严格1/4，未通过",
       "evidence": {
         "prefixes": [
+          "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022",
           "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022"
         ],
         "kinds": []
       },
       "curated_media": [
         {
-          "path": "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022/seed_10000/episode_0.mp4",
-          "title": "backflip v6 · FIXSTAND 往返 · seed 10000",
-          "label": "后翻 v6：首尾 FIXSTAND 各4/4；关节速度比1.0986–1.1092，非足端接地4/4，完整验收0/4；仅研究仿真。"
+          "path": "artifacts/backflip_v7_verified_20261022/outputs/fixstand_backflip_upstream_actor_v7_20261022/seed_12400/episode_0.mp4",
+          "title": "后翻v7 · 完整动作与首尾FIXSTAND · seed12400",
+          "label": "后翻v7：独立四种子完整动作、首尾FIXSTAND与URDF速度/限位4/4；无机身触地，最大速度比0.7722–0.7888。仅单技能仿真；实机未验证，统一热切换严格1/4，未通过。"
         }
       ],
       "training_entry": "manual"
@@ -271,10 +272,10 @@
         "go2_backflip_native",
         "lsd"
       ],
-      "description": "v9起跳前消抖通过，但落地/关节约束/末端站姿失败。网页保留v8研究候选；v10针对落地续训，尚未验收。",
+      "description": "v10已完成：准备段消抖4/4，但完整动作/首尾与URDF约束联合0/4，仍有落地接触和超速。当前对比PhysX与MuJoCo物理子步和初始状态，网站仍保留v8研究演示。",
       "acceptance": "完整约2π侧向旋转、真实腾空、无机身触地且稳定落地；逐物理步另查关节速度/限位。",
       "recipe": "sideflip_native_ppo",
-      "local_status": "v9准备段4/4、完整0/4；v10落地约束续训中",
+      "local_status": "v10消抖4/4、完整0/4；跨引擎诊断中",
       "evidence": {
         "prefixes": [
           "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022"

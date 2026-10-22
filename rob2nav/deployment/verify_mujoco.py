@@ -59,6 +59,7 @@ def main():
         choreography=SkillSequence(runtime,load_steps(a.sequence))
         sequence=[step.skill for step in choreography.steps]
     native_peak=0.;flip_rotation=0.;maximum_speed_ratio=0.
+    backflip_checks=[];check=None;check_epoch=None
     old_tau=None;old_kp=None;last_ref=None;naive=[];max_torque_step=0.;max_gain_step=0.;max_ref_step=0.;max_tilt=0.;min_height=1e9
     wall=time.monotonic();loop_gaps=[];last_wall=wall;passed=False;reason='time budget'
     next_progress=0.;last_progress=None
@@ -110,6 +111,9 @@ def main():
                 passed=True;reason='all requested profiles committed and settled';break
             command=runtime.step(s,t)
             native=c.phase=='ACTIVE' and c.active and c.active.actuation=='native_pd'
+            if native and c.active.observation=='backflip60' and c.epoch!=check_epoch:
+                from .atomic_validation import BackflipValidation
+                check=BackflipValidation(model,c.active,c.phase_at);backflip_checks.append(check);check_epoch=c.epoch
             if native and current_id=='sideflip69':flip_rotation+=s.gyro[0]*.002
             from .core import FREE_SPEED
             maximum_speed_ratio=max(maximum_speed_ratio,float(np.max(abs(s.dq)/FREE_SPEED)))
@@ -127,8 +131,12 @@ def main():
                     speed=np.clip(data.qvel[dids],-2*FREE_SPEED,2*FREE_SPEED)
                     lower=np.maximum(EFFORT*(-1-speed/FREE_SPEED),-EFFORT);upper=np.minimum(EFFORT*(1-speed/FREE_SPEED),EFFORT)
                     raw=command.kp*(command.qref-data.qpos[qids])+command.kd*(command.dqref-data.qvel[dids])+command.feedforward
-                    data.ctrl[aids]=np.clip(raw,lower,upper)
+                    if native and c.active.motor_control is not None:
+                        from skills.backflip.control import motor_torque
+                        data.ctrl[aids]=motor_torque(raw,data.qvel[dids],c.active.motor_control,SDK_JOINTS)
+                    else:data.ctrl[aids]=np.clip(raw,lower,upper)
                 mujoco.mj_step(model,data)
+                if check is not None:check.sample(model,data,float(data.time)-start_time)
             if abs(float(data.time)-start_time-t)>1e-7:raise RuntimeError('Physics time discontinuity/reset')
             tilt=float(np.arccos(np.clip(env.rotation[2,2],-1,1)));max_tilt=max(max_tilt,tilt);min_height=min(min_height,float(data.qpos[2]))
             samples.append(np.r_[t,command.tau,command.qref,command.kp,command.kd,s.q,s.dq,s.feet,tilt,data.qpos[:3]])
@@ -139,7 +147,6 @@ def main():
             if video is not None and t>=next_render:video.append_data(env.render());next_render=t+.1
             delay=.002-(time.monotonic()-before)
             if delay>0:time.sleep(delay)
-        publish_progress(t,finished=True)
         np.savez_compressed(a.output/'control_trace.npz',values=np.asarray(samples),
             columns=np.array(['time']+[f'{k}:{j}' for k in ['tau','qref','kp','kd','q','dq'] for j in SDK_JOINTS]+[f'force:{l}' for l in ['FR','FL','RR','RL']]+['tilt','x','y','z']))
         report=dict(seed=a.seed,asset=a.asset,wire_mode=a.wire_mode,sequence=sequence,shared_sequencer=choreography is not None,initial_yaw_deg=a.initial_yaw_deg,atomic_cycle=a.atomic_cycle,flip_rotation_rad=flip_rotation,native_motion_peak_torque_step_Nm=native_peak,maximum_joint_speed_ratio=maximum_speed_ratio,passed=bool(passed and (not a.atomic_cycle or abs(flip_rotation)>5.5) and max_torque_step<=.300001 and max_gain_step<=.030001),reason=reason,
@@ -152,9 +159,21 @@ def main():
             timing_scope='Simulation clock drives the controller; pacing/rendering IPC timing is recorded but is not a hard-real-time hardware certificate',
             model_sha256=dict(runtime.model_history),retained_prepared_entries=len(runtime.prepared),hardware_connected=False,
             root_writes='initialization only; actuator rollout in reported wire_mode, no stabilizing root force or weld',final_position=data.qpos[:3].tolist())
-        report['source_sha256']={str(f.relative_to(root)):hashlib.sha256(f.read_bytes()).hexdigest() for f in (root/'rob2nav/deployment').glob('*.py')}
+        report['source_sha256']={'rob2nav/deployment/'+f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in Path(__file__).resolve().parent.glob('*.py')}
+        motor_source=Path(__file__).resolve().parents[2]/'skills/backflip/control.py'
+        report['source_sha256']['skills/backflip/control.py']=hashlib.sha256(motor_source.read_bytes()).hexdigest()
+        if a.asset=='source':report['model_xml_sha256']=hashlib.sha256(source_model.read_bytes()).hexdigest()
         trace=np.asarray(samples)
         report['compact_transitions']=not a.legacy_transitions
+        atomic_reports=[item.report() for item in backflip_checks]
+        expected_backflips=sum(runtime.profile(step.skill)[1].observation=='backflip60' for step in choreography.steps) if choreography else 0
+        report['backflip_validation']=atomic_reports
+        report['backflip_validation_complete']=len(atomic_reports)==expected_backflips
+        report['passed']=bool(report['passed'] and maximum_speed_ratio<=1. and report['backflip_validation_complete'] and all(item['passed'] for item in atomic_reports))
+        if passed and not report['passed']:report['reason']='strict atomic/velocity acceptance failed; inspect backflip_validation'
+        for index,item in enumerate(backflip_checks):
+            (a.output/f'backflip_{index}_trace.json').write_text(json.dumps(item.trace)+'\n')
+        passed=report['passed'];publish_progress(t,finished=True)
         if last_progress is not None:report['composition_timing']=last_progress
         report['duration_s']=float(trace[-1,0]) if len(trace) else 0.
         report['joint_travel_rad']=float(np.abs(np.diff(trace[:,49:61],axis=0)).sum()) if len(trace)>1 else 0.

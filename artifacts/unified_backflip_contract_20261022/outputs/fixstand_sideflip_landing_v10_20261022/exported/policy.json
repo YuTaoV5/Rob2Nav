@@ -1,0 +1,158 @@
+{
+  "robot": "Go2",
+  "role": "real PhysX PPO training, not FK replay",
+  "unitree_commit": "4960b84732b0c2ec593dccbfe963fda1bcd7b1e3",
+  "backflip_asset_commit": "954aa61ceb62c515689677f44a21e32109f6b62d",
+  "reference_sha256": "dac9a73a486b0edc22d2405007bee206469158484fd57a9288424bae1a467f7b",
+  "source_sha256": {
+    "build_motion.py": "53a0e3f08df12810f4f4eed93131c04d51a1c2c9b16e9e250a6bfc5fbc3f10e8",
+    "evaluate_isaac.py": "94720fdc36432b143af287ba5f29bfbf70e9a5c950f47ccbad1f16cb74ced8eb",
+    "__init__.py": "ffcc68bfbdf6da1f4c28bc3dc023ce973e296f061197538697a3acc2dc9d7388",
+    "check_reference.py": "0ecbb238f6a12ccd88fe4b03382751dedbf99a7910db7cd69bdcd86f06d91229",
+    "task.py": "73ce934578ac27e8d60783014c27ac0a221cd0f495320ee87f11fb2d3c3a8313",
+    "train.py": "4e95e663dacf5a300871a92ca9b8b14b633f38d9f6f711a79646a2d286da450b",
+    "common.py": "49aa4b92f14991c72b99ae7363412c269a9103f0f2b7f5540bf3ea9f22525eaa"
+  },
+  "joint_names": [
+    "FL_hip_joint",
+    "FR_hip_joint",
+    "RL_hip_joint",
+    "RR_hip_joint",
+    "FL_thigh_joint",
+    "FR_thigh_joint",
+    "RL_thigh_joint",
+    "RR_thigh_joint",
+    "FL_calf_joint",
+    "FR_calf_joint",
+    "RL_calf_joint",
+    "RR_calf_joint"
+  ],
+  "body_names": [
+    "base",
+    "FL_hip",
+    "FR_hip",
+    "Head_upper",
+    "RL_hip",
+    "RR_hip",
+    "FL_thigh",
+    "FR_thigh",
+    "Head_lower",
+    "RL_thigh",
+    "RR_thigh",
+    "FL_calf",
+    "FR_calf",
+    "RL_calf",
+    "RR_calf",
+    "FL_foot",
+    "FR_foot",
+    "RL_foot",
+    "RR_foot"
+  ],
+  "anchor": "base",
+  "distal_bodies": [
+    "FL_foot",
+    "FR_foot",
+    "RL_foot",
+    "RR_foot"
+  ],
+  "action_scale": 0.5,
+  "kp": 40,
+  "kd": 1,
+  "actor_observations": 69,
+  "action_dim": 12,
+  "policy_hz": 50,
+  "physics_hz": 500,
+  "motor_model": "dc_linear_v1",
+  "seed": 43,
+  "requested_iterations": 1500,
+  "num_envs": 1024,
+  "hardware_connected": false,
+  "fixstand_roundtrip": {
+    "skill": "sideflip",
+    "objective": "standard four-foot stance -> action -> standard four-foot stance",
+    "standard_pose": {
+      "FR_hip_joint": 0.0,
+      "FR_thigh_joint": 0.8,
+      "FR_calf_joint": -1.5,
+      "FL_hip_joint": 0.0,
+      "FL_thigh_joint": 0.8,
+      "FL_calf_joint": -1.5,
+      "RR_hip_joint": 0.0,
+      "RR_thigh_joint": 1.0,
+      "RR_calf_joint": -1.5,
+      "RL_hip_joint": 0.0,
+      "RL_thigh_joint": 1.0,
+      "RL_calf_joint": -1.5
+    },
+    "terminal_hold_s": 1.0,
+    "reset_only_state_writes": true,
+    "hardware_connected": false,
+    "shared_objective_sha256": "9f63aed5bd6542dc5e9ecc1a56e08e93f01d152e4680db56ec2a0c272f02cd12",
+    "independently_validated": false,
+    "reference_sha256": "dac9a73a486b0edc22d2405007bee206469158484fd57a9288424bae1a467f7b",
+    "actor_observations": 69,
+    "action_parameterization": "reference_residual_v4",
+    "padded_region_frames": 90,
+    "residual_limit_rad": 0.2,
+    "bridge_residual_limit_rad": 0.05,
+    "terminal_hip_taper_frames": 50,
+    "boundary_blend_frames": 10,
+    "quiet_preparation_seconds": 2.4,
+    "landing_constraints": true,
+    "landing_objective_sha256": "75c86438af92e052b274ccbed7dd0da232464d39fca3c9e2a732f58976057e50",
+    "peak_endpoint_objective": true
+  },
+  "actor_input_dim": 69,
+  "actor_output_dim": 12,
+  "normalization": "identity",
+  "actor_observation_terms": [
+    {
+      "name": "motion_command",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "motion_anchor_ori_b",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "base_ang_vel",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "joint_pos_rel",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "joint_vel_rel",
+      "scale": null,
+      "clip": null
+    },
+    {
+      "name": "last_action",
+      "scale": null,
+      "clip": null
+    }
+  ],
+  "default_joint_pos": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.8,
+    0.8,
+    1.0,
+    1.0,
+    -1.5,
+    -1.5,
+    -1.5,
+    -1.5
+  ],
+  "checkpoint_sha256": "e83d5f354e27a523296d46b96c72c41d24f227b8531e35225470d3dda544b1c6",
+  "policy_sha256": "9ed65e3134a82f442ec47f853544dea3887ff229cd41c0fcad577e109cfd22cd",
+  "export_verified_finite": true,
+  "capability_verified": false
+}

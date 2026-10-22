@@ -95,6 +95,8 @@ class Skill:
     endpoint_residual_limit_rad:float=.2
     terminal_hip_taper_frames:int=0
     boundary_blend_frames:int=0
+    motor_control:dict|None=None
+    entry_torque_blend_s:float=0.
 
     def checked(self):
         if len(self.joints)!=12 or set(self.joints)!=set(SDK_JOINTS):raise ValueError('Joint-name mapping must be a complete Go2 bijection')
@@ -102,8 +104,15 @@ class Skill:
         if min(self.kp)<0 or max(self.kp)>80 or min(self.kd)<0 or max(self.kd)>8:raise ValueError('PD outside configured bound')
         if not np.isfinite([self.policy_hz,self.scale]).all() or self.policy_hz not in (25,50,100) or self.scale<=0:raise ValueError('Invalid policy timing/scale')
         if self.observation not in ('stand','robogauge45','backflip60','upright48','upright52','mimic69'):raise ValueError('Unsupported observation adapter')
+        if self.motor_control is not None:
+            from skills.backflip.control import control_contract
+            c=control_contract(self.motor_control)
+            if self.observation!='backflip60' or self.actuation!='native_pd':raise ValueError('Backflip motor contract requires native backflip control')
+            if self.scale!=c['action_scale'] or c['action_clip']!=8. or any(k!=c['stiffness'] for k in self.kp) or any(k!=c['damping'] for k in self.kd):raise ValueError('Backflip action/PD and motor contracts disagree')
+        if not np.isfinite(self.entry_torque_blend_s) or not 0<=self.entry_torque_blend_s<=.4 or (self.entry_torque_blend_s and self.motor_control is None):raise ValueError('Entry torque blending requires a validated motor contract and at most 0.4 seconds')
         compatible={'joint_offset_v1':None,'reference_residual_v2':'mimic69','reference_residual_v3':'mimic69','reference_residual_v4':'mimic69','backflip_entry_v2':'backflip60','backflip_entry_v3':'backflip60','upright_endpoint_v2':'upright52','upright_endpoint_v3':'upright52'}
         if self.action_parameterization not in compatible or (compatible[self.action_parameterization] is not None and self.observation!=compatible[self.action_parameterization]):raise ValueError('Action and observation contracts disagree')
+        if self.motor_control is not None and self.action_parameterization not in ('backflip_entry_v2','backflip_entry_v3'):raise ValueError('Motor contract requires the delayed-entry action mapping')
         if self.action_parameterization in ('reference_residual_v2','reference_residual_v3','reference_residual_v4'):
             if not self.reference or not .01<=self.bridge_residual_limit_rad<=self.residual_limit_rad<=.3:raise ValueError('Invalid sideflip residual contract')
         elif self.residual_limit_rad or self.bridge_residual_limit_rad:raise ValueError('Residual limits require reference residual action')

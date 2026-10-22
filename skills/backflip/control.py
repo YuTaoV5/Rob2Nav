@@ -42,3 +42,11 @@ def configure_playback(module,raw):
     module.TARGET_VELOCITY_LIMIT=np.array(contract['target_velocity_limits'])
     module.MOTOR_TORQUE_Y1=contract['motor_torque_y1'];module.MOTOR_TORQUE_Y2=contract['motor_torque_y2']
     return contract
+
+
+def motor_torque(raw,velocity,contract,joint_names=JOINT_NAMES):
+    """The native training/playback motoring and braking curve, in caller order."""
+    limits=np.array([contract['joint_velocity_limits'][JOINT_NAMES.index(n)] for n in joint_names])
+    fraction=np.clip((limits-np.abs(velocity))/(limits-contract['motor_velocity_x1']),0.,1.)
+    peak=np.where(np.asarray(velocity)*raw>0.,contract['motor_torque_y1'],contract['motor_torque_y2'])
+    return np.clip(raw,-peak*fraction,peak*fraction)

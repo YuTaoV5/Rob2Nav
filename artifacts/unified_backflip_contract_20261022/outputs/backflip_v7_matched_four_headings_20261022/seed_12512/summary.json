@@ -1,0 +1,468 @@
+{
+  "seed": 12512,
+  "asset": "source",
+  "wire_mode": "hybrid_pd",
+  "sequence": [
+    "stand",
+    "walk_moe",
+    "backflip60",
+    "walk_moe",
+    "stand"
+  ],
+  "shared_sequencer": true,
+  "initial_yaw_deg": 15.0,
+  "atomic_cycle": false,
+  "flip_rotation_rad": 0.0,
+  "native_motion_peak_torque_step_Nm": 5.961837665074972,
+  "maximum_joint_speed_ratio": 0.7885412009385584,
+  "passed": false,
+  "reason": "strict atomic/velocity acceptance failed; inspect backflip_validation",
+  "backend": "MuJoCo real free-base hot-switch harness; commits/model hashes below define which actors were actually exercised",
+  "commits": [
+    {
+      "time": 5.66,
+      "skill": "stand",
+      "position": [
+        -0.007726579488455671,
+        -0.0019750424445513725,
+        0.33111609856447183
+      ]
+    },
+    {
+      "time": 12.792,
+      "skill": "walk_moe",
+      "position": [
+        -0.016420211486174122,
+        -0.005251002272212017,
+        0.31493788925592403
+      ]
+    },
+    {
+      "time": 20.636,
+      "skill": "backflip60",
+      "position": [
+        0.047176245555490916,
+        0.023386674252442542,
+        0.32951553526729094
+      ]
+    },
+    {
+      "time": 33.644,
+      "skill": "walk_moe",
+      "position": [
+        -0.809677848860802,
+        -0.30881217070723604,
+        0.3138699683204998
+      ]
+    },
+    {
+      "time": 42.742000000000004,
+      "skill": "stand",
+      "position": [
+        -0.7456360924359902,
+        -0.28464924637056604,
+        0.32579830567285156
+      ]
+    }
+  ],
+  "requests": [],
+  "controller_events": [
+    {
+      "time": 0.0,
+      "event": "capture_measured_state",
+      "phase": "CAPTURE",
+      "epoch": 0
+    },
+    {
+      "time": 1.0,
+      "event": "NEUTRAL",
+      "phase": "NEUTRAL",
+      "epoch": 0
+    },
+    {
+      "time": 3.0,
+      "event": "READY",
+      "phase": "READY",
+      "epoch": 0
+    },
+    {
+      "time": 3.0020000000000002,
+      "event": "request:stand",
+      "phase": "READY",
+      "epoch": 0
+    },
+    {
+      "time": 3.3040000000000003,
+      "event": "ENTRY",
+      "phase": "ENTRY",
+      "epoch": 0
+    },
+    {
+      "time": 3.656,
+      "event": "WARMUP",
+      "phase": "WARMUP",
+      "epoch": 1
+    },
+    {
+      "time": 4.658,
+      "event": "BLEND",
+      "phase": "BLEND",
+      "epoch": 1
+    },
+    {
+      "time": 5.658,
+      "event": "ACTIVE",
+      "phase": "ACTIVE",
+      "epoch": 1
+    },
+    {
+      "time": 5.658,
+      "event": "commit:stand",
+      "phase": "ACTIVE",
+      "epoch": 1
+    },
+    {
+      "time": 8.104000000000001,
+      "event": "request:walk_moe",
+      "phase": "ACTIVE",
+      "epoch": 1
+    },
+    {
+      "time": 8.104000000000001,
+      "event": "EXIT",
+      "phase": "EXIT",
+      "epoch": 1
+    },
+    {
+      "time": 10.104000000000001,
+      "event": "ENTRY",
+      "phase": "ENTRY",
+      "epoch": 1
+    },
+    {
+      "time": 10.77,
+      "event": "WARMUP",
+      "phase": "WARMUP",
+      "epoch": 2
+    },
+    {
+      "time": 11.790000000000001,
+      "event": "BLEND",
+      "phase": "BLEND",
+      "epoch": 2
+    },
+    {
+      "time": 12.790000000000001,
+      "event": "ACTIVE",
+      "phase": "ACTIVE",
+      "epoch": 2
+    },
+    {
+      "time": 12.790000000000001,
+      "event": "commit:walk_moe",
+      "phase": "ACTIVE",
+      "epoch": 2
+    },
+    {
+      "time": 15.164,
+      "event": "request:backflip60",
+      "phase": "ACTIVE",
+      "epoch": 2
+    },
+    {
+      "time": 15.164,
+      "event": "EXIT",
+      "phase": "EXIT",
+      "epoch": 2
+    },
+    {
+      "time": 17.326,
+      "event": "ENTRY",
+      "phase": "ENTRY",
+      "epoch": 2
+    },
+    {
+      "time": 19.326,
+      "event": "WARMUP",
+      "phase": "WARMUP",
+      "epoch": 3
+    },
+    {
+      "time": 20.332,
+      "event": "ARMED",
+      "phase": "ARMED",
+      "epoch": 3
+    },
+    {
+      "time": 20.332,
+      "event": "commit:backflip60",
+      "phase": "ARMED",
+      "epoch": 3
+    },
+    {
+      "time": 20.634,
+      "event": "ACTIVE",
+      "phase": "ACTIVE",
+      "epoch": 3
+    },
+    {
+      "time": 20.634,
+      "event": "atomic_trigger",
+      "phase": "ACTIVE",
+      "epoch": 3
+    },
+    {
+      "time": 20.650000000000002,
+      "event": "request:walk_moe",
+      "phase": "ACTIVE",
+      "epoch": 3
+    },
+    {
+      "time": 27.636,
+      "event": "EXIT",
+      "phase": "EXIT",
+      "epoch": 3
+    },
+    {
+      "time": 29.636,
+      "event": "ENTRY",
+      "phase": "ENTRY",
+      "epoch": 3
+    },
+    {
+      "time": 31.636,
+      "event": "WARMUP",
+      "phase": "WARMUP",
+      "epoch": 4
+    },
+    {
+      "time": 32.642,
+      "event": "BLEND",
+      "phase": "BLEND",
+      "epoch": 4
+    },
+    {
+      "time": 33.642,
+      "event": "ACTIVE",
+      "phase": "ACTIVE",
+      "epoch": 4
+    },
+    {
+      "time": 33.642,
+      "event": "commit:walk_moe",
+      "phase": "ACTIVE",
+      "epoch": 4
+    },
+    {
+      "time": 35.648,
+      "event": "request:stand",
+      "phase": "ACTIVE",
+      "epoch": 4
+    },
+    {
+      "time": 35.924,
+      "event": "EXIT",
+      "phase": "EXIT",
+      "epoch": 4
+    },
+    {
+      "time": 40.386,
+      "event": "ENTRY",
+      "phase": "ENTRY",
+      "epoch": 4
+    },
+    {
+      "time": 40.736000000000004,
+      "event": "WARMUP",
+      "phase": "WARMUP",
+      "epoch": 5
+    },
+    {
+      "time": 41.74,
+      "event": "BLEND",
+      "phase": "BLEND",
+      "epoch": 5
+    },
+    {
+      "time": 42.74,
+      "event": "ACTIVE",
+      "phase": "ACTIVE",
+      "epoch": 5
+    },
+    {
+      "time": 42.74,
+      "event": "commit:stand",
+      "phase": "ACTIVE",
+      "epoch": 5
+    }
+  ],
+  "max_torque_step_Nm": 0.30000000000036686,
+  "max_kp_step": 0.030000000000036664,
+  "max_reference_step_rad": 0.4512512575885874,
+  "max_tilt_deg": 179.22584365612084,
+  "min_base_height_m": 0.1716592300137063,
+  "steps": 22370,
+  "analytical_naive_switches": [],
+  "loop_wall_gap_ms_p99": 2.70167989656329,
+  "loop_wall_gap_ms_max": 252.78543308377266,
+  "timing_scope": "Simulation clock drives the controller; pacing/rendering IPC timing is recorded but is not a hard-real-time hardware certificate",
+  "model_sha256": {
+    "stand": "",
+    "walk_moe": "2206659a6a23886446dcfc05d86888d6cdc9b8a4e31f44cbbc4e2d17ba3d6ead",
+    "backflip60": "73a56f68c90b1164346f6dce812e769e668b376f610c8984b869858ec495935b"
+  },
+  "retained_prepared_entries": 3,
+  "hardware_connected": false,
+  "root_writes": "initialization only; actuator rollout in reported wire_mode, no stabilizing root force or weld",
+  "final_position": [
+    -0.7523824322384468,
+    -0.2835437227111997,
+    0.3273354170200951
+  ],
+  "source_sha256": {
+    "rob2nav/deployment/runner.py": "dee0f2b59ec4733438f2b7a9575ee8e2189a3732dea9f332081ec82d47b97465",
+    "rob2nav/deployment/verify_mujoco.py": "b21001ee05585ca967d702979b6046404cc74222c21f3848b80ce4e0cec96e5a",
+    "rob2nav/deployment/keys.py": "a1563a726df69052504b8012245a3d2485f323cff30ffa0a9f677ec5735783f1",
+    "rob2nav/deployment/__main__.py": "72bac55a79bb707cb75f65b0c5b6881e0326703782bc5cc6a98957771c5ddb2f",
+    "rob2nav/deployment/core.py": "578412df691d827380d11e0fd160efdb13a4fc679ce70906c5ec9fe6ef1a41cc",
+    "rob2nav/deployment/sequence.py": "2384dd53042358f3f1edc9a7be2f80a53086afb3e8a954872ca747396659f3c4",
+    "rob2nav/deployment/service.py": "4dc5d2fc494b5c84167f50a8c09e6a76312644fedbcc7a44920a4e00b75c1109",
+    "rob2nav/deployment/__init__.py": "fe519182f7cf5e8d6a3244d1b297b08aada027a7fe0c0ac67e757b75db51412e",
+    "rob2nav/deployment/teleop.py": "e0b4e14abe0f372fa9802e7565771126f7af14122d92751f17b3f01a57373946",
+    "rob2nav/deployment/unitree.py": "fc0b11d1f675c1480e6e99e5c7c43a6cee93cbf3845c789944b5472f0cf59062",
+    "rob2nav/deployment/calibration.py": "e1a41f21454c137a7860796092978798d0de98c1a1e4d7d4856eb884ffecc24e",
+    "rob2nav/deployment/observer.py": "9ca2b40405adb1060b528c33c4e5414f771b15a4cb6a1bb6ec86636065d2f49a",
+    "rob2nav/deployment/types.py": "cda31c0776938737b6d9cd8b9cffa205acf5c4de690376009463679c5fbfb091",
+    "rob2nav/deployment/atomic_validation.py": "d6c1f1d9f03ad519661b4cd859256f5902b6747c3ac2c86091b004ff369cb18a",
+    "rob2nav/deployment/policies.py": "1ee3a89a18f9014bd12c43acc7a584601f584474610a5ce46f94ff5cd24faaab",
+    "skills/backflip/control.py": "1b619a57d6d4678edf16efca958aa4a40acbdbf8e223d0f15f2a11a48f3aebc3"
+  },
+  "model_xml_sha256": "fb81da82a8b5949bc0a45d5bf3a5003507c53d731cd43caf690cf729d05479d3",
+  "compact_transitions": true,
+  "backflip_validation": [
+    {
+      "skill": "backflip60",
+      "start_s": 20.634,
+      "coverage_complete": true,
+      "action_completed": true,
+      "fixstand": {
+        "passed": false,
+        "initial": {
+          "passed": false,
+          "samples": 35,
+          "stable_fraction": 0.9142857142857143,
+          "max_pose_error_rad": 0.12344776113477152
+        },
+        "terminal": {
+          "passed": true,
+          "samples": 50,
+          "stable_fraction": 1.0,
+          "max_pose_error_rad": 0.06797678193842427
+        },
+        "pose_tolerance_rad": 0.12,
+        "max_joint_speed_rad_s": 1.0,
+        "minimum_upright_cos": 0.98,
+        "required_stable_fraction": 0.95,
+        "terminal_hold_s": 1.0,
+        "base_height_range_m": [
+          0.26,
+          0.4
+        ],
+        "minimum_foot_force_N": 4.0
+      },
+      "body_y_rotation_rad": -6.267799499941787,
+      "axis_dominance": 0.8291169490819039,
+      "airtime_s": 0.32500000000000023,
+      "max_height_m": 0.6246881874625391,
+      "unexpected_body_ground_contact": false,
+      "max_joint_speed_ratio": 0.7885412009385584,
+      "max_joint_limit_excess_rad": 0.0,
+      "hardware_constraints_pass": true,
+      "motor_contract": {
+        "schema_version": 1,
+        "joint_names": [
+          "FL_hip_joint",
+          "FL_thigh_joint",
+          "FL_calf_joint",
+          "FR_hip_joint",
+          "FR_thigh_joint",
+          "FR_calf_joint",
+          "RL_hip_joint",
+          "RL_thigh_joint",
+          "RL_calf_joint",
+          "RR_hip_joint",
+          "RR_thigh_joint",
+          "RR_calf_joint"
+        ],
+        "action_scale": 0.5,
+        "action_clip": 8.0,
+        "stiffness": 40.0,
+        "damping": 1.0,
+        "motor_velocity_x1": 13.5,
+        "motor_torque_y1": 20.2,
+        "motor_torque_y2": 23.4,
+        "joint_velocity_limits": [
+          30.1,
+          30.1,
+          15.7,
+          30.1,
+          30.1,
+          15.7,
+          30.1,
+          30.1,
+          15.7,
+          30.1,
+          30.1,
+          15.7
+        ],
+        "target_velocity_limits": [
+          13.5,
+          13.5,
+          13.5,
+          13.5,
+          13.5,
+          13.5,
+          13.5,
+          13.5,
+          13.5,
+          13.5,
+          13.5,
+          13.5
+        ]
+      },
+      "motor_contract_present": true,
+      "passed": false,
+      "hardware_qualified": false
+    }
+  ],
+  "backflip_validation_complete": true,
+  "composition_timing": {
+    "step_index": 4,
+    "step_count": 5,
+    "skill": "stand",
+    "current_skill": "stand",
+    "controller_phase": "ACTIVE",
+    "status": "failed",
+    "step_dwell_s": 0.0,
+    "step_target_s": 2,
+    "planned_dwell_s": 7,
+    "dwell_elapsed_s": 7,
+    "execution_elapsed_s": 44.742000000000004,
+    "extra_elapsed_s": 38.742000000000004,
+    "atomic_steps": 1,
+    "initialization_s": 1.0000000000000007,
+    "total_elapsed_s": 45.742000000000004
+  },
+  "duration_s": 44.74,
+  "joint_travel_rad": 89.30808054926503,
+  "profile_sha256": {
+    "deployment/skills/walk_mlp.json": "90ea64b6db16306486bed125fa19cb0e3b468618441c7e33ba05e7ebcea7287c",
+    "deployment/skills/sideflip69.json": "2619df3b644caf7bbe670ce25fc8d39e11bb4b3ec5cba7a2633d770780f16145",
+    "deployment/skills/stand.json": "a473e274b6adbfd180fbe24a042e4038a872da1701f5bf28256e056f377e0e85",
+    "deployment/skills/walk_moe.json": "fccbfb93fdde1c7a29250b06e80f3a00286733fd62acdbcecba03afa30a2c1de",
+    "deployment/skills/backflip60.json": "2f3f40889501201c6acacf52f26787804f90bee4de7080d8a0d48ba7754e92a3",
+    "deployment/skills/upright48.json": "f9a4aec02843363ea3a6443716af3a21a4aa20ff240b1b1b166074d58d66d641",
+    "deployment/skills/stand_soft.json": "f6a00c6ba4d7d096055b418e9d8991ba574839a438d5ebb8aa9e85dc0837a971",
+    "deployment/skills/stand_stiff.json": "f012c5d89da667f42041e423254f75f244cc3f4052cf2d1576ecc9ed9d7e4e38"
+  }
+}

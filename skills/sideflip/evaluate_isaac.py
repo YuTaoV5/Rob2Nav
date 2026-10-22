@@ -32,6 +32,13 @@ def main():
     if meta.get('motor_model')=='dc_linear_v1':
         from skills.sideflip.common import enable_transfer_motors
         enable_transfer_motors(cfg,source)
+    fixstand=meta.get('fixstand_roundtrip') or {}
+    if fixstand:
+        from skills.fixstand import configure_sideflip
+        mode=fixstand['action_parameterization']
+        configure_sideflip(cfg,contract,mode.startswith('reference_residual_'),
+            fixstand['residual_limit_rad'],fixstand['bridge_residual_limit_rad'],
+            fixstand['terminal_hip_taper_frames'],fixstand.get('boundary_blend_frames',0))
     cfg.observations.policy.enable_corruption=False
     cfg.events.base_com=None
     cfg.events.physics_material=None
@@ -76,6 +83,9 @@ def main():
                 joints=d.joint_pos[0].tolist(),joint_velocity=d.joint_vel[0].tolist(),
                 projected_gravity=d.projected_gravity_b[0].tolist()))
         args.output.mkdir(parents=True,exist_ok=False)
+        from isaaclab.utils.io import dump_yaml
+        dump_yaml(str(args.output/'env.yaml'),cfg)
+        write_json(args.output/'effective_fixstand.json',fixstand)
         write_json(args.output/'trace.json',trace)
         quat=np.array([x['quaternion'] for x in trace]);rot=Rotation.from_quat(quat[:,[1,2,3,0]])
         increments=(rot[:-1].inv()*rot[1:]).as_rotvec()
@@ -98,7 +108,8 @@ def main():
             body_x_rotation_rad=turn,axis_dominance=dominance,airtime_s=max_airborne,unexpected_body_ground_contact=bad,
             max_height=max(x['position'][2] for x in trace),final_projected_gravity=trace[-1]['projected_gravity'],
             max_joint_speed_ratio=speed_ratio,max_joint_limit_excess_rad=excess,
-            hardware_constraints_pass=speed_ratio<=1. and excess<=.001,hardware_connected=False))
+            hardware_constraints_pass=speed_ratio<=1. and excess<=.001,hardware_connected=False,
+            constraint_sampling_hz=1./env.step_dt,constraint_scope='control-frame diagnostic; not all physics substeps'))
     finally:
         env.close()
         MotionCommand._adaptive_sampling=original_sampling

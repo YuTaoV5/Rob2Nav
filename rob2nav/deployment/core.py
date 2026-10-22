@@ -18,11 +18,23 @@ class Servo:
     def __init__(self,s):
         self.q=s.q.copy();self.dq=s.dq.copy();self.kp=np.zeros(12);self.kd=np.zeros(12)
         self.tau=np.clip(s.tau,-EFFORT,EFFORT);self.bias=self.tau.copy();self.envelope_conflicts=0
+        self.native_entry_bias=np.zeros(12)
     def match_bias(self,s,capture=False):
         if capture:self.q=s.q.copy();self.dq=np.zeros(12)
         self.bias=np.clip(self.tau-self.kp*(self.q-s.q)-self.kd*(self.dq-s.dq),-.5*EFFORT,.5*EFFORT)
-    def native(self,s,target,kp,kd,phase,epoch,handover_dt=None):
-        self.q=vector(target);self.dq=np.zeros(12);self.kp=vector(kp);self.kd=vector(kd);self.bias=np.zeros(12)
+    def native(self,s,target,kp,kd,phase,epoch,handover_dt=None,motor_control=None,dt=.002,entry_blend_s=0.,entry_elapsed=0.):
+        if motor_control is not None:
+            from skills.backflip.control import JOINT_NAMES,motor_torque
+            velocity=np.array([motor_control['target_velocity_limits'][JOINT_NAMES.index(n)] for n in SDK_JOINTS])
+            self.q+=np.clip(vector(target)-self.q,-velocity*dt,velocity*dt)
+        else:self.q=vector(target)
+        self.dq=np.zeros(12);self.kp=vector(kp);self.kd=vector(kd);self.bias=np.zeros(12)
+        if motor_control is not None:
+            raw=self.kp*(self.q-s.q)-self.kd*s.dq
+            if entry_blend_s and entry_elapsed<=1e-9:self.native_entry_bias=self.tau-raw
+            feedforward=self.native_entry_bias*(1-quintic(entry_elapsed/entry_blend_s)) if entry_blend_s else np.zeros(12)
+            self.tau=motor_torque(raw+feedforward,s.dq,motor_control,SDK_JOINTS)
+            return MotorCommand(self.tau.copy(),self.q.copy(),self.dq.copy(),self.kp.copy(),self.kd.copy(),phase,epoch,feedforward=feedforward.copy())
         speed=np.clip(s.dq,-2*FREE_SPEED,2*FREE_SPEED)
         low=np.maximum(EFFORT*(-1-speed/FREE_SPEED),-EFFORT);high=np.minimum(EFFORT*(1-speed/FREE_SPEED),EFFORT)
         if handover_dt is not None:
@@ -225,7 +237,7 @@ class SwitchController:
                     self.active=self.pending;self.pending=None;self._phase('ACTIVE',now);self.event(now,'commit:'+self.active.id)
         if self.phase=='FAULT':target=s.q.copy();kp=np.zeros(12);kd=np.full(12,2.);integrate=False;bias_scale=0.
         if self.phase=='ACTIVE' and self.active.actuation=='native_pd':
-            command=self.servo.native(s,target,kp,kd,self.phase,self.epoch,handover_dt=dt if now-self.phase_at<.1 and not self.active.atomic else None)
+            command=self.servo.native(s,target,kp,kd,self.phase,self.epoch,handover_dt=dt if now-self.phase_at<.1 and not self.active.atomic else None,motor_control=self.active.motor_control,dt=dt,entry_blend_s=self.active.entry_torque_blend_s,entry_elapsed=now-self.phase_at)
         else:
             support_skill=entry_skill or self.active
             model_gain=support_skill.support_model_gain if support_skill is not None else 0.

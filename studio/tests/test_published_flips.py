@@ -7,14 +7,14 @@ from studio.published_flips import live_flip
 ROOT=Path(__file__).resolve().parents[2]
 
 
-@pytest.mark.parametrize('skill,version,seconds',[('sideflip','peak_pose_v8','8'),('backflip','verified_entry_v6','5')])
+@pytest.mark.parametrize('skill,version,seconds',[('sideflip','peak_pose_v8','8'),('backflip','upstream_actor_v7','5')])
 def test_published_contract_and_native_launch(skill,version,seconds):
     module,args,policy,note=live_flip(ROOT,skill,Path('/pinned/source'))
     assert version in str(policy)
     assert '--fixstand-roundtrip' in args
     assert args[args.index('--seconds')+1]==seconds
     assert args[args.index('--physics-hz')+1]=='1000'
-    assert '0/4' in note
+    assert ('0/4' if skill=='sideflip' else '4/4') in note
     metadata=json.loads(policy.with_name('policy.json' if skill=='sideflip' else 'export.json').read_text())
     assert metadata['policy_sha256']==hashlib.sha256(policy.read_bytes()).hexdigest()
     if skill=='sideflip':
@@ -43,6 +43,6 @@ def test_catalog_selects_current_candidates_only():
     for skill in ('sideflip','backflip'):
         rows=[m for m in data['models'] if m['skill']==skill and m['role']=='selected']
         assert rows
-        assert all('fixstand_best_flips_20261022' in m['path'] for m in rows)
-        assert all('0/4' in m['validation'] for m in rows)
+        assert all(('fixstand_best_flips_20261022' if skill=='sideflip' else 'backflip_v7_verified_20261022') in m['path'] for m in rows)
+        assert all(('0/4' if skill=='sideflip' else '4/4') in m['validation'] for m in rows)
         assert all((ROOT/r['path']).is_file() for m in rows for r in m['resources'])
