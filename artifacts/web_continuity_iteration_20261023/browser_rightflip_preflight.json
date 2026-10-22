@@ -1,0 +1,119 @@
+{
+  "scope": "Browser form rendering, editing and preflight only; no duplicate draft or training submission",
+  "preflightPassed": true,
+  "fields": [
+    {
+      "label": "实验名称",
+      "type": "text",
+      "value": "Go2侧空翻 · 原生动作模仿PPO"
+    },
+    {
+      "label": "随机种子 seed",
+      "type": "number",
+      "value": "43"
+    },
+    {
+      "label": "并行环境数 num_envs",
+      "type": "number",
+      "value": "32"
+    },
+    {
+      "label": "PPO更新轮数 iterations",
+      "type": "number",
+      "value": "2"
+    },
+    {
+      "label": "初始化方式",
+      "type": "select",
+      "value": "base"
+    },
+    {
+      "checked": true,
+      "label": "四足稳定起止fixstand_roundtrip",
+      "type": "checkbox",
+      "value": "on"
+    },
+    {
+      "label": "微调学习率（0沿用训练器）finetune_learning_rate",
+      "type": "number",
+      "value": "0.0003"
+    },
+    {
+      "label": "项目内参考动作NPZ（空白使用原参考）motion",
+      "type": "text",
+      "value": "artifacts/web_continuity_iteration_20261023/inputs/right_v1/rightflip.npz"
+    },
+    {
+      "checked": true,
+      "label": "边界残差控制boundary_residual",
+      "type": "checkbox",
+      "value": "on"
+    },
+    {
+      "label": "边界残差上限 radboundary_residual_limit",
+      "type": "number",
+      "value": "0.2"
+    },
+    {
+      "label": "衔接残差上限（0沿用训练器）boundary_bridge_limit",
+      "type": "number",
+      "value": "0.05"
+    },
+    {
+      "label": "末段髋关节渐收帧数boundary_terminal_hip_taper_frames",
+      "type": "number",
+      "value": "50"
+    },
+    {
+      "label": "边界连续混合帧数boundary_blend_frames",
+      "type": "number",
+      "value": "10"
+    },
+    {
+      "checked": true,
+      "label": "准备段消抖quiet_preparation",
+      "type": "checkbox",
+      "value": "on"
+    },
+    {
+      "checked": true,
+      "label": "起止峰值约束peak_endpoint_objective",
+      "type": "checkbox",
+      "value": "on"
+    },
+    {
+      "checked": true,
+      "label": "落地约束landing_constraints",
+      "type": "checkbox",
+      "value": "on"
+    },
+    {
+      "checked": true,
+      "label": "逐物理子步峰值约束substep_objective",
+      "type": "checkbox",
+      "value": "on"
+    },
+    {
+      "label": "重设策略噪声（0保留）reset_std",
+      "type": "number",
+      "value": "0.3"
+    },
+    {
+      "label": "计算设备device",
+      "type": "text",
+      "value": "cuda:0"
+    },
+    {
+      "checked": true,
+      "label": "显式电机模型迁移transfer_motors",
+      "type": "checkbox",
+      "value": "on"
+    },
+    {
+      "label": "侧翻方向sideflip_direction",
+      "type": "select",
+      "value": "right"
+    }
+  ],
+  "command": "查看解析命令\n/root/isaacsim/python.sh -m skills.sideflip.train --backflip-source /root/gpufree-data/Rob2Nav-upstreams/GO2_backflip --unitree-source /root/gpufree-data/Rob2Nav-upstreams/unitree_rl_lab --output /root/gpufree-data/Rob2Nav/outputs/studio/runs/PREVIEW --num-envs 32 --iterations 2 --seed 43 --device cuda:0 --headless --motion /root/gpufree-data/Rob2Nav/artifacts/web_continuity_iteration_20261023/inputs/right_v1/rightflip.npz --transfer-motors --fixstand-roundtrip --finetune-learning-rate 0.0003 --sideflip-direction right --boundary-residual --boundary-residual-limit 0.2 --boundary-bridge-limit 0.05 --boundary-terminal-hip-taper-frames 50 --boundary-blend-frames 10 --quiet-preparation --peak-endpoint-objective --landing-constraints --substep-objective --reset-std 0.3"
+}
