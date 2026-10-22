@@ -1,0 +1,45 @@
+========================================================================
+ONNX           : /root/gpufree-data/Rob2Nav/outputs/fixstand_backflip_upstream_actor_v7_20261022/exported/policy.onnx
+MJCF           : /root/gpufree-data/Rob2Nav-upstreams/GO2_backflip/mujoco/go2/go2_isaac.xml
+Policy input   : observation[60]
+Control        : 50 Hz, Kp/Kd=40/1, scale=0.5
+Action latency : one policy step (20 ms)
+Joint target margin: 0 rad
+Joint dynamics : damping=0, frictionloss=0, armature=0
+Contact friction: 1
+Controls       : SPACE backflip | R physical reset | ESC quit
+No automatic physical reset: RL controls takeoff, landing and recovery.
+========================================================================
+[START] backflip triggered
+step      0 | FLIP | phase 0.02s | base_z 0.319m | pitch_rate +0.041rad/s
+step     10 | FLIP | phase 0.22s | base_z 0.317m | pitch_rate -0.045rad/s
+step     20 | FLIP | phase 0.42s | base_z 0.315m | pitch_rate -0.010rad/s
+step     30 | FLIP | phase 0.62s | base_z 0.314m | pitch_rate -0.011rad/s
+step     40 | FLIP | phase 0.82s | base_z 0.313m | pitch_rate -0.013rad/s
+step     50 | FLIP | phase 1.02s | base_z 0.311m | pitch_rate +0.015rad/s
+step     60 | FLIP | phase 1.22s | base_z 0.288m | pitch_rate +0.573rad/s
+step     70 | FLIP | phase 1.42s | base_z 0.177m | pitch_rate +1.053rad/s
+step     80 | FLIP | phase 1.62s | base_z 0.455m | pitch_rate -12.181rad/s
+step     90 | FLIP | phase 1.82s | base_z 0.617m | pitch_rate -11.361rad/s
+step    100 | FLIP | phase 2.02s | base_z 0.430m | pitch_rate -8.974rad/s
+step    110 | FLIP | phase 2.22s | base_z 0.229m | pitch_rate +2.152rad/s
+step    120 | FLIP | phase 2.42s | base_z 0.327m | pitch_rate -0.075rad/s
+step    130 | FLIP | phase 2.62s | base_z 0.319m | pitch_rate +0.336rad/s
+step    140 | FLIP | phase 2.82s | base_z 0.324m | pitch_rate -0.018rad/s
+[BACKFLIP] phase complete; actor remains in control for landing/recovery
+step    150 | WAIT | phase 3.00s | base_z 0.324m | pitch_rate -0.007rad/s
+step    160 | WAIT | phase 3.00s | base_z 0.323m | pitch_rate +0.002rad/s
+step    170 | WAIT | phase 3.00s | base_z 0.323m | pitch_rate +0.044rad/s
+step    180 | WAIT | phase 3.00s | base_z 0.323m | pitch_rate +0.036rad/s
+step    190 | WAIT | phase 3.00s | base_z 0.323m | pitch_rate +0.008rad/s
+step    200 | WAIT | phase 3.00s | base_z 0.322m | pitch_rate -0.004rad/s
+step    210 | WAIT | phase 3.00s | base_z 0.322m | pitch_rate +0.003rad/s
+step    220 | WAIT | phase 3.00s | base_z 0.322m | pitch_rate +0.010rad/s
+step    230 | WAIT | phase 3.00s | base_z 0.322m | pitch_rate +0.009rad/s
+step    240 | WAIT | phase 3.00s | base_z 0.321m | pitch_rate +0.004rad/s
+结束：仿真 5.00s，墙钟 2.69s，机身高度 0.321m
+诊断：累计俯仰 -6.273 rad | 机身高度 0.174--0.619 m | 最终倾角 0.007 rad
+诊断：最大关节速度 21.57 rad/s (RR_thigh_joint) | 最大限位超出 0.0000 rad (: 0.0000, 边界 0.0000) | 头部接触 否
+任务验证：PASS
+硬件安全验证：PASS
+总体验证：PASS
