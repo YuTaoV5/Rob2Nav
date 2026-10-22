@@ -14,6 +14,8 @@ COMMON = {
 }
 SCHEMAS = {
     'sideflip_native_ppo': {**COMMON,
+        'joint_kp': field('关节位置增益 Kp', 40., 1., 80.),
+        'joint_kd': field('关节阻尼增益 Kd', 1., 0., 8.),
         'sideflip_direction': field('侧翻方向', 'left', choices=['left','right']),
         'motion': field('项目内参考动作NPZ（空白使用原参考）', ''),
         'boundary_residual': field('边界残差控制', False),

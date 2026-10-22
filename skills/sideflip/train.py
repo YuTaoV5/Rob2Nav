@@ -28,8 +28,12 @@ p.add_argument('--substep-objective',action='store_true')
 p.add_argument('--peak-endpoint-objective',action='store_true')
 p.add_argument('--finetune-learning-rate',type=float)
 p.add_argument('--reset-std',type=float)
+p.add_argument('--joint-kp',type=float,default=40.)
+p.add_argument('--joint-kd',type=float,default=1.)
 AppLauncher.add_app_launcher_args(p)
 args = p.parse_args()
+from .gains import checked as checked_gains
+checked_gains(args.joint_kp,args.joint_kd)
 if args.boundary_residual and not args.fixstand_roundtrip:p.error('--boundary-residual requires --fixstand-roundtrip')
 if not .01<=args.boundary_residual_limit<=.3:p.error('Boundary residual limit must be in [.01,.3] rad')
 if args.boundary_bridge_limit is not None and (not args.boundary_residual or not .01<=args.boundary_bridge_limit<=args.boundary_residual_limit):
@@ -75,6 +79,8 @@ def main():
         from .common import enable_transfer_motors
         enable_transfer_motors(cfg,source)
         cfg.rewards.undesired_contacts.weight=-10.
+    from .gains import configure as configure_gains
+    configure_gains(cfg,args.joint_kp,args.joint_kd)
     if args.fixstand_roundtrip:
         from skills.fixstand import configure_sideflip
         configure_sideflip(cfg,contract,args.boundary_residual,args.boundary_residual_limit,args.boundary_bridge_limit,args.boundary_terminal_hip_taper_frames,args.boundary_blend_frames)
@@ -122,7 +128,7 @@ def main():
         reference_sha256=sha(args.motion), source_sha256={f.name:sha(f) for f in Path(__file__).parent.glob('*.py')},
         sideflip_direction=args.sideflip_direction,
         joint_names=contract['joint_names'], body_names=bodies, anchor=anchor, distal_bodies=feet,
-        action_scale=.5, kp=40, kd=1, actor_observations=69, action_dim=12,
+        action_scale=.5, kp=args.joint_kp, kd=args.joint_kd, actor_observations=69, action_dim=12,
         policy_hz=round(1/(cfg.sim.dt*cfg.decimation)), physics_hz=round(1/cfg.sim.dt),
         motor_model='dc_linear_v1' if args.transfer_motors else 'ideal_pd', seed=args.seed, requested_iterations=args.iterations,
         num_envs=args.num_envs, hardware_connected=False))

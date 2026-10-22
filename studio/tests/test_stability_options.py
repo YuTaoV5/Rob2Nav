@@ -21,6 +21,14 @@ def test_frontflip_is_independent_recipe_and_direction(tmp_path):
         config('backflip_native_ppo', recipe_options={'flip_direction':'front'})
 
 
+def test_sideflip_web_gain_edits_reach_trainer(tmp_path):
+    c=config('sideflip_native_ppo',recipe_options={'joint_kp':40.,'joint_kd':2.})
+    cmd=command(c,tmp_path,tmp_path/'outputs/studio/runs/PREVIEW',tmp_path/'preview.json','/isaac/python.sh')
+    assert cmd[cmd.index('--joint-kp')+1]=='40.0'
+    assert cmd[cmd.index('--joint-kd')+1]=='2.0'
+    with pytest.raises(ValueError):validate('sideflip_native_ppo',{'joint_kd':float('nan')})
+
+
 def test_sideflip_substep_resume_contract(tmp_path):
     ck = tmp_path/'outputs/parent/model_10.pt'; ck.parent.mkdir(parents=True); ck.write_bytes(b'parent')
     motion = ck.parent/'reference.npz'; motion.write_bytes(b'motion')

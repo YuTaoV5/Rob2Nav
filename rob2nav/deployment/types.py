@@ -157,6 +157,12 @@ class Skill:
         if s.policy:
             file=(Path(root)/s.policy).resolve()
             if not file.is_relative_to(Path(root).resolve()) or hashlib.sha256(file.read_bytes()).hexdigest()!=s.sha256:raise ValueError('Policy path/hash mismatch')
+            if s.observation=='mimic69' and file.with_suffix('.json').is_file():
+                meta=json.loads(file.with_suffix('.json').read_text(encoding='utf-8'))
+                from skills.sideflip.gains import checked as checked_gains
+                kp,kd=checked_gains(meta.get('kp',40.),meta.get('kd',1.))
+                if any(v!=kp for v in s.kp) or any(v!=kd for v in s.kd):
+                    raise ValueError('Sideflip deployment gains disagree with exported policy')
         return s
 
 

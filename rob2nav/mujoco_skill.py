@@ -28,8 +28,8 @@ def assert_physics_step(data,previous_time,timestep):
         raise FloatingPointError('MuJoCo reported invalid position, velocity or acceleration')
 
 
-def motor_torque(target,q,dq,effort,velocity_limit,motor_model='ideal_pd'):
-    raw=40*(target-q)-dq
+def motor_torque(target,q,dq,effort,velocity_limit,motor_model='ideal_pd',kp=40.,kd=1.):
+    raw=kp*(target-q)-kd*dq
     if motor_model=='ideal_pd':return np.clip(raw,-effort,effort)
     if motor_model!='dc_linear_v1':raise ValueError('Unknown motor contract')
     speed=np.clip(dq,-2*velocity_limit,2*velocity_limit)
@@ -61,6 +61,8 @@ def main():
     if not 0<args.seconds<=60:
         raise ValueError('Expected a finite duration in (0,60] seconds')
     meta=json.loads(args.policy.with_suffix('.json').read_text())
+    from skills.sideflip.gains import checked as checked_gains
+    kp,kd=checked_gains(meta.get('kp',40.),meta.get('kd',1.))
     if args.kind=='sideflip':
         if args.motion is None:raise ValueError('Sideflip requires a reference motion')
         from skills.sideflip.direction import inference_direction
@@ -122,7 +124,7 @@ def main():
         data.qvel[vids]=reference['joint_vel'][0]
         mujoco.mj_forward(model,data)
     for _ in range(round(.5*args.physics_hz) if args.initialization=='settled' else 0):
-        data.ctrl[aids]=motor_torque(target,data.qpos[qids],data.qvel[vids],effort,velocity_limits,meta.get('motor_model','ideal_pd'))
+        data.ctrl[aids]=motor_torque(target,data.qpos[qids],data.qvel[vids],effort,velocity_limits,meta.get('motor_model','ideal_pd'),kp,kd)
         before_step=float(data.time)
         mujoco.mj_step(model,data)
         assert_physics_step(data,before_step,model.opt.timestep)
@@ -216,7 +218,7 @@ def main():
                 preparation['max_target_step_rad']=max(preparation['max_target_step_rad'],float(np.max(abs(target-previous_target))))
             previous_target=target.copy()
             for _ in range(args.physics_hz//50):
-                data.ctrl[aids]=motor_torque(target,data.qpos[qids],data.qvel[vids],effort,velocity_limits,meta.get('motor_model','ideal_pd'))
+                data.ctrl[aids]=motor_torque(target,data.qpos[qids],data.qvel[vids],effort,velocity_limits,meta.get('motor_model','ideal_pd'),kp,kd)
                 before_step=float(data.time)
                 mujoco.mj_step(model,data)
                 assert_physics_step(data,before_step,model.opt.timestep)
