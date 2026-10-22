@@ -42,9 +42,14 @@ def landing_constraints(env,lower,upper,velocity):
     speed=torch.tensor([velocity[n] for n in names],device=robot.device)
     excess=torch.maximum(torch.relu(lo-robot.data.joint_pos),torch.relu(robot.data.joint_pos-hi)).max(-1).values
     overspeed=torch.relu((torch.abs(robot.data.joint_vel)/speed).max(-1).values-.85)
+    stats=getattr(env,'_physical_joint_statistics',None)
+    if stats is not None:
+        excess=stats.maximum_excess.max(-1).values
+        overspeed=torch.relu((stats.maximum_velocity/speed).max(-1).values-.85)
     sensor=env.scene['contact_forces']
     ids=[i for i,n in enumerate(sensor.body_names) if 'foot' not in n.lower() and 'calf' not in n.lower()]
     contacts=(torch.linalg.vector_norm(sensor.data.net_forces_w[:,ids],dim=-1)>4.).float().sum(-1)
+    if stats is not None:contacts=stats.maximum_contacts
     time=phase_time(env)
     return ((time>=2.4)&(time<5.))*((excess/.04)**2+10.*overspeed**2+contacts)
 

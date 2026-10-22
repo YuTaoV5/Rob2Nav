@@ -26,6 +26,8 @@ def main():
     p.add_argument('--seed',type=int,default=1000)
     p.add_argument('--initial-joint-noise',type=float,default=.002)
     p.add_argument('--initial-yaw-deg',type=float,default=0.)
+    p.add_argument('--initial-state',type=Path,help='Read-only captured-entry diagnostic; applied only at initialization')
+    p.add_argument('--direction',choices=['back','front'],default='back')
     p.add_argument('--video',action='store_true')
     p.add_argument('--fixstand-roundtrip',action='store_true')
     p.add_argument('--diagnostics',action='store_true',help='Record read-only per-substep failure diagnostics')
@@ -33,6 +35,7 @@ def main():
     a=p.parse_args()
     if not 0<a.seconds<=60 or not 0<=a.initial_joint_noise<=.05:raise ValueError('Invalid evaluation duration/noise')
     if not np.isfinite(a.initial_yaw_deg) or abs(a.initial_yaw_deg)>180:raise ValueError('Invalid initial heading')
+    if a.initial_state is not None and (a.initial_yaw_deg or a.initial_joint_noise):raise ValueError('Captured state requires zero additional yaw/noise')
     source=a.source.resolve();policy=a.onnx.resolve()
     if subprocess.check_output(['git','-C',str(source),'rev-parse','HEAD'],text=True).strip()!=PIN:
         raise ValueError('Wrong upstream commit')
@@ -43,6 +46,10 @@ def main():
     spec=importlib.util.spec_from_file_location('_rob2nav_backflip_playback',file)
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
     module.SIM_DT=1./a.physics_hz;module.DECIMATION=a.physics_hz//50;module.POLICY_DT=.02
+    observed=None
+    if a.initial_state is not None:
+        from .initial_state import validate
+        observed=validate(json.loads(a.initial_state.read_text()),module.JOINT_NAMES)
     export_file=policy.parent/'export.json'
     exported=json.loads(export_file.read_text()) if export_file.exists() else {}
     controller=None
@@ -50,6 +57,7 @@ def main():
         from .control import configure_playback
         controller=configure_playback(module,exported['control_contract'])
     contract=exported.get('fixstand_roundtrip') or {}
+    if a.direction!=contract.get('flip_direction','back'):raise ValueError('Requested direction does not match the trained actor contract')
     delayed=contract.get('action_parameterization') in ('backflip_entry_v2','backflip_entry_v3')
     if delayed:
         if hashlib.sha256(policy.read_bytes()).hexdigest()!=exported['policy_sha256']:
@@ -87,9 +95,15 @@ def main():
         resets+=1
         if resets>1:raise RuntimeError('Unexpected physical reset during policy rollout')
         original_reset(model,data,qids)
-        yaw=np.radians(a.initial_yaw_deg)
-        data.qpos[3:7]=[np.cos(yaw/2),0.,0.,np.sin(yaw/2)]
-        data.qpos[qids]+=rng.uniform(-a.initial_joint_noise,a.initial_joint_noise,12)
+        if observed is not None:
+            _,dids=module.joint_addresses(model)
+            data.qpos[:3]=observed['root_position'];data.qpos[3:7]=observed['root_quaternion']
+            data.qpos[qids]=observed['joint_position'];data.qvel[dids]=observed['joint_velocity']
+            data.qvel[:3]=observed['root_linear_velocity_world'];data.qvel[3:6]=observed['root_angular_velocity_body']
+        else:
+            yaw=np.radians(a.initial_yaw_deg)
+            data.qpos[3:7]=[np.cos(yaw/2),0.,0.,np.sin(yaw/2)]
+            data.qpos[qids]+=rng.uniform(-a.initial_joint_noise,a.initial_joint_noise,12)
         mujoco.mj_forward(model,data)
     def step(model,data,*args,**kwargs):
         nonlocal rotation,angular_travel,max_speed,max_excess,air,max_air,bad,minimum_up,max_height,writer,renderer,next_trace,next_frame
@@ -148,14 +162,18 @@ def main():
     tail=trace[-100:];dominance=abs(rotation)/max(angular_travel,1e-8)
     success=bool(5.5<abs(rotation)<7.1 and dominance>.75 and max_air>=.08 and max_height>.45 and minimum_up<-.8 and not bad and
         all(x['upright']>.9 and x['position'][2]>.22 and x['speed']<.25 and x['angular_speed']<1. for x in tail))
+    from rob2nav.fixstand_validation import rotation_matches
+    direction_pass=rotation_matches(rotation,a.direction);success=bool(success and direction_pass)
     metrics=dict(body_y_rotation_rad=rotation,axis_dominance=dominance,airtime_s=max_air,max_height=max_height,
         terminal_upright=trace[-1]['upright'],unexpected_body_ground_contact=bad,max_joint_speed_ratio=max_speed,max_joint_limit_excess_rad=max_excess)
+    metrics.update(expected_direction=a.direction,direction_pass=direction_pass)
     if a.fixstand_roundtrip:
         from rob2nav.fixstand_validation import assess
         metrics['action_completed']=bool(success);metrics['fixstand']=assess(trace,initial_end=.8 if delayed else .35)
         success=bool(success and metrics['fixstand']['passed'])
-    summary=dict(args=dict(kind='backflip',seed=a.seed,physics_hz=a.physics_hz,initial_joint_noise=a.initial_joint_noise,initial_yaw_deg=a.initial_yaw_deg),backend='MuJoCo',
-        role='locally trained Go2 backflip; pinned native observation/controller',successes=int(success),total=1,episodes=[dict(success=success,**metrics)],metrics=metrics,
+    summary=dict(args=dict(kind=a.direction+'flip',seed=a.seed,physics_hz=a.physics_hz,initial_joint_noise=a.initial_joint_noise,initial_yaw_deg=a.initial_yaw_deg,
+        initial_state_sha256=hashlib.sha256(a.initial_state.read_bytes()).hexdigest() if a.initial_state else None),backend='MuJoCo',
+        role='locally trained Go2 '+a.direction+'flip; pinned native observation/controller',successes=int(success),total=1,episodes=[dict(success=success,**metrics)],metrics=metrics,
         policy_sha256=hashlib.sha256(policy.read_bytes()).hexdigest(),source_commit=PIN,source_sha256=hashlib.sha256(file.read_bytes()).hexdigest(),
         evaluator_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),policy_hz=50,physics_hz=a.physics_hz,
         joint_names=list(module.JOINT_NAMES),physical_resets=resets,root_state_writes='initialization only; no in-flight reset/stabilizing force',

@@ -67,7 +67,9 @@ def urdf_speed_penalty(env,limits,margin=.9):
     import torch
     robot=env.scene['robot']
     velocity=torch.tensor([limits[name] for name in robot.joint_names],device=robot.device)
-    ratio=torch.max(torch.abs(robot.data.joint_vel)/velocity,dim=-1).values
+    stats=getattr(env,'_physical_joint_statistics',None)
+    measured=stats.maximum_velocity if stats is not None else torch.abs(robot.data.joint_vel)
+    ratio=torch.max(measured/velocity,dim=-1).values
     return torch.clamp(ratio-margin,min=0.)**2
 
 
@@ -90,8 +92,9 @@ def quiet_preparation_penalty(env,end=2.4):
     gate=torch.clamp((end-time)/.2,0.,1.)
     term=env.action_manager.get_term('JointPositionAction')
     change=torch.max(torch.abs(term.target_step_delta),dim=-1).values
-    velocity=torch.max(torch.abs(robot.data.joint_vel),dim=-1).values
-    omega=torch.linalg.vector_norm(robot.data.root_ang_vel_b,dim=-1)
+    stats=getattr(env,'_physical_joint_statistics',None)
+    velocity=torch.max(stats.maximum_velocity if stats is not None else torch.abs(robot.data.joint_vel),dim=-1).values
+    omega=stats.maximum_angular_speed if stats is not None else torch.linalg.vector_norm(robot.data.root_ang_vel_b,dim=-1)
     return gate*((torch.clamp(change-.04,min=0.)/.04)**2+
                  torch.clamp(velocity-1.5,min=0.)**2+
                  4.*torch.clamp(omega-.35,min=0.)**2)

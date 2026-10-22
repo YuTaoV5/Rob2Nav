@@ -13,6 +13,7 @@ import sys
 def main():
     p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True)
     p.add_argument('--smoke',action='store_true')
+    p.add_argument('--smoke-yaw',type=float,default=0.)
     p.add_argument('--entry-torque-blend',type=float,default=0.);a=p.parse_args()
     root=Path(__file__).resolve().parents[1];out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
     fixture=out/'fixture';shutil.copytree(root/'deployment',fixture/'deployment')
@@ -40,7 +41,8 @@ def main():
         dict(skill='stand',seconds=1),dict(skill='walk_moe',seconds=2,velocity=[.15,0,0]),
         dict(skill='backflip60',trigger=True),dict(skill='walk_moe',seconds=2,velocity=[.15,0,0]),
         dict(skill='stand',seconds=2)]),indent=2)+'\n')
-    cases=[(12509,0)] if a.smoke else [(12510,0),(12511,-15),(12512,15),(12513,30)]
+    if a.smoke_yaw and not a.smoke:p.error('--smoke-yaw requires --smoke')
+    cases=[(12509,a.smoke_yaw)] if a.smoke else [(12510,0),(12511,-15),(12512,15),(12513,30)]
     def run(case):
         seed,yaw=case;dest=out/f'seed_{seed}';log=(out/f'seed_{seed}.log').open('wb')
         with log:

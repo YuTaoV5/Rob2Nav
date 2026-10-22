@@ -17,12 +17,16 @@ parser.add_argument('--urdf-speed-limits',action='store_true')
 parser.add_argument('--fast-safety-curriculum',action='store_true')
 parser.add_argument('--safety-start',type=float)
 parser.add_argument('--finetune-learning-rate',type=float)
+parser.add_argument('--flip-direction',choices=['back','front'],default='back')
+parser.add_argument('--initial-std',type=float)
 args, rest = parser.parse_known_args()
 if args.delayed_entry and not args.fixstand_roundtrip:raise ValueError('Delayed entry requires fixstand training')
 if not 0.<=args.entry_hold_scale<=.4 or (args.entry_hold_scale!=.4 and not args.delayed_entry):raise ValueError('Entry hold scale requires delayed entry and [0, 0.4]')
 if args.fast_safety_curriculum and not args.urdf_speed_limits:raise ValueError('Fast safety curriculum requires URDF speed limits')
 if args.safety_start is not None and (not args.fast_safety_curriculum or not 0.<=args.safety_start<=1.):raise ValueError('Safety start requires fast curriculum and [0,1]')
 if args.finetune_learning_rate is not None and not 0.<args.finetune_learning_rate<=.001:raise ValueError('Invalid finetune learning rate')
+if args.flip_direction=='front' and not (args.fixstand_roundtrip and args.delayed_entry):raise ValueError('Frontflip requires the standard delayed-entry task')
+if args.initial_std is not None and not .01<=args.initial_std<=1.:raise ValueError('Invalid initial action noise')
 source = args.source.resolve()
 entry = source / (args.entry + '.py')
 text = entry.read_text()
@@ -50,7 +54,7 @@ if args.fixstand_roundtrip:
         if text.count(required)!=1:raise RuntimeError('Pinned training entry changed: '+required)
     from skills.backflip.launcher_patch import configure_fixstand_source
     text=configure_fixstand_source(text,source,args.urdf_speed_limits,args.fast_safety_curriculum,
-        args.delayed_entry,args.entry_hold_scale)
+        args.delayed_entry,args.entry_hold_scale,args.flip_direction)
     if args.safety_start is not None:
         text=text.replace('agent_cfg = Go2BackflipPPORunnerCfg()',
             f'env_cfg.rewards.safety_curriculum_start={args.safety_start!r}\n    agent_cfg = Go2BackflipPPORunnerCfg()')
@@ -58,6 +62,8 @@ if args.fixstand_roundtrip:
         needle='agent_cfg = Go2BackflipPPORunnerCfg()'
         if text.count(needle)!=1:raise RuntimeError('Pinned agent config entry changed')
         text=text.replace(needle,needle+f'\n    agent_cfg.algorithm.learning_rate={args.finetune_learning_rate!r}\n    agent_cfg.algorithm.schedule="fixed"')
+    if args.initial_std is not None:
+        text=text.replace('agent_cfg = Go2BackflipPPORunnerCfg()',f'agent_cfg = Go2BackflipPPORunnerCfg()\n    agent_cfg.policy.init_noise_std={args.initial_std!r}')
     text=text.replace('init_at_random_ep_len=True','init_at_random_ep_len=False')
     text=text.replace('runner.learn(agent_cfg.max_iterations, init_at_random_ep_len=False)',
         'runner.learn(agent_cfg.max_iterations, init_at_random_ep_len=False)\n    from skills.fixstand import write_completion\n    write_completion(log_dir,agent_cfg.max_iterations)')
@@ -69,6 +75,8 @@ if args.fixstand_roundtrip:
         if args.delayed_entry:
             version='backflip_entry_v2' if args.entry_hold_scale==.4 else 'backflip_entry_v3'
             text=text.replace("'backflip',actor_observations=60)",f"'backflip',actor_observations=60,action_parameterization='{version}',entry_hold_scale={args.entry_hold_scale!r},entry_seconds=1.,release_seconds=[1.,1.2],episode_seconds=5.)")
+        if args.flip_direction=='front':
+            text=text.replace("'backflip',actor_observations=60", "'frontflip',actor_observations=60,flip_direction='front'")
 if '--checkpoint' in rest:
     index=rest.index('--checkpoint')+1
     rest[index]=str(Path(rest[index]).expanduser().resolve())

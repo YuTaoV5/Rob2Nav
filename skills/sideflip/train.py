@@ -23,6 +23,7 @@ p.add_argument('--boundary-terminal-hip-taper-frames',type=int,default=0)
 p.add_argument('--boundary-blend-frames',type=int,default=0)
 p.add_argument('--quiet-preparation',action='store_true')
 p.add_argument('--landing-constraints',action='store_true')
+p.add_argument('--substep-objective',action='store_true')
 p.add_argument('--peak-endpoint-objective',action='store_true')
 p.add_argument('--finetune-learning-rate',type=float)
 p.add_argument('--reset-std',type=float)
@@ -38,6 +39,7 @@ if args.peak_endpoint_objective and not args.fixstand_roundtrip:p.error('Peak en
 if args.boundary_blend_frames and (not args.boundary_residual or not 2<=args.boundary_blend_frames<=20):p.error('Boundary blending requires residual mode and 2..20 frames')
 if args.quiet_preparation and not args.boundary_blend_frames:p.error('Quiet preparation requires continuous boundary mapping')
 if args.landing_constraints and not args.peak_endpoint_objective:p.error('Landing constraints require endpoint objective')
+if args.substep_objective and not args.landing_constraints:p.error('Physical substep objective requires landing constraints')
 if args.finetune_learning_rate is not None and not 0.<args.finetune_learning_rate<=.001:p.error('Invalid finetune learning rate')
 if args.reset_std is not None and not .01<=args.reset_std<=1.:p.error('Invalid reset std')
 args.kit_args = (args.kit_args+' --enable isaacsim.asset.importer.urdf').strip()
@@ -82,6 +84,7 @@ def main():
     if args.landing_constraints:
         from skills.gait_objectives import configure_sideflip_landing
         configure_sideflip_landing(cfg,source)
+    if args.substep_objective:cfg.scene.contact_forces.update_period=cfg.sim.dt
     bodies = contract['body_names']
     anchor = cfg.commands.motion.anchor_body_name
     feet = cfg.terminations.ee_body_pos.params['body_names']
@@ -105,6 +108,8 @@ def main():
             boundary_blend_frames=args.boundary_blend_frames,
             quiet_preparation_seconds=2.4 if args.quiet_preparation else 0.,
             landing_constraints=args.landing_constraints,
+            physical_substep_objective=args.substep_objective,
+            physical_statistics_sha256=sha(Path(__file__).parents[1]/'substep_statistics.py') if args.substep_objective else None,
             landing_objective_sha256=sha(Path(__file__).parents[1]/'gait_objectives.py') if args.landing_constraints else None,
             peak_endpoint_objective=args.peak_endpoint_objective)
     dump_yaml(str(args.output/'env.yaml'), cfg)
@@ -119,6 +124,10 @@ def main():
         num_envs=args.num_envs, hardware_connected=False))
     torch.set_num_threads(4)
     env = ManagerBasedRLEnv(cfg=cfg)
+    statistics=None
+    if args.substep_objective:
+        from skills.substep_statistics import install
+        statistics=install(env,source)
     try:
         wrapped = RslRlVecEnvWrapper(env, clip_actions=100.)
         runner_cfg = agent.to_dict()
@@ -133,9 +142,11 @@ def main():
             with torch.no_grad():parameters[key].fill_(math.log(args.reset_std) if key=='log_std' else args.reset_std)
             runner.alg.optimizer.state.pop(parameters[key],None)
         runner.learn(num_learning_iterations=args.iterations, init_at_random_ep_len=False)
+        if statistics is not None:write_json(args.output/'physical_statistics.json',statistics.report())
         write_json(args.output/'completion.json', dict(execution_complete=True,
             requested_iterations=args.iterations, capability_verified=False, hardware_connected=False))
     finally:
+        if statistics is not None:statistics.close()
         env.close()
 
 

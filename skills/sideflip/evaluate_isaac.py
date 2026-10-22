@@ -11,6 +11,7 @@ p.add_argument('--policy',required=True,type=Path)
 p.add_argument('--output',required=True,type=Path)
 p.add_argument('--seconds',default=6.,type=float)
 p.add_argument('--seed',default=1000,type=int)
+p.add_argument('--substep-diagnostics',action='store_true')
 AppLauncher.add_app_launcher_args(p)
 args=p.parse_args()
 args.kit_args=(args.kit_args+' --enable isaacsim.asset.importer.urdf').strip()
@@ -40,6 +41,7 @@ def main():
             fixstand['residual_limit_rad'],fixstand['bridge_residual_limit_rad'],
             fixstand['terminal_hip_taper_frames'],fixstand.get('boundary_blend_frames',0))
     cfg.observations.policy.enable_corruption=False
+    if args.substep_diagnostics:cfg.scene.contact_forces.update_period=cfg.sim.dt
     cfg.events.base_com=None
     cfg.events.physics_material=None
     cfg.commands.motion.pose_range={}
@@ -53,6 +55,7 @@ def main():
     def start_at_zero(self,env_ids):self.time_steps[env_ids]=0
     MotionCommand._adaptive_sampling=start_at_zero
     env=ManagerBasedRLEnv(cfg)
+    original_scene_update=env.scene.update
     try:
         cmd=env.command_manager.get_term('motion')
         original_update=cmd._update_command
@@ -70,7 +73,26 @@ def main():
         import xml.etree.ElementTree as ET
         from scipy.spatial.transform import Rotation
         limits={j.attrib['name']:j.find('limit').attrib for j in ET.parse(source/'resources/robots/go2/urdf/go2_description.urdf').getroot().findall('joint') if j.attrib['name'] in robot.joint_names}
-        trace=[]
+        trace=[];subtrace=[];physical=None
+        if args.substep_diagnostics:
+            def sample_substep(dt):
+                original_scene_update(dt)
+                d=robot.data;sensor=env.scene['contact_forces']
+                force=torch.linalg.vector_norm(sensor.data.net_forces_w[0],dim=-1).tolist()
+                forces={leg:sum(v for n,v in zip(sensor.body_names,force) if n==leg+'_foot') for leg in ('FR','FL','RR','RL')}
+                from skills.fixstand import POSE
+                q=d.joint_pos[0].tolist();dq=d.joint_vel[0].tolist()
+                subtrace.append(dict(time=(len(subtrace)+1)*dt,position=d.root_pos_w[0].tolist(),
+                    quaternion=d.root_quat_w[0].tolist(),joints=q,joint_velocity=dq,
+                    ground_bodies=[n for n,v in zip(sensor.body_names,force) if v>1.],
+                    foot_forces_N=forces,all_feet_ground=all(v>4. for v in forces.values()),
+                    upright=float(-d.projected_gravity_b[0,2]),speed=float(torch.linalg.vector_norm(d.root_lin_vel_w[0,:2])),
+                    angular_speed=float(torch.linalg.vector_norm(d.root_ang_vel_b[0])),max_joint_speed=max(abs(v) for v in dq),
+                    standard_pose_error=max(abs(v-POSE[n]) for n,v in zip(robot.joint_names,q))))
+            env.scene.update=sample_substep
+        initial=dict(reference_frame=int(cmd.time_steps[0]),observation=obs['policy'][0].tolist(),
+                     position=robot.data.root_pos_w[0].tolist(),quaternion=robot.data.root_quat_w[0].tolist(),
+                     joints=robot.data.joint_pos[0].tolist(),joint_velocity=robot.data.joint_vel[0].tolist())
         for i in range(round(args.seconds/env.step_dt)):
             input_obs=obs['policy'].clone()
             with torch.inference_mode():act=actor(input_obs)
@@ -87,6 +109,18 @@ def main():
         dump_yaml(str(args.output/'env.yaml'),cfg)
         write_json(args.output/'effective_fixstand.json',fixstand)
         write_json(args.output/'trace.json',trace)
+        write_json(args.output/'initial_state.json',initial)
+        if args.substep_diagnostics:
+            if len(subtrace)!=round(args.seconds/cfg.sim.dt):raise RuntimeError('Incomplete physical substep coverage')
+            write_json(args.output/'substep_trace.json',subtrace)
+            physical_bad=any(any('foot' not in n and 'calf' not in n for n in x['ground_bodies']) for x in subtrace)
+            physical_speed=max(abs(v)/float(limits[n]['velocity']) for x in subtrace for n,v in zip(robot.joint_names,x['joint_velocity']))
+            physical_excess=max(0.,max(max(float(limits[n]['lower'])-v,v-float(limits[n]['upper'])) for x in subtrace for n,v in zip(robot.joint_names,x['joints'])))
+            from rob2nav.fixstand_validation import assess
+            physical=dict(physics_hz=1./cfg.sim.dt,samples=len(subtrace),
+                max_joint_speed_ratio=physical_speed,max_joint_limit_excess_rad=physical_excess,unexpected_body_contact=physical_bad,
+                fixstand=assess(subtrace),hardware_qualified=False)
+            write_json(args.output/'substep_acceptance.json',physical)
         quat=np.array([x['quaternion'] for x in trace]);rot=Rotation.from_quat(quat[:,[1,2,3,0]])
         increments=(rot[:-1].inv()*rot[1:]).as_rotvec()
         turn=float(increments[:,0].sum());dominance=abs(turn)/max(1e-8,float(np.linalg.norm(increments,axis=1).sum()))
@@ -98,6 +132,9 @@ def main():
         bad=any(any(not ('foot' in n or 'calf' in n) for n in x['ground_bodies']) for x in trace)
         speed_ratio=max(abs(v)/float(limits[n]['velocity']) for x in trace for n,v in zip(robot.joint_names,x['joint_velocity']))
         excess=max(0.,max(max(float(limits[n]['lower'])-v,v-float(limits[n]['upper'])) for x in trace for n,v in zip(robot.joint_names,x['joints'])))
+        control_constraints=dict(max_joint_speed_ratio=speed_ratio,max_joint_limit_excess_rad=excess,unexpected_body_contact=bad)
+        if physical is not None:
+            speed_ratio=physical['max_joint_speed_ratio'];excess=physical['max_joint_limit_excess_rad'];bad=physical['unexpected_body_contact']
         success=bool(5.5<abs(turn)<7.1 and dominance>.75 and max_airborne>=.08 and not bad and
             max(x['position'][2] for x in trace)>.45 and min(-x['projected_gravity'][2] for x in trace)<-.8 and
             all(-x['projected_gravity'][2]>.90 and x['position'][2]>.22 and np.linalg.norm(x['linear_velocity'][:2])<.25 and np.linalg.norm(x['angular_velocity'])<1. for x in tail))
@@ -109,8 +146,11 @@ def main():
             max_height=max(x['position'][2] for x in trace),final_projected_gravity=trace[-1]['projected_gravity'],
             max_joint_speed_ratio=speed_ratio,max_joint_limit_excess_rad=excess,
             hardware_constraints_pass=speed_ratio<=1. and excess<=.001,hardware_connected=False,
-            constraint_sampling_hz=1./env.step_dt,constraint_scope='control-frame diagnostic; not all physics substeps'))
+            control_frame_constraints=control_constraints,substep_constraints=physical,
+            constraint_sampling_hz=1./cfg.sim.dt if args.substep_diagnostics else 1./env.step_dt,
+            constraint_scope='every physical substep' if args.substep_diagnostics else 'control-frame diagnostic; not all physics substeps'))
     finally:
+        env.scene.update=original_scene_update
         env.close()
         MotionCommand._adaptive_sampling=original_sampling
 

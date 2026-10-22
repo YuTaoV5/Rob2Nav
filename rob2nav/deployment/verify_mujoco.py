@@ -113,7 +113,7 @@ def main():
             native=c.phase=='ACTIVE' and c.active and c.active.actuation=='native_pd'
             if native and c.active.observation=='backflip60' and c.epoch!=check_epoch:
                 from .atomic_validation import BackflipValidation
-                check=BackflipValidation(model,c.active,c.phase_at);backflip_checks.append(check);check_epoch=c.epoch
+                check=BackflipValidation(model,c.active,c.phase_at,data);backflip_checks.append(check);check_epoch=c.epoch
             if native and current_id=='sideflip69':flip_rotation+=s.gyro[0]*.002
             from .core import FREE_SPEED
             maximum_speed_ratio=max(maximum_speed_ratio,float(np.max(abs(s.dq)/FREE_SPEED)))

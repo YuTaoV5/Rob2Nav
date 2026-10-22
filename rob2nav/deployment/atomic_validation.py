@@ -5,13 +5,17 @@ from rob2nav.fixstand_validation import assess
 
 
 class BackflipValidation:
-    def __init__(self,model,skill,start):
+    def __init__(self,model,skill,start,data=None):
         self.skill=skill;self.start=start;self.trace=[];self.next_sample=0.
         self.rotation=0.;self.travel=0.;self.air=0.;self.max_air=0.;self.height=0.
         self.minimum_up=1.;self.bad=False;self.speed=0.;self.excess=0.;self.elapsed=0.
         self.ids=np.array([model.joint(n).id for n in SDK_JOINTS])
         self.qids=model.jnt_qposadr[self.ids];self.dids=model.jnt_dofadr[self.ids]
         self.base=model.body('base').id
+        self.initial_state=None if data is None else dict(schema_version=1,joint_names=list(SDK_JOINTS),
+            joint_position=data.qpos[self.qids].tolist(),joint_velocity=data.qvel[self.dids].tolist(),
+            root_position=data.qpos[:3].tolist(),root_quaternion=data.qpos[3:7].tolist(),
+            root_linear_velocity_world=data.qvel[:3].tolist(),root_angular_velocity_body=data.qvel[3:6].tolist())
 
     def sample(self,model,data,now):
         import mujoco
@@ -53,6 +57,7 @@ class BackflipValidation:
         endpoints=assess(self.trace,initial_end=.8);constraints=self.speed<=1. and self.excess<=.001
         contract=self.skill.motor_control is not None
         return dict(skill=self.skill.id,start_s=self.start,coverage_complete=complete,action_completed=motion,
+            initial_state=getattr(self,'initial_state',None),
             fixstand=endpoints,body_y_rotation_rad=self.rotation,axis_dominance=dominance,
             airtime_s=self.max_air,max_height_m=self.height,unexpected_body_ground_contact=self.bad,
             max_joint_speed_ratio=self.speed,max_joint_limit_excess_rad=self.excess,
