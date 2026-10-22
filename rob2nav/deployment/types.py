@@ -117,7 +117,8 @@ class Skill:
             if not self.reference or not .01<=self.bridge_residual_limit_rad<=self.residual_limit_rad<=.3:raise ValueError('Invalid sideflip residual contract')
         elif self.residual_limit_rad or self.bridge_residual_limit_rad:raise ValueError('Residual limits require reference residual action')
         if self.action_parameterization in ('reference_residual_v3','reference_residual_v4'):
-            if type(self.terminal_hip_taper_frames) is not int or not 2<=self.terminal_hip_taper_frames<=50:raise ValueError('Invalid terminal hip taper')
+            taper=self.terminal_hip_taper_frames
+            if type(taper) is not int or not (2<=taper<=50 or self.action_parameterization=='reference_residual_v4' and taper==0):raise ValueError('Invalid terminal hip taper')
         elif self.terminal_hip_taper_frames:raise ValueError('Terminal hip taper requires reference_residual_v3')
         if self.action_parameterization=='reference_residual_v4':
             if type(self.boundary_blend_frames) is not int or not 2<=self.boundary_blend_frames<=20:raise ValueError('Invalid continuous boundary width')

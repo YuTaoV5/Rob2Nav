@@ -58,6 +58,7 @@ SCHEMAS['frontflip_native_ppo'] = {**SCHEMAS['backflip_native_ppo'],
     'peak_contact_forces': field('物理子步接触峰值', True),
     'flip_direction': field('空翻方向', 'front', choices=['front'])}
 SCHEMAS['backflip_native_ppo']['flip_direction'] = field('空翻方向', 'back', choices=['back'])
+SCHEMAS['sideflip_native_ppo']['boundary_terminal_hip_taper_frames']['help']='0保留有界学习补偿；2–50帧将末段髋残差衰减到0。参考归零不保证实测站姿归零，必须独立验收。'
 for _rid in ('sideflip_native_ppo','backflip_native_ppo','frontflip_native_ppo'):
     SCHEMAS[_rid]['evaluation_seed_start']=field('独立四种子验收起点（自动评估时使用）',20000,0,2147483644)
 
