@@ -57,9 +57,10 @@ def inventory(root,existing,evaluations):
         digest=d.get('sha256')
         evidence=[dict(label=e['name'],url='#simulation?evaluation='+e['id']) for e in evaluations
                   if digest and e.get('checkpoint')==digest]
-        manuals=[dict(label=label,url='#reports?path='+quote('skills/'+skill+'/'+name,safe=''))
-                 for label,name in [('仿真手册','SIMULATION.md'),('部署手册','DEPLOYMENT.md')]
-                 if skill and (root/'skills'/skill/name).is_file()]
+        from .documents import manual
+        manuals=[dict(label=label,url='#reports?path='+quote(manual(root,skill,kind),safe=''))
+                 for label,kind in [('仿真手册','simulation'),('部署手册','deployment')]
+                 if skill and (root/manual(root,skill,kind)).is_file()]
         m.update(skill=skill,format=Path(rel).suffix[1:].upper(),role=role,selection_basis=basis,
                  validation=d.get('validation','未关联到该文件哈希的独立评估；不自动认证'),
                  sha256=digest,checksum_source='发布索引记录' if digest else None,

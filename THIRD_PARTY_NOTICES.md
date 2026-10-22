@@ -25,19 +25,19 @@ and asset restrictions described below.
 
 ## Isaac Lab perceptive locomotion experiments
 
-- Framework: [Isaac Lab 2.3.2](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2), BSD-3-Clause; installed externally rather than vendored.
+- Framework: [Isaac Lab 2.3.2](https://github.com${ISAACLAB_ROOT}/tree/v2.3.2), BSD-3-Clause; installed externally rather than vendored.
 - Optimizer: [RSL-RL 3.1.2](https://github.com/leggedrobotics/rsl_rl), BSD-3-Clause.
 - The Go2 USD and external initial rough checkpoint are downloaded from NVIDIA's Isaac Lab asset server. NVIDIA assets and checkpoints retain their original terms; the root source-code license does not relicense them or derived weights.
 - `artifacts/perceptive/manifest.json` identifies the external initializer URL and SHA-256, and separately identifies Rob2Nav's fine-tuned teacher and student checkpoints.
 - The from-scratch teacher, fine-tuned teacher, student imitation and student PPO are distinct training stages. They do not update the vendored RoboGauge or NJU checkpoints.
-- Extreme Parkour, Robot Parkour Learning and Vision Locomotion are methodological references, linked in [the experiment documentation](docs/PERCEPTIVE_RL.md). This extension does not claim to reproduce their full training methods or published performance.
+- Extreme Parkour, Robot Parkour Learning and Vision Locomotion are methodological references, linked in [the experiment documentation](docs/感知强化学习训练说明.md). This extension does not claim to reproduce their full training methods or published performance.
 
 ## NJU quadrupedal-agility
 
 - Source: https://github.com/NJU-RLC/quadrupedal-agility
 - Revision: `15d16ea99bc23e5d401b0b0e3b88a8edcc28f0ed`
 - Subset location: `vendor/NJUAgility/`
-- License: MIT; see [upstream license](vendor/NJUAgility/LICENSE) and notices retained in individual files.
+- License: MIT; see [upstream license](https://github.com/YuTaoV5/Rob2Nav/blob/main/vendor/NJUAgility/LICENSE) and notices retained in individual files.
 - The subset includes unchanged BBC networks, a normalization utility, and two upstream deployment checkpoints.
 - [Provenance](vendor/NJUAgility/PROVENANCE.md) and SHA-256 snapshot identify the files; `python scripts/check_nju.py` verifies them.
 - Rob2Nav's sensing, IK, navigation and switching code are independent additions. No NJU checkpoint weights were trained or updated in this integration.
@@ -51,12 +51,12 @@ optimizer and is not a from-scratch run. The original artifact is unchanged.
 The AME-inspired visible-map encoder and training integration are Rob2Nav
 additions. Additional inspected go2_rl_gym revision and inherited notices are
 recorded in [MoE provenance](vendor/moe_reference/PROVENANCE.md) and
-[license](vendor/moe_reference/LICENSE).
+[license](https://github.com/YuTaoV5/Rob2Nav/blob/main/vendor/moe_reference/LICENSE).
 
 - Source: https://github.com/wty-yy/RoboGauge
 - Revision: `add2c7ee0185ea8fd93d242f86e1c8cac6e9913b`
 - Location: `vendor/RoboGauge/`
-- License: MIT; see [the original license](vendor/RoboGauge/LICENSE).
+- License: MIT; see [the original license](https://github.com/YuTaoV5/Rob2Nav/blob/main/vendor/RoboGauge/LICENSE).
 - Copyright: 2025 tianyang wu.
 
 The source snapshot includes upstream robot meshes, model checkpoints, documentation and assets as distributed by RoboGauge. Original files and notices are preserved. The root project license does not replace any third-party notices. Additional dependencies retain their respective licenses.

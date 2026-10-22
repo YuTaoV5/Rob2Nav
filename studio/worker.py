@@ -114,7 +114,7 @@ def execute(jobs,job,root,python,mujoco_python=None):
 
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--root',required=True);parser.add_argument('--python',required=True);parser.add_argument('--mujoco-python',default='/root/gpufree-data/envs/go2-mapless/bin/python')
+    parser=argparse.ArgumentParser();parser.add_argument('--root',required=True);parser.add_argument('--python',required=True);parser.add_argument('--mujoco-python',default=os.environ.get('CPU_PY',sys.executable))
     args=parser.parse_args();root=Path(args.root).resolve();jobs=Jobs(root)
     if os.name!='posix':raise SystemExit('Training worker requires a Linux simulator host')
     import fcntl

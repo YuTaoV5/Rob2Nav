@@ -33,10 +33,10 @@ python -m studio.api --port 8765
 GPU服务器启动（使用独立Web虚拟环境，不修改Isaac环境）：
 
 ```bash
-/root/gpufree-data/envs/rob2nav-studio/bin/python -m studio.api \
-  --root /root/gpufree-data/Rob2Nav --port 8765 --allow-training \
-  --sim-python /root/isaacsim/python.sh \
-  --mujoco-python /root/gpufree-data/envs/go2-mapless/bin/python
+"$WEB_PY" -m studio.api \
+  --root "$ROB2NAV_ROOT" --port 8765 --allow-training \
+  --sim-python "$ISAAC_PY" \
+  --mujoco-python "$CPU_PY"
 ```
 
 `--allow-training`只开放显式任务提交；不会启动任何实验。当前版本训练适配器仅支持MoE。该选项必须绑定loopback。不要直接把可执行服务暴露到公网。
@@ -45,7 +45,7 @@ GPU服务器启动（使用独立Web虚拟环境，不修改Isaac环境）：
 
 ```bash
 ssh -N -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 \
-  -L 127.0.0.1:8766:127.0.0.1:8765 -p 30249 root@120.209.70.195
+  -L 127.0.0.1:8766:127.0.0.1:8765 -p 30249 "${SSH_USER}@${SSH_HOST}"
 ```
 
 输入已有SSH凭据；密码不写入任何配置。浏览 http://127.0.0.1:8766 。重启电脑或隧道断开后需重新建立隧道，服务器网页服务需单独保持运行。
@@ -104,7 +104,7 @@ cd studio/frontend && npm run build
 
 新增验证：模型12关节限位与网格完整性、两种窄桩最终课程逐几何一致、资产路径边界、非法难度/类型拒绝。完整后台17项测试通过；Web构建通过。浏览器检查三维Go2、关节/碰撞切换、20cm窄桩预览、研究中心跳转与本地URDF导入。自主探索与策略训练继续暂停。
 
-![新版机器人查看器与主次导航](../docs/assets/studio-robot-viewer.png)
+![新版机器人查看器与主次导航](https://github.com/YuTaoV5/Rob2Nav/blob/main/docs/assets/studio-robot-viewer.png)
 
 ## 创建实验页的GPU占用提示
 
@@ -112,10 +112,10 @@ cd studio/frontend && npm run build
 
 `/api/resources`补充nvidia-smi计算进程PID、程序名和显存；如检测到GPU占用但没有关联Studio执行任务，提示“未关联任务”，轮次无法确认并提供实验页入口。不启动额外训练来演示提示，UI验收使用隔离目录、明确标识的样例记录。
 
-![GPU任务提示条界面验收示例，非真实训练](../docs/assets/studio-gpu-banner-example.png)
+![GPU任务提示条界面验收示例，非真实训练](https://github.com/YuTaoV5/Rob2Nav/blob/main/docs/assets/studio-gpu-banner-example.png)
 
 
-在线权重推理、三维拖动回放、任务多指标遥测和权重候选选择见 [在线仿真说明](../docs/ONLINE_SIMULATION.md)。
+在线权重推理、三维拖动回放、任务多指标遥测和权重候选选择见 [在线仿真说明](../docs/在线仿真使用说明.md)。
 
 ### 仿真与队列入口（2026-10-20）
 仿真页面默认打开在线仿真；点击运行新仿真，在弹窗中依次选择已有训练任务、该任务检查点、地形/几何/难度、时长和种子。队列最佳候选按钮会预选对应任务和权重，不自动提交；最佳候选不代表已验证全局最优。在线三维状态与历史视频/评估分为两个页签，历史证据链接自动进入历史回放。任务队列合并实时任务详情、TensorBoard曲线和可展开的历史训练记录；旧experiments和jobs路由均可访问同一队列。能力与方案位于左侧栏底部图标。
