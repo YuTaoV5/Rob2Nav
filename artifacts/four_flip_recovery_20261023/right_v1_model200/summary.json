@@ -1,0 +1,147 @@
+{
+  "args": {
+    "kind": "sideflip",
+    "seed": 27300,
+    "initialization": "settled",
+    "physics_hz": 1000,
+    "joint_limit_time_constant": null
+  },
+  "backend": "MuJoCo",
+  "successes": 0,
+  "total": 1,
+  "evaluator_sha256": "5ce110826a054708b023888368969b8698d935c7d375742b53b4903a6e4bc261",
+  "episodes": [
+    {
+      "success": false,
+      "unwrapped_roll_rad": 3.2401135623774864,
+      "body_x_rotation_rad": 1.8665079308870054,
+      "axis_dominance": 0.27666294623914905,
+      "terminal_upright": -0.9948956510937629,
+      "airtime_s": 0.06100000000000005,
+      "expected_direction": "right",
+      "direction_pass": false,
+      "max_joint_speed_ratio": 1.0627566759548155,
+      "max_joint_limit_excess_rad": 0.12913956058536713,
+      "unexpected_body_ground_contact": true,
+      "ground_contact_rule": "foot spheres and contact points inside their own anatomical foot region",
+      "ground_contact_rule_sha256": "803b0c9f2ee2d00129fc4550e25e05accc982f07768f42218261de9fa1c9d34f",
+      "action_completed": false,
+      "fixstand": {
+        "passed": false,
+        "initial": {
+          "passed": false,
+          "samples": 36,
+          "stable_fraction": 0.0,
+          "max_pose_error_rad": 0.1467998896388104
+        },
+        "terminal": {
+          "passed": false,
+          "samples": 51,
+          "stable_fraction": 0.0,
+          "max_pose_error_rad": 0.10467847539632569
+        },
+        "pose_tolerance_rad": 0.12,
+        "max_joint_speed_rad_s": 1.0,
+        "minimum_upright_cos": 0.98,
+        "required_stable_fraction": 0.95,
+        "terminal_hold_s": 1.0,
+        "base_height_range_m": [
+          0.26,
+          0.4
+        ],
+        "minimum_foot_force_N": 4.0
+      },
+      "preparation": {
+        "end_s": 2.4,
+        "max_target_step_rad": 0.03143898255271449,
+        "max_joint_speed_rad_s": 1.4089317975252789,
+        "max_body_angular_speed_rad_s": 0.9983647346761031,
+        "limits": {
+          "max_target_step_rad": 0.08,
+          "max_joint_speed_rad_s": 3.0,
+          "max_body_angular_speed_rad_s": 1.0
+        },
+        "passed": true
+      },
+      "target_continuity": {
+        "passed": false,
+        "max_target_step_rad": 1.0157635509967804,
+        "max_target_slew_urdf_ratio": 2.2477511387721747,
+        "joint": "RL_calf_joint",
+        "recorded_control_step_end_s": 3.2399999999996987,
+        "policy_hz": 50.0,
+        "limit_target_slew_urdf_ratio": 1.0,
+        "sample_pairs": 399,
+        "scope": "Mapped target change per control period, not measured joint speed; first target has no preceding logged target"
+      }
+    }
+  ],
+  "metrics": {
+    "unwrapped_roll_rad": 3.2401135623774864,
+    "body_x_rotation_rad": 1.8665079308870054,
+    "axis_dominance": 0.27666294623914905,
+    "terminal_upright": -0.9948956510937629,
+    "airtime_s": 0.06100000000000005,
+    "expected_direction": "right",
+    "direction_pass": false,
+    "max_joint_speed_ratio": 1.0627566759548155,
+    "max_joint_limit_excess_rad": 0.12913956058536713,
+    "unexpected_body_ground_contact": true,
+    "ground_contact_rule": "foot spheres and contact points inside their own anatomical foot region",
+    "ground_contact_rule_sha256": "803b0c9f2ee2d00129fc4550e25e05accc982f07768f42218261de9fa1c9d34f",
+    "action_completed": false,
+    "fixstand": {
+      "passed": false,
+      "initial": {
+        "passed": false,
+        "samples": 36,
+        "stable_fraction": 0.0,
+        "max_pose_error_rad": 0.1467998896388104
+      },
+      "terminal": {
+        "passed": false,
+        "samples": 51,
+        "stable_fraction": 0.0,
+        "max_pose_error_rad": 0.10467847539632569
+      },
+      "pose_tolerance_rad": 0.12,
+      "max_joint_speed_rad_s": 1.0,
+      "minimum_upright_cos": 0.98,
+      "required_stable_fraction": 0.95,
+      "terminal_hold_s": 1.0,
+      "base_height_range_m": [
+        0.26,
+        0.4
+      ],
+      "minimum_foot_force_N": 4.0
+    },
+    "preparation": {
+      "end_s": 2.4,
+      "max_target_step_rad": 0.03143898255271449,
+      "max_joint_speed_rad_s": 1.4089317975252789,
+      "max_body_angular_speed_rad_s": 0.9983647346761031,
+      "limits": {
+        "max_target_step_rad": 0.08,
+        "max_joint_speed_rad_s": 3.0,
+        "max_body_angular_speed_rad_s": 1.0
+      },
+      "passed": true
+    },
+    "target_continuity": {
+      "passed": false,
+      "max_target_step_rad": 1.0157635509967804,
+      "max_target_slew_urdf_ratio": 2.2477511387721747,
+      "joint": "RL_calf_joint",
+      "recorded_control_step_end_s": 3.2399999999996987,
+      "policy_hz": 50.0,
+      "limit_target_slew_urdf_ratio": 1.0,
+      "sample_pairs": 399,
+      "scope": "Mapped target change per control period, not measured joint speed; first target has no preceding logged target"
+    }
+  },
+  "policy_sha256": "56df512c80d9fe5ddb188218436074139a85c11430d740f8fb4cecdadc9bc840",
+  "root_state_writes": "initialization only; no root stabilization/weld/teleport during evaluation",
+  "hardware_connected": false,
+  "motor_model": "dc_linear_v1",
+  "hardware_constraints_pass": false
+}

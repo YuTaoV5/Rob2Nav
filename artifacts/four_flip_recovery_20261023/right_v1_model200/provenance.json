@@ -1,0 +1,29 @@
+{
+  "scope": "Mid-training diagnostic only",
+  "checkpoint": 200,
+  "seed": 27300,
+  "final_qualification": false,
+  "command": [
+    "/root/gpufree-data/envs/go2-mapless/bin/python",
+    "-m",
+    "rob2nav.mujoco_skill",
+    "--kind",
+    "sideflip",
+    "--policy",
+    "/root/gpufree-data/Rob2Nav/outputs/studio_diagnostics/right_v1_model200/exported/policy.pt",
+    "--backflip-source",
+    "/root/gpufree-data/Rob2Nav-upstreams/GO2_backflip",
+    "--motion",
+    "/root/gpufree-data/Rob2Nav/artifacts/web_continuity_iteration_20261023/inputs/right_v1/rightflip.npz",
+    "--seconds",
+    "8",
+    "--physics-hz",
+    "1000",
+    "--fixstand-roundtrip",
+    "--diagnostics",
+    "--seed",
+    "27300",
+    "--output",
+    "/root/gpufree-data/Rob2Nav/outputs/studio_diagnostics/right_v1_model200/seed_27300"
+  ]
+}
