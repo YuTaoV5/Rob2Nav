@@ -24,7 +24,7 @@ class Control(BaseModel):
     action: Literal['goal', 'start', 'stop', 'reset', 'camera']
     goal: list[float] | None = Field(default=None, min_length=2, max_length=2)
     camera: dict[str,float] | None = None
-    scene: Literal['empty', 'slalom', 'blocked','rooms_dynamic','follow_obstacles','follow_stairs','follow_sand','follow_mixed'] | None = None
+    scene: Literal['empty', 'slalom', 'blocked','rooms_dynamic','follow_obstacles','follow_stairs','follow_sand','follow_mixed','stairs_door','stairs_route'] | None = None
     task: Literal['navigate','follow'] | None = None
     person_id: Literal['person_01','person_02','person_03'] = 'person_01'
     follow_distance: float = Field(default=1.2,ge=.9,le=2.5)
@@ -49,7 +49,7 @@ class Engine:
     def loop(self):
         from go2_nav.env import load_config
         from .task_env import TaskEnvironment as Go2MaplessEnv
-        from .tasks import TASK_SCENES,StaticRoute,follow_goal,pedestrian_guard
+        from .tasks import TASK_SCENES,STEP_TASK_SCENES,StaticRoute,follow_goal,pedestrian_guard
         from go2_nav.planner import ReactivePlanner
         from .controller import action as navigation_action
         env = None
@@ -58,7 +58,7 @@ class Engine:
             cfg = load_config(self.config or Path(__file__).with_name('config.json'))
             config_sha = hashlib.sha256(json.dumps(cfg, sort_keys=True).encode()).hexdigest()
             cfg.update(max_seconds=1e9)
-            scene = 'rooms_dynamic' if self.planner_backend=='scan' else 'empty'
+            scene = 'stairs_door' if self.planner_backend=='scan' else 'empty'
             task_mode='navigate';person_id='person_01';spacing=1.2
             tracking='not_requested';safety_reason='';last_seen=-1e9
             route=[];route_at=-1e9;route_goal=None;local_goal=None;local_at=-1e9
@@ -105,7 +105,7 @@ class Engine:
             def valid(p):
                 return router.free(p)
 
-            boxes = geometry();router=StaticRoute(boxes)
+            boxes = geometry();router=StaticRoute(boxes,clearance=.60 if scene=='stairs_route' else .37)
             while not self.closed.is_set():
                 while not self.commands.empty():
                     cmd = self.commands.get_nowait()
@@ -123,7 +123,7 @@ class Engine:
                         env.close()
                         env = Go2MaplessEnv(cfg, scene=scene, sensor_mode='lidar')
                         _, info = env.reset(seed=cmd.seed)
-                        boxes = geometry();router=StaticRoute(boxes)
+                        boxes = geometry();router=StaticRoute(boxes,clearance=.60 if scene=='stairs_route' else .37)
                         if scene in TASK_SCENES:goal=env.goal.copy()
                         env.goal[:] = goal
                         phase, reason, path = 'READY', 'scene_reset', []
@@ -200,6 +200,7 @@ class Engine:
                 if scene in TASK_SCENES:
                     limits=np.array([cfg['max_vx'],cfg['max_vy'],cfg['max_wz']])
                     physical=np.clip(action*limits,[-.35,-.20,-.8],[.45,.20,.8])
+                    if scene in STEP_TASK_SCENES:physical=np.clip(physical,[-.20,-.12,-.5],[.30,.12,.5])
                     physical,guard_reason=pedestrian_guard(physical,env.rotation,env.data.qpos[:2],tracks)
                     if guard_reason:safety_reason=guard_reason
                     action=physical/limits
@@ -216,6 +217,7 @@ class Engine:
                     path = path[-1600:]
                 if env.data.time >= next_render:
                     env.model.site('goal').pos[:2] = goal
+                    env.model.site('goal').pos[2] = .10+env.ground(float(goal[0]))
                     import mujoco
                     if env.renderer is None:env.renderer=mujoco.Renderer(env.model,height=480,width=640)
                     camera=mujoco.MjvCamera()
@@ -240,6 +242,10 @@ class Engine:
                                           follow_samples=len(follow_errors),lost_samples=lost_samples,route_failures=route_failures),
                         terrain=getattr(env,'terrain_meta',{}).get('terrain','flat'),
                         terrain_surfaces=getattr(env,'terrain_meta',{}).get('surfaces',[]),sand_region=getattr(env,'terrain_meta',{}).get('sand_region'),
+                        door=getattr(env,'terrain_meta',{}).get('door'),step_height_m=getattr(env,'terrain_meta',{}).get('step_height_m'),
+                        course_metrics=getattr(env,'course_metrics',{}),
+                        routing_clearance_m=router.clearance,
+                        low_step_filter='support-relative 0.20m height rejection; known bounded low-step course' if scene in STEP_TASK_SCENES else None,
                         person_observation='simulator-labelled identity and pose with lidar-origin line-of-sight; not RGB/ReID',
                         camera=camera_settings.copy(),policy_sha256=policy_sha,
                         planner_inputs=('static building map A* subgoals + SCAN ray pointcloud + visible simulated person tracks' if scene in TASK_SCENES else 'simulated lidar returns, odometry, selected goal; no obstacle metadata'))
@@ -289,7 +295,7 @@ def create_app(config=None, checkpoint=None,planner_backend="ppo"):
             from studio.live_skills import Camera
             try:cmd.camera=Camera(**(cmd.camera or {})).model_dump()
             except ValueError as exc:raise HTTPException(422,str(exc))
-        if (cmd.scene in ('rooms_dynamic','follow_obstacles','follow_stairs','follow_sand','follow_mixed') or cmd.task=='follow') and planner_backend!='scan':
+        if (cmd.scene in ('rooms_dynamic','follow_obstacles','follow_stairs','follow_sand','follow_mixed','stairs_door','stairs_route') or cmd.task=='follow') and planner_backend!='scan':
             raise HTTPException(422,'Task scenarios require the SCAN worker')
         if engine.error:
             raise HTTPException(503, engine.error)

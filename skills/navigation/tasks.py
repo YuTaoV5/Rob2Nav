@@ -4,7 +4,8 @@ import math
 import xml.etree.ElementTree as ET
 import numpy as np
 
-TASK_SCENES=('rooms_dynamic','follow_obstacles','follow_stairs','follow_sand','follow_mixed')
+STEP_TASK_SCENES=('stairs_door','stairs_route')
+TASK_SCENES=('rooms_dynamic','follow_obstacles','follow_stairs','follow_sand','follow_mixed',*STEP_TASK_SCENES)
 COLORS=((.92,.55,.12,1),(.17,.57,.85,1),(.66,.33,.78,1))
 
 def populate(world,scene,cfg,obstacle_names):
@@ -12,7 +13,32 @@ def populate(world,scene,cfg,obstacle_names):
     def box(name,x,y,sx,sy,height=.65,obstacle=True,rgba='.65 .48 .35 1',friction='.8 .02 .01'):
         if obstacle:obstacle_names.append(name)
         ET.SubElement(world,'geom',name=name,type='box',pos=f'{x} {y} {height/2}',size=f'{sx} {sy} {height/2}',rgba=rgba,friction=friction,group='0',priority='1')
-    if scene=='rooms_dynamic':
+    if scene in STEP_TASK_SCENES:
+        # Walls enter static routing. Low steps remain physical traversable supports.
+        height=.05 if scene=='stairs_door' else .08
+        surfaces=[(2.0,2.45,height),(2.45,2.9,2*height),(2.9,4.4,2*height),(4.4,4.85,height)]
+        names=[]
+        for i,(lo,hi,h) in enumerate(surfaces):
+            name=f'nav_step_{i}';names.append(name)
+            box(name,(lo+hi)/2,0,(hi-lo)/2,2.88,h,False,rgba='.61 .52 .36 1')
+        meta.update(goal=[7.2,-.9] if scene=='stairs_door' else [7.2,1.0],surfaces=surfaces,
+            step_geom_names=names,step_height_m=height,step_count=2,
+            terrain=f'rigid low steps: 2 x {height:.2f}m ascent and descent; bounded simulation course',
+            step_interval=[2.,4.85],max_platform_height_m=2*height)
+        if scene=='stairs_door':
+            width=.95;x=3.5
+            for side in (-1,1):
+                lo,hi=(width/2,3.) if side>0 else (-3.,-width/2)
+                box('door_jamb_'+str(side),x,(lo+hi)/2,.10,(hi-lo)/2,1.4,rgba='.42 .53 .62 1')
+            # Overhead beam is physical, but its XY projection must not seal the map.
+            ET.SubElement(world,'geom',name='door_lintel',type='box',pos=f'{x} 0 1.30',size=f'.10 {width/2} .10',rgba='.42 .53 .62 1',group='0')
+            meta['door']=dict(x=x,y=0.,width_m=width,opening_height_m=1.10)
+            box('exit_furniture',5.7,.8,.35,.40)
+        else:
+            box('route_furniture',3.5,1.15,.35,.4)
+            box('route_furniture_exit',5.7,-1.2,.35,.4)
+        paths=[]
+    elif scene=='rooms_dynamic':
         for x in (3.,6.):
             for lo,hi in [(-3.,-2.15),(-.65,.65),(2.15,3.)]:box(f'partition_{x}_{lo}',x,(lo+hi)/2,.08,(hi-lo)/2,1.25)
         for lo,hi in [(-2.,-1.25),(1.25,3.75),(5.25,7.25),(8.75,10.)]:box(f'room_divider_{lo}',(lo+hi)/2,0,(hi-lo)/2,.08,1.25)
@@ -56,9 +82,9 @@ def populate(world,scene,cfg,obstacle_names):
 
 class StaticRoute:
     """Known building floor plan only. Moving person truth is never an A* obstacle."""
-    def __init__(self,boxes):self.boxes=boxes;self.res=.2
+    def __init__(self,boxes,clearance=.37):self.boxes=boxes;self.res=.2;self.clearance=clearance
     def free(self,p):
-        return -1.45<=p[0]<=9.4 and -2.5<=p[1]<=2.5 and all(abs(p[0]-b['x'])>=b['sx']+.37 or abs(p[1]-b['y'])>=b['sy']+.37 for b in self.boxes)
+        return -1.45<=p[0]<=9.4 and -2.5<=p[1]<=2.5 and all(abs(p[0]-b['x'])>=b['sx']+self.clearance or abs(p[1]-b['y'])>=b['sy']+self.clearance for b in self.boxes)
     def line(self,a,b):
         n=max(2,int(math.dist(a,b)/.05)+1)
         return all(self.free(np.asarray(a)+(np.asarray(b)-a)*t) for t in np.linspace(0,1,n))
@@ -74,7 +100,17 @@ class StaticRoute:
         if self.line(start,goal):return [list(start),list(goal)]
         cell=lambda p:(round(p[0]/self.res),round(p[1]/self.res))
         xy=lambda p:np.array(p)*self.res
-        s,g=cell(start),cell(goal);todo=[(0,s)];cost={s:0};prev={};done=set()
+        def anchor(point):
+            c=cell(point)
+            candidates=[(c[0]+dx,c[1]+dy) for dx in range(-3,4) for dy in range(-3,4)]
+            # A free continuous pose can round into an occupied grid cell.
+            # Connect it to a genuinely free, visible grid anchor instead.
+            for v in sorted(candidates,key=lambda v:math.dist(point,xy(v))):
+                if self.free(xy(v)) and self.line(point,xy(v)):return v
+            return None
+        s,g=anchor(start),anchor(goal)
+        if s is None or g is None:return []
+        todo=[(0,s)];cost={s:0};prev={};done=set()
         while todo and len(done)<5000:
             _,u=heapq.heappop(todo)
             if u in done:continue
@@ -82,7 +118,7 @@ class StaticRoute:
             if u==g:
                 path=[list(goal)];v=u
                 while v!=s:path.append(xy(v).tolist());v=prev[v]
-                path.append(list(start));path.reverse();smooth=[path[0]];i=0
+                path.append(xy(s).tolist());path.append(list(start));path.reverse();smooth=[path[0]];i=0
                 while i<len(path)-1:
                     j=len(path)-1
                     while j>i+1 and not self.line(path[i],path[j]):j-=1

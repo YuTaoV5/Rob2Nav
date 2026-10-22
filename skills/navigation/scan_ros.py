@@ -48,7 +48,7 @@ class Bridge(Node):
                 except subprocess.TimeoutExpired:os.killpg(p.pid,signal.SIGKILL);p.wait()
         self.children=[]
         if self.log:self.log.close();self.log=None
-    def restart(self,session,dynamic_task=False):
+    def restart(self,session,dynamic_task=False,low_steps=False):
         self.stop_children();self.session=session;self.cmd=[0.,0.,0.];self.cmd_at=0.;self.plans=0;self.command_count=0;self.goal_key=None
         self.goal_at=0.;self.goal_plan_baseline=0;self.goal_attempts=0
         folder=Path('/root/gpufree-data/Rob2Nav/outputs/scan_web');folder.mkdir(parents=True,exist_ok=True)
@@ -56,12 +56,19 @@ class Bridge(Node):
         config=SOURCE/'install/scan_planner/share/scan_planner/config'
         binary=SOURCE/'install/scan_planner/lib/scan_planner'
         self.map_timeout=2.0 if dynamic_task else 0.0
+        self.low_steps=low_steps
+        if low_steps:
+            source=(SOURCE/'src/planner/plan_manage/src/scan_replan_fsm.cpp').read_text()
+            if 'fsm.rob2nav_use_goal_height' not in source:raise RuntimeError('Apply and build deployment/patch_scan_goal_height.py first')
         if dynamic_task:
             source=(SOURCE/'src/planner/plan_env/src/grid_map.cpp').read_text()
             if 'rob2nav_occupancy_timeout_' not in source:raise RuntimeError('Apply and build deployment/patch_scan_dynamic_map.py first')
         commands=[
             [str(binary/'scan_planner_node'),'--ros-args','--params-file',str(config/'planner.yaml'),'-p',f'grid_map.rob2nav_occupancy_timeout:={self.map_timeout}','-r','body_pose:=/quad_0/body_pose','-r','sensor_pose:=/quad_0/lidar_pose','-r','cloud:=/quad_0/cloud'],
             [str(binary/'closed_loop_controller'),'--ros-args','--params-file',str(config/'controllers.yaml'),'-r','body_pose:=/quad_0/body_pose','-r','cmd_vel:=/quad_0/cmd_vel']]
+        if low_steps:
+            commands[0]+= ['-p','fsm.rob2nav_use_goal_height:=true','-p','manager.max_vel:=0.30','-p','optimization.max_vel:=0.30']
+            commands[1]+= ['-p','max_vx:=0.30','-p','max_vy:=0.12','-p','max_vyaw:=0.50']
         self.children=[subprocess.Popen(c,stdout=self.log,stderr=subprocess.STDOUT,start_new_session=True) for c in commands]
         self.started=time.monotonic()
     def receive(self):
@@ -74,7 +81,7 @@ class Bridge(Node):
             if self.children and time.monotonic()-self.last_packet>10:self.stop_children();self.session=None
             return
         d,peer=packet;self.last_packet=time.monotonic()
-        if d['session']!=self.session:self.restart(d['session'],d.get('dynamic_task',False))
+        if d['session']!=self.session:self.restart(d['session'],d.get('dynamic_task',False),d.get('low_step_navigation',False))
         stamp=self.get_clock().now().to_msg()
         odom=Odometry();odom.header.stamp=stamp;odom.header.frame_id='world';odom.child_frame_id='base'
         p,q=d['position'],d['quaternion']
@@ -99,7 +106,8 @@ class Bridge(Node):
         age=time.monotonic()-self.cmd_at
         reply=dict(session=self.session,command=self.cmd if age<.3 and d['active'] else [0.,0.,0.],command_age=age if self.cmd_at else None,
             plans=self.plans,commands=self.command_count,source_commit=PIN,map_occupancy_timeout_s=self.map_timeout,source_variant='rob2nav_dynamic_map_v1',ready=all(p.poll() is None for p in self.children),
-            sensor_points=len(points),goal_published=self.goal_key is not None,goal_attempts=self.goal_attempts,
+            sensor_points=len(points),goal_height_enabled=self.low_steps,planner_max_velocity_mps=.30 if self.low_steps else .75,
+            requested_goal_height_m=d.get('goal_height',.3),goal_published=self.goal_key is not None,goal_attempts=self.goal_attempts,
             goal_subscribers=self.goal.get_subscription_count(),goal_acknowledged=self.plans>self.goal_plan_baseline)
         self.sock.sendto(json.dumps(reply).encode(),peer)
 

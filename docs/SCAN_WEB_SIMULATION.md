@@ -1,5 +1,7 @@
 # SCAN 网页实时 MuJoCo 仿真
 
+新增[台阶后过窄门与台阶路线](SCAN_STEPS_AND_NARROW_DOOR.md)：5cm/8cm低台阶、0.95m窄门、可选手动目标高程补丁及规划/执行速度对齐；具体尺寸和验收范围以新说明为准。
+
 完整操作/环境恢复见[SCAN仿真手册](../skills/navigation/SCAN_SIMULATION.md)，硬件导航集成见[SCAN实机部署手册](../skills/navigation/SCAN_DEPLOYMENT.md)。
 
 网页入口：导航页选择「SCAN 原生规划器 + MuJoCo」，或在线仿真选择「SCAN 原生规划仿真」。独立窗口为 `/scan-live`。点击地图空地设置目标，再点击开始。左键拖动画面旋转、右键拖动平移、滚轮缩放。停止与重置只影响仿真。

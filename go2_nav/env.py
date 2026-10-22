@@ -123,7 +123,7 @@ class Go2MaplessEnv(gym.Env):
                 self.obstacle_names.append("course_block")
             if "goal" in self.terrain_meta:
                 self.goal = np.asarray(self.terrain_meta["goal"], dtype=float)
-        elif self.scene in ('rooms_dynamic','follow_obstacles','follow_stairs','follow_sand','follow_mixed'):
+        elif self.scene in ('rooms_dynamic','follow_obstacles','follow_stairs','follow_sand','follow_mixed','stairs_door','stairs_route'):
             from skills.navigation.tasks import populate
             self.terrain_meta=populate(world,self.scene,self.cfg,self.obstacle_names)
             self.goal=np.asarray(self.terrain_meta['goal'],dtype=float)

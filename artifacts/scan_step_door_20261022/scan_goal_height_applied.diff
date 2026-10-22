@@ -1,0 +1,14 @@
+--- a/src/planner/plan_manage/src/scan_replan_fsm.cpp
++++ b/src/planner/plan_manage/src/scan_replan_fsm.cpp
+@@ -0,0 +1,2 @@
++#include <algorithm>
++#include <cmath>
+@@ -36,0 +39 @@
++    node_->declare_parameter<bool>("fsm.rob2nav_use_goal_height", false);
+@@ -157 +160,5 @@
+-    end_pt_ << msg->poses[0].pose.position.x, msg->poses[0].pose.position.y, rviz_goal_height_;
++    const double requested_height = msg->poses[0].pose.position.z;
++    const bool use_goal_height = node_->get_parameter("fsm.rob2nav_use_goal_height").as_bool();
++    const double goal_height = use_goal_height && std::isfinite(requested_height)
++        ? std::max(0.20, std::min(1.00, requested_height)) : rviz_goal_height_;
++    end_pt_ << msg->poses[0].pose.position.x, msg->poses[0].pose.position.y, goal_height;
