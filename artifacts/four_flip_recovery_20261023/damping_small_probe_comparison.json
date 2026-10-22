@@ -1,0 +1,65 @@
+{
+  "diagnostic_only": true,
+  "seed": 27100,
+  "independent_qualification": false,
+  "records": [
+    {
+      "damping": 1.2,
+      "policy_sha256": "d74c8e6e8c7e865ae50989a746e03ea4b2a101d5c911d098d8e0097fa55d30e3",
+      "metrics": {
+        "unwrapped_roll_rad": -6.273504740190581,
+        "body_x_rotation_rad": -6.24528903067685,
+        "axis_dominance": 0.7939529653526856,
+        "terminal_upright": 0.9999514349467784,
+        "airtime_s": 0.34700000000000025,
+        "expected_direction": "left",
+        "direction_pass": true,
+        "max_joint_speed_ratio": 1.039291917498429,
+        "max_joint_limit_excess_rad": 0.03901148832051238,
+        "unexpected_body_ground_contact": true,
+        "ground_contact_rule": "foot spheres and contact points inside their own anatomical foot region",
+        "ground_contact_rule_sha256": "803b0c9f2ee2d00129fc4550e25e05accc982f07768f42218261de9fa1c9d34f",
+        "action_completed": false,
+        "fixstand": {
+          "passed": false,
+          "initial": {
+            "passed": false,
+            "samples": 36,
+            "stable_fraction": 0.8055555555555556,
+            "max_pose_error_rad": 0.12853896366072912
+          },
+          "terminal": {
+            "passed": false,
+            "samples": 51,
+            "stable_fraction": 0.0,
+            "max_pose_error_rad": 0.1294392799851831
+          },
+          "pose_tolerance_rad": 0.12,
+          "max_joint_speed_rad_s": 1.0,
+          "minimum_upright_cos": 0.98,
+          "required_stable_fraction": 0.95,
+          "terminal_hold_s": 1.0,
+          "base_height_range_m": [
+            0.26,
+            0.4
+          ],
+          "minimum_foot_force_N": 4.0
+        },
+        "preparation": {
+          "end_s": 2.4,
+          "max_target_step_rad": 0.046572636131992695,
+          "max_joint_speed_rad_s": 1.4821701185994551,
+          "max_body_angular_speed_rad_s": 0.5108965844434693,
+          "limits": {
+            "max_target_step_rad": 0.08,
+            "max_joint_speed_rad_s": 3.0,
+            "max_body_angular_speed_rad_s": 1.0
+          },
+          "passed": true
+        }
+      },
+      "successes": 0,
+      "constraints": false
+    }
+  ]
+}
