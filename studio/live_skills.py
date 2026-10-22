@@ -125,12 +125,12 @@ def mount_live_skills(app,root,python):
             stop();key=uuid.uuid4().hex[:12];out=root/'outputs/live_skills'/key
             stream=out/'stream';stream.mkdir(parents=True)
             sequence=out/'sequence.json';sequence.write_text(json.dumps({'steps':steps},ensure_ascii=False))
-            args=['--root',str(root),'--output',str(out/'evaluation'),'--asset','source','--sequence',str(sequence),'--max-seconds',str(budget),'--seed','9315']
+            args=['--root',str(root),'--output',str(out/'evaluation'),'--asset','source','--sequence',str(sequence),'--progress',str(stream/'progress.json'),'--max-seconds',str(budget),'--seed','9315']
             if a.research_stunts:args.append('--atomic-cycle')
             log=(out/'process.log').open('wb')
             try:proc=subprocess.Popen([str(python),'-m','studio.live_runner','--stream',str(stream),'--module','rob2nav.deployment.verify_mujoco','--',*args],cwd=root,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             finally:log.close()
-            current.clear();current.update(id=key,skill='composition',phase='STARTING',note='统一控制器真实MuJoCo编排；侧翻仅研究仿真，所有配置均未获实机资格。',stream=str(stream),hardware_enabled=False,steps=len(steps),cycles=a.cycles)
+            current.clear();current.update(id=key,skill='composition',phase='STARTING',note='统一控制器真实MuJoCo编排；侧翻仅研究仿真，所有配置均未获实机资格。',stream=str(stream),hardware_enabled=False,steps=len(steps),cycles=a.cycles,source_steps=[s.model_dump() for s in a.steps])
             last_client=time.monotonic()
             return {k:v for k,v in current.items() if k!='stream'}
 
@@ -142,6 +142,14 @@ def mount_live_skills(app,root,python):
             if not current:return {'phase':'IDLE'}
             s={k:v for k,v in current.items() if k!='stream'}
             s.update(read(Path(current['stream'])/'state.json',{}))
+            if current.get('skill')=='composition':
+                progress=read(Path(current['stream'])/'progress.json',{})
+                if progress:
+                    s['progress']=progress;s['time']=progress['total_elapsed_s']
+                    if progress['status'] in ('complete','failed'):
+                        s['phase']='COMPLETED' if progress['status']=='complete' else 'FAILED'
+                # A stopped process may leave a RUNNING frame on disk.
+                if current['phase']=='STOPPED':s['phase']='STOPPED'
             result=read(Path(current['stream']).parent/'evaluation/summary.json',{})
             if result:
                 s['result']={k:result[k] for k in ['successes','total','hardware_constraints_pass','metrics','collisions','falls','policy_sha256'] if k in result}

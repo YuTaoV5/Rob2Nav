@@ -39,6 +39,25 @@ class SkillSequence:
             _,contract=runtime.profile(step.skill)
             if contract.atomic!=step.trigger:raise ValueError('Atomic sequence steps require an explicit trigger; gait steps must not trigger')
         self.index=0;self.requested=False;self.started=None;self.done=False;self.error=None
+        self.completed_dwell=0.;self.atomic_index=None
+    def progress(self,now):
+        """Read-only telemetry; ACTIVE dwell excludes preparation and handover waits."""
+        c=self.runtime.controller;step=self.steps[self.index]
+        elapsed=max(0.,now-self.started) if self.started is not None else 0.
+        dwell=min(elapsed,step.seconds) if not step.trigger else 0.
+        total=sum(s.seconds for s in self.steps if not s.trigger)
+        credited=min(total,self.completed_dwell+dwell)
+        atomic=bool(c.active is not None and c.active.atomic and c.phase=='ACTIVE')
+        status=('complete' if self.done else 'failed' if self.error or c.phase=='FAULT' else
+            'atomic' if atomic else 'transition' if self.started is None else
+            'handover' if elapsed>=step.seconds else 'dwell')
+        index=self.atomic_index if atomic and self.atomic_index is not None else self.index
+        return dict(step_index=index,step_count=len(self.steps),skill=self.steps[index].skill,
+            current_skill=c.active.id if c.active is not None else None,controller_phase=c.phase,
+            status=status,step_dwell_s=0. if self.done or atomic else dwell,
+            step_target_s=None if self.steps[index].trigger else self.steps[index].seconds,
+            planned_dwell_s=total,dwell_elapsed_s=credited,execution_elapsed_s=max(0.,now),
+            extra_elapsed_s=max(0.,now-credited),atomic_steps=sum(s.trigger for s in self.steps))
     @staticmethod
     def terrain_handover_ready(snapshot):
         # A terrain policy may remain pitched on a stair. Keep it active until
@@ -73,5 +92,7 @@ class SkillSequence:
                     self.error='terrain handover window timed out';c.set_velocity([0,0,0],now)
                 return
         if c.active.atomic or elapsed>=step.seconds:
+            if c.active.atomic:self.atomic_index=self.index
+            else:self.completed_dwell+=step.seconds
             if self.index==len(self.steps)-1:self.done=True;c.set_velocity([0,0,0],now)
             else:self.index+=1;self.requested=False;self.started=None

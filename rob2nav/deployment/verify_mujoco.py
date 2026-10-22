@@ -19,6 +19,7 @@ def main():
     p.add_argument('--seed',type=int,default=9201);p.add_argument('--video',action='store_true')
     p.add_argument('--legacy-transitions',action='store_true',help='Compare against mandatory neutral/2s entry transitions')
     p.add_argument('--sequence',type=Path,help='Use the same state-driven sequence component as the device service')
+    p.add_argument('--progress',type=Path,help='Publish read-only sequence timing for the live UI')
     p.add_argument('--source-model',type=Path,help='Exact Go2 MuJoCo source XML; defaults to packaged deployment/models/go2_isaac.xml')
     p.add_argument('--initial-yaw-deg',type=float,default=0.)
     p.add_argument('--max-seconds',type=float,default=80.,help='Whole sequence budget; individual entry/exit deadlines are unchanged')
@@ -60,6 +61,19 @@ def main():
     native_peak=0.;flip_rotation=0.;maximum_speed_ratio=0.
     old_tau=None;old_kp=None;last_ref=None;naive=[];max_torque_step=0.;max_gain_step=0.;max_ref_step=0.;max_tilt=0.;min_height=1e9
     wall=time.monotonic();loop_gaps=[];last_wall=wall;passed=False;reason='time budget'
+    next_progress=0.;last_progress=None
+    def publish_progress(now,finished=False):
+        nonlocal next_progress,last_progress
+        if choreography is None:return
+        if not finished and now<next_progress:return
+        last_progress=choreography.progress(now)
+        last_progress.update(initialization_s=start_time,total_elapsed_s=start_time+now)
+        # All displayed components share this simulation clock, including startup.
+        last_progress['extra_elapsed_s']+=start_time
+        if finished:last_progress['status']='complete' if passed else 'failed'
+        if a.progress:
+            tmp=a.progress.with_suffix('.tmp');tmp.write_text(json.dumps(last_progress));tmp.replace(a.progress)
+        next_progress=now+.1
     def snapshot(t,i):
         forces=np.zeros(4);contact_force=np.zeros(6)
         for index in range(data.ncon):
@@ -80,6 +94,7 @@ def main():
             s=snapshot(t,i)
             c=runtime.controller
             if choreography is not None:choreography.tick(s,t)
+            publish_progress(t)
             current_id=c.active.id if c.active else None
             if choreography is None and c.phase=='ARMED' and t-c.phase_at>.5 and not c.trigger_requested:c.trigger()
             if c.phase=='ACTIVE' and current_id!=last_active:
@@ -124,6 +139,7 @@ def main():
             if video is not None and t>=next_render:video.append_data(env.render());next_render=t+.1
             delay=.002-(time.monotonic()-before)
             if delay>0:time.sleep(delay)
+        publish_progress(t,finished=True)
         np.savez_compressed(a.output/'control_trace.npz',values=np.asarray(samples),
             columns=np.array(['time']+[f'{k}:{j}' for k in ['tau','qref','kp','kd','q','dq'] for j in SDK_JOINTS]+[f'force:{l}' for l in ['FR','FL','RR','RL']]+['tilt','x','y','z']))
         report=dict(seed=a.seed,asset=a.asset,wire_mode=a.wire_mode,sequence=sequence,shared_sequencer=choreography is not None,initial_yaw_deg=a.initial_yaw_deg,atomic_cycle=a.atomic_cycle,flip_rotation_rad=flip_rotation,native_motion_peak_torque_step_Nm=native_peak,maximum_joint_speed_ratio=maximum_speed_ratio,passed=bool(passed and (not a.atomic_cycle or abs(flip_rotation)>5.5) and max_torque_step<=.300001 and max_gain_step<=.030001),reason=reason,
@@ -139,6 +155,7 @@ def main():
         report['source_sha256']={str(f.relative_to(root)):hashlib.sha256(f.read_bytes()).hexdigest() for f in (root/'rob2nav/deployment').glob('*.py')}
         trace=np.asarray(samples)
         report['compact_transitions']=not a.legacy_transitions
+        if last_progress is not None:report['composition_timing']=last_progress
         report['duration_s']=float(trace[-1,0]) if len(trace) else 0.
         report['joint_travel_rad']=float(np.abs(np.diff(trace[:,49:61],axis=0)).sum()) if len(trace)>1 else 0.
         report['profile_sha256']={str(f.relative_to(root)):hashlib.sha256(f.read_bytes()).hexdigest() for f in (root/'deployment/skills').glob('*.json')}
