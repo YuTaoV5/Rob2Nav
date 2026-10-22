@@ -18,6 +18,8 @@ p.add_argument('--fixstand-roundtrip',action='store_true')
 p.add_argument('--endpoint-residual',action='store_true')
 p.add_argument('--endpoint-residual-limit',type=float,default=.2)
 p.add_argument('--upright-reset-fraction',type=float,default=0.)
+p.add_argument('--alternating-rear-gait',action='store_true')
+p.add_argument('--finetune-learning-rate',type=float)
 AppLauncher.add_app_launcher_args(p)
 args = p.parse_args()
 if args.endpoint_residual and not (args.fixstand_roundtrip and args.stepping_gait):
@@ -25,6 +27,8 @@ if args.endpoint_residual and not (args.fixstand_roundtrip and args.stepping_gai
 if not .01<=args.endpoint_residual_limit<=.2 or (args.endpoint_residual_limit!=.2 and not args.endpoint_residual):
     p.error('--endpoint-residual-limit requires endpoint residual and a value in [0.01, 0.2]')
 if args.stepping_gait and not args.transfer_motors:p.error('--stepping-gait requires --transfer-motors')
+if args.alternating_rear_gait and not (args.stepping_gait and args.fixstand_roundtrip):p.error('Rear alternation requires stepping FIXSTAND')
+if args.finetune_learning_rate is not None and not 0.<args.finetune_learning_rate<=.001:p.error('Invalid learning rate')
 if args.reset_std is not None and not .01<=args.reset_std<=1.:p.error('--reset-std must be in [0.01,1]')
 if args.upright_reset_fraction and (not args.fixstand_roundtrip or not 0.<args.upright_reset_fraction<=.5):
     p.error('--upright-reset-fraction requires FIXSTAND and a value in (0, .5]')
@@ -54,10 +58,16 @@ def main():
     if args.fixstand_roundtrip:
         from skills.fixstand import configure_upright
         configure_upright(cfg,args.endpoint_residual,args.endpoint_residual_limit,args.upright_reset_fraction)
+    if args.alternating_rear_gait:
+        from skills.gait_objectives import configure_rear_alternation
+        configure_rear_alternation(cfg)
     agent = BasePPORunnerCfg()
     agent.seed,agent.device = args.seed,cfg.sim.device
     agent.max_iterations,agent.save_interval = args.iterations,100
     agent.experiment_name = 'rob2nav_go2_upright_walk'
+    if args.finetune_learning_rate is not None:
+        agent.algorithm.learning_rate=args.finetune_learning_rate
+        agent.algorithm.schedule='fixed'
     if args.reset_std is not None:agent.policy.init_noise_std=args.reset_std
     args.output.mkdir(parents=True,exist_ok=False)
     if args.fixstand_roundtrip:
@@ -65,7 +75,8 @@ def main():
         write_contract(args.output/'fixstand.json','upright',actor_observations=52,phase_seconds=[1.,5.,6.5,8.],
             action_parameterization=('upright_endpoint_v2' if args.endpoint_residual_limit==.2 else 'upright_endpoint_v3') if args.endpoint_residual else 'joint_offset_v1',
             residual_limit_rad=args.endpoint_residual_limit,release_seconds=[1.,1.5],recovery_seconds=[5.,6.5],
-            upright_reset_fraction=args.upright_reset_fraction)
+            upright_reset_fraction=args.upright_reset_fraction,alternating_rear_gait=args.alternating_rear_gait,
+            gait_objective_sha256=sha(Path(__file__).parents[1]/'gait_objectives.py') if args.alternating_rear_gait else None)
     dump_yaml(str(args.output/'env.yaml'),cfg)
     dump_yaml(str(args.output/'agent.yaml'),agent)
     torch.set_num_threads(4)
@@ -96,7 +107,7 @@ def main():
                     previous=json.loads(prior.read_text())
                     if previous.get('actor_observations')!=52 or previous.get('phase_seconds')!=[1.,5.,6.5,8.]:
                         raise RuntimeError('Incompatible fixstand phase contract')
-                    runner.load(str(args.resume))
+                    runner.load(str(args.resume),load_optimizer=args.finetune_learning_rate is None)
                 else:
                     from skills.fixstand import initialize_expanded_policy
                     transfer=initialize_expanded_policy(runner,args.resume)

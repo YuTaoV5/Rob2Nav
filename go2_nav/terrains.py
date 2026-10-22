@@ -35,12 +35,25 @@ def populate(world, scene, cfg):
         slab("approach", -2, start, 0)
         for i in range(count):
             slab(f"stair_{i}", start+i*run, start+(i+1)*run, (i+1)*h, color="0.64 0.54 0.32 1")
-        slab("landing", start+count*run, 10, count*h)
-        meta["goal_height"] = count*h
+        if cfg.get('terrain_return',False):
+            end=start+count*run
+            slab('top_landing',end,end+1.,count*h)
+            for i in range(count):
+                slab(f'down_{i}',end+1.+i*run,end+1.+(i+1)*run,(count-i-1)*h)
+            slab('exit_landing',end+1.+count*run,12,0.)
+            meta.update(goal_height=0.,goal=[9.,0.],required_top_height=count*h)
+        else:
+            slab("landing", start+count*run, 10, count*h)
+            meta["goal_height"] = count*h
     elif scene == "platform":
         slab("approach", -2, 3., 0)
-        slab("platform", 3., 10, h, color="0.60 0.40 0.20 1")
-        meta["goal_height"] = h
+        if cfg.get('terrain_return',False):
+            slab('platform',3.,5.,h,color='0.60 0.40 0.20 1')
+            slab('exit_landing',5.,10.,0.)
+            meta.update(goal_height=0.,required_top_height=h)
+        else:
+            slab("platform", 3., 10, h, color="0.60 0.40 0.20 1")
+            meta["goal_height"] = h
     elif scene == "hurdles":
         slab('approach',-2,1.5,0.)
         slab('low_step',1.5,2.15,.08,color='.68 .52 .32 1')

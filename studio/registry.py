@@ -43,7 +43,7 @@ def capabilities(catalog,jobs):
                 if any(r['path']==path for r in catalog.get('reports',[]))]
         selector=skill.get('evidence',{})
         related=[j for j in jobs if j['config'].get('capability_id')==skill['id']]
-        prefixes=selector.get('prefixes',[])+[f"outputs/studio/jobs/{j['id']}/evaluation/" for j in related]
+        prefixes=selector.get('prefixes',[])+[f"skills/{skill['id']}/evidence/"]+[f"outputs/studio/jobs/{j['id']}/evaluation/" for j in related]
         matches=[e for e in catalog['evaluations'] if any(e['path'].startswith(p) for p in prefixes)
             and (not selector.get('kinds') or e['kind'] in selector['kinds']) and not e.get('diagnostic')]
         skill['evaluations']=matches
@@ -59,6 +59,8 @@ def capabilities(catalog,jobs):
         for media in skill.get('curated_media',[]):
             if media['path'] in available and not any(m['url'].endswith(media['path']) for m in skill['local_videos']):
                 skill['local_videos'].append(dict(url='/api/files/'+media['path'],type='video',origin='local',title=media['title'],label=media['label']))
+        preferred=skill.get('preferred_video') or next((m['path'] for m in skill.get('curated_media',[])),None)
+        if preferred:skill['local_videos'].sort(key=lambda media:not media['url'].endswith(preferred))
         # Completed training is not a proof that the capability passed.
         skill['active_jobs']=sum(j['state'] in ('queued','preflight','running','evaluating') for j in skill['jobs'])
         skill['training_complete']=sum(j['state']=='succeeded' for j in skill['jobs'])

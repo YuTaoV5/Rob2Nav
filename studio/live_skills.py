@@ -162,7 +162,7 @@ def mount_live_skills(app,root,python):
                 if current['phase']=='STOPPED':s['phase']='STOPPED'
             result=read(Path(current['stream']).parent/'evaluation/summary.json',{})
             if result:
-                s['result']={k:result[k] for k in ['successes','total','hardware_constraints_pass','metrics','collisions','falls','policy_sha256'] if k in result}
+                s['result']={k:result[k] for k in ['successes','total','hardware_constraints_pass','metrics','collisions','falls','policy_sha256','checkpoint_sha256','results','acceptance_scope'] if k in result}
                 if current.get('skill')=='composition':s['result'].update({k:result[k] for k in ['passed','reason','sequence','max_torque_step_Nm','maximum_joint_speed_ratio','commits'] if k in result})
                 if 'total' not in s['result'] and isinstance(result.get('episodes'),int):s['result']['total']=result['episodes']
             if proc is not None and proc.poll() is not None:

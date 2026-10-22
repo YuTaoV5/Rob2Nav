@@ -65,7 +65,7 @@ def pie(root,out,scene,seconds,seed):
     finally:depth.close()
 
 
-def lsd(root,out,choice,seconds,seed):
+def lsd(root,out,choice,seconds,seed,physics_hz=None):
     folder,entry=source(root,'lsd');sys.path.insert(0,str(folder))
     import torch
     from src.scripts.rl_sdk import RLPolicy
@@ -81,12 +81,12 @@ def lsd(root,out,choice,seconds,seed):
     if loaded is not None:spec=loaded
     spec.worldbody.add_geom(name='rob2nav_flat_floor',type=mujoco.mjtGeom.mjGEOM_PLANE,size=[30,30,.1],friction=[1.,.005,.0001],rgba=[.65,.75,.9,1.])
     spec.worldbody.add_light(pos=[0,0,5],dir=[0,0,-1])
-    model=spec.compile();model.opt.timestep=float(skill.params.dt);data=mujoco.MjData(model)
+    model=spec.compile();model.opt.timestep=1./physics_hz if physics_hz else float(skill.params.dt);data=mujoco.MjData(model)
     physical_names=skill.params.joint_controller_names
     policy_names=[physical_names[i] for i in skill.params.joint_mapping]
     contract=dict(robot='go2',policy=choice,joints=policy_names,
         observation='45 proprio' if choice=='lsd_loco' else '69 motion-reference conditioned',action_dim=12,
-        policy_hz=1/(float(skill.params.dt)*int(skill.params.decimation)),physics_hz=1/float(skill.params.dt),
+        policy_hz=1/(float(skill.params.dt)*int(skill.params.decimation)),physics_hz=1/model.opt.timestep,
         kp=skill.params.rl_kp.tolist(),kd=skill.params.rl_kd.tolist(),source_commit=entry['commit'],
         prelude='0.8s fixed PD stance, not learned recovery')
     joints=np.array([mujoco.mj_name2id(model,mujoco.mjtObj.mjOBJ_JOINT,n) for n in policy_names])
@@ -113,7 +113,7 @@ def lsd(root,out,choice,seconds,seed):
         with torch.inference_mode():active.run_inference(state,control)
         target=active.output_dof_pos.numpy()[0];velocity=active.output_dof_vel.numpy()[0]
         if not np.isfinite(target).all():raise FloatingPointError('Nonfinite policy action')
-        for _ in range(int(active.params.decimation)):
+        for _ in range(round(float(active.params.dt)*int(active.params.decimation)/model.opt.timestep)):
             data.ctrl[aids]=active.params.rl_kp.numpy()[0]*(target-data.qpos[qids])+active.params.rl_kd.numpy()[0]*(velocity-data.qvel[vids])
             mujoco.mj_step(model,data)
     record(out,model,data,step,policy_names,qids,seconds,choice,entry,seed,contract)
@@ -121,10 +121,11 @@ def lsd(root,out,choice,seconds,seed):
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--policy',choices=['pie','lsd_loco','lsd_jump','lsd_backflip','lsd_sideflip'],required=True);p.add_argument('--root',required=True);p.add_argument('--output',required=True)
+    p.add_argument('--physics-hz',type=int,choices=[200,500,1000])
     p.add_argument('--scene',choices=['empty','stairs'],default='stairs');p.add_argument('--seconds',type=float,default=10);p.add_argument('--seed',type=int,default=801);a=p.parse_args()
     if not 1<=a.seconds<=120:raise ValueError('Invalid duration')
     np.random.seed(a.seed)
     if a.policy=='pie':pie(Path(a.root),Path(a.output),a.scene,a.seconds,a.seed)
-    else:lsd(Path(a.root),Path(a.output),a.policy,a.seconds,a.seed)
+    else:lsd(Path(a.root),Path(a.output),a.policy,a.seconds,a.seed,a.physics_hz)
 
 if __name__=='__main__':main()

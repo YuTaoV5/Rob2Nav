@@ -15,7 +15,9 @@ def source(root,project):
     for name,digest in entry['sha256'].items():
         p=(folder/name).resolve()
         if not p.is_relative_to(folder) or not p.is_file():raise ValueError('Pinned source file missing: '+name)
-        if hashlib.sha256(p.read_bytes()).hexdigest()!=digest:raise ValueError('Pinned source hash mismatch: '+name)
+        payload=p.read_bytes()
+        if name in entry.get('lf_normalized_files',[]):payload=payload.replace(b'\r\n',b'\n')
+        if hashlib.sha256(payload).hexdigest()!=digest:raise ValueError('Pinned source hash mismatch: '+name)
     return folder,entry
 
 

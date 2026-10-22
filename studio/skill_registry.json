@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "reviewed_at": "2026-10-21",
+  "reviewed_at": "2026-10-22",
   "projects": [
     {
       "id": "robogauge",
@@ -160,49 +160,61 @@
   "capabilities": [
     {
       "id": "stairs",
-      "name": "感知阶梯 / 提前抬腿",
+      "name": "楼梯上、下行",
       "category": "感知越障",
       "projects": [
         "robogauge",
         "ame_go2"
       ],
-      "description": "Native Go2 MoE sensor-policy PPO training and PhysX terrain evaluation. Dedicated train, simulation and SDK-plan manuals are linked below; historical scores remain tied to their checkpoint hashes.",
-      "acceptance": "独立台阶高度/种子，完整上落阶梯；小腿碰撞率和基础能力保留。",
+      "description": "使用RoboGauge原始MoE完成4级×8cm楼梯上、下行，回平地后稳定停留2秒。固定场景种子12010–12013为4/4，非任意地形或实机资格。",
+      "acceptance": "4级×8cm楼梯上、下行，确认登顶承重，回平地后水平速度<0.20m/s、角速度<0.5rad/s、朝上程度>0.98持续2秒，无碰撞/跌倒；实机关节包络另验。",
       "recipe": "moe_stairs",
-      "local_status": "已有历史仿真",
+      "local_status": "本轮固定场景往返及停稳4/4",
       "evidence": {
         "prefixes": [
-          "artifacts/ame/baseline_recheck",
-          "artifacts/perceptive/student_success_replay",
-          "artifacts/perception_diagnostics_v6"
+          "artifacts/capability_recovery_20261022/outputs/capability_release_20261022/stairs"
         ],
         "kinds": [
           "stairs"
         ]
-      }
+      },
+      "preferred_video": "artifacts/capability_recovery_20261022/outputs/capability_release_20261022/stairs/episode_0.mp4",
+      "curated_media": [
+        {
+          "path": "artifacts/capability_recovery_20261022/outputs/capability_release_20261022/stairs/episode_0.mp4",
+          "title": "4级×8cm楼梯上、下行 · 原始MoE · seed12010",
+          "label": "固定场景4/4；实际往返与终点停稳，非实机资格"
+        }
+      ]
     },
     {
       "id": "platform",
-      "name": "高台攀爬",
+      "name": "20cm高台上、下台",
       "category": "感知越障",
       "projects": [
         "robogauge",
         "ame_go2"
       ],
-      "description": "Native Go2 MoE sensor-policy PPO training and PhysX terrain evaluation. Dedicated train, simulation and SDK-plan manuals are linked below; historical scores remain tied to their checkpoint hashes.",
-      "acceptance": "指定高台高度、完整上台/下台、无外力；跨种子评估。",
+      "description": "使用RoboGauge原始MoE完成20cm高台上、下台，回平地后稳定停留2秒。固定场景种子12010–12013为4/4，非任意地形或实机资格。",
+      "acceptance": "20cm高台上、下台，确认登顶承重，回平地后水平速度<0.20m/s、角速度<0.5rad/s、朝上程度>0.98持续2秒，无碰撞/跌倒；实机关节包络另验。",
       "recipe": "moe_platform",
-      "local_status": "已有历史仿真",
+      "local_status": "本轮固定场景往返及停稳4/4",
       "evidence": {
         "prefixes": [
-          "artifacts/perceptive/student_success_replay",
-          "artifacts/ame",
-          "artifacts/perception_diagnostics_v6"
+          "artifacts/capability_recovery_20261022/outputs/capability_release_20261022/platform"
         ],
         "kinds": [
           "platform"
         ]
-      }
+      },
+      "preferred_video": "artifacts/capability_recovery_20261022/outputs/capability_release_20261022/platform/episode_0.mp4",
+      "curated_media": [
+        {
+          "path": "artifacts/capability_recovery_20261022/outputs/capability_release_20261022/platform/episode_0.mp4",
+          "title": "20cm高台上、下台 · 原始MoE · seed12010",
+          "label": "固定场景4/4；实际往返与终点停稳，非实机资格"
+        }
+      ]
     },
     {
       "id": "multiterrain",
@@ -212,10 +224,10 @@
         "robogauge",
         "ame_go2"
       ],
-      "description": "Native Go2 MoE sensor-policy PPO training and PhysX terrain evaluation. Dedicated train, simulation and SDK-plan manuals are linked below; historical scores remain tied to their checkpoint hashes.",
+      "description": "已修复包含沟槽却禁用跳跃的网页配置。启用MoE+感知调度+关节跳跃原语后可跨沟，但落地仍失败；不能以单独楼梯/高台通过代替混合地形通过。",
       "acceptance": "同协议多技能评估矩阵、失败视频与基座退化量。",
       "recipe": "moe_mixed",
-      "local_status": "已有失败与保持对照",
+      "local_status": "复验落地失败；混合能力未验收",
       "evidence": {
         "prefixes": [
           "artifacts/moe_perceptive",
@@ -231,10 +243,10 @@
       "projects": [
         "go2_backflip_native"
       ],
-      "description": "后翻 v6：首尾 FIXSTAND 各4/4；关节速度比1.0986–1.1092，非足端接地4/4，完整验收0/4；仅研究仿真。",
+      "description": "已实测5个原项目ONNX和LeggedSkillDeploy后翻。原6000_actor动作完整、无机身接地，但首尾与速度失败；已用其网络初始化v7。网页仍为v6研究候选。",
       "acceptance": "本次训练模型需独立完成完整俯仰翻转、稳定落地、多条件重复及关节/力矩/速度约束；实机仅方案。",
       "recipe": "backflip_native_ppo",
-      "local_status": "v6 首尾站立4/4；完整验收0/4",
+      "local_status": "开源actor已选定并启动v7续训；完整验收未过",
       "evidence": {
         "prefixes": [
           "artifacts/fixstand_best_flips_20261022/outputs/fixstand_backflip_verified_entry_v6_20261022"
@@ -259,10 +271,10 @@
         "go2_backflip_native",
         "lsd"
       ],
-      "description": "侧翻 v8：首尾 FIXSTAND 各4/4；轴向占比0.724低于0.75，关节速度比1.0855–1.0871，完整验收0/4；仅研究仿真。",
+      "description": "v9起跳前消抖通过，但落地/关节约束/末端站姿失败。网页保留v8研究候选；v10针对落地续训，尚未验收。",
       "acceptance": "完整约2π侧向旋转、真实腾空、无机身触地且稳定落地；逐物理步另查关节速度/限位。",
       "recipe": "sideflip_native_ppo",
-      "local_status": "v8 首尾站立4/4；完整验收0/4",
+      "local_status": "v9准备段4/4、完整0/4；v10落地约束续训中",
       "evidence": {
         "prefixes": [
           "artifacts/fixstand_best_flips_20261022/outputs/fixstand_sideflip_peak_pose_v8_20261022"
@@ -285,15 +297,14 @@
       "projects": [
         "robogauge"
       ],
-      "description": "网页点击目标，MuJoCo持续物理闭环执行。本次PPO速度头完成100352步训练、8回合独立到达/稳定停止，以及网页两目标和断线停止；规则导航保留为对照。",
+      "description": "网页目标点由原生SCAN ROS2与MuJoCo/MoE闭环执行。本轮空旷及绕障两组固定目标2/2到达，无碰撞或跌倒；不沿用旧PPO速度头的8回合成绩作为本轮SCAN成绩。",
       "acceptance": "指定目标到达后持续站立2秒，无碰撞/跌倒；最终距离<0.55m、水平速度<0.20m/s；断线退出。",
       "recipe": "navigation_ppo",
       "training_entry": "manual",
-      "local_status": "PPO训练完成；8回合与网页点击通过",
+      "local_status": "原生SCAN网页两固定目标2/2；非全工况验收",
       "evidence": {
         "prefixes": [
-          "outputs/navigation_ppo_eval_empty_20261021",
-          "outputs/navigation_ppo_eval_slalom_20261021"
+          "artifacts/capability_recovery_20261022/outputs/capability_navigation_recheck_20261022"
         ],
         "kinds": []
       }
@@ -306,11 +317,11 @@
         "unitree_mimic_go2",
         "go2_backflip_native"
       ],
-      "description": "5000轮训练已完成。原引擎可起立前移，但后足连续接触、没有真实换步；MuJoCo迁移失败。新增离地/换步与支撑期足端运动约束正在重训。",
+      "description": "旧权重起立后滑移，无双后足真实承重周期。当前从更好的v3重训，加入RR/RL交替承重与足端离地目标；不使用Go1权重冒充Go2验证。",
       "acceptance": "四足自行起立；真实后足交替离地和落地，保持姿态并前进；禁止用滑移代替迈步。实机仅方案。",
       "recipe": "upright_walk_ppo",
       "training_entry": "manual",
-      "local_status": "起立前移伴滑移；真实行走未通过",
+      "local_status": "无真实承重迈步；v5交替步态重训中",
       "evidence": {
         "prefixes": [
           "outputs/upright_walk_",

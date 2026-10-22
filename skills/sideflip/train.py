@@ -22,6 +22,7 @@ p.add_argument('--boundary-bridge-limit',type=float)
 p.add_argument('--boundary-terminal-hip-taper-frames',type=int,default=0)
 p.add_argument('--boundary-blend-frames',type=int,default=0)
 p.add_argument('--quiet-preparation',action='store_true')
+p.add_argument('--landing-constraints',action='store_true')
 p.add_argument('--peak-endpoint-objective',action='store_true')
 p.add_argument('--finetune-learning-rate',type=float)
 p.add_argument('--reset-std',type=float)
@@ -36,6 +37,7 @@ if args.boundary_terminal_hip_taper_frames and (not args.boundary_residual or no
 if args.peak_endpoint_objective and not args.fixstand_roundtrip:p.error('Peak endpoint objective requires FIXSTAND')
 if args.boundary_blend_frames and (not args.boundary_residual or not 2<=args.boundary_blend_frames<=20):p.error('Boundary blending requires residual mode and 2..20 frames')
 if args.quiet_preparation and not args.boundary_blend_frames:p.error('Quiet preparation requires continuous boundary mapping')
+if args.landing_constraints and not args.peak_endpoint_objective:p.error('Landing constraints require endpoint objective')
 if args.finetune_learning_rate is not None and not 0.<args.finetune_learning_rate<=.001:p.error('Invalid finetune learning rate')
 if args.reset_std is not None and not .01<=args.reset_std<=1.:p.error('Invalid reset std')
 args.kit_args = (args.kit_args+' --enable isaacsim.asset.importer.urdf').strip()
@@ -77,6 +79,9 @@ def main():
     if args.quiet_preparation:
         from skills.fixstand import configure_quiet_preparation
         configure_quiet_preparation(cfg)
+    if args.landing_constraints:
+        from skills.gait_objectives import configure_sideflip_landing
+        configure_sideflip_landing(cfg,source)
     bodies = contract['body_names']
     anchor = cfg.commands.motion.anchor_body_name
     feet = cfg.terminations.ee_body_pos.params['body_names']
@@ -99,6 +104,8 @@ def main():
             terminal_hip_taper_frames=args.boundary_terminal_hip_taper_frames,
             boundary_blend_frames=args.boundary_blend_frames,
             quiet_preparation_seconds=2.4 if args.quiet_preparation else 0.,
+            landing_constraints=args.landing_constraints,
+            landing_objective_sha256=sha(Path(__file__).parents[1]/'gait_objectives.py') if args.landing_constraints else None,
             peak_endpoint_objective=args.peak_endpoint_objective)
     dump_yaml(str(args.output/'env.yaml'), cfg)
     dump_yaml(str(args.output/'agent.yaml'), agent)

@@ -1,5 +1,6 @@
 import argparse
 import json
+import hashlib
 import os
 from pathlib import Path
 os.environ.setdefault("MUJOCO_GL", "egl" if os.name != "nt" else "glfw")
@@ -23,6 +24,7 @@ def main():
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--straight", action="store_true", help="Privileged-free fixed-command locomotion benchmark")
     p.add_argument("--no-jump", action="store_true")
+    p.add_argument('--roundtrip',action='store_true',help='Ascend, descend and hold at the destination for two seconds')
     p.add_argument("--residual-checkpoint")
     p.add_argument("--video", action="store_true")
     p.add_argument("--output", default="outputs/terrain")
@@ -30,6 +32,8 @@ def main():
     cfg = terrain_config(args.config)
     cfg.update(locomotion=args.locomotion, max_seconds=args.max_seconds)
     cfg["auto_jump"] = not args.no_jump
+    cfg['terrain_return']=args.roundtrip
+    cfg['terminal_hold_s']=2. if args.roundtrip else 0.
     cfg["water_recenter"] = args.scene == "mixed"
     if args.residual_checkpoint:
         cfg["residual_checkpoint"] = args.residual_checkpoint
@@ -40,6 +44,14 @@ def main():
     out = Path(args.output)
     out.mkdir(parents=True, exist_ok=True)
     env = TerrainEnv(cfg, scene=args.scene)
+    root=Path(__file__).resolve().parents[1]
+    model_file=Path(str(env.robot.cfg.control.model_path).format(ROBOGAUGE_ROOT_DIR=str(root/'vendor/RoboGauge')))
+    provenance=dict(checkpoint_sha256=hashlib.sha256(model_file.read_bytes()).hexdigest(),
+        source_sha256={n:hashlib.sha256((root/n).read_bytes()).hexdigest() for n in
+            ['go2_nav/env.py','go2_nav/terrain_env.py','go2_nav/terrains.py','go2_nav/terrain_planner.py','go2_nav/planner.py']},
+        backend='MuJoCo',role='原始开源MoE + 本地感知调度',
+        args=dict(kind=args.scene,seed=args.seed,roundtrip=args.roundtrip),hardware_connected=False,
+        acceptance_scope='fixed scene; geometric crossing and terminal hold; hardware joint-envelope qualification not measured')
     results = []
     try:
         for episode in range(args.episodes):
@@ -75,7 +87,7 @@ def main():
         (out/"summary.json").write_text(json.dumps(dict(config=cfg, results=results,
               episodes=len(results), successes=sum(r["success"] for r in results),
               collisions=sum(r["collision"] for r in results), falls=sum(r["fallen"] for r in results),
-              water_entries=sum(r["water_entered"] for r in results)), indent=2))
+              water_entries=sum(r["water_entered"] for r in results),**provenance), indent=2))
     finally:
         env.close()
 

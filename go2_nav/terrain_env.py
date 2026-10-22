@@ -37,6 +37,8 @@ class TerrainEnv(Go2MaplessEnv):
         self.support_z = 0.
         self.gap_edge_world = None
         self.settling = True
+        self.visited_top=False
+        self.terminal_stable_s=0.
         result = super().reset(**kwargs)
         self.settling = False
         return result
@@ -93,6 +95,9 @@ class TerrainEnv(Go2MaplessEnv):
         stance = [f for f in self.foot_ids if f in contacts]
         if stance:
             self.support_z = float(np.median(self.data.geom_xpos[stance, 2]-.022))
+            required=getattr(self,'terrain_meta',{}).get('required_top_height')
+            if required is not None and self.support_z>=required-.04 and len(stance)>=2 and self.rotation[2,2]>.9:
+                self.visited_top=True
         self.airborne_time = self.airborne_time+self.cfg["control_dt"] if airborne else 0.
         self.max_airborne_time = max(self.max_airborne_time, self.airborne_time)
         self.height_peak = max(self.height_peak, float(self.data.qpos[2]))
@@ -208,6 +213,14 @@ class TerrainEnv(Go2MaplessEnv):
 
     def step(self, action):
         obs, reward, terminated, truncated, info = super().step(action)
+        if self.cfg.get('terminal_hold_s',0.):
+            # Only a reached goal may extend the trial; collisions/falls always terminate.
+            candidate=bool(info['success'] and (not self.cfg.get('terrain_return') or self.visited_top))
+            stable=candidate and np.linalg.norm(self.data.qvel[:2])<.20 and np.linalg.norm(self.data.qvel[3:6])<.5 and self.rotation[2,2]>.98
+            self.terminal_stable_s=self.terminal_stable_s+self.cfg['navigation_dt'] if stable else 0.
+            info['success']=bool(candidate and self.terminal_stable_s>=self.cfg['terminal_hold_s'])
+            info.update(visited_top=self.visited_top,terminal_stable_s=self.terminal_stable_s)
+            terminated=bool(info['success'] or info['fallen'] or info['collision'])
         if self.water_entered:
             reward -= 20
             terminated = True
