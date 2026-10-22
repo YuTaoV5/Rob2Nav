@@ -1,0 +1,26 @@
+{
+  "pid": 172720,
+  "command": [
+    "/root/gpufree-data/envs/go2-mapless/bin/python",
+    "-m",
+    "skills.backflip.simulate",
+    "--source",
+    "/root/gpufree-data/Rob2Nav-upstreams/GO2_backflip",
+    "--onnx",
+    "artifacts/backflip_v8_2200_verified_20261022/exported/policy.onnx",
+    "--seconds",
+    "5",
+    "--physics-hz",
+    "1000",
+    "--direction",
+    "back",
+    "--fixstand-roundtrip",
+    "--diagnostics",
+    "--seed",
+    "15300",
+    "--output",
+    "outputs/studio_diagnostics/backflip_peak_context_regression_20261023/case"
+  ],
+  "regression_only": true,
+  "not_new_independent_qualification": true
+}

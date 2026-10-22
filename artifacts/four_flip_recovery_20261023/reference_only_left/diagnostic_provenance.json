@@ -1,0 +1,10 @@
+{
+  "role": "Reference-only actuator baseline, NOT a trained skill or recommended deployment",
+  "learned_parameter_count": 0,
+  "formula": "action = (observation[:12] - default_joint_pos) / 0.5; PD motor target therefore equals reference joint positions",
+  "measured_feedback_used_by_actor": false,
+  "root_state_writes": "initialization only in the shared dynamics evaluator",
+  "metadata_note": "Asset/observation fields copied from existing model metadata; inherited num_envs/iterations/source hashes describe that template, NOT training of this deterministic controller",
+  "qualification_eligible": false,
+  "no_training_submitted": true
+}

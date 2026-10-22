@@ -226,7 +226,7 @@ def main():
                 if float(data.time)-start<=preparation['end_s']:
                     preparation['max_joint_speed_rad_s']=max(preparation['max_joint_speed_rad_s'],float(np.max(abs(data.qvel[vids]))))
                     preparation['max_body_angular_speed_rad_s']=max(preparation['max_body_angular_speed_rad_s'],float(np.linalg.norm(velocity_buffer[:3])))
-                if diagnostics is not None:diagnostics.sample(model,data,float(data.time)-start,vids,velocity_buffer[:3])
+                if diagnostics is not None:diagnostics.sample(model,data,float(data.time)-start,vids,velocity_buffer[:3],target=target)
                 signed_x_rotation+=float(velocity_buffer[0])*model.opt.timestep
                 angular_travel+=float(np.linalg.norm(velocity_buffer[:3]))*model.opt.timestep
                 max_speed_ratio=max(max_speed_ratio,float(np.max(np.abs(data.qvel[vids])/velocity_limits)))

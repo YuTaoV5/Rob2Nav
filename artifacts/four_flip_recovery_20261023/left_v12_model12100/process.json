@@ -1,0 +1,28 @@
+{
+  "pid": 156751,
+  "command": [
+    "/root/gpufree-data/envs/go2-mapless/bin/python",
+    "-m",
+    "rob2nav.mujoco_skill",
+    "--kind",
+    "sideflip",
+    "--policy",
+    "outputs/studio_diagnostics/left_v12_model12100_20261023/exported/policy.pt",
+    "--motion",
+    "artifacts/web_continuity_iteration_20261023/inputs/side_v12/sideflip.npz",
+    "--backflip-source",
+    "/root/gpufree-data/Rob2Nav-upstreams/GO2_backflip",
+    "--seconds",
+    "8",
+    "--physics-hz",
+    "1000",
+    "--fixstand-roundtrip",
+    "--diagnostics",
+    "--seed",
+    "27000",
+    "--output",
+    "outputs/studio_diagnostics/left_v12_model12100_20261023/seed_27000",
+    "--video"
+  ],
+  "diagnostic_only": true
+}

@@ -1,0 +1,30 @@
+{
+  "pid": 162830,
+  "command": [
+    "/root/gpufree-data/envs/go2-mapless/bin/python",
+    "-m",
+    "rob2nav.mujoco_skill",
+    "--kind",
+    "sideflip",
+    "--policy",
+    "outputs/studio_diagnostics/reference_only_left_20261023/diagnostic_controller.pt",
+    "--motion",
+    "artifacts/web_continuity_iteration_20261023/inputs/side_v12/sideflip.npz",
+    "--backflip-source",
+    "/root/gpufree-data/Rob2Nav-upstreams/GO2_backflip",
+    "--seconds",
+    "8",
+    "--physics-hz",
+    "1000",
+    "--fixstand-roundtrip",
+    "--diagnostics",
+    "--seed",
+    "27000",
+    "--output",
+    "outputs/studio_diagnostics/reference_only_left_20261023/seed_27000",
+    "--video"
+  ],
+  "role": "DETERMINISTIC REFERENCE-ONLY ACTUATOR DIAGNOSTIC: not learned weights, not kinematic/root-state replay",
+  "diagnostic_only": true,
+  "no_training_submitted": true
+}

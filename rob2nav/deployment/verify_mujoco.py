@@ -17,6 +17,8 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--root',type=Path,default=Path(__file__).resolve().parents[2]);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--wire-mode',choices=['torque','hybrid_pd'],default='hybrid_pd');p.add_argument('--asset',choices=['robogauge','source'],default='robogauge');p.add_argument('--atomic-cycle',action='store_true')
     p.add_argument('--seed',type=int,default=9201);p.add_argument('--video',action='store_true')
+    p.add_argument('--video-fps',type=int,choices=[10,25,50],default=25)
+    p.add_argument('--video-distance',type=float,default=2.4)
     p.add_argument('--legacy-transitions',action='store_true',help='Compare against mandatory neutral/2s entry transitions')
     p.add_argument('--sequence',type=Path,help='Use the same state-driven sequence component as the device service')
     p.add_argument('--progress',type=Path,help='Publish read-only sequence timing for the live UI')
@@ -24,6 +26,7 @@ def main():
     p.add_argument('--initial-yaw-deg',type=float,default=0.)
     p.add_argument('--max-seconds',type=float,default=80.,help='Whole sequence budget; individual entry/exit deadlines are unchanged')
     a=p.parse_args()
+    if not np.isfinite(a.video_distance) or not 1.5<=a.video_distance<=8:p.error('Invalid video camera distance')
     if not np.isfinite(a.initial_yaw_deg) or abs(a.initial_yaw_deg)>180:p.error('Invalid initial yaw')
     if not np.isfinite(a.max_seconds) or not 1<=a.max_seconds<=1800:p.error('Invalid simulation duration')
     if a.initial_yaw_deg and a.asset!='source':p.error('Initial yaw variation currently requires the source asset')
@@ -51,7 +54,7 @@ def main():
     aids=np.array([int(np.where(model.actuator_trnid[:,0]==i)[0][0]) for i in ids])
     from .observer import KinematicObserver
     observer=KinematicObserver(model);foot_ids=observer.feet;floor=model.geom('floor').id
-    start_time=float(data.time);runtime=UnifiedRuntime(root,allow_research_stunts=a.atomic_cycle,compact_transitions=not a.legacy_transitions);samples=[];events=[];requests=[];video=None;next_render=0.
+    start_time=float(data.time);runtime=UnifiedRuntime(root,allow_research_stunts=a.atomic_cycle,compact_transitions=not a.legacy_transitions);samples=[];events=[];requests=[];video=None;video_renderer=None;video_clock=None
     sequence=['stand','walk_moe','sideflip69','walk_moe','stand'] if a.atomic_cycle else ['stand_soft','stand_stiff','walk_mlp','walk_moe','stand'];requested=0;last_active=None;active_since=0.
     choreography=None
     if a.sequence:
@@ -94,7 +97,12 @@ def main():
         initial=snapshot(0.,0);runtime.arm(initial,0.);runtime.stage_async(sequence[0],initial);requested=1
         if a.video:
             import imageio.v2 as imageio
-            video=imageio.get_writer(a.output/'switches.mp4',fps=10,macro_block_size=1)
+            from PIL import Image,ImageDraw
+            from rob2nav.video_clock import VideoClock
+            video=imageio.get_writer(a.output/'switches.mp4',fps=a.video_fps,macro_block_size=1)
+            video_clock=VideoClock(a.video_fps)
+            video_renderer=mujoco.Renderer(model,height=480,width=640)
+            camera=mujoco.MjvCamera();camera.distance=a.video_distance;camera.azimuth=135;camera.elevation=-20
         for i in range(1,round(a.max_seconds/.002)+1):
             t=i*.002;before=time.monotonic();loop_gaps.append(before-last_wall);last_wall=before
             s=snapshot(t,i)
@@ -147,11 +155,20 @@ def main():
             if abs(float(data.time)-start_time-t)>1e-7:raise RuntimeError('Physics time discontinuity/reset')
             tilt=float(np.arccos(np.clip(env.rotation[2,2],-1,1)));max_tilt=max(max_tilt,tilt);min_height=min(min_height,float(data.qpos[2]))
             samples.append(np.r_[t,command.tau,command.qref,command.kp,command.kd,s.q,s.dq,s.feet,tilt,data.qpos[:3]])
+            if video is not None:
+                frame=video_clock.sample(t)
+                if frame is not None:
+                    camera.lookat[:]=[data.qpos[0],data.qpos[1],.35]
+                    video_renderer.update_scene(data,camera=camera)
+                    picture=Image.fromarray(video_renderer.render().copy());draw=ImageDraw.Draw(picture)
+                    label=f'sim {t:08.3f}s | {c.phase} | {c.active.id if c.active else "none"}'
+                    draw.rectangle((0,0,640,20),fill='black');draw.text((6,3),label,fill='white')
+                    video.append_data(np.asarray(picture))
+                    frame.update(controller_phase=c.phase,skill=c.active.id if c.active else None)
             if c.phase=='FAULT':reason=c.fault;break
             if not native and (data.qpos[2]<(0.16 if a.asset=='source' else .22) or tilt>.35):reason='posture envelope exceeded';break
             if runtime.stage_error:reason='staging failure:'+runtime.stage_error;break
             if choreography is not None and choreography.error:reason='sequence failure:'+choreography.error;break
-            if video is not None and t>=next_render:video.append_data(env.render());next_render=t+.1
             delay=.002-(time.monotonic()-before)
             if delay>0:time.sleep(delay)
         np.savez_compressed(a.output/'control_trace.npz',values=np.asarray(samples),
@@ -188,11 +205,18 @@ def main():
         passed=report['passed'];publish_progress(t,finished=True)
         if last_progress is not None:report['composition_timing']=last_progress
         report['duration_s']=float(trace[-1,0]) if len(trace) else 0.
+        if video_clock is not None:
+            report['video_recording']=video_clock.report(report['duration_s'])
+            report['video_recording'].update(camera_distance_m=a.video_distance,camera_elevation_deg=-20,
+                camera_tracks='measured root XY, fixed lookat height 0.35m',annotation='simulation time, controller phase and active skill')
+            if not report['video_recording']['full_timeline_coverage']:raise RuntimeError('Incomplete video timeline')
+            (a.output/'video_timeline.json').write_text(json.dumps(video_clock.timeline)+'\n')
         report['joint_travel_rad']=float(np.abs(np.diff(trace[:,49:61],axis=0)).sum()) if len(trace)>1 else 0.
         report['profile_sha256']={str(f.relative_to(root)):hashlib.sha256(f.read_bytes()).hexdigest() for f in (root/'deployment/skills').glob('*.json')}
         (a.output/'summary.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report),flush=True)
     finally:
         if video is not None:video.close()
+        if video_renderer is not None:video_renderer.close()
         runtime.close();env.close()
 
 
