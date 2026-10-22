@@ -35,6 +35,8 @@ Rob2Nav 正在演进为独立的腿足策略部署与导航框架，网页是其
 
 ## 新环境部署网站
 
+- [在云服务器查看 Go2 EDU RViz](docs/GO2_EDU_REMOTE_RVIZ.md)：ROS1 真机远程可视化、反向 SSH 连接和验收步骤。
+
 - [部署步骤](docs/DEPLOYMENT.md)：从克隆仓库到启动网页；MuJoCo和GPU训练为可选扩展。
 - [网站所需数据目录](docs/DATA_CATALOG.md)：仓库已包含精选模型、真实评估、训练曲线和视频，无需额外下载完整历史数据包。
 - [Studio使用说明](studio/README.md)：网页功能、显式任务提交与当前能力边界。
