@@ -32,6 +32,8 @@ SCHEMAS = {
         'alternating_rear_gait': field('后足交替踏步', False),
         'stationary_upright': field('静态直立（与踏步互斥）', False),
         'in_place_stepping': field('原地踏步（零位移指令）', False),
+        'in_place_airtime': field('零指令真实抬脚落地奖励', False),
+        'in_place_airtime_weight': field('真实抬脚落地奖励权重', 60., 0., 200.),
         'endpoint_residual': field('起止残差控制', False),
         'endpoint_residual_limit': field('起止残差上限 rad', .2, .01, .2),
         'upright_reset_fraction': field('直立阶段初始化比例', 0., 0., .5),
@@ -88,6 +90,7 @@ def validate(rid, options):
     requires('alternating_rear_gait', o.get('stepping_gait') and o.get('fixstand_roundtrip'))
     requires('stationary_upright', o.get('transfer_motors') and o.get('fixstand_roundtrip') and not o.get('stepping_gait') and not o.get('alternating_rear_gait'))
     requires('in_place_stepping', o.get('transfer_motors') and o.get('fixstand_roundtrip') and o.get('stepping_gait') and o.get('alternating_rear_gait') and not o.get('stationary_upright'))
+    requires('in_place_airtime',o.get('in_place_stepping'))
     requires('endpoint_residual', o.get('fixstand_roundtrip') and (o.get('stepping_gait') or o.get('stationary_upright')))
     requires('upright_reset_fraction', o.get('fixstand_roundtrip'))
     for k, high in [('boundary_blend_frames', 20), ('boundary_terminal_hip_taper_frames', 50)]:
@@ -116,6 +119,7 @@ def arguments(rid, options):
         value = options[key]
         if key == 'motion':
             continue  # resolved against the trusted project roots separately
+        if key == 'in_place_airtime_weight' and not options.get('in_place_airtime'):continue
         if key in ('finetune_learning_rate', 'reset_std', 'initial_std', 'min_action_std', 'max_action_std', 'boundary_bridge_limit') and value == 0:
             continue
         if key == 'safety_start' and value == -1:

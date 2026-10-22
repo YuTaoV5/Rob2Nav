@@ -10,7 +10,16 @@ REGISTRY=Path(__file__).with_name('skill_registry.json')
 
 
 def registry():
-    return json.loads(REGISTRY.read_text(encoding='utf-8'))
+    data=json.loads(REGISTRY.read_text(encoding='utf-8'))
+    from .stability_options import SCHEMAS
+    for recipe in data.get('recipes',[]):
+        fields=SCHEMAS.get(recipe['id'],{})
+        options=recipe.setdefault('defaults',{}).setdefault('recipe_options',{})
+        metadata=recipe.setdefault('option_schema',{})
+        for key,field in fields.items():
+            options.setdefault(key,field['default'])
+            metadata[key]={**metadata.get(key,{}),**field}
+    return data
 
 
 def resolve_recipe(config,require_ready=False):

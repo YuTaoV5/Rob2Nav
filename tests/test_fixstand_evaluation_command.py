@@ -1,6 +1,13 @@
 from pathlib import Path
 import pytest
+import subprocess,sys
 from scripts.evaluate_fixstand_run import simulation_arguments
+
+
+def test_script_bootstraps_repository_without_ambient_pythonpath(tmp_path):
+    script=Path(__file__).resolve().parents[1]/'scripts/evaluate_fixstand_run.py'
+    code='import runpy,sys; m=runpy.run_path(sys.argv[1]); assert str(m["ROOT"]) in sys.path'
+    subprocess.run([sys.executable,'-I','-c',code,str(script)],cwd=tmp_path,check=True)
 
 
 def test_sideflip_requires_explicit_matching_reference():
