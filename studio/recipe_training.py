@@ -102,6 +102,8 @@ def recipe_command(config, root, output, isaac_python, mujoco_python=None):
         raise ValueError('Training output must be inside Studio runs')
     rid = config.recipe_id; opt = options_for(config)
     validate_options(rid, config.recipe_options)
+    if config.auto_evaluate and 'evaluation_seed_start' in opt and opt['evaluation_seed_start']<=config.seed<opt['evaluation_seed_start']+4:
+        raise ValueError('Independent evaluation seeds must not include the training seed')
     if rid == 'navigation_ppo':
         cmd = [str(mujoco_python or isaac_python), '-m', 'go2_nav.train', '--config', str(root/'skills/navigation/config.json'),
                 '--sensors', opt['sensors'], '--scene', opt['scene'], '--envs', str(opt['envs']), '--steps', str(opt['steps']),
@@ -133,3 +135,20 @@ def recipe_command(config, root, output, isaac_python, mujoco_python=None):
         if opt['transfer_motors']: cmd += ['--transfer-motors']
         return cmd + stability_arguments(rid, opt)
     raise ValueError('Unsupported training recipe')
+
+
+def skill_evaluation_command(config,root,run,cpu_python):
+    """The same strict four-seed evaluator used for reviewed acrobatics runs."""
+    rid=config.recipe_id
+    kinds={'sideflip_native_ppo':'sideflip','backflip_native_ppo':'backflip','frontflip_native_ppo':'frontflip'}
+    if not config.auto_evaluate or rid not in kinds:return None
+    opt=options_for(config)
+    if not opt['fixstand_roundtrip']:return None
+    if not cpu_python:raise ValueError('Strict skill evaluation requires the MuJoCo CPU runtime')
+    start=opt['evaluation_seed_start']
+    if start<=config.seed<start+4:raise ValueError('Independent evaluation seeds must not include the training seed')
+    root=Path(root).resolve()
+    cmd=[str(cpu_python),str(root/'scripts/evaluate_fixstand_run.py'),'--kind',kinds[rid],
+         '--run',str(run),'--seed-start',str(start),'--source',str(root.parent/'Rob2Nav-upstreams/GO2_backflip')]
+    if rid=='sideflip_native_ppo':cmd+=['--motion',str(motion_path(config,root))]
+    return cmd

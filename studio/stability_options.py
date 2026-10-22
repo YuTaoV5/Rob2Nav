@@ -57,6 +57,8 @@ SCHEMAS['frontflip_native_ppo'] = {**SCHEMAS['backflip_native_ppo'],
     'peak_contact_forces': field('物理子步接触峰值', True),
     'flip_direction': field('空翻方向', 'front', choices=['front'])}
 SCHEMAS['backflip_native_ppo']['flip_direction'] = field('空翻方向', 'back', choices=['back'])
+for _rid in ('sideflip_native_ppo','backflip_native_ppo','frontflip_native_ppo'):
+    SCHEMAS[_rid]['evaluation_seed_start']=field('独立四种子验收起点（自动评估时使用）',20000,0,2147483644)
 
 
 def defaults(rid):
@@ -119,6 +121,7 @@ def arguments(rid, options):
         value = options[key]
         if key == 'motion':
             continue  # resolved against the trusted project roots separately
+        if key == 'evaluation_seed_start':continue  # evaluator option, never a trainer argument
         if key == 'in_place_airtime_weight' and not options.get('in_place_airtime'):continue
         if key in ('finetune_learning_rate', 'reset_std', 'initial_std', 'min_action_std', 'max_action_std', 'boundary_bridge_limit') and value == 0:
             continue

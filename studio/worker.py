@@ -92,6 +92,25 @@ def execute(jobs,job,root,python,mujoco_python=None):
             if not completion.get('execution_complete') or completion.get('requested_iterations')!=config.iterations:
                 raise RuntimeError('Skill trainer completion manifest does not match the requested budget')
         detail.update(artifacts=[str(p) for p in artifacts],note='Training artifacts exist; independent MuJoCo skill validation is still required.')
+        from .recipe_training import skill_evaluation_command
+        evaluation=skill_evaluation_command(config,root,run,mujoco_python)
+        if evaluation:
+            # A rejected skill is a successfully executed experiment, not a
+            # qualified deployment. Never infer capability from exit status.
+            launch(evaluation,'evaluation')
+            result=read_json(run/'evaluation.json',{})
+            episodes=result.get('episodes',[])
+            start=int(evaluation[evaluation.index('--seed-start')+1])
+            if ([e.get('seed') for e in episodes]!=list(range(start,start+4)) or
+                result.get('status') not in ('not_accepted','passed_simulation_only') or
+                any(type(e.get(k)) is not bool for e in episodes for k in ('passed','motion_pass','constraints_pass'))):
+                raise RuntimeError('Incomplete or invalid four-seed skill evaluation')
+            accepted=all(e['passed'] and e['motion_pass'] and e['constraints_pass'] for e in episodes)
+            if accepted!=(result['status']=='passed_simulation_only'):raise RuntimeError('Evaluation status and episode results disagree')
+            detail.update(evaluation=episodes,simulation_acceptance=result['status'],hardware_qualified=False,
+                note='Strict four-seed MuJoCo evaluation complete; simulation only. Video review and unified hot-switch validation remain required.')
+        elif config.auto_evaluate and config.recipe_id in ('sideflip_native_ppo','backflip_native_ppo','frontflip_native_ppo'):
+            detail['note']='Automatic strict acrobatics evaluation requires FIXSTAND roundtrip; this legacy task has not been validated.'
         jobs.update(key,'succeeded',detail)
         return
     ck=checked_training(run,config.iterations)

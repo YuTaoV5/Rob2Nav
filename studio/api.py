@@ -221,7 +221,13 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
             try:job['progress_updated']=status.stat().st_mtime
             except OSError:job['progress_updated']=None
             if job['state']=='evaluating' and job['detail'].get('stage')=='evaluation':
-                job['evaluation_completed']=sum(bool(read_json(p)) for p in (jobs.directory/'jobs'/job['id']/'evaluation').glob('*/summary.json'))
+                if job['config'].get('recipe_id') in ('sideflip_native_ppo','backflip_native_ppo','frontflip_native_ppo'):
+                    start=job['config'].get('recipe_options',{}).get('evaluation_seed_start',20000)
+                    job['evaluation_completed']=sum(bool(read_json(folder/f'seed_{seed}/summary.json')) for seed in range(start,start+4))
+                    job['evaluation_total']=4
+                else:
+                    job['evaluation_completed']=sum(bool(read_json(p)) for p in (jobs.directory/'jobs'/job['id']/'evaluation').glob('*/summary.json'))
+                    job['evaluation_total']=9
         return clean(result)
 
     @app.get('/api/jobs/{key}/telemetry')
