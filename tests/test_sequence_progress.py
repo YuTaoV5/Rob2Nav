@@ -9,7 +9,7 @@ from rob2nav.deployment.sequence import SkillSequence,Step
 class SequenceProgressTests(unittest.TestCase):
     def setup_sequence(self,steps):
         contracts={s.skill:NS(id=s.skill,atomic=s.trigger) for s in steps}
-        c=NS(phase='ENTRY',active=None,set_velocity=Mock(),trigger_requested=False)
+        c=NS(phase='ENTRY',active=None,set_velocity=Mock(),trigger_requested=False,epoch=0)
         r=NS(controller=c,profile=lambda n:(None,contracts[n]),stage_error=None,
             future=None,next=None,queued=None,stage_async=Mock())
         seq=SkillSequence(r,steps)
@@ -45,6 +45,21 @@ class SequenceProgressTests(unittest.TestCase):
         c.phase='ACTIVE';c.active=contracts['stand'];seq.tick(self.snapshot,0);seq.tick(self.snapshot,1)
         seq.tick(self.snapshot,1.01)
         self.assertAlmostEqual(seq.progress(2.01)['dwell_elapsed_s'],2)
+
+    def test_repeated_atomic_requires_a_new_epoch(self):
+        seq,c,contracts=self.setup_sequence([Step('flip',trigger=True),Step('flip',trigger=True),Step('stand')])
+        c.phase='ACTIVE';c.active=contracts['flip'];c.epoch=7
+        seq.tick(self.snapshot,1)
+        self.assertEqual(seq.index,1)
+        seq.tick(self.snapshot,1.02)
+        seq.runtime.stage_async.assert_called_once_with('flip',self.snapshot)
+        seq.tick(self.snapshot,2)
+        self.assertEqual(seq.index,1)
+        c.phase='ENTRY';seq.tick(self.snapshot,3)
+        self.assertEqual(seq.index,1)
+        c.phase='ACTIVE';c.epoch=8;seq.tick(self.snapshot,4)
+        self.assertEqual(seq.index,2)
+        self.assertEqual(seq.consumed_atomic_epoch,8)
 
     def test_unstable_handover_is_extra_time(self):
         seq,c,contracts=self.setup_sequence([Step('walk',1),Step('stand',2)])

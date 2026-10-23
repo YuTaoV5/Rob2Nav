@@ -40,7 +40,7 @@ class UnifiedRuntime:
         self.stage_error=None
         def prepare():
             path,skill=self.profile(profile_id)
-            if self.active is not None and self.active.skill==skill:raise ValueError('Requested contract is already active')
+            if self.active is not None and self.active.skill==skill and not skill.atomic:raise ValueError('Requested contract is already active')
             if self.controller.hardware and not skill.hardware_qualified:raise ValueError('Hardware skill quarantined: '+skill.blocker)
             if self.approval is not None:self.approval(skill)
             if not self.controller.hardware and not skill.simulation_enabled:

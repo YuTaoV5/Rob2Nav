@@ -39,7 +39,7 @@ class SkillSequence:
             _,contract=runtime.profile(step.skill)
             if contract.atomic!=step.trigger:raise ValueError('Atomic sequence steps require an explicit trigger; gait steps must not trigger')
         self.index=0;self.requested=False;self.started=None;self.done=False;self.error=None
-        self.completed_dwell=0.;self.atomic_index=None
+        self.completed_dwell=0.;self.atomic_index=None;self.consumed_atomic_epoch=None
     def progress(self,now):
         """Read-only telemetry; ACTIVE dwell excludes preparation and handover waits."""
         c=self.runtime.controller;step=self.steps[self.index]
@@ -70,11 +70,14 @@ class SkillSequence:
         if self.done or self.error:c.set_velocity([0,0,0],now);return
         if c.phase=='FAULT' or r.stage_error:self.error=c.fault or r.stage_error;c.set_velocity([0,0,0],now);return
         step=self.steps[self.index]
+        repeat_consumed=(step.trigger and c.active is not None and c.active.id==step.skill
+                         and self.consumed_atomic_epoch is not None and c.epoch==self.consumed_atomic_epoch)
         if not self.requested:
-            if c.phase=='ACTIVE' and c.active is not None and c.active.id==step.skill:
+            if c.phase=='ACTIVE' and c.active is not None and c.active.id==step.skill and not repeat_consumed:
                 self.requested=True
             elif r.future is None and r.next is None and r.queued is None:
                 r.stage_async(step.skill,snapshot);self.requested=True
+        if repeat_consumed:c.set_velocity([0,0,0],now);return
         current=c.active.id if c.active is not None else None
         if current!=step.skill or c.phase not in ('ACTIVE','ARMED'):c.set_velocity([0,0,0],now);return
         if c.phase=='ARMED':
@@ -92,7 +95,7 @@ class SkillSequence:
                     self.error='terrain handover window timed out';c.set_velocity([0,0,0],now)
                 return
         if c.active.atomic or elapsed>=step.seconds:
-            if c.active.atomic:self.atomic_index=self.index
+            if c.active.atomic:self.atomic_index=self.index;self.consumed_atomic_epoch=c.epoch
             else:self.completed_dwell+=step.seconds
             if self.index==len(self.steps)-1:self.done=True;c.set_velocity([0,0,0],now)
             else:self.index+=1;self.requested=False;self.started=None
