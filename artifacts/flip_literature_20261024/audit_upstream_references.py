@@ -91,7 +91,7 @@ def main():
         'results': {p: audit(data[p], limits) for p in FILES},
     }
     target = Path(__file__).with_name('upstream_reference_audit.json')
-    target.write_text(json.dumps(result, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+    target.write_bytes((json.dumps(result, ensure_ascii=False, indent=2)+'\n').encode('utf-8'))
     for p, x in result['results'].items():
         print(Path(p).name, json.dumps(x))
 
