@@ -1,0 +1,214 @@
+{
+  "repository": "yusongmin1/go2_flip_TO",
+  "commit": "d12fb093dc391d39815b252eb209a6e4c0692726",
+  "scope": "Stored 50Hz trajectory kinematics against the optimization URDF only. No solver run, torque/impact check, closed-loop rollout, or hardware qualification.",
+  "joint_order": [
+    "FL_hip_joint",
+    "FL_thigh_joint",
+    "FL_calf_joint",
+    "FR_hip_joint",
+    "FR_thigh_joint",
+    "FR_calf_joint",
+    "RL_hip_joint",
+    "RL_thigh_joint",
+    "RL_calf_joint",
+    "RR_hip_joint",
+    "RR_thigh_joint",
+    "RR_calf_joint"
+  ],
+  "limits": {
+    "FL_hip_joint": {
+      "lower": -1.0472,
+      "upper": 1.0472,
+      "velocity": 30.1
+    },
+    "FL_thigh_joint": {
+      "lower": -1.5708,
+      "upper": 3.4907,
+      "velocity": 30.1
+    },
+    "FL_calf_joint": {
+      "lower": -2.7227,
+      "upper": -0.83776,
+      "velocity": 15.7
+    },
+    "FR_hip_joint": {
+      "lower": -1.0472,
+      "upper": 1.0472,
+      "velocity": 30.1
+    },
+    "FR_thigh_joint": {
+      "lower": -1.5708,
+      "upper": 3.4907,
+      "velocity": 30.1
+    },
+    "FR_calf_joint": {
+      "lower": -2.7227,
+      "upper": -0.83776,
+      "velocity": 15.7
+    },
+    "RL_hip_joint": {
+      "lower": -1.0472,
+      "upper": 1.0472,
+      "velocity": 30.1
+    },
+    "RL_thigh_joint": {
+      "lower": -0.5236,
+      "upper": 4.5379,
+      "velocity": 30.1
+    },
+    "RL_calf_joint": {
+      "lower": -2.7227,
+      "upper": -0.83776,
+      "velocity": 15.7
+    },
+    "RR_hip_joint": {
+      "lower": -1.0472,
+      "upper": 1.0472,
+      "velocity": 30.1
+    },
+    "RR_thigh_joint": {
+      "lower": -0.5236,
+      "upper": 4.5379,
+      "velocity": 30.1
+    },
+    "RR_calf_joint": {
+      "lower": -2.7227,
+      "upper": -0.83776,
+      "velocity": 15.7
+    }
+  },
+  "sources": {
+    "src/robots/go2/go2/urdf/go2.urdf": {
+      "url": "https://raw.githubusercontent.com/yusongmin1/go2_flip_TO/d12fb093dc391d39815b252eb209a6e4c0692726/src/robots/go2/go2/urdf/go2.urdf",
+      "sha256": "dec0dc5885049b2bc584a02f9d1db418ad741e1ec8672798eb9b9938473c6d5d",
+      "bytes": 29512
+    },
+    "datasets/go2/mocap_motions_go2/quad_backflip_50hz.txt": {
+      "url": "https://raw.githubusercontent.com/yusongmin1/go2_flip_TO/d12fb093dc391d39815b252eb209a6e4c0692726/datasets/go2/mocap_motions_go2/quad_backflip_50hz.txt",
+      "sha256": "673b605bfdadd8ff122ba5c363ba46beb5a611f3eadaac0da5e4eec86abc6063",
+      "bytes": 74415
+    },
+    "datasets/go2/mocap_motions_go2/quad_frontflip_50hz.txt": {
+      "url": "https://raw.githubusercontent.com/yusongmin1/go2_flip_TO/d12fb093dc391d39815b252eb209a6e4c0692726/datasets/go2/mocap_motions_go2/quad_frontflip_50hz.txt",
+      "sha256": "d9ebcc3e2719ce831c96949d2f226f51138f87eacef9746f4fc8497e4d2a89a6",
+      "bytes": 74415
+    },
+    "datasets/go2/mocap_motions_go2/quad_sideflip_50hz.txt": {
+      "url": "https://raw.githubusercontent.com/yusongmin1/go2_flip_TO/d12fb093dc391d39815b252eb209a6e4c0692726/datasets/go2/mocap_motions_go2/quad_sideflip_50hz.txt",
+      "sha256": "9dcc00265d61c50996ae989ac251c62066dfd1d6476e6fc77f4e75d32b964674",
+      "bytes": 75603
+    },
+    "datasets/go2/mocap_motions_go2/quad_sideflip_right_50hz.txt": {
+      "url": "https://raw.githubusercontent.com/yusongmin1/go2_flip_TO/d12fb093dc391d39815b252eb209a6e4c0692726/datasets/go2/mocap_motions_go2/quad_sideflip_right_50hz.txt",
+      "sha256": "7c21cc37b9f917c174c69c78c13dc6dca304155cddab5f682c26894282e512a1",
+      "bytes": 75603
+    }
+  },
+  "results": {
+    "datasets/go2/mocap_motions_go2/quad_backflip_50hz.txt": {
+      "samples": 125,
+      "dt": 0.02,
+      "duration_seconds": 2.48,
+      "quaternion_max_norm_error": 5.744513349448255e-07,
+      "root_displacement_m": [
+        -0.4,
+        0.0,
+        0.0
+      ],
+      "initial_to_terminal_joint_max_difference_rad": 0.0,
+      "joint_position_limit_excess_rad": 0.0,
+      "declared_joint_velocity_max_urdf_ratio": 0.9992258598726116,
+      "finite_difference_joint_velocity_max_urdf_ratio": 0.9992261146496817,
+      "finite_difference_minus_declared_left_sample_max_rad_s": 30.484846000000005,
+      "finite_difference_minus_declared_right_sample_max_rad_s": 4.800000000036242e-05,
+      "velocity_alignment_note": "Semi-implicit integration uses the NEXT node velocity for the interval. Left-sample disagreement alone is not an export defect.",
+      "integrated_world_rotation_increments_rad": [
+        0.0060437429268372055,
+        -6.281461841625869,
+        -0.07988635884205032
+      ],
+      "angular_path_length_rad": 7.731859798919942,
+      "terminal_orientation_distance_rad": 0.0,
+      "physics_verified": false
+    },
+    "datasets/go2/mocap_motions_go2/quad_frontflip_50hz.txt": {
+      "samples": 125,
+      "dt": 0.02,
+      "duration_seconds": 2.48,
+      "quaternion_max_norm_error": 5.02212626152243e-07,
+      "root_displacement_m": [
+        0.4,
+        0.0,
+        0.0
+      ],
+      "initial_to_terminal_joint_max_difference_rad": 0.0,
+      "joint_position_limit_excess_rad": 0.0,
+      "declared_joint_velocity_max_urdf_ratio": 0.9993909554140128,
+      "finite_difference_joint_velocity_max_urdf_ratio": 0.999391719745223,
+      "finite_difference_minus_declared_left_sample_max_rad_s": 35.57355,
+      "finite_difference_minus_declared_right_sample_max_rad_s": 4.8999999999410626e-05,
+      "velocity_alignment_note": "Semi-implicit integration uses the NEXT node velocity for the interval. Left-sample disagreement alone is not an export defect.",
+      "integrated_world_rotation_increments_rad": [
+        0.11241603065774747,
+        6.284235310381279,
+        0.23997090034063837
+      ],
+      "angular_path_length_rad": 7.243954494849748,
+      "terminal_orientation_distance_rad": 0.0,
+      "physics_verified": false
+    },
+    "datasets/go2/mocap_motions_go2/quad_sideflip_50hz.txt": {
+      "samples": 127,
+      "dt": 0.02,
+      "duration_seconds": 2.52,
+      "quaternion_max_norm_error": 6.651007211644355e-07,
+      "root_displacement_m": [
+        0.0,
+        0.3,
+        0.0
+      ],
+      "initial_to_terminal_joint_max_difference_rad": 0.0,
+      "joint_position_limit_excess_rad": 0.0,
+      "declared_joint_velocity_max_urdf_ratio": 0.9998045859872612,
+      "finite_difference_joint_velocity_max_urdf_ratio": 0.9998057324840771,
+      "finite_difference_minus_declared_left_sample_max_rad_s": 29.971432,
+      "finite_difference_minus_declared_right_sample_max_rad_s": 4.900000000285232e-05,
+      "velocity_alignment_note": "Semi-implicit integration uses the NEXT node velocity for the interval. Left-sample disagreement alone is not an export defect.",
+      "integrated_world_rotation_increments_rad": [
+        -6.295797211834903,
+        0.0881872864093446,
+        -0.1377319315118001
+      ],
+      "angular_path_length_rad": 7.176338354486373,
+      "terminal_orientation_distance_rad": 0.0,
+      "physics_verified": false
+    },
+    "datasets/go2/mocap_motions_go2/quad_sideflip_right_50hz.txt": {
+      "samples": 127,
+      "dt": 0.02,
+      "duration_seconds": 2.52,
+      "quaternion_max_norm_error": 6.521647872848035e-07,
+      "root_displacement_m": [
+        0.0,
+        -0.3,
+        0.0
+      ],
+      "initial_to_terminal_joint_max_difference_rad": 0.0,
+      "joint_position_limit_excess_rad": 0.0,
+      "declared_joint_velocity_max_urdf_ratio": 0.9999029299363057,
+      "finite_difference_joint_velocity_max_urdf_ratio": 0.9999044585987265,
+      "finite_difference_minus_declared_left_sample_max_rad_s": 29.818699999999996,
+      "finite_difference_minus_declared_right_sample_max_rad_s": 5.000000000002225e-05,
+      "velocity_alignment_note": "Semi-implicit integration uses the NEXT node velocity for the interval. Left-sample disagreement alone is not an export defect.",
+      "integrated_world_rotation_increments_rad": [
+        6.2960049336223145,
+        0.0812409020455505,
+        0.1737711777063253
+      ],
+      "angular_path_length_rad": 7.268335801933429,
+      "terminal_orientation_distance_rad": 0.0,
+      "physics_verified": false
+    }
+  }
+}
