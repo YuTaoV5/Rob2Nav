@@ -1,4 +1,5 @@
 export const skillInfo:Record<string,{name:string;description:string}>={
+ backflip60:{name:'后空翻',description:'完成一圈并站稳后再继续，可连续添加；当前仅限仿真。'},
  stand:{name:'站稳不动',description:'保持四脚站立，用于开始、结束或中途停留。'},
  walk_moe:{name:'日常行走（推荐）',description:'按设定速度前进或后退，适合与站立串联演示。'},
  walk_mlp:{name:'对照行走（实验）',description:'另一套行走模型，用于研究对比；切换组合尚未通过回归。'},

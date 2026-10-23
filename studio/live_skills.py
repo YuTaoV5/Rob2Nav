@@ -122,6 +122,7 @@ def mount_live_skills(app,root,python):
         if a.cycles>1 and any(s.skill=='sideflip69' for s in a.steps) and not a.research_stunts:
             raise HTTPException(422,'侧翻重复演示需要显式开启研究仿真')
         allowed={'stand','stand_soft','stand_stiff','walk_mlp','walk_moe'}|({'sideflip69'} if a.research_stunts else set())
+        if profiles.get('backflip60',{}).get('simulation_enabled') is True:allowed.add('backflip60')
         steps=[]
         for cycle in range(a.cycles):
             steps.extend(s.model_dump() for s in a.steps if cycle==0 or s is not a.steps[0])
