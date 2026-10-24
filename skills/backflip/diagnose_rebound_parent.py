@@ -42,10 +42,31 @@ class FrozenParentDiagnostic(ReboundEvaluation):
             intervention='current rebound phase clock instead of the trained single-flip clock',
             weights_changed=False,training_contract_verified=False,hardware_qualified=False)
         super().configure(module,{**exported,'rebound_contract':hypothetical},args)
+        from .rebound_landing import LandingConfig, LandingPhases
+        self.landing_observer=LandingPhases(1,module.SIM_DT,LandingConfig(**asdict(settings)))
+        self.landing_events=[]
+
+    def sample(self,model,data,frame,qids,dids):
+        # Observation only: the original v1 runtime still drives actor phase features.
+        super().sample(model,data,frame,qids,dids)
+        import torch
+        q=data.qpos[3:7]
+        upright=float(1.-2.*(q[1]*q[1]+q[2]*q[2]))
+        r=self.landing_observer
+        old=int(r.phase[0])
+        contact=max(frame.forces.values())>self.contract['execution_thresholds']['recovery_contact_force']
+        r.step(torch.tensor([bool(contact)]),torch.tensor([data.qvel[3:6].tolist()]),
+               torch.tensor([bool(frame.unexpected)]),torch.tensor([upright]))
+        if old!=int(r.phase[0]):
+            self.landing_events.append(dict(time_s=float(data.time),phase=int(r.phase[0]),
+                completed=int(r.completed[0]),upright=upright,rebound_elapsed_s=float(r.rebound_time[0])))
 
     def report(self):
         result=super().report()
         result['counterfactual_diagnostic']=self.provenance
+        result['landing_counter_observer']=dict(events=self.landing_events,
+            completed=int(self.landing_observer.completed[0]),controls_actor=False,
+            capability_verified=False,scope='candidate v2 bookkeeping on unchanged v1 physical rollout')
         return result
 
 
