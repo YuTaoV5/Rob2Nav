@@ -1,0 +1,53 @@
+{
+  "configuration_and_update_chain_verified": true,
+  "capability_verified": false,
+  "checkpoint": "model_2201.pt",
+  "checkpoint_sha256": "1b226a70b44005aadeee8fa2c589c8a53d782ef460c9d7efd8771b479596d6f3",
+  "completion": {
+    "execution_complete": true,
+    "requested_iterations": 2,
+    "last_checkpoint": "model_2201.pt",
+    "capability_verified": false,
+    "hardware_connected": false
+  },
+  "teacher_retention": {
+    "version": "actor_retention_sgd_v1",
+    "algorithm": "one actor-only SGD step after each PPO update",
+    "manifest_sha256": "aaddcc76f4394d0c48eb209f866ffcbbf6bdea6ea847e7e6f353beae7146a2f6",
+    "samples_sha256": "6633aca909b9b35463f49aededfdabcc58ebab573839e0b12346052c8dbb1371",
+    "teacher_policy_sha256": "c8adf96a70cdb9e68f7aa7fe02271ae36908b6c8ab29ad967d03c73a58eaa82d",
+    "samples": 408,
+    "sampler_seed": 76,
+    "sampler_resume": "reset on each new training invocation; not bitwise resume",
+    "max_grad_norm": 1.0,
+    "action_scale": 0.5,
+    "action_clip": 8.0,
+    "weight": 5.0,
+    "learning_rate": 0.0001,
+    "batch_size": 128,
+    "hold_scale": 0.15
+  },
+  "scalars": {
+    "teacher_retention_mse": [
+      {
+        "step": 2200,
+        "value": 1.5108162187971175e-07
+      },
+      {
+        "step": 2201,
+        "value": 1.1993810176136321e-06
+      }
+    ],
+    "teacher_retention_grad_norm": [
+      {
+        "step": 2200,
+        "value": 0.0027183126658201218
+      },
+      {
+        "step": 2201,
+        "value": 0.007796791382133961
+      }
+    ]
+  },
+  "onnx_max_error": 2.5331974029541016e-07
+}
