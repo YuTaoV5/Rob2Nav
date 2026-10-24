@@ -18,6 +18,8 @@ def configure(cfg, cycles, max_rebound_seconds=.45, env_class=None):
     if getattr(env_class, '_rob2nav_rebound_installed', False):
         raise RuntimeError('Rebound hooks already installed; use a fresh training process')
     cfg.rebound = asdict(settings)
+    from .rebound_contract import implementation_hashes
+    cfg.rebound_implementation_sha256 = implementation_hashes()
     cfg.episode_length_s = 1. + 2. * cycles + 2.
     cfg.contact_sensor.update_period = cfg.sim.dt
     cfg.rewards.use_peak_contact_forces = True
