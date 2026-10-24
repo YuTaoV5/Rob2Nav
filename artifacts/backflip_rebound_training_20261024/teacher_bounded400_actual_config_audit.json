@@ -1,0 +1,35 @@
+{
+  "actual_config_verified": true,
+  "capability_verified": false,
+  "env_diff": [],
+  "agent_diff": [
+    {
+      "path": ".run_name",
+      "baseline": "studio_b82d79cda1c04538",
+      "current": "studio_9844d059b0624e74"
+    }
+  ],
+  "teacher_retention": {
+    "version": "actor_retention_sgd_v1",
+    "algorithm": "one actor-only SGD step after each PPO update",
+    "manifest_sha256": "aaddcc76f4394d0c48eb209f866ffcbbf6bdea6ea847e7e6f353beae7146a2f6",
+    "samples_sha256": "6633aca909b9b35463f49aededfdabcc58ebab573839e0b12346052c8dbb1371",
+    "teacher_policy_sha256": "c8adf96a70cdb9e68f7aa7fe02271ae36908b6c8ab29ad967d03c73a58eaa82d",
+    "samples": 408,
+    "sampler_seed": 76,
+    "sampler_resume": "reset on each new training invocation; not bitwise resume",
+    "max_grad_norm": 1.0,
+    "action_scale": 0.5,
+    "action_clip": 8.0,
+    "weight": 5.0,
+    "learning_rate": 0.0001,
+    "batch_size": 128,
+    "hold_scale": 0.15
+  },
+  "files_sha256": {
+    "params/env.yaml": "15179d066b17c80a893cded2f853ee09ad8845001293fda930d442bd262a87ca",
+    "params/agent.yaml": "d5d66cf1102bd61aa70d268b2523619ae338f1700c262810e8628fd49dc701fc",
+    "teacher_retention.json": "af2ad5fabf8589eab9589c7e12414f41a8f4941d345001514f2570e96dcea203",
+    "fixstand.json": "944b65852ce8cb0da45ae9dce7e89652888a1eb6bf2b6859d77e0a6162f73c96"
+  }
+}
