@@ -62,6 +62,8 @@ SCHEMAS['frontflip_native_ppo'] = {**SCHEMAS['backflip_native_ppo'],
     'peak_contact_forces': field('物理子步接触峰值', True),
     'flip_direction': field('空翻方向', 'front', choices=['front'])}
 SCHEMAS['backflip_native_ppo']['flip_direction'] = field('空翻方向', 'back', choices=['back'])
+SCHEMAS['backflip_native_ppo']['rebound_cycles'] = field('连续后翻次数（1为原单翻；2/3为接续训练）',1,1,3)
+SCHEMAS['backflip_native_ppo']['rebound_max_seconds'] = field('中间落地至再次离地确认时限 秒',.45,.05,1.)
 SCHEMAS['sideflip_native_ppo']['boundary_terminal_hip_taper_frames']['help']='0保留有界学习补偿；2–50帧将末段髋残差衰减到0。参考归零不保证实测站姿归零，必须独立验收。'
 for _rid in ('sideflip_native_ppo','backflip_native_ppo','frontflip_native_ppo'):
     SCHEMAS[_rid]['evaluation_seed_start']=field('独立四种子验收起点（自动评估时使用）',20000,0,2147483644)
@@ -120,6 +122,11 @@ def validate(rid, options):
             raise ValueError('Action noise minimum exceeds maximum')
         for key in ('finetune_learning_rate', 'initial_std'):
             requires(key, o['fixstand_roundtrip'])
+    if rid == 'backflip_native_ppo':
+        if o['rebound_cycles'] != 1 and not (o['fixstand_roundtrip'] and o['delayed_entry']):
+            raise ValueError('Rebound training requires delayed FIXSTAND entry')
+        if o['rebound_cycles'] == 1 and o['rebound_max_seconds'] != .45:
+            raise ValueError('Rebound interval requires multiple cycles')
     if rid == 'upright_walk_ppo' and o['endpoint_residual_limit'] != .2 and not o['endpoint_residual']:
         raise ValueError('Endpoint limit requires endpoint residual')
 
@@ -128,6 +135,7 @@ def arguments(rid, options):
     result = []
     for key, f in SCHEMAS.get(rid, {}).items():
         value = options[key]
+        if key.startswith('rebound_') and options.get('rebound_cycles',1)==1:continue
         if key == 'motion':
             continue  # resolved against the trusted project roots separately
         if key == 'evaluation_seed_start':continue  # evaluator option, never a trainer argument

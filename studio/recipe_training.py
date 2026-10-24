@@ -102,6 +102,8 @@ def recipe_command(config, root, output, isaac_python, mujoco_python=None):
         raise ValueError('Training output must be inside Studio runs')
     rid = config.recipe_id; opt = options_for(config)
     validate_options(rid, config.recipe_options)
+    if opt.get('rebound_cycles',1)!=1 and config.auto_evaluate:
+        raise ValueError('Continuous rebound evaluator is not connected yet; only explicit training smoke with auto_evaluate=false is supported')
     if config.auto_evaluate and 'evaluation_seed_start' in opt and opt['evaluation_seed_start']<=config.seed<opt['evaluation_seed_start']+4:
         raise ValueError('Independent evaluation seeds must not include the training seed')
     if rid == 'navigation_ppo':
@@ -144,6 +146,7 @@ def skill_evaluation_command(config,root,run,cpu_python):
     if not config.auto_evaluate or rid not in kinds:return None
     opt=options_for(config)
     if not opt['fixstand_roundtrip']:return None
+    if opt.get('rebound_cycles',1)!=1:raise ValueError('Single-flip evaluator cannot certify a rebound sequence')
     if not cpu_python:raise ValueError('Strict skill evaluation requires the MuJoCo CPU runtime')
     start=opt['evaluation_seed_start']
     if start<=config.seed<start+4:raise ValueError('Independent evaluation seeds must not include the training seed')

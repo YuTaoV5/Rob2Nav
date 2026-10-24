@@ -23,6 +23,8 @@ parser.add_argument('--flip-direction',choices=['back','front'],default='back')
 parser.add_argument('--initial-std',type=float)
 parser.add_argument('--peak-contact-forces',action='store_true')
 parser.add_argument('--reward-scales-json',default='{}')
+parser.add_argument('--rebound-cycles',type=int,choices=[1,2,3],default=1)
+parser.add_argument('--rebound-max-seconds',type=float,default=.45)
 args, rest = parser.parse_known_args()
 from skills.backflip.reward_options import parse_scales
 reward_scales=parse_scales(args.reward_scales_json)
@@ -35,6 +37,13 @@ if args.safety_start is not None and (not args.fast_safety_curriculum or not 0.<
 if args.finetune_learning_rate is not None and not 0.<args.finetune_learning_rate<=.001:raise ValueError('Invalid finetune learning rate')
 if args.flip_direction=='front' and not (args.fixstand_roundtrip and args.delayed_entry):raise ValueError('Frontflip requires the standard delayed-entry task')
 if args.initial_std is not None and not .01<=args.initial_std<=1.:raise ValueError('Invalid initial action noise')
+if args.rebound_cycles != 1:
+    if not (args.fixstand_roundtrip and args.delayed_entry and args.flip_direction=='back'):
+        raise ValueError('Rebound requires delayed FIXSTAND backflip')
+    from skills.backflip.rebound import ReboundConfig
+    ReboundConfig(cycles=args.rebound_cycles,max_rebound_seconds=args.rebound_max_seconds)
+elif args.rebound_max_seconds != .45:
+    raise ValueError('Rebound interval requires multiple cycles')
 source = args.source.resolve()
 entry = source / (args.entry + '.py')
 text = entry.read_text()
@@ -62,7 +71,7 @@ if args.fixstand_roundtrip:
         if text.count(required)!=1:raise RuntimeError('Pinned training entry changed: '+required)
     from skills.backflip.launcher_patch import configure_fixstand_source
     text=configure_fixstand_source(text,source,args.urdf_speed_limits,args.fast_safety_curriculum,
-        args.delayed_entry,args.entry_hold_scale,args.flip_direction,args.peak_contact_forces,reward_scales)
+        args.delayed_entry,args.entry_hold_scale,args.flip_direction,args.peak_contact_forces,reward_scales,args.rebound_cycles,args.rebound_max_seconds)
     if args.safety_start is not None:
         text=text.replace('agent_cfg = Go2BackflipPPORunnerCfg()',
             f'env_cfg.rewards.safety_curriculum_start={args.safety_start!r}\n    agent_cfg = Go2BackflipPPORunnerCfg()')
@@ -83,6 +92,9 @@ if args.fixstand_roundtrip:
         if args.delayed_entry:
             version='backflip_entry_v2' if args.entry_hold_scale==.4 else 'backflip_entry_v3'
             text=text.replace("'backflip',actor_observations=60)",f"'backflip',actor_observations=60,action_parameterization='{version}',entry_hold_scale={args.entry_hold_scale!r},entry_seconds=1.,release_seconds=[1.,1.2],episode_seconds=5.)")
+        if args.rebound_cycles != 1:
+            text=text.replace("action_parameterization='backflip_entry_v3'","action_parameterization='backflip_rebound_v1'").replace("action_parameterization='backflip_entry_v2'","action_parameterization='backflip_rebound_v1'")
+            text=text.replace('episode_seconds=5.)',f'episode_seconds={3.+2.*args.rebound_cycles!r},rebound_cycles={args.rebound_cycles!r},rebound_max_seconds={args.rebound_max_seconds!r},phase_contract="contact_cycle_v1")')
         if args.flip_direction=='front':
             text=text.replace("'backflip',actor_observations=60", "'frontflip',actor_observations=60,flip_direction='front'")
         if args.peak_contact_forces:
