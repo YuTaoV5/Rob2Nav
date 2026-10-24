@@ -1,0 +1,93 @@
+{
+  "source": "landing_single_entry_policy_trace_28600.json",
+  "source_sha256": "c5caf685ec4804cd2a9602b894a0852e733ccc83f049b1cd4aa1e18e60a6fdb5",
+  "samples": 450,
+  "policy_hz": 50,
+  "action_scale": 0.5,
+  "action_clip": 8,
+  "provenance": "Corrected single-entry frozen-parent counterfactual, seed 28600",
+  "quantity": "Requested joint target before 20ms latency and physical-substep slew limiting; NOT issued servo target or measured velocity",
+  "clock_rewinds": [
+    {
+      "time_s": 2.04,
+      "previous_clock": 1.0199822187423706,
+      "clock": 0.5149998068809509,
+      "joint": "FR_thigh_joint",
+      "requested_target_delta_rad": 0.8557846695184708
+    }
+  ],
+  "first_landing_window": [
+    {
+      "time_s": 1.98,
+      "previous_clock": 0.9599818587303162,
+      "clock": 0.9799816012382507,
+      "joint": "FR_thigh_joint",
+      "requested_target_delta_rad": 0.24028760194778442
+    },
+    {
+      "time_s": 2.0,
+      "previous_clock": 0.9799816012382507,
+      "clock": 0.9999813437461853,
+      "joint": "FL_thigh_joint",
+      "requested_target_delta_rad": 0.1505647897720337
+    },
+    {
+      "time_s": 2.02,
+      "previous_clock": 0.9999813437461853,
+      "clock": 1.0199822187423706,
+      "joint": "FL_thigh_joint",
+      "requested_target_delta_rad": 0.09126842021942139
+    },
+    {
+      "time_s": 2.04,
+      "previous_clock": 1.0199822187423706,
+      "clock": 0.5149998068809509,
+      "joint": "FR_thigh_joint",
+      "requested_target_delta_rad": 0.8557846695184708
+    },
+    {
+      "time_s": 2.06,
+      "previous_clock": 0.5149998068809509,
+      "clock": 0.5349995493888855,
+      "joint": "RL_thigh_joint",
+      "requested_target_delta_rad": 0.4620060920715332
+    },
+    {
+      "time_s": 2.08,
+      "previous_clock": 0.5349995493888855,
+      "clock": 0.5549992918968201,
+      "joint": "RR_thigh_joint",
+      "requested_target_delta_rad": 0.5723810195922852
+    },
+    {
+      "time_s": 2.1,
+      "previous_clock": 0.5549992918968201,
+      "clock": 0.5749990344047546,
+      "joint": "RR_thigh_joint",
+      "requested_target_delta_rad": 0.537002682685852
+    },
+    {
+      "time_s": 2.12,
+      "previous_clock": 0.5749990344047546,
+      "clock": 0.5949987769126892,
+      "joint": "RL_thigh_joint",
+      "requested_target_delta_rad": 0.46139514446258545
+    },
+    {
+      "time_s": 2.14,
+      "previous_clock": 0.5949987769126892,
+      "clock": 0.6149985194206238,
+      "joint": "FL_hip_joint",
+      "requested_target_delta_rad": 0.16033710539340973
+    },
+    {
+      "time_s": 2.16,
+      "previous_clock": 0.6149985194206238,
+      "clock": 0.6349982619285583,
+      "joint": "RL_calf_joint",
+      "requested_target_delta_rad": 0.4921192079782486
+    }
+  ],
+  "causal_limitation": "Clock and physical observation change together; this audit does not isolate clock-only causation",
+  "capability_verified": false
+}
