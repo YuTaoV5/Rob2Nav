@@ -66,7 +66,8 @@ def main(extension=None):
         raise ValueError('Entry counterfactual requires delayed-entry playback and [0,.4]')
     if extension is not None:extension.configure(module,exported,a)
     entry_policy_trace=[]
-    if delayed:
+    # Rebound extensions own the one-time entry mapping, including frozen-parent diagnostics.
+    if delayed and extension is None:
         if hashlib.sha256(policy.read_bytes()).hexdigest()!=exported['policy_sha256']:
             raise ValueError('Backflip export hash mismatch')
         if contract['entry_seconds']!=1. or contract['release_seconds']!=[1.,1.2]:
