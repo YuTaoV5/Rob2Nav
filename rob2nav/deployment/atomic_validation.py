@@ -26,10 +26,37 @@ class JointConstraintValidation:
             passed=bool(covered and self.speed<=1. and self.excess<=.001))
 
 
+class EntryHoldStatistics:
+    """Read-only substep peaks during the trained one-second entry hold."""
+    def __init__(self, dt, duration=1.):
+        self.dt=float(dt);self.duration=float(duration);self.samples=0
+        self.first=None;self.last=None;self.joint_speed=0.;self.angular_speed=0.;self.pose_error=0.
+
+    def sample(self, elapsed, q, dq, omega, neutral):
+        if not 1e-7<elapsed<=self.duration+1e-7:return
+        self.samples+=1
+        if self.first is None:self.first=float(elapsed)
+        self.last=float(elapsed)
+        self.joint_speed=max(self.joint_speed,float(np.max(np.abs(dq))))
+        self.angular_speed=max(self.angular_speed,float(np.linalg.norm(omega)))
+        self.pose_error=max(self.pose_error,float(np.max(np.abs(np.asarray(q)-neutral))))
+
+    def report(self):
+        expected=round(self.duration/self.dt)
+        covered=(self.samples==expected and self.first is not None and self.first<=self.dt+1e-7
+                 and self.last>=self.duration-self.dt-1e-7)
+        return dict(scope='trained entry hold only; every physical substep',duration_s=self.duration,
+                    physics_hz=1./self.dt,samples=self.samples,expected_samples=expected,
+                    coverage_complete=bool(covered),first_sample_s=self.first,last_sample_s=self.last,
+                    max_joint_speed_rad_s=self.joint_speed,max_body_angular_speed_rad_s=self.angular_speed,
+                    max_pose_error_rad=self.pose_error,visual_twitch_free_verified=False)
+
+
 class BackflipValidation:
     def __init__(self,model,skill,start,data=None):
         self.skill=skill;self.start=start;self.trace=[];self.next_sample=0.
         self.rotation=0.;self.travel=0.;self.air=0.;self.max_air=0.;self.height=0.
+        self.entry_hold=EntryHoldStatistics(model.opt.timestep)
         self.minimum_up=1.;self.bad=False;self.speed=0.;self.excess=0.;self.elapsed=0.
         self.ids=np.array([model.joint(n).id for n in SDK_JOINTS])
         self.qids=model.jnt_qposadr[self.ids];self.dids=model.jnt_dofadr[self.ids]
@@ -50,6 +77,7 @@ class BackflipValidation:
         from .core import FREE_SPEED,NEUTRAL
         self.speed=max(self.speed,float(np.max(abs(data.qvel[self.dids])/FREE_SPEED)))
         q=data.qpos[self.qids];ranges=model.jnt_range[self.ids]
+        self.entry_hold.sample(t,q,data.qvel[self.dids],data.qvel[3:6],NEUTRAL)
         self.excess=max(self.excess,float(max(0.,np.max(np.maximum(q-ranges[:,1],ranges[:,0]-q)))))
         frame=self.ground_reader.sample(data);forces=frame.forces;contacts=frame.bodies
         self.bad|=bool(frame.unexpected)
@@ -74,6 +102,7 @@ class BackflipValidation:
         contract=self.skill.motor_control is not None
         return dict(skill=self.skill.id,start_s=self.start,coverage_complete=complete,action_completed=motion,
             initial_state=getattr(self,'initial_state',None),
+            entry_hold_physics=self.entry_hold.report() if self.skill.action_parameterization in ('backflip_entry_v2','backflip_entry_v3') else None,
             expected_direction='back',direction_pass=direction,
             fixstand=endpoints,body_y_rotation_rad=self.rotation,axis_dominance=dominance,
             airtime_s=self.max_air,max_height_m=self.height,unexpected_body_ground_contact=self.bad,
