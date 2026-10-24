@@ -25,6 +25,12 @@ parser.add_argument('--peak-contact-forces',action='store_true')
 parser.add_argument('--reward-scales-json',default='{}')
 parser.add_argument('--rebound-cycles',type=int,choices=[1,2,3],default=1)
 parser.add_argument('--rebound-max-seconds',type=float,default=.45)
+parser.add_argument('--rebound-phase-version',choices=['legacy_v1','landing_v2'],default='legacy_v1')
+parser.add_argument('--rebound-landing-max-seconds',type=float,default=.25)
+parser.add_argument('--rebound-min-air-rotation',type=float,default=3.141592653589793)
+parser.add_argument('--rebound-landing-upright-cos',type=float,default=.9)
+parser.add_argument('--rebound-target-rate-weight',type=float,default=0.)
+parser.add_argument('--rebound-target-rate-margin',type=float,default=.8)
 args, rest = parser.parse_known_args()
 from skills.backflip.reward_options import parse_scales
 reward_scales=parse_scales(args.reward_scales_json)
@@ -44,6 +50,16 @@ if args.rebound_cycles != 1:
     ReboundConfig(cycles=args.rebound_cycles,max_rebound_seconds=args.rebound_max_seconds)
 elif args.rebound_max_seconds != .45:
     raise ValueError('Rebound interval requires multiple cycles')
+landing_options=None
+from studio.stability_options import defaults,validate
+_validation=defaults('backflip_native_ppo')
+_validation.update({k:getattr(args,k) for k in _validation if k.startswith('rebound_')})
+_validation.update(fixstand_roundtrip=args.fixstand_roundtrip,delayed_entry=args.delayed_entry)
+validate('backflip_native_ppo',_validation)
+if args.rebound_phase_version=='landing_v2':
+    landing_options=dict(landing_max_seconds=args.rebound_landing_max_seconds,
+        min_air_rotation=args.rebound_min_air_rotation,landing_upright_cos=args.rebound_landing_upright_cos,
+        target_rate_weight=args.rebound_target_rate_weight,target_rate_margin=args.rebound_target_rate_margin)
 source = args.source.resolve()
 entry = source / (args.entry + '.py')
 text = entry.read_text()
@@ -71,7 +87,7 @@ if args.fixstand_roundtrip:
         if text.count(required)!=1:raise RuntimeError('Pinned training entry changed: '+required)
     from skills.backflip.launcher_patch import configure_fixstand_source
     text=configure_fixstand_source(text,source,args.urdf_speed_limits,args.fast_safety_curriculum,
-        args.delayed_entry,args.entry_hold_scale,args.flip_direction,args.peak_contact_forces,reward_scales,args.rebound_cycles,args.rebound_max_seconds)
+        args.delayed_entry,args.entry_hold_scale,args.flip_direction,args.peak_contact_forces,reward_scales,args.rebound_cycles,args.rebound_max_seconds,args.rebound_phase_version,landing_options)
     if args.safety_start is not None:
         text=text.replace('agent_cfg = Go2BackflipPPORunnerCfg()',
             f'env_cfg.rewards.safety_curriculum_start={args.safety_start!r}\n    agent_cfg = Go2BackflipPPORunnerCfg()')
@@ -95,6 +111,9 @@ if args.fixstand_roundtrip:
         if args.rebound_cycles != 1:
             text=text.replace("action_parameterization='backflip_entry_v3'","action_parameterization='backflip_rebound_v1'").replace("action_parameterization='backflip_entry_v2'","action_parameterization='backflip_rebound_v1'")
             text=text.replace('episode_seconds=5.)',f'episode_seconds={3.+2.*args.rebound_cycles!r},rebound_cycles={args.rebound_cycles!r},rebound_max_seconds={args.rebound_max_seconds!r},phase_contract="contact_cycle_v1")')
+        if args.rebound_phase_version=='landing_v2':
+            text=text.replace("action_parameterization='backflip_rebound_v1'","action_parameterization='backflip_rebound_landing_v2'")
+            text=text.replace('phase_contract="contact_cycle_v1"',f'phase_contract="landing_cycle_v2",rebound_landing_options={landing_options!r}')
         if args.flip_direction=='front':
             text=text.replace("'backflip',actor_observations=60", "'frontflip',actor_observations=60,flip_direction='front'")
         if args.peak_contact_forces:
