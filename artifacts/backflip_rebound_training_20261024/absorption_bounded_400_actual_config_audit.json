@@ -1,0 +1,74 @@
+{
+  "job": "b82d79cda1c04538",
+  "baseline": "6c9c607e37cb448d",
+  "actual_env_differences": [
+    {
+      "path": "/rebound_landing_shaping",
+      "old": null,
+      "new": {
+        "version": "landing_absorption_v1",
+        "upright_weight": 5.0,
+        "height_weight": 2.0,
+        "phase": "LANDING",
+        "source_sha256": "7f38f9df0fdcc6704a3718a1befbb6dd12910d193dfe2d3b7ef1f72e8cdf783f"
+      }
+    }
+  ],
+  "validated_contract": {
+    "version": "backflip_rebound_landing_v2",
+    "settings": {
+      "cycles": 3,
+      "entry_seconds": 1.0,
+      "max_rebound_seconds": 0.45,
+      "takeoff_confirm_seconds": 0.02,
+      "landing_confirm_seconds": 0.01,
+      "min_airtime_seconds": 0.08,
+      "min_rotation": 5.5,
+      "max_rotation": 7.1,
+      "min_axis_dominance": 0.75,
+      "landing_max_seconds": 0.25,
+      "min_air_rotation": 3.141592653589793,
+      "inverted_cos": -0.5,
+      "landing_upright_cos": 0.9
+    },
+    "episode_seconds": 9.0,
+    "entry_hold_scale": 0.15,
+    "phase_contract": "landing_cycle_v2",
+    "training_physics_dt": 0.005,
+    "policy_dt": 0.02,
+    "execution_thresholds": {
+      "takeoff_start": 0.5,
+      "recovery_contact_force": 5.0,
+      "unsafe_body_contact_force": 100.0
+    },
+    "implementation_sha256": {
+      "rebound_landing.py": "fc34f4337c26b6dad98544359e0e160dee8569151a06b6cd7df3c14b77fd75eb",
+      "rebound_landing_task.py": "53ca49b8bd0e02f370a3d0f4ce766140542b13563778dac0aa2e38b6c6087120"
+    },
+    "target_rate_objective": {
+      "weight": 5.0,
+      "margin": 0.8,
+      "space": "mapped_clipped_sdk_actions"
+    },
+    "capability_verified": false,
+    "landing_shaping": {
+      "version": "landing_absorption_v1",
+      "upright_weight": 5.0,
+      "height_weight": 2.0,
+      "phase": "LANDING",
+      "source_sha256": "7f38f9df0fdcc6704a3718a1befbb6dd12910d193dfe2d3b7ef1f72e8cdf783f"
+    }
+  },
+  "latest_iteration": [
+    "Learning iteration 2278/2600 \u001b[0m                     "
+  ],
+  "agent_yaml_identical": false,
+  "agent_yaml_sha256": "2d5200c4a16c8adf7826835f4bddf8c65c99d0693e11db6fa759c9ac9901c5f9",
+  "agent_yaml_difference": {
+    "run_name": {
+      "old": "studio_6c9c607e37cb448d",
+      "new": "studio_b82d79cda1c04538"
+    }
+  },
+  "agent_training_parameters_identical": true
+}
