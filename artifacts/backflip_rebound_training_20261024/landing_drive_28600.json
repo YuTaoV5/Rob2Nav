@@ -1,0 +1,648 @@
+{
+  "args": {
+    "kind": "backflip_rebound",
+    "seed": 28600,
+    "physics_hz": 1000,
+    "initial_joint_noise": 0.002,
+    "initial_yaw_deg": 0.0,
+    "initial_state_sha256": null
+  },
+  "backend": "MuJoCo",
+  "role": "counterfactual rebound phase replay of a single-flip actor; not qualified",
+  "successes": 0,
+  "total": 1,
+  "episodes": [
+    {
+      "success": false,
+      "body_y_rotation_rad": -6.319304527558968,
+      "axis_dominance": 0.5542995778068722,
+      "airtime_s": 0.32000000000000023,
+      "max_height": 0.6211860672722815,
+      "terminal_upright": 0.9999984504655636,
+      "unexpected_body_ground_contact": true,
+      "max_joint_speed_ratio": 1.5588719521254029,
+      "max_joint_limit_excess_rad": 0.11736196129929066,
+      "expected_direction": "back",
+      "direction_pass": true,
+      "ground_contact_rule": "foot spheres and contact points inside their own anatomical foot region",
+      "ground_contact_rule_sha256": "803b0c9f2ee2d00129fc4550e25e05accc982f07768f42218261de9fa1c9d34f",
+      "rebound_motion": {
+        "motion_pass": false,
+        "scope": "independent per-physics-step flight/connection audit only",
+        "coverage_complete": true,
+        "samples": 9000,
+        "expected_samples": 9000,
+        "expected_cycles": 3,
+        "observed_flights": 5,
+        "flights": [
+          {
+            "start_s": 1.6469999999999294,
+            "end_s": 1.9659999999998943,
+            "samples": 320,
+            "pitch_rad": -3.6335733417345044,
+            "angular_travel_rad": 3.6362668767031163,
+            "duration_s": 0.32,
+            "axis_dominance": 0.9992592581733016,
+            "motion_pass": false
+          },
+          {
+            "start_s": 2.105999999999879,
+            "end_s": 2.1379999999998756,
+            "samples": 33,
+            "pitch_rad": -0.19824191243541497,
+            "angular_travel_rad": 0.20182335639188645,
+            "duration_s": 0.033,
+            "axis_dominance": 0.9822545615111202,
+            "motion_pass": false
+          },
+          {
+            "start_s": 2.18799999999987,
+            "end_s": 2.268999999999861,
+            "samples": 82,
+            "pitch_rad": 0.027492383547907968,
+            "angular_travel_rad": 0.3272151052079847,
+            "duration_s": 0.082,
+            "axis_dominance": 0.08401929834636833,
+            "motion_pass": false
+          },
+          {
+            "start_s": 2.6219999999998223,
+            "end_s": 2.6999999999998137,
+            "samples": 79,
+            "pitch_rad": -0.03414829987093394,
+            "angular_travel_rad": 0.14239078621103818,
+            "duration_s": 0.079,
+            "axis_dominance": 0.2398209938971933,
+            "motion_pass": false
+          },
+          {
+            "start_s": 3.250999999999753,
+            "end_s": 3.315999999999746,
+            "samples": 66,
+            "pitch_rad": 0.03579027205528787,
+            "angular_travel_rad": 0.1613802105337789,
+            "duration_s": 0.066,
+            "axis_dominance": 0.2217760897504624,
+            "motion_pass": false
+          }
+        ],
+        "connections": [
+          {
+            "contact_duration_s": 0.1389999999999848,
+            "confirmed_rebound_s": 0.1589999999999848,
+            "passed": true
+          },
+          {
+            "contact_duration_s": 0.04899999999999449,
+            "confirmed_rebound_s": 0.0689999999999945,
+            "passed": true
+          },
+          {
+            "contact_duration_s": 0.3519999999999611,
+            "confirmed_rebound_s": 0.37199999999996114,
+            "passed": true
+          },
+          {
+            "contact_duration_s": 0.5499999999999393,
+            "confirmed_rebound_s": 0.5699999999999393,
+            "passed": false
+          }
+        ],
+        "max_rebound_seconds": 0.45,
+        "unfinished_flight": false,
+        "unexpected_body_contact": true,
+        "hardware_qualified": false,
+        "duration_covered": true
+      },
+      "target_continuity": {
+        "passed": false,
+        "raw_target_slew_urdf_ratio": 3.6396160247219598,
+        "issued_target_slew_urdf_ratio": 0.8598726114650008,
+        "policy_calls": 450,
+        "first_target_checked_against_reset_pose": true
+      },
+      "entry_quiet": {
+        "passed": true,
+        "duration_s": 1.0,
+        "max_joint_speed_rad_s": 2.401242316070244,
+        "max_body_angular_speed_rad_s": 0.1675850086057189,
+        "max_target_step_rad": 0.0745401680469513,
+        "scope": "initial trained hold only, not full visual acceptance"
+      },
+      "execution_contract": {
+        "version": "backflip_rebound_v1",
+        "settings": {
+          "cycles": 3,
+          "entry_seconds": 1.0,
+          "max_rebound_seconds": 0.45,
+          "takeoff_confirm_seconds": 0.02,
+          "landing_confirm_seconds": 0.01,
+          "min_airtime_seconds": 0.08,
+          "min_rotation": 5.5,
+          "max_rotation": 7.1,
+          "min_axis_dominance": 0.75
+        },
+        "episode_seconds": 9.0,
+        "phase_contract": "contact_cycle_v1",
+        "entry_hold_scale": 0.15,
+        "implementation_sha256": {
+          "rebound.py": "aae4443b2abd9561a8b40776c1e04f96636f64af1a27caa3cfa53f85ecdb1ff3",
+          "rebound_task.py": "3ef3de10207f6dd5444c9bca501a88a8c59ea060ab308409180d2a6ce25f1d0d"
+        },
+        "capability_verified": false,
+        "counterfactual": true,
+        "execution_thresholds": {
+          "takeoff_start": 0.5,
+          "recovery_contact_force": 5.0,
+          "unsafe_body_contact_force": 100.0
+        },
+        "diagnostic_execution_override": {
+          "version": "landing_clock_candidate_v2",
+          "settings": {
+            "cycles": 3,
+            "entry_seconds": 1.0,
+            "max_rebound_seconds": 0.45,
+            "takeoff_confirm_seconds": 0.02,
+            "landing_confirm_seconds": 0.01,
+            "min_airtime_seconds": 0.08,
+            "min_rotation": 5.5,
+            "max_rotation": 7.1,
+            "min_axis_dominance": 0.75,
+            "landing_max_seconds": 0.25,
+            "min_air_rotation": 3.141592653589793,
+            "inverted_cos": -0.5,
+            "landing_upright_cos": 0.9
+          },
+          "controls_actor": true,
+          "training_contract_verified": false,
+          "source_sha256": {
+            "rebound_landing.py": "8ca1eaa71235ec9fb5ba14e782c9e49a3d36b05d7f55859b9b686e89936f4ed1",
+            "diagnose_landing_drive.py": "be9e545ba7db1202af72056850972b4f3db094c91b69691c25a9576bcc67b0c0"
+          }
+        }
+      },
+      "visual_review_complete": false,
+      "hardware_qualified": false,
+      "counterfactual_diagnostic": {
+        "parent_policy_sha256": "c8adf96a70cdb9e68f7aa7fe02271ae36908b6c8ab29ad967d03c73a58eaa82d",
+        "specification_yaml_sha256": "5fa93a05eddc0c5a6130594368055701dca4217664bb181f67ce48819f5ae424",
+        "intervention": "candidate landing-aware phase clock drives frozen single-flip actor",
+        "weights_changed": false,
+        "training_contract_verified": false,
+        "hardware_qualified": false
+      },
+      "landing_clock_diagnostic": {
+        "events": [
+          {
+            "time_s": 1.0010000000000006,
+            "phase": 1,
+            "completed": 0,
+            "upright": 0.9999597300149881,
+            "rebound_elapsed_s": 0.0,
+            "clock_before": 0.0009906754130497575,
+            "clock_after": 0.0009906754130497575
+          },
+          {
+            "time_s": 1.6659999999999273,
+            "phase": 2,
+            "completed": 0,
+            "upright": -0.3195261962050642,
+            "rebound_elapsed_s": 0.0,
+            "clock_before": 0.665985643863678,
+            "clock_after": 0.665985643863678
+          },
+          {
+            "time_s": 1.9669999999998942,
+            "phase": 6,
+            "completed": 0,
+            "upright": 0.5429517516926412,
+            "rebound_elapsed_s": 0.0010000000474974513,
+            "clock_before": 0.9669817686080933,
+            "clock_after": 0.9669817686080933
+          },
+          {
+            "time_s": 2.026999999999888,
+            "phase": 3,
+            "completed": 1,
+            "upright": 0.900272623664396,
+            "rebound_elapsed_s": 0.060999952256679535,
+            "clock_before": 1.0269825458526611,
+            "clock_after": 0.5
+          },
+          {
+            "time_s": 2.124999999999877,
+            "phase": 2,
+            "completed": 1,
+            "upright": 0.9856503454364683,
+            "rebound_elapsed_s": 0.15900014340877533,
+            "clock_before": 0.5979987382888794,
+            "clock_after": 0.5979987382888794
+          },
+          {
+            "time_s": 2.1389999999998754,
+            "phase": 6,
+            "completed": 1,
+            "upright": 0.9678886316567545,
+            "rebound_elapsed_s": 0.0010000000474974513,
+            "clock_before": 0.6119985580444336,
+            "clock_after": 0.6119985580444336
+          },
+          {
+            "time_s": 2.18799999999987,
+            "phase": 5,
+            "completed": 1,
+            "upright": 0.8807001138195807,
+            "rebound_elapsed_s": 0.04899997264146805,
+            "clock_before": 0.6609979271888733,
+            "clock_after": 0.6609979271888733
+          }
+        ],
+        "completed": 1,
+        "controls_actor": true,
+        "capability_verified": false,
+        "independent_v2_acceptance_implemented": false
+      },
+      "action_completed": false,
+      "fixstand": {
+        "passed": false,
+        "initial": {
+          "passed": false,
+          "samples": 35,
+          "stable_fraction": 0.0,
+          "max_pose_error_rad": 0.15459255152336682
+        },
+        "terminal": {
+          "passed": true,
+          "samples": 51,
+          "stable_fraction": 1.0,
+          "max_pose_error_rad": 0.08977202683179847
+        },
+        "pose_tolerance_rad": 0.12,
+        "max_joint_speed_rad_s": 1.0,
+        "minimum_upright_cos": 0.98,
+        "required_stable_fraction": 0.95,
+        "terminal_hold_s": 1.0,
+        "base_height_range_m": [
+          0.26,
+          0.4
+        ],
+        "minimum_foot_force_N": 4.0
+      }
+    }
+  ],
+  "metrics": {
+    "body_y_rotation_rad": -6.319304527558968,
+    "axis_dominance": 0.5542995778068722,
+    "airtime_s": 0.32000000000000023,
+    "max_height": 0.6211860672722815,
+    "terminal_upright": 0.9999984504655636,
+    "unexpected_body_ground_contact": true,
+    "max_joint_speed_ratio": 1.5588719521254029,
+    "max_joint_limit_excess_rad": 0.11736196129929066,
+    "expected_direction": "back",
+    "direction_pass": true,
+    "ground_contact_rule": "foot spheres and contact points inside their own anatomical foot region",
+    "ground_contact_rule_sha256": "803b0c9f2ee2d00129fc4550e25e05accc982f07768f42218261de9fa1c9d34f",
+    "rebound_motion": {
+      "motion_pass": false,
+      "scope": "independent per-physics-step flight/connection audit only",
+      "coverage_complete": true,
+      "samples": 9000,
+      "expected_samples": 9000,
+      "expected_cycles": 3,
+      "observed_flights": 5,
+      "flights": [
+        {
+          "start_s": 1.6469999999999294,
+          "end_s": 1.9659999999998943,
+          "samples": 320,
+          "pitch_rad": -3.6335733417345044,
+          "angular_travel_rad": 3.6362668767031163,
+          "duration_s": 0.32,
+          "axis_dominance": 0.9992592581733016,
+          "motion_pass": false
+        },
+        {
+          "start_s": 2.105999999999879,
+          "end_s": 2.1379999999998756,
+          "samples": 33,
+          "pitch_rad": -0.19824191243541497,
+          "angular_travel_rad": 0.20182335639188645,
+          "duration_s": 0.033,
+          "axis_dominance": 0.9822545615111202,
+          "motion_pass": false
+        },
+        {
+          "start_s": 2.18799999999987,
+          "end_s": 2.268999999999861,
+          "samples": 82,
+          "pitch_rad": 0.027492383547907968,
+          "angular_travel_rad": 0.3272151052079847,
+          "duration_s": 0.082,
+          "axis_dominance": 0.08401929834636833,
+          "motion_pass": false
+        },
+        {
+          "start_s": 2.6219999999998223,
+          "end_s": 2.6999999999998137,
+          "samples": 79,
+          "pitch_rad": -0.03414829987093394,
+          "angular_travel_rad": 0.14239078621103818,
+          "duration_s": 0.079,
+          "axis_dominance": 0.2398209938971933,
+          "motion_pass": false
+        },
+        {
+          "start_s": 3.250999999999753,
+          "end_s": 3.315999999999746,
+          "samples": 66,
+          "pitch_rad": 0.03579027205528787,
+          "angular_travel_rad": 0.1613802105337789,
+          "duration_s": 0.066,
+          "axis_dominance": 0.2217760897504624,
+          "motion_pass": false
+        }
+      ],
+      "connections": [
+        {
+          "contact_duration_s": 0.1389999999999848,
+          "confirmed_rebound_s": 0.1589999999999848,
+          "passed": true
+        },
+        {
+          "contact_duration_s": 0.04899999999999449,
+          "confirmed_rebound_s": 0.0689999999999945,
+          "passed": true
+        },
+        {
+          "contact_duration_s": 0.3519999999999611,
+          "confirmed_rebound_s": 0.37199999999996114,
+          "passed": true
+        },
+        {
+          "contact_duration_s": 0.5499999999999393,
+          "confirmed_rebound_s": 0.5699999999999393,
+          "passed": false
+        }
+      ],
+      "max_rebound_seconds": 0.45,
+      "unfinished_flight": false,
+      "unexpected_body_contact": true,
+      "hardware_qualified": false,
+      "duration_covered": true
+    },
+    "target_continuity": {
+      "passed": false,
+      "raw_target_slew_urdf_ratio": 3.6396160247219598,
+      "issued_target_slew_urdf_ratio": 0.8598726114650008,
+      "policy_calls": 450,
+      "first_target_checked_against_reset_pose": true
+    },
+    "entry_quiet": {
+      "passed": true,
+      "duration_s": 1.0,
+      "max_joint_speed_rad_s": 2.401242316070244,
+      "max_body_angular_speed_rad_s": 0.1675850086057189,
+      "max_target_step_rad": 0.0745401680469513,
+      "scope": "initial trained hold only, not full visual acceptance"
+    },
+    "execution_contract": {
+      "version": "backflip_rebound_v1",
+      "settings": {
+        "cycles": 3,
+        "entry_seconds": 1.0,
+        "max_rebound_seconds": 0.45,
+        "takeoff_confirm_seconds": 0.02,
+        "landing_confirm_seconds": 0.01,
+        "min_airtime_seconds": 0.08,
+        "min_rotation": 5.5,
+        "max_rotation": 7.1,
+        "min_axis_dominance": 0.75
+      },
+      "episode_seconds": 9.0,
+      "phase_contract": "contact_cycle_v1",
+      "entry_hold_scale": 0.15,
+      "implementation_sha256": {
+        "rebound.py": "aae4443b2abd9561a8b40776c1e04f96636f64af1a27caa3cfa53f85ecdb1ff3",
+        "rebound_task.py": "3ef3de10207f6dd5444c9bca501a88a8c59ea060ab308409180d2a6ce25f1d0d"
+      },
+      "capability_verified": false,
+      "counterfactual": true,
+      "execution_thresholds": {
+        "takeoff_start": 0.5,
+        "recovery_contact_force": 5.0,
+        "unsafe_body_contact_force": 100.0
+      },
+      "diagnostic_execution_override": {
+        "version": "landing_clock_candidate_v2",
+        "settings": {
+          "cycles": 3,
+          "entry_seconds": 1.0,
+          "max_rebound_seconds": 0.45,
+          "takeoff_confirm_seconds": 0.02,
+          "landing_confirm_seconds": 0.01,
+          "min_airtime_seconds": 0.08,
+          "min_rotation": 5.5,
+          "max_rotation": 7.1,
+          "min_axis_dominance": 0.75,
+          "landing_max_seconds": 0.25,
+          "min_air_rotation": 3.141592653589793,
+          "inverted_cos": -0.5,
+          "landing_upright_cos": 0.9
+        },
+        "controls_actor": true,
+        "training_contract_verified": false,
+        "source_sha256": {
+          "rebound_landing.py": "8ca1eaa71235ec9fb5ba14e782c9e49a3d36b05d7f55859b9b686e89936f4ed1",
+          "diagnose_landing_drive.py": "be9e545ba7db1202af72056850972b4f3db094c91b69691c25a9576bcc67b0c0"
+        }
+      }
+    },
+    "visual_review_complete": false,
+    "hardware_qualified": false,
+    "counterfactual_diagnostic": {
+      "parent_policy_sha256": "c8adf96a70cdb9e68f7aa7fe02271ae36908b6c8ab29ad967d03c73a58eaa82d",
+      "specification_yaml_sha256": "5fa93a05eddc0c5a6130594368055701dca4217664bb181f67ce48819f5ae424",
+      "intervention": "candidate landing-aware phase clock drives frozen single-flip actor",
+      "weights_changed": false,
+      "training_contract_verified": false,
+      "hardware_qualified": false
+    },
+    "landing_clock_diagnostic": {
+      "events": [
+        {
+          "time_s": 1.0010000000000006,
+          "phase": 1,
+          "completed": 0,
+          "upright": 0.9999597300149881,
+          "rebound_elapsed_s": 0.0,
+          "clock_before": 0.0009906754130497575,
+          "clock_after": 0.0009906754130497575
+        },
+        {
+          "time_s": 1.6659999999999273,
+          "phase": 2,
+          "completed": 0,
+          "upright": -0.3195261962050642,
+          "rebound_elapsed_s": 0.0,
+          "clock_before": 0.665985643863678,
+          "clock_after": 0.665985643863678
+        },
+        {
+          "time_s": 1.9669999999998942,
+          "phase": 6,
+          "completed": 0,
+          "upright": 0.5429517516926412,
+          "rebound_elapsed_s": 0.0010000000474974513,
+          "clock_before": 0.9669817686080933,
+          "clock_after": 0.9669817686080933
+        },
+        {
+          "time_s": 2.026999999999888,
+          "phase": 3,
+          "completed": 1,
+          "upright": 0.900272623664396,
+          "rebound_elapsed_s": 0.060999952256679535,
+          "clock_before": 1.0269825458526611,
+          "clock_after": 0.5
+        },
+        {
+          "time_s": 2.124999999999877,
+          "phase": 2,
+          "completed": 1,
+          "upright": 0.9856503454364683,
+          "rebound_elapsed_s": 0.15900014340877533,
+          "clock_before": 0.5979987382888794,
+          "clock_after": 0.5979987382888794
+        },
+        {
+          "time_s": 2.1389999999998754,
+          "phase": 6,
+          "completed": 1,
+          "upright": 0.9678886316567545,
+          "rebound_elapsed_s": 0.0010000000474974513,
+          "clock_before": 0.6119985580444336,
+          "clock_after": 0.6119985580444336
+        },
+        {
+          "time_s": 2.18799999999987,
+          "phase": 5,
+          "completed": 1,
+          "upright": 0.8807001138195807,
+          "rebound_elapsed_s": 0.04899997264146805,
+          "clock_before": 0.6609979271888733,
+          "clock_after": 0.6609979271888733
+        }
+      ],
+      "completed": 1,
+      "controls_actor": true,
+      "capability_verified": false,
+      "independent_v2_acceptance_implemented": false
+    },
+    "action_completed": false,
+    "fixstand": {
+      "passed": false,
+      "initial": {
+        "passed": false,
+        "samples": 35,
+        "stable_fraction": 0.0,
+        "max_pose_error_rad": 0.15459255152336682
+      },
+      "terminal": {
+        "passed": true,
+        "samples": 51,
+        "stable_fraction": 1.0,
+        "max_pose_error_rad": 0.08977202683179847
+      },
+      "pose_tolerance_rad": 0.12,
+      "max_joint_speed_rad_s": 1.0,
+      "minimum_upright_cos": 0.98,
+      "required_stable_fraction": 0.95,
+      "terminal_hold_s": 1.0,
+      "base_height_range_m": [
+        0.26,
+        0.4
+      ],
+      "minimum_foot_force_N": 4.0
+    }
+  },
+  "policy_sha256": "c8adf96a70cdb9e68f7aa7fe02271ae36908b6c8ab29ad967d03c73a58eaa82d",
+  "source_commit": "954aa61ceb62c515689677f44a21e32109f6b62d",
+  "source_sha256": "f1f5a621008cbbef5490744649bbe25acd6fdfb91a6b67eea47d3eaf456e54c1",
+  "entry_hold_diagnostic": null,
+  "trained_execution_contract": false,
+  "evaluator_sha256": "190a32eef0317e1340320c8439b8e292e8011b1d9b021ef90d510dedd70e3350",
+  "policy_hz": 50,
+  "physics_hz": 1000,
+  "joint_names": [
+    "FL_hip_joint",
+    "FL_thigh_joint",
+    "FL_calf_joint",
+    "FR_hip_joint",
+    "FR_thigh_joint",
+    "FR_calf_joint",
+    "RL_hip_joint",
+    "RL_thigh_joint",
+    "RL_calf_joint",
+    "RR_hip_joint",
+    "RR_thigh_joint",
+    "RR_calf_joint"
+  ],
+  "physical_resets": 1,
+  "root_state_writes": "initialization only; no in-flight reset/stabilizing force",
+  "hardware_constraints_pass": false,
+  "hardware_connected": false,
+  "control_contract": {
+    "schema_version": 1,
+    "joint_names": [
+      "FL_hip_joint",
+      "FL_thigh_joint",
+      "FL_calf_joint",
+      "FR_hip_joint",
+      "FR_thigh_joint",
+      "FR_calf_joint",
+      "RL_hip_joint",
+      "RL_thigh_joint",
+      "RL_calf_joint",
+      "RR_hip_joint",
+      "RR_thigh_joint",
+      "RR_calf_joint"
+    ],
+    "action_scale": 0.5,
+    "action_clip": 8.0,
+    "stiffness": 40.0,
+    "damping": 1.0,
+    "motor_velocity_x1": 13.5,
+    "motor_torque_y1": 20.2,
+    "motor_torque_y2": 23.4,
+    "joint_velocity_limits": [
+      30.1,
+      30.1,
+      15.7,
+      30.1,
+      30.1,
+      15.7,
+      30.1,
+      30.1,
+      15.7,
+      30.1,
+      30.1,
+      15.7
+    ],
+    "target_velocity_limits": [
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5,
+      13.5
+    ]
+  },
+  "control_parameter_source": "exported_training_config"
+}
