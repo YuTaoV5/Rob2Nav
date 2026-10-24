@@ -1,0 +1,13 @@
+{
+  "evaluator_baseline_sha256": "20325879641d43287efc25fa9b629b4adc663995b26f6ecc79209737ba57a8b6",
+  "replacements": [
+    [
+      "if opt.get('rebound_cycles',1)!=1 and config.auto_evaluate:",
+      "if opt.get('rebound_cycles',1)!=1 and config.auto_evaluate and opt.get('rebound_phase_version')!='landing_v2':"
+    ],
+    [
+      "    if opt.get('rebound_cycles',1)!=1:raise ValueError('Single-flip evaluator cannot certify a rebound sequence')",
+      "    if opt.get('rebound_cycles',1)!=1:\n        if opt.get('rebound_phase_version')!='landing_v2':raise ValueError('Legacy rebound requires its explicit evaluation pipeline')\n        kinds[rid]='backflip_landing'"
+    ]
+  ]
+}
