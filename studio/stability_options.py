@@ -70,6 +70,8 @@ SCHEMAS['backflip_native_ppo']['rebound_min_air_rotation'] = field('v2纯腾空�
 SCHEMAS['backflip_native_ppo']['rebound_landing_upright_cos'] = field('v2落地确认朝上余弦',.9,.1,1.)
 SCHEMAS['backflip_native_ppo']['rebound_target_rate_weight'] = field('v2映射目标速率惩罚权重',0.,0.,100.)
 SCHEMAS['backflip_native_ppo']['rebound_target_rate_margin'] = field('v2映射目标速率惩罚起点/URDF限速',.8,.1,1.)
+SCHEMAS['backflip_native_ppo']['rebound_absorption_upright_weight'] = field('中间落地直立奖励（仅吸收阶段）',0.,0.,100.)
+SCHEMAS['backflip_native_ppo']['rebound_absorption_height_weight'] = field('中间落地高度奖励（不要求停稳）',0.,0.,100.)
 SCHEMAS['sideflip_native_ppo']['boundary_terminal_hip_taper_frames']['help']='0保留有界学习补偿；2–50帧将末段髋残差衰减到0。参考归零不保证实测站姿归零，必须独立验收。'
 for _rid in ('sideflip_native_ppo','backflip_native_ppo','frontflip_native_ppo'):
     SCHEMAS[_rid]['evaluation_seed_start']=field('独立四种子验收起点（自动评估时使用）',20000,0,2147483644)
@@ -135,7 +137,7 @@ def validate(rid, options):
             if not .01 < o['rebound_landing_max_seconds'] <= o['rebound_max_seconds']:
                 raise ValueError('Landing absorption must fit inside rebound budget')
         elif any(o[k]!=defaults(rid)[k] for k in ('rebound_landing_max_seconds','rebound_min_air_rotation',
-                 'rebound_landing_upright_cos','rebound_target_rate_weight','rebound_target_rate_margin')):
+                 'rebound_landing_upright_cos','rebound_target_rate_weight','rebound_target_rate_margin','rebound_absorption_upright_weight','rebound_absorption_height_weight')):
             raise ValueError('Landing/target-rate options require landing_v2')
         if o['rebound_cycles'] != 1 and not (o['fixstand_roundtrip'] and o['delayed_entry']):
             raise ValueError('Rebound training requires delayed FIXSTAND entry')

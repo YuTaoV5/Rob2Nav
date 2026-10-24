@@ -31,6 +31,8 @@ parser.add_argument('--rebound-min-air-rotation',type=float,default=3.1415926535
 parser.add_argument('--rebound-landing-upright-cos',type=float,default=.9)
 parser.add_argument('--rebound-target-rate-weight',type=float,default=0.)
 parser.add_argument('--rebound-target-rate-margin',type=float,default=.8)
+parser.add_argument('--rebound-absorption-upright-weight',type=float,default=0.)
+parser.add_argument('--rebound-absorption-height-weight',type=float,default=0.)
 args, rest = parser.parse_known_args()
 from skills.backflip.reward_options import parse_scales
 reward_scales=parse_scales(args.reward_scales_json)
@@ -60,6 +62,9 @@ if args.rebound_phase_version=='landing_v2':
     landing_options=dict(landing_max_seconds=args.rebound_landing_max_seconds,
         min_air_rotation=args.rebound_min_air_rotation,landing_upright_cos=args.rebound_landing_upright_cos,
         target_rate_weight=args.rebound_target_rate_weight,target_rate_margin=args.rebound_target_rate_margin)
+    if args.rebound_absorption_upright_weight or args.rebound_absorption_height_weight:
+        landing_options.update(absorption_upright_weight=args.rebound_absorption_upright_weight,
+                               absorption_height_weight=args.rebound_absorption_height_weight)
 source = args.source.resolve()
 entry = source / (args.entry + '.py')
 text = entry.read_text()

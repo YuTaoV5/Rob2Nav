@@ -42,6 +42,12 @@ def validate_landing_contract(env, contract):
     options=dict(landing_max_seconds=settings.landing_max_seconds,
         min_air_rotation=settings.min_air_rotation,landing_upright_cos=settings.landing_upright_cos,
         target_rate_weight=weight,target_rate_margin=margin)
+    shaping=env.get('rebound_landing_shaping')
+    if shaping is not None:
+        from .landing_shaping import metadata
+        expected=metadata(shaping.get('upright_weight'),shaping.get('height_weight'))
+        if shaping!=expected:raise ValueError('Landing shaping source/config mismatch')
+        options.update(absorption_upright_weight=shaping['upright_weight'],absorption_height_weight=shaping['height_weight'])
     if contract.get('rebound_landing_options') != options:
         raise ValueError('Landing/objective metadata disagrees with actual training')
     duration = 3. + 2. * settings.cycles
@@ -71,8 +77,10 @@ def validate_landing_contract(env, contract):
     hashes = implementation_hashes()
     if env.get('rebound_implementation_sha256') != hashes:
         raise ValueError('Rebound implementation differs from recorded training code')
-    return dict(version=VERSION, settings=raw, episode_seconds=duration,
+    result = dict(version=VERSION, settings=raw, episode_seconds=duration,
                 entry_hold_scale=hold, phase_contract='landing_cycle_v2',
                 training_physics_dt=dt, policy_dt=.02, execution_thresholds=timing, implementation_sha256=hashes,
                 target_rate_objective=dict(weight=weight,margin=margin,space="mapped_clipped_sdk_actions"),
                 capability_verified=False)
+    if shaping is not None:result['landing_shaping']=shaping
+    return result

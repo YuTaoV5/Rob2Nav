@@ -28,8 +28,16 @@ def configure_fixstand_source(text,source,urdf_speed_limits=False,fast_safety_cu
             block.extend(['from skills.backflip.rebound_task import configure as configure_rebound',
                           f'configure_rebound(env_cfg,{rebound_cycles!r},{rebound_max_seconds!r})'])
         elif rebound_phase_version=='landing_v2':
+            options=dict(rebound_landing_options or {})
+            upright=options.pop('absorption_upright_weight',0.)
+            height=options.pop('absorption_height_weight',0.)
             block.extend(['from skills.backflip.rebound_landing_task import configure as configure_rebound',
-                          f'configure_rebound(env_cfg,{rebound_cycles!r},{rebound_max_seconds!r},**{rebound_landing_options or {}!r})'])
+                          f'configure_rebound(env_cfg,{rebound_cycles!r},{rebound_max_seconds!r},**{options!r})'])
+            if upright or height:
+                from .landing_shaping import metadata
+                metadata(upright,height)
+                block.extend(['from skills.backflip.landing_shaping import configure as configure_landing_shaping',
+                              f'configure_landing_shaping(env_cfg,{upright!r},{height!r})'])
         else:raise ValueError('Unknown rebound phase version')
     if reward_scales:
         from .reward_options import parse_scales
