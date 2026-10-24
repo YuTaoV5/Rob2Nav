@@ -6,7 +6,7 @@ JOINT_NAMES=tuple(f'{leg}_{joint}_joint' for leg in ('FL','FR','RL','RR') for jo
 
 
 def validate_entry_contract(env,contract):
-    if contract and contract.get('action_parameterization')=='backflip_rebound_v1':
+    if contract and str(contract.get('action_parameterization','')).startswith('backflip_rebound_'):
         raise ValueError('Rebound actor requires its own phase-aware exporter and evaluator; single-flip export is forbidden')
     if contract and contract.get('action_parameterization') in ('backflip_entry_v2','backflip_entry_v3'):
         if env.get('episode_length_s')!=5. or env.get('entry_delay_seconds')!=1.:

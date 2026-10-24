@@ -11,14 +11,18 @@ from rob2nav.export_actor import ConfigLoader
 from .control import control_contract,validate_entry_contract
 
 
-def export(checkpoint,output,*,rebound=False):
+def export(checkpoint,output,*,rebound=False,landing=False):
+    if rebound and landing:raise ValueError("Choose exactly one rebound contract")
     checkpoint=Path(checkpoint);output=Path(output)
     cfg=yaml.safe_load((checkpoint.parent/'params/agent.yaml').read_text())
     if cfg['policy']['activation']!='elu':raise ValueError('Expected reviewed ELU architecture')
     contract=json.loads((checkpoint.parent/'fixstand.json').read_text()) if (checkpoint.parent/'fixstand.json').exists() else None
     env=yaml.load((checkpoint.parent/'params/env.yaml').read_text(),Loader=ConfigLoader)
     rebound_contract=None
-    if rebound:
+    if landing:
+        from .landing_contract import validate_landing_contract
+        rebound_contract=validate_landing_contract(env,contract)
+    elif rebound:
         from .rebound_contract import validate_rebound_contract
         rebound_contract=validate_rebound_contract(env,contract)
     else:

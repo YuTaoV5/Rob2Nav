@@ -58,7 +58,7 @@ def main(extension=None):
         from .control import configure_playback
         controller=configure_playback(module,exported['control_contract'])
     contract=exported.get('fixstand_roundtrip') or {}
-    if contract.get('action_parameterization')=='backflip_rebound_v1' and extension is None:
+    if str(contract.get('action_parameterization','')).startswith('backflip_rebound_') and extension is None:
         raise ValueError('This is the single-flip evaluator; rebound requires contact-cycle execution and per-cycle acceptance')
     if a.direction!=contract.get('flip_direction','back'):raise ValueError('Requested direction does not match the trained actor contract')
     delayed=contract.get('action_parameterization') in ('backflip_entry_v2','backflip_entry_v3')
