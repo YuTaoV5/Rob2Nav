@@ -52,10 +52,14 @@ def validate_rebound_contract(env, contract):
         raise ValueError('Rebound contacts must be sampled every physics step')
     if env.get('control', {}).get('action_clip') != 8.:
         raise ValueError('Rebound parent action clip must remain 8')
+    rewards=env.get('rewards',{})
+    timing={key:rewards.get(key) for key in ('takeoff_start','recovery_contact_force','unsafe_body_contact_force')}
+    if any(type(v) not in (int,float) or not math.isfinite(v) or v<=0 for v in timing.values()):
+        raise ValueError('Actual contact thresholds and cycle launch phase required')
     hashes = implementation_hashes()
     if env.get('rebound_implementation_sha256') != hashes:
         raise ValueError('Rebound implementation differs from recorded training code')
     return dict(version=VERSION, settings=raw, episode_seconds=duration,
                 entry_hold_scale=hold, phase_contract='contact_cycle_v1',
-                training_physics_dt=dt, policy_dt=.02, implementation_sha256=hashes,
+                training_physics_dt=dt, policy_dt=.02, execution_thresholds=timing, implementation_sha256=hashes,
                 capability_verified=False)

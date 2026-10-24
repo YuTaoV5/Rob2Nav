@@ -9,6 +9,7 @@ def inputs():
     env=dict(rebound=asdict(ReboundConfig()), episode_length_s=9., entry_delay_seconds=1.,
              entry_hold_scale=.15, sim={'dt':.005}, decimation=4,
              contact_sensor={'update_period':.005}, control={'action_clip':8.},
+             rewards={'takeoff_start':.5,'recovery_contact_force':5.,'unsafe_body_contact_force':5.},
              rebound_implementation_sha256=implementation_hashes())
     contract=dict(action_parameterization='backflip_rebound_v1', phase_contract='contact_cycle_v1',
                   actor_observations=60, rebound_cycles=3, rebound_max_seconds=.45,

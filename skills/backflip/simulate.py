@@ -17,7 +17,7 @@ from rob2nav.mujoco_skill import assert_physics_step
 PIN='954aa61ceb62c515689677f44a21e32109f6b62d'
 
 
-def main():
+def main(extension=None):
     p=argparse.ArgumentParser()
     p.add_argument('--source',required=True,type=Path)
     p.add_argument('--onnx',required=True,type=Path)
@@ -58,12 +58,13 @@ def main():
         from .control import configure_playback
         controller=configure_playback(module,exported['control_contract'])
     contract=exported.get('fixstand_roundtrip') or {}
-    if contract.get('action_parameterization')=='backflip_rebound_v1':
+    if contract.get('action_parameterization')=='backflip_rebound_v1' and extension is None:
         raise ValueError('This is the single-flip evaluator; rebound requires contact-cycle execution and per-cycle acceptance')
     if a.direction!=contract.get('flip_direction','back'):raise ValueError('Requested direction does not match the trained actor contract')
     delayed=contract.get('action_parameterization') in ('backflip_entry_v2','backflip_entry_v3')
     if a.entry_hold_diagnostic is not None and (not delayed or not 0.<=a.entry_hold_diagnostic<=.4):
         raise ValueError('Entry counterfactual requires delayed-entry playback and [0,.4]')
+    if extension is not None:extension.configure(module,exported,a)
     entry_policy_trace=[]
     if delayed:
         if hashlib.sha256(policy.read_bytes()).hexdigest()!=exported['policy_sha256']:
@@ -120,6 +121,7 @@ def main():
     def step(model,data,*args,**kwargs):
         nonlocal rotation,angular_travel,max_speed,max_excess,air,max_air,bad,minimum_up,max_height,writer,renderer,next_trace,next_frame,ground_reader
         before_step=float(data.time)
+        if extension is not None:extension.before_step()
         result=original_step(model,data,*args,**kwargs)
         assert_physics_step(data,before_step,model.opt.timestep)
         qids,dids=module.joint_addresses(model)
@@ -136,6 +138,7 @@ def main():
         contact_frame=ground_reader.sample(data);contacts=contact_frame.bodies;foot_forces=contact_frame.forces
         air=0. if contacts else air+model.opt.timestep;max_air=max(max_air,air)
         bad|=bool(contact_frame.unexpected)
+        if extension is not None:extension.sample(model,data,contact_frame,qids,dids)
         up=float(data.xmat[model.body('base').id].reshape(3,3)[2,2]);minimum_up=min(minimum_up,up);max_height=max(max_height,float(data.qpos[2]))
         if data.time>=next_trace:
             trace.append(dict(time=float(data.time),position=data.qpos[:3].tolist(),quaternion=data.qpos[3:7].tolist(),
@@ -173,12 +176,16 @@ def main():
     metrics.update(expected_direction=a.direction,direction_pass=direction_pass)
     metrics['ground_contact_rule']='foot spheres and contact points inside their own anatomical foot region'
     metrics['ground_contact_rule_sha256']=ground_reader.rule_sha256
+    if extension is not None:
+        extra=extension.report()
+        metrics.update(extra)
+        success=bool(extra['rebound_motion']['motion_pass'] and extra['target_continuity']['passed'] and extra['entry_quiet']['passed'] and max_speed<=1. and max_excess<=.001 and not bad)
     if a.fixstand_roundtrip:
         from rob2nav.fixstand_validation import assess
-        metrics['action_completed']=bool(success);metrics['fixstand']=assess(trace,initial_end=.8 if delayed else .35)
+        metrics['action_completed']=bool(success);metrics['fixstand']=assess(trace,initial_end=.8 if delayed or extension is not None else .35)
         success=bool(success and metrics['fixstand']['passed'])
     if entry_policy_trace:(a.output/'entry_policy_trace.json').write_text(json.dumps(entry_policy_trace,indent=2)+'\n')
-    summary=dict(args=dict(kind=a.direction+'flip',seed=a.seed,physics_hz=a.physics_hz,initial_joint_noise=a.initial_joint_noise,initial_yaw_deg=a.initial_yaw_deg,
+    summary=dict(args=dict(kind='backflip_rebound' if extension is not None else a.direction+'flip',seed=a.seed,physics_hz=a.physics_hz,initial_joint_noise=a.initial_joint_noise,initial_yaw_deg=a.initial_yaw_deg,
         initial_state_sha256=hashlib.sha256(a.initial_state.read_bytes()).hexdigest() if a.initial_state else None),backend='MuJoCo',
         role='locally trained Go2 '+a.direction+'flip; pinned native observation/controller',successes=int(success),total=1,episodes=[dict(success=success,**metrics)],metrics=metrics,
         policy_sha256=hashlib.sha256(policy.read_bytes()).hexdigest(),source_commit=PIN,source_sha256=hashlib.sha256(file.read_bytes()).hexdigest(),
