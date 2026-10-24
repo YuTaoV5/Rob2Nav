@@ -65,6 +65,8 @@ def main():
     from .atomic_validation import JointConstraintValidation
     from .core import FREE_SPEED
     joint_constraints=JointConstraintValidation(model,SDK_JOINTS,FREE_SPEED)
+    from .command_validation import CommandRateValidation
+    command_constraints=CommandRateValidation(SDK_JOINTS,FREE_SPEED)
     from rob2nav.ground_contacts import GroundContactValidation
     ground_constraints=GroundContactValidation(model)
     backflip_checks=[];check=None;check_epoch=None
@@ -123,6 +125,7 @@ def main():
             if c.phase=='ACTIVE' and complete and current_id==sequence[-1]:
                 passed=True;reason='all requested profiles committed and settled';break
             command=runtime.step(s,t)
+            command_constraints.sample(t,command.qref)
             native=c.phase=='ACTIVE' and c.active and c.active.actuation=='native_pd'
             if native and c.active.observation=='backflip60' and c.epoch!=check_epoch:
                 from .atomic_validation import BackflipValidation
@@ -195,10 +198,12 @@ def main():
         report['backflip_validation_complete']=len(atomic_reports)==expected_backflips
         whole=joint_constraints.report(len(samples)*round(.002/model.opt.timestep))
         report['whole_sequence_joint_constraints']=whole
+        issued=command_constraints.report(len(samples))
+        report['whole_sequence_command_continuity']=issued
         ground=ground_constraints.report(len(samples)*round(.002/model.opt.timestep))
         report['whole_sequence_ground_contacts']=ground
         report['maximum_joint_speed_ratio']=max(maximum_speed_ratio,whole['max_joint_speed_ratio'])
-        report['passed']=bool(report['passed'] and whole['passed'] and ground['passed'] and maximum_speed_ratio<=1. and report['backflip_validation_complete'] and all(item['passed'] for item in atomic_reports))
+        report['passed']=bool(report['passed'] and issued['passed'] and whole['passed'] and ground['passed'] and maximum_speed_ratio<=1. and report['backflip_validation_complete'] and all(item['passed'] for item in atomic_reports))
         if passed and not report['passed']:report['reason']='strict atomic/joint/ground-contact acceptance failed; inspect complete reports'
         for index,item in enumerate(backflip_checks):
             (a.output/f'backflip_{index}_trace.json').write_text(json.dumps(item.trace)+'\n')
