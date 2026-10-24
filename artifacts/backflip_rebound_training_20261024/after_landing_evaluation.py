@@ -48,6 +48,17 @@ def verify(run):
                 scope='runtime/configuration checked, motion qualification is not required for a bounded episode probe')
 
 
+def read_live_state(path, attempts=5):
+    """Retry only transient partial JSON reads; never retry job creation."""
+    for attempt in range(attempts):
+        try:
+            return json.loads(path.read_text()) if path.exists() else {}
+        except json.JSONDecodeError:
+            if attempt == attempts - 1:
+                raise
+            time.sleep(0.2)
+
+
 def main():
     base=ROOT/'outputs/landing_episode_queue_20261024';base.mkdir(exist_ok=True)
     lock=(base/'lock').open('w');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
@@ -63,7 +74,7 @@ def main():
             if job['state'] not in ('draft','queued','preflight','running','succeeded'):
                 raise RuntimeError('Configuration smoke terminated: '+job['state'])
             wait_state=ROOT/'outputs/landing_after_smoke_20261024/state.json'
-            evaluation=json.loads(wait_state.read_text()) if wait_state.exists() else {}
+            evaluation=read_live_state(wait_state)
             if evaluation.get('stage')=='failed':raise RuntimeError('Existing evaluator failed: '+str(evaluation.get('error')))
             if job['state']=='succeeded' and evaluation.get('stage')=='completed':break
             record(stage='waiting',training_state=job['state'],evaluation_stage=evaluation.get('stage'))

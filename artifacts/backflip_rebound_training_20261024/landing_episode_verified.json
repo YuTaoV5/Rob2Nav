@@ -1,0 +1,43 @@
+{
+  "actual_contract": {
+    "version": "backflip_rebound_landing_v2",
+    "settings": {
+      "cycles": 3,
+      "entry_seconds": 1.0,
+      "max_rebound_seconds": 0.45,
+      "takeoff_confirm_seconds": 0.02,
+      "landing_confirm_seconds": 0.01,
+      "min_airtime_seconds": 0.08,
+      "min_rotation": 5.5,
+      "max_rotation": 7.1,
+      "min_axis_dominance": 0.75,
+      "landing_max_seconds": 0.25,
+      "min_air_rotation": 3.141592653589793,
+      "inverted_cos": -0.5,
+      "landing_upright_cos": 0.9
+    },
+    "episode_seconds": 9.0,
+    "entry_hold_scale": 0.15,
+    "phase_contract": "landing_cycle_v2",
+    "training_physics_dt": 0.005,
+    "policy_dt": 0.02,
+    "execution_thresholds": {
+      "takeoff_start": 0.5,
+      "recovery_contact_force": 5.0,
+      "unsafe_body_contact_force": 100.0
+    },
+    "implementation_sha256": {
+      "rebound_landing.py": "fc34f4337c26b6dad98544359e0e160dee8569151a06b6cd7df3c14b77fd75eb",
+      "rebound_landing_task.py": "53ca49b8bd0e02f370a3d0f4ce766140542b13563778dac0aa2e38b6c6087120"
+    },
+    "target_rate_objective": {
+      "weight": 5.0,
+      "margin": 0.8,
+      "space": "mapped_clipped_sdk_actions"
+    },
+    "capability_verified": false
+  },
+  "evaluation_status": "not_accepted",
+  "policy_sha256": "f23ecc6f1897f1cfb09d5dd9e5853999875a24b4ff01126f805f8f3960f82b48",
+  "scope": "runtime/configuration checked, motion qualification is not required for a bounded episode probe"
+}
