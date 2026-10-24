@@ -99,3 +99,31 @@ def test_install_preserves_original_update_and_rejects_duplicate():
     assert calls == [1] and losses["ppo"] == 7. and updater.steps == 1
     assert "teacher_retention_mse" in losses
     with pytest.raises(ValueError, match="already installed"): install(runner, updater)
+
+
+def test_web_defaults_and_teacher_cli():
+    from studio.stability_options import defaults, validate, arguments
+    rid='backflip_native_ppo'
+    options=defaults(rid)
+    validate(rid,options)
+    assert not any('teacher' in arg for arg in arguments(rid,options))
+    options.update(fixstand_roundtrip=True,delayed_entry=True,rebound_cycles=3,rebound_phase_version='landing_v2',
+        rebound_teacher_weight=1.,rebound_teacher_data='artifacts/reference',rebound_teacher_manifest_sha256='a'*64)
+    validate(rid,options)
+    args=arguments(rid,options)
+    assert args[args.index('--rebound-teacher-weight')+1]=='1.0'
+    assert args[args.index('--rebound-teacher-data')+1]=='artifacts/reference'
+    for path in ['/tmp/data','../data','C:/data']:
+        with pytest.raises(ValueError):validate(rid,{**options,'rebound_teacher_data':path})
+    with pytest.raises(ValueError):validate(rid,{**options,'rebound_phase_version':'legacy_v1'})
+    with pytest.raises(ValueError):validate(rid,{**options,'rebound_teacher_manifest_sha256':'wrong'})
+
+
+def test_web_preflight_uses_pinned_reference():
+    from studio.recipe_training import teacher_path
+    config=SimpleNamespace(recipe_id='backflip_native_ppo',recipe_options=dict(
+        rebound_teacher_weight=1.,rebound_teacher_data=str(REFERENCE.relative_to(REFERENCE.parents[2])),
+        rebound_teacher_manifest_sha256=hashlib.sha256((REFERENCE/'manifest.json').read_bytes()).hexdigest()))
+    assert teacher_path(config,REFERENCE.parents[2])==REFERENCE
+    config.recipe_options['rebound_teacher_manifest_sha256']='0'*64
+    with pytest.raises(ValueError,match='manifest hash'):teacher_path(config,REFERENCE.parents[2])

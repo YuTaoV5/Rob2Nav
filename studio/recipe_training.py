@@ -51,10 +51,24 @@ def motion_path(config, root):
     return path
 
 
+def teacher_path(config, root):
+    opt=options_for(config)
+    if not opt.get('rebound_teacher_weight'):return None
+    root=Path(root).resolve()
+    path=(root/opt['rebound_teacher_data']).resolve()
+    if not path.is_dir() or not any(path.is_relative_to(root/folder) for folder in ('outputs','artifacts','skills')):
+        raise ValueError('Teacher data must be an existing project artifact directory')
+    from skills.backflip.teacher_data import load_reference
+    load_reference(path,opt['rebound_teacher_manifest_sha256'])
+    return path
+
+
 def prerequisites(config, root):
     root = Path(root)
     rid = config.recipe_id
     required = []
+    try:teacher_path(config,root)
+    except (ValueError,OSError,KeyError) as exc:return [str(exc)]
     if rid == 'navigation_ppo':
         required = [root / 'skills/navigation/config.json', root / 'vendor/RoboGauge']
     elif rid in ('sideflip_native_ppo', 'upright_walk_ppo', 'backflip_native_ppo', 'frontflip_native_ppo'):
@@ -102,6 +116,7 @@ def recipe_command(config, root, output, isaac_python, mujoco_python=None):
         raise ValueError('Training output must be inside Studio runs')
     rid = config.recipe_id; opt = options_for(config)
     validate_options(rid, config.recipe_options)
+    teacher_path(config,root)
     if opt.get('rebound_cycles',1)!=1 and config.auto_evaluate and opt.get('rebound_phase_version')!='landing_v2':
         raise ValueError('Continuous rebound evaluator is not connected yet; only explicit training smoke with auto_evaluate=false is supported')
     if config.auto_evaluate and 'evaluation_seed_start' in opt and opt['evaluation_seed_start']<=config.seed<opt['evaluation_seed_start']+4:

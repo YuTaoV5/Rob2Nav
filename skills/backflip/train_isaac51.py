@@ -33,6 +33,11 @@ parser.add_argument('--rebound-target-rate-weight',type=float,default=0.)
 parser.add_argument('--rebound-target-rate-margin',type=float,default=.8)
 parser.add_argument('--rebound-absorption-upright-weight',type=float,default=0.)
 parser.add_argument('--rebound-absorption-height-weight',type=float,default=0.)
+parser.add_argument('--rebound-teacher-data',default='')
+parser.add_argument('--rebound-teacher-manifest-sha256',default='')
+parser.add_argument('--rebound-teacher-weight',type=float,default=0.)
+parser.add_argument('--rebound-teacher-learning-rate',type=float,default=.00001)
+parser.add_argument('--rebound-teacher-batch-size',type=int,default=128)
 args, rest = parser.parse_known_args()
 from skills.backflip.reward_options import parse_scales
 reward_scales=parse_scales(args.reward_scales_json)
@@ -103,6 +108,19 @@ if args.fixstand_roundtrip:
     if args.initial_std is not None:
         text=text.replace('agent_cfg = Go2BackflipPPORunnerCfg()',f'agent_cfg = Go2BackflipPPORunnerCfg()\n    agent_cfg.policy.init_noise_std={args.initial_std!r}')
     text=text.replace('init_at_random_ep_len=True','init_at_random_ep_len=False')
+    if args.rebound_teacher_weight:
+        if not args.fixstand_output:raise ValueError('Teacher retention needs recorded FIXSTAND output')
+        from skills.backflip.teacher_data import load_reference
+        teacher_path=(ROOT/args.rebound_teacher_data).resolve()
+        if not any(teacher_path.is_relative_to(ROOT/folder) for folder in ('outputs','artifacts','skills')):
+            raise ValueError('Teacher directory outside project artifacts')
+        load_reference(teacher_path,args.rebound_teacher_manifest_sha256)
+        settings=dict(directory=str(teacher_path),manifest_sha256=args.rebound_teacher_manifest_sha256,
+            weight=args.rebound_teacher_weight,learning_rate=args.rebound_teacher_learning_rate,
+            batch_size=args.rebound_teacher_batch_size,hold_scale=args.entry_hold_scale)
+        needle='runner.learn(agent_cfg.max_iterations, init_at_random_ep_len=False)'
+        if text.count(needle)!=1:raise RuntimeError('Pinned learning entry changed')
+        text=text.replace(needle,f'from skills.backflip.teacher_retention import configure_runner\n    configure_runner(runner,log_dir,seed=agent_cfg.seed,**{settings!r})\n    '+needle)
     text=text.replace('runner.learn(agent_cfg.max_iterations, init_at_random_ep_len=False)',
         'runner.learn(agent_cfg.max_iterations, init_at_random_ep_len=False)\n    from skills.fixstand import write_completion\n    write_completion(log_dir,agent_cfg.max_iterations)')
     if args.fixstand_output:

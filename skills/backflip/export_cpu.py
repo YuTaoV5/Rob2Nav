@@ -18,6 +18,17 @@ def export(checkpoint,output,*,rebound=False,landing=False):
     if cfg['policy']['activation']!='elu':raise ValueError('Expected reviewed ELU architecture')
     contract=json.loads((checkpoint.parent/'fixstand.json').read_text()) if (checkpoint.parent/'fixstand.json').exists() else None
     env=yaml.load((checkpoint.parent/'params/env.yaml').read_text(),Loader=ConfigLoader)
+    teacher_record=None
+    teacher_path=checkpoint.parent/'teacher_retention.json'
+    teacher_hash=(contract or {}).get('teacher_retention_sha256')
+    if teacher_path.exists() or teacher_hash:
+        payload=teacher_path.read_bytes()
+        if hashlib.sha256(payload).hexdigest()!=teacher_hash:raise ValueError('Teacher training record mismatch')
+        teacher_record=json.loads(payload)
+        manifest=(checkpoint.parent/'teacher_manifest.json').read_bytes()
+        if hashlib.sha256(manifest).hexdigest()!=teacher_record['manifest_sha256']:
+            raise ValueError('Teacher manifest differs from actual training record')
+        if teacher_record['version']!='actor_retention_sgd_v1':raise ValueError('Unknown teacher training version')
     rebound_contract=None
     if landing:
         from .landing_contract import validate_landing_contract
@@ -54,7 +65,7 @@ def export(checkpoint,output,*,rebound=False,landing=False):
         policy_sha256=hashlib.sha256((output/'policy.onnx').read_bytes()).hexdigest(),actor_input_dim=60,
         actor_output_dim=12,onnx_max_error=error,fixstand_roundtrip=contract,control_contract=controller,
         reward_scale_overrides=env.get('reward_scale_overrides',{}),actual_reward_scales=env['rewards']['scales'],
-        entry_training_contract_verified=True,rebound_contract=rebound_contract,capability_verified=False),indent=2)+'\n')
+        entry_training_contract_verified=True,rebound_contract=rebound_contract,teacher_retention=teacher_record,capability_verified=False),indent=2)+'\n')
 
 
 if __name__=='__main__':

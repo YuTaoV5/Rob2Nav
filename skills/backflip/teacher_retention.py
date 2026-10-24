@@ -12,38 +12,7 @@ import torch
 from skills.fixstand import backflip_entry_weight
 
 
-def load_reference(directory, manifest_sha256):
-    directory=Path(directory)
-    payload=(directory/'manifest.json').read_bytes()
-    if len(manifest_sha256)!=64 or hashlib.sha256(payload).hexdigest()!=manifest_sha256:
-        raise ValueError('Teacher manifest hash mismatch')
-    meta=json.loads(payload)
-    if meta.get('version')!='first_flip_retention_data_v1' or meta.get('action_space')!='raw actor before entry mapping and clipping':
-        raise ValueError('Unknown teacher observation/action semantics')
-    data_path=directory/'samples.npz'
-    if hashlib.sha256(data_path.read_bytes()).hexdigest()!=meta.get('samples_sha256'):
-        raise ValueError('Teacher data hash mismatch')
-    with np.load(data_path,allow_pickle=False) as saved:
-        data={k:saved[k].copy() for k in ('observations','raw_actions','policy_time','seed')}
-    n=meta.get('samples')
-    if type(n) is not int or n<1 or data['observations'].shape!=(n,60) or data['raw_actions'].shape!=(n,12) or data['policy_time'].shape!=(n,) or data['seed'].shape!=(n,):
-        raise ValueError('Teacher shape mismatch')
-    if not all(np.isfinite(v).all() for v in data.values()):raise ValueError('Nonfinite teacher data')
-    if (data['policy_time']<0).any() or (data['policy_time']>2.1).any():raise ValueError('Teacher includes unsupported/terminal time')
-    absorption=meta.get('absorption_seconds')
-    if type(absorption) not in (int,float) or not math.isfinite(absorption) or not 0<=absorption<=.06:
-        raise ValueError('Invalid teacher absorption window')
-    if not meta.get('sources'):raise ValueError('Missing teacher sources')
-    if len(set(s['seed'] for s in meta['sources']))!=len(meta['sources']):raise ValueError('Duplicate teacher seeds')
-    if set(data['seed'].tolist())!={s['seed'] for s in meta['sources']}:raise ValueError('Teacher source mismatch')
-    for s in meta['sources']:
-        contact=s.get('first_contact_trace_s');cutoff=s.get('cutoff_s')
-        if type(contact) not in (int,float) or type(cutoff) not in (int,float) or not math.isfinite(contact) or not math.isfinite(cutoff) or contact<1 or abs(cutoff-contact-absorption)>1e-9:
-            raise ValueError('Teacher contact cutoff mismatch')
-        t=data['policy_time'][data['seed']==s['seed']]
-        if len(t)!=s['retained'] or not np.allclose(t,np.arange(len(t))*.02,rtol=0,atol=1e-9) or (t>s['cutoff_s']+1e-9).any():
-            raise ValueError('Teacher time coverage mismatch')
-    return data,meta
+from .teacher_data import load_reference
 
 
 def mapped_targets(raw,time,hold_scale,action_scale,action_clip):
@@ -95,3 +64,31 @@ def install(runner,updater):
         if not isinstance(losses,dict):raise ValueError('Unsupported PPO loss result')
         return {**losses,**updater.step()}
     runner.alg.update=update;runner._teacher_retention_installed=True
+
+
+def configure_runner(runner, log_dir, *, directory, manifest_sha256, seed, **settings):
+    """New run sampler resets explicitly; does not promise exact resume."""
+    import yaml
+    from rob2nav.export_actor import ConfigLoader
+    from .landing_contract import validate_landing_contract
+    log_dir=Path(log_dir)
+    env=yaml.load((log_dir/'params/env.yaml').read_text(),Loader=ConfigLoader)
+    contract=json.loads((log_dir/'fixstand.json').read_text())
+    validate_landing_contract(env,contract)
+    if env['control']['action_scale']!=.5 or env['control']['action_clip']!=8. or contract.get('entry_hold_scale')!=settings['hold_scale']:
+        raise ValueError('Teacher mapping differs from actual training contract')
+    data, meta=load_reference(directory,manifest_sha256)
+    updater=RetentionUpdater(runner.alg.policy.actor,data,seed=seed,**settings)
+    install(runner,updater)
+    log_dir=Path(log_dir)
+    record=dict(version='actor_retention_sgd_v1',algorithm='one actor-only SGD step after each PPO update',
+        manifest_sha256=manifest_sha256,samples_sha256=meta['samples_sha256'],
+        teacher_policy_sha256=meta['teacher_policy_sha256'],samples=meta['samples'],
+        sampler_seed=seed,sampler_resume='reset on each new training invocation; not bitwise resume',
+        max_grad_norm=1.,action_scale=.5,action_clip=8.,**settings)
+    (log_dir/'teacher_retention.json').write_text(json.dumps(record,indent=2)+'\n')
+    contract['teacher_retention_sha256']=hashlib.sha256((log_dir/'teacher_retention.json').read_bytes()).hexdigest()
+    (log_dir/'fixstand.json').write_text(json.dumps(contract,indent=2)+'\n')
+    (log_dir/'teacher_manifest.json').write_bytes((Path(directory)/'manifest.json').read_bytes())
+    print('[Rob2Nav] Actor retention configured: '+json.dumps(record),flush=True)
+    return updater

@@ -72,6 +72,14 @@ SCHEMAS['backflip_native_ppo']['rebound_target_rate_weight'] = field('v2映射�
 SCHEMAS['backflip_native_ppo']['rebound_target_rate_margin'] = field('v2映射目标速率惩罚起点/URDF限速',.8,.1,1.)
 SCHEMAS['backflip_native_ppo']['rebound_absorption_upright_weight'] = field('中间落地直立奖励（仅吸收阶段）',0.,0.,100.)
 SCHEMAS['backflip_native_ppo']['rebound_absorption_height_weight'] = field('中间落地高度奖励（不要求停稳）',0.,0.,100.)
+for _key, _field in {
+    'data': field('首翻保留数据目录（项目相对路径）',''),
+    'manifest_sha256': field('首翻保留 manifest SHA256',''),
+    'weight': field('首翻保留权重（0关闭）',0.,0.,100.),
+    'learning_rate': field('首翻保留独立SGD学习率',.00001,.000000001,.001),
+    'batch_size': field('首翻保留每轮采样数',128,1,4096),
+}.items():
+    SCHEMAS['backflip_native_ppo']['rebound_teacher_'+_key]=_field
 SCHEMAS['sideflip_native_ppo']['boundary_terminal_hip_taper_frames']['help']='0保留有界学习补偿；2–50帧将末段髋残差衰减到0。参考归零不保证实测站姿归零，必须独立验收。'
 for _rid in ('sideflip_native_ppo','backflip_native_ppo','frontflip_native_ppo'):
     SCHEMAS[_rid]['evaluation_seed_start']=field('独立四种子验收起点（自动评估时使用）',20000,0,2147483644)
@@ -131,6 +139,18 @@ def validate(rid, options):
         for key in ('finetune_learning_rate', 'initial_std'):
             requires(key, o['fixstand_roundtrip'])
     if rid == 'backflip_native_ppo':
+        if o['rebound_teacher_weight']:
+            if o['rebound_phase_version']!='landing_v2' or not o['fixstand_roundtrip'] or not o['delayed_entry']:
+                raise ValueError('Teacher retention requires delayed FIXSTAND landing_v2')
+            from pathlib import PurePosixPath, PureWindowsPath
+            value=o['rebound_teacher_data']
+            if not value or PurePosixPath(value).is_absolute() or PureWindowsPath(value).is_absolute() or '..' in value.replace('\\','/').split('/'):
+                raise ValueError('Teacher data must be a project relative directory')
+            digest=o['rebound_teacher_manifest_sha256']
+            if len(digest)!=64 or any(c not in '0123456789abcdef' for c in digest):
+                raise ValueError('Teacher manifest requires lowercase SHA256')
+        elif o['rebound_teacher_data'] or o['rebound_teacher_manifest_sha256']:
+            raise ValueError('Teacher data requires nonzero retention weight')
         if o['rebound_phase_version']=='landing_v2':
             if o['rebound_cycles']==1:raise ValueError('Landing v2 requires multiple cycles')
             # Studio runs without torch; retain the same cross-field bound here.
@@ -151,6 +171,7 @@ def arguments(rid, options):
     result = []
     for key, f in SCHEMAS.get(rid, {}).items():
         value = options[key]
+        if key.startswith('rebound_teacher_') and not options.get('rebound_teacher_weight'):continue
         if key.startswith('rebound_') and options.get('rebound_cycles',1)==1:continue
         if key.startswith('rebound_') and key not in ('rebound_cycles','rebound_max_seconds') and options.get('rebound_phase_version','legacy_v1')=='legacy_v1':continue
         if key == 'motion':
