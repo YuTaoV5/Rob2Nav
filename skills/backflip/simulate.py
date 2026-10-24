@@ -184,12 +184,13 @@ def main(extension=None):
         from rob2nav.fixstand_validation import assess
         metrics['action_completed']=bool(success);metrics['fixstand']=assess(trace,initial_end=.8 if delayed or extension is not None else .35)
         success=bool(success and metrics['fixstand']['passed'])
+    if getattr(extension,'counterfactual',False):success=False
     if entry_policy_trace:(a.output/'entry_policy_trace.json').write_text(json.dumps(entry_policy_trace,indent=2)+'\n')
     summary=dict(args=dict(kind='backflip_rebound' if extension is not None else a.direction+'flip',seed=a.seed,physics_hz=a.physics_hz,initial_joint_noise=a.initial_joint_noise,initial_yaw_deg=a.initial_yaw_deg,
         initial_state_sha256=hashlib.sha256(a.initial_state.read_bytes()).hexdigest() if a.initial_state else None),backend='MuJoCo',
-        role='locally trained Go2 '+a.direction+'flip; pinned native observation/controller',successes=int(success),total=1,episodes=[dict(success=success,**metrics)],metrics=metrics,
+        role='counterfactual rebound phase replay of a single-flip actor; not qualified' if getattr(extension,'counterfactual',False) else 'locally trained Go2 '+a.direction+'flip; pinned native observation/controller',successes=int(success),total=1,episodes=[dict(success=success,**metrics)],metrics=metrics,
         policy_sha256=hashlib.sha256(policy.read_bytes()).hexdigest(),source_commit=PIN,source_sha256=hashlib.sha256(file.read_bytes()).hexdigest(),
-        entry_hold_diagnostic=a.entry_hold_diagnostic,trained_execution_contract=a.entry_hold_diagnostic is None,
+        entry_hold_diagnostic=a.entry_hold_diagnostic,trained_execution_contract=a.entry_hold_diagnostic is None and not getattr(extension,'counterfactual',False),
         evaluator_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),policy_hz=50,physics_hz=a.physics_hz,
         joint_names=list(module.JOINT_NAMES),physical_resets=resets,root_state_writes='initialization only; no in-flight reset/stabilizing force',
         hardware_constraints_pass=max_speed<=1. and max_excess<=.001,hardware_connected=False,
