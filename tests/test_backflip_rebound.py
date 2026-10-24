@@ -46,6 +46,35 @@ class ReboundTests(unittest.TestCase):
         self.sample(True)
         self.assertEqual(self.s.phase[0].item(), self.s.FAILED)
 
+    def test_ground_rotation_cannot_substitute_for_airborne_flip(self):
+        self.sample(True)
+        self.sample(True, -6.28, n=100)
+        self.sample(False, 0., n=10)
+        self.sample(True)
+        self.assertEqual(self.s.completed[0].item(), 0)
+        self.assertEqual(self.s.phase[0].item(), self.s.FAILED)
+
+    def test_substep_contact_confirmation_and_budget_keep_quantization(self):
+        self.s = ReboundPhases(2, .003, ReboundConfig(entry_seconds=.003))
+        self.sample(True)
+        self.sample(False, -6.28, n=334)
+        self.sample(True, n=3)
+        self.assertEqual(self.s.completed[0].item(), 0)
+        self.sample(True)
+        self.assertEqual(self.s.completed[0].item(), 1)
+        self.assertAlmostEqual(self.s.rebound_time[0].item(), .012, places=6)
+        self.sample(True, n=147)
+        self.assertEqual(self.s.phase[0].item(), self.s.FAILED)
+
+    def test_contact_chatter_cannot_sum_short_airtime(self):
+        self.s = ReboundPhases(2, .001, ReboundConfig(entry_seconds=.001))
+        self.sample(True)
+        for _ in range(10):
+            self.sample(False, -70., n=10)
+            self.sample(True)
+        self.sample(True, n=12)
+        self.assertEqual(self.s.completed[0].item(), 0)
+
     def test_body_contact_sticky_and_partial_reset(self):
         self.sample(True, body=True)
         self.flip()

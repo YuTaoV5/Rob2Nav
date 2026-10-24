@@ -81,7 +81,11 @@ class ReboundPhases:
         airborne = moving & ~foot_contact
         self.air = torch.where(airborne, self.air + self.dt, 0.)
         self.max_air = torch.maximum(self.max_air, self.air)
-        integrate = moving & (self.contact == 0)
+        # Count rotation in flight only; grounded turning cannot earn a flip.
+        unconfirmed_contact = ((self.phase == self.PUSH) | (self.phase == self.REBOUND)) & foot_contact
+        self.angle[unconfirmed_contact] = 0.
+        self.travel[unconfirmed_contact] = 0.
+        integrate = airborne
         self.angle += torch.where(integrate, -body_omega[:, 1] * self.dt, 0.)
         self.travel += torch.where(integrate, torch.linalg.vector_norm(body_omega, dim=-1) * self.dt, 0.)
         # Start the rebound budget at first landing contact, including confirmation.
@@ -106,8 +110,9 @@ class ReboundPhases:
         self.just_landed[:] = accepted
         self.phase[accepted] = self.REBOUND
         self.phase[accepted & (self.completed == self.cfg.cycles)] = self.RECOVERY
+        confirmed_contact_duration = self.contact.clone()
         for name in ('angle', 'travel', 'air', 'max_air', 'contact'):
             getattr(self, name)[accepted] = 0.
         # Retain just the current contact-confirmation interval as next rebound budget.
-        self.rebound_time[accepted] = self.cfg.landing_confirm_seconds
+        self.rebound_time[accepted] = confirmed_contact_duration[accepted]
         return self.phase
