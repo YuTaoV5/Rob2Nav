@@ -101,6 +101,33 @@ class DeploymentCoreTests(unittest.TestCase):
         c.tick(state(.004,2),.004)
         self.assertEqual(c.phase,'WARMUP')
 
+    def test_repeated_backflip_compact_requires_explicit_simulation_opt_in(self):
+        flip=skill('backflip60',observation='backflip60',atomic=True)
+        c=SwitchController(compact_transitions=True)
+        c.active=flip;c.pending=flip
+        self.assertFalse(c.compact_entry_allowed())
+        c=SwitchController(compact_transitions=True,simulation_repeat_compact=True)
+        c.active=flip;c.pending=flip
+        self.assertTrue(c.compact_entry_allowed())
+        c.pending=dataclasses.replace(flip,kd=(2.,)*12)
+        self.assertFalse(c.compact_entry_allowed())
+        c.pending=flip;c.compact_transitions=False
+        self.assertFalse(c.compact_entry_allowed())
+        c=SwitchController(hardware=True,compact_transitions=True,simulation_repeat_compact=True)
+        c.active=flip;c.pending=flip
+        self.assertFalse(c.compact_entry_allowed())
+
+    def test_repeat_compact_still_waits_for_finish_and_measured_stability(self):
+        for finished,feet,expected in [(False,np.ones(4)*35,'ACTIVE'),
+                                       (True,np.zeros(4),'ACTIVE'),
+                                       (True,np.ones(4)*35,'ENTRY')]:
+            c=SwitchController(compact_transitions=True,simulation_repeat_compact=True)
+            c.arm(state(),0);c.phase='ACTIVE';c.phase_at=-8.;c.stable_since=-1.
+            c.active=skill('backflip60',observation='backflip60',atomic=True)
+            c.pending=c.active;c.servo.kp[:]=30;c.servo.kd[:]=1.5
+            c.tick(state(.002,1,feet=feet),.002,Intent(0,.002,NEUTRAL,finished=finished))
+            self.assertEqual(c.phase,expected)
+
     def test_compact_routes_remain_disabled_for_hardware(self):
         self.assertFalse(SwitchController(hardware=True,compact_transitions=True).compact_transitions)
 

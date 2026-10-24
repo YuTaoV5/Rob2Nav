@@ -24,8 +24,8 @@ class Prepared:
 
 
 class UnifiedRuntime:
-    def __init__(self,root,hardware=False,allow_research_stunts=False,approval=None,compact_transitions=True,qualified_compact_pairs=()):
-        self.root=Path(root).resolve();self.controller=SwitchController(hardware,compact_transitions,qualified_compact_pairs)
+    def __init__(self,root,hardware=False,allow_research_stunts=False,approval=None,compact_transitions=True,qualified_compact_pairs=(),simulation_repeat_compact=False):
+        self.root=Path(root).resolve();self.controller=SwitchController(hardware,compact_transitions,qualified_compact_pairs,simulation_repeat_compact)
         self.executor=ThreadPoolExecutor(max_workers=1,thread_name_prefix='policy-staging')
         self.future=None;self.active=None;self.next=None;self.queued=None;self.stage_error=None;self.started=0.;self.prepared=[]
         self.model_history={}

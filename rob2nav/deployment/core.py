@@ -93,8 +93,9 @@ class Servo:
 
 class SwitchController:
     """Two-phase skill activation. Atomic skills cannot be interrupted by a switch."""
-    def __init__(self,hardware=False,compact_transitions=False,qualified_compact_pairs=()):
+    def __init__(self,hardware=False,compact_transitions=False,qualified_compact_pairs=(),simulation_repeat_compact=False):
         self.hardware=hardware;self.phase='OFF';self.active=None;self.pending=None;self.epoch=0
+        self.simulation_repeat_compact=bool(simulation_repeat_compact and not hardware)
         self.qualified_compact_pairs=frozenset(tuple(pair) for pair in qualified_compact_pairs)
         self.compact_transitions=bool(compact_transitions and (not hardware or self.qualified_compact_pairs))
         self.entry_duration=2.;self.entry_fallback=False
@@ -137,6 +138,10 @@ class SwitchController:
         if self.hardware:
             return (self.compact_transitions and self.active is not None and self.pending is not None and
                 (self.active.digest(),self.pending.digest()) in self.qualified_compact_pairs)
+        if (self.simulation_repeat_compact and self.compact_transitions and self.active is not None
+                and self.pending is not None and self.active.atomic
+                and self.active.observation=='backflip60' and self.active.digest()==self.pending.digest()):
+            return True
         supported={'stand','walk_moe','sideflip69'}
         return (self.compact_transitions and self.pending is not None and self.pending.id in supported
                 and (self.active is None or self.active.id in supported))

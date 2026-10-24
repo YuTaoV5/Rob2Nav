@@ -19,6 +19,7 @@ def main():
     p.add_argument('--seed',type=int,default=9201);p.add_argument('--video',action='store_true')
     p.add_argument('--video-fps',type=int,choices=[10,25,50],default=25)
     p.add_argument('--video-distance',type=float,default=2.4)
+    p.add_argument('--experimental-compact-backflip-repeat',action='store_true',help='Opt-in simulation-only identical-contract repeat; not hardware qualification')
     p.add_argument('--legacy-transitions',action='store_true',help='Compare against mandatory neutral/2s entry transitions')
     p.add_argument('--sequence',type=Path,help='Use the same state-driven sequence component as the device service')
     p.add_argument('--progress',type=Path,help='Publish read-only sequence timing for the live UI')
@@ -54,7 +55,7 @@ def main():
     aids=np.array([int(np.where(model.actuator_trnid[:,0]==i)[0][0]) for i in ids])
     from .observer import KinematicObserver
     observer=KinematicObserver(model);foot_ids=observer.feet;floor=model.geom('floor').id
-    start_time=float(data.time);runtime=UnifiedRuntime(root,allow_research_stunts=a.atomic_cycle,compact_transitions=not a.legacy_transitions);samples=[];events=[];requests=[];video=None;video_renderer=None;video_clock=None
+    start_time=float(data.time);runtime=UnifiedRuntime(root,allow_research_stunts=a.atomic_cycle,compact_transitions=not a.legacy_transitions,simulation_repeat_compact=a.experimental_compact_backflip_repeat);samples=[];events=[];requests=[];video=None;video_renderer=None;video_clock=None
     sequence=['stand','walk_moe','sideflip69','walk_moe','stand'] if a.atomic_cycle else ['stand_soft','stand_stiff','walk_mlp','walk_moe','stand'];requested=0;last_active=None;active_since=0.
     choreography=None
     if a.sequence:
@@ -192,6 +193,7 @@ def main():
         if a.asset=='source':report['model_xml_sha256']=hashlib.sha256(source_model.read_bytes()).hexdigest()
         trace=np.asarray(samples)
         report['compact_transitions']=not a.legacy_transitions
+        report['experimental_compact_backflip_repeat']=a.experimental_compact_backflip_repeat
         atomic_reports=[item.report() for item in backflip_checks]
         expected_backflips=sum(runtime.profile(step.skill)[1].observation=='backflip60' for step in choreography.steps) if choreography else 0
         report['backflip_validation']=atomic_reports
