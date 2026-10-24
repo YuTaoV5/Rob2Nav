@@ -44,7 +44,7 @@ SCHEMAS = {
         'reset_std': field('重设策略噪声（0保留）', 0., 0., 1.),
     },
     'backflip_native_ppo': {**COMMON,
-        'reward_scales_json': field('前后翻奖励权重JSON（如 {"lin_vel_z":60}）', '{}'),
+        'reward_scales_json': field('前后翻奖励权重JSON（前翻可用 ang_vel_x 抑制横滚，默认0）', '{}'),
         'peak_contact_forces': field('物理子步接触峰值', False),
         'flip_direction': field('空翻方向', 'back', choices=['back', 'front']),
         'delayed_entry': field('稳定承重后进入动作', False),

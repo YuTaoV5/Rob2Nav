@@ -18,6 +18,11 @@ def adapt_method(name,text):
     return text.replace(old,new)
 
 
+def roll_rate_penalty(self):
+    """Non-target body roll rate; positive magnitude, use a negative weight."""
+    return abs(self._robot.data.root_ang_vel_b[:, 0])
+
+
 def configure(cfg,source):
     from isaaclab_backflip.tasks.go2_backflip.go2_backflip_env import Go2BackflipEnv
     source=Path(source);file=Path(inspect.getfile(Go2BackflipEnv)).resolve()
@@ -31,6 +36,8 @@ def configure(cfg,source):
         exec(compile(code,'<rob2nav-positive-pitch-task>','exec'),scope)
         setattr(Go2BackflipEnv,name,scope[name])
     Go2BackflipEnv._rob2nav_forward_rotation=True
+    Go2BackflipEnv._reward_ang_vel_x=roll_rate_penalty
+    cfg.rewards.scales.setdefault('ang_vel_x',0.0)
     cfg.flip_direction='front'
     cfg.frontflip_reward_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     cfg.frontflip_base_sha256=hashlib.sha256(pristine).hexdigest()
