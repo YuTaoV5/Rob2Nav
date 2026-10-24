@@ -7,6 +7,13 @@ from rob2nav.rebound_validation import ContinuousFlipAudit
 
 
 class ReboundEvaluation:
+    runtime_type=ReboundPlaybackState
+
+    def create_audit(self,dt,c):
+        return ContinuousFlipAudit(dt,cycles=c['cycles'],max_rebound_seconds=c['max_rebound_seconds'],
+            takeoff_confirm_seconds=c['takeoff_confirm_seconds'],min_airtime_seconds=c['min_airtime_seconds'],
+            min_rotation=c['min_rotation'],max_rotation=c['max_rotation'],min_axis_dominance=c['min_axis_dominance'])
+
     def configure(self, module, exported, args):
         contract=exported.get('rebound_contract')
         if not contract:raise ValueError('Audited rebound export required')
@@ -18,11 +25,9 @@ class ReboundEvaluation:
             raise ValueError('Rebound rollout must cover its full trained episode')
         args.fixstand_roundtrip=True
         self.module=module;self.args=args;self.contract=contract
-        self.runtime=ReboundPlaybackState(contract,module.SIM_DT)
+        self.runtime=self.runtime_type(contract,module.SIM_DT)
         c=contract['settings']
-        self.audit=ContinuousFlipAudit(module.SIM_DT,cycles=c['cycles'],max_rebound_seconds=c['max_rebound_seconds'],
-            takeoff_confirm_seconds=c['takeoff_confirm_seconds'],min_airtime_seconds=c['min_airtime_seconds'],
-            min_rotation=c['min_rotation'],max_rotation=c['max_rotation'],min_axis_dominance=c['min_axis_dominance'])
+        self.audit=self.create_audit(module.SIM_DT,c)
         self.velocity=np.asarray(exported['control_contract']['joint_velocity_limits'])
         self.previous=np.zeros(12);self.applied=np.zeros(12);self.slew=np.zeros(12)
         self.last_target=module.DEFAULT_DOF_POS.copy()
