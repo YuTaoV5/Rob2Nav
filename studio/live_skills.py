@@ -31,6 +31,7 @@ class Composition(BaseModel):
     steps:list[CompositionStep]=Field(min_length=2,max_length=8)
     cycles:int=Field(default=1,ge=1,le=4)
     research_stunts:bool=False
+    compact_backflip_repeat:bool=False
 
 
 class Camera(BaseModel):
@@ -132,6 +133,8 @@ def mount_live_skills(app,root,python):
             if raw['trigger']!=bool(profiles[raw['skill']].get('atomic')):raise HTTPException(422,'原子技能需要显式触发，普通技能不能触发')
             try:Step(**raw).checked()
             except (ValueError,TypeError) as exc:raise HTTPException(422,f'第 {index+1} 步 {raw["skill"]}：{exc}') from exc
+        if a.compact_backflip_repeat and not any(x['skill']==y['skill']=='backflip60' for x,y in zip(steps,steps[1:])):
+            raise HTTPException(422,'短过渡需要相邻的重复后翻步骤')
         budget=min(1800.,max(30.,sum(s['seconds'] for s in steps)+len(steps)*8+15))
         with lock:
             stop();key=uuid.uuid4().hex[:12];out=root/'outputs/live_skills'/key
@@ -139,10 +142,11 @@ def mount_live_skills(app,root,python):
             sequence=out/'sequence.json';sequence.write_text(json.dumps({'steps':steps},ensure_ascii=False))
             args=['--root',str(root),'--output',str(out/'evaluation'),'--asset','source','--sequence',str(sequence),'--progress',str(stream/'progress.json'),'--max-seconds',str(budget),'--seed','9315']
             if a.research_stunts:args.append('--atomic-cycle')
+            if a.compact_backflip_repeat:args.append('--experimental-compact-backflip-repeat')
             log=(out/'process.log').open('wb')
             try:proc=subprocess.Popen([str(python),'-m','studio.live_runner','--stream',str(stream),'--module','rob2nav.deployment.verify_mujoco','--',*args],cwd=root,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             finally:log.close()
-            current.clear();current.update(id=key,skill='composition',phase='STARTING',note='统一控制器真实MuJoCo编排；侧翻仅研究仿真，所有配置均未获实机资格。',stream=str(stream),hardware_enabled=False,steps=len(steps),cycles=a.cycles,source_steps=[s.model_dump() for s in a.steps])
+            current.clear();current.update(id=key,skill='composition',phase='STARTING',note='统一控制器真实MuJoCo编排；侧翻仅研究仿真，所有配置均未获实机资格。',stream=str(stream),hardware_enabled=False,steps=len(steps),cycles=a.cycles,compact_backflip_repeat=a.compact_backflip_repeat,source_steps=[s.model_dump() for s in a.steps])
             last_client=time.monotonic()
             return {k:v for k,v in current.items() if k!='stream'}
 

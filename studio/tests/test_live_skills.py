@@ -42,7 +42,8 @@ def test_composition_rejects_unapproved_or_unbounded_steps(tmp_path):
             assert c.post(route,json={'steps':steps,**extra},headers=headers).status_code==422
 
 
-def test_composition_triple_backflip_preserves_three_triggers(tmp_path,monkeypatch):
+@pytest.mark.parametrize('compact',[False,True])
+def test_composition_triple_backflip_preserves_three_triggers(tmp_path,monkeypatch,compact):
     import json
     from types import SimpleNamespace
     folder=tmp_path/'deployment/skills';folder.mkdir(parents=True)
@@ -50,11 +51,20 @@ def test_composition_triple_backflip_preserves_three_triggers(tmp_path,monkeypat
     flip=folder/'backflip60.json'
     flip.write_text(json.dumps({'id':'backflip60','atomic':True,'simulation_enabled':True}))
     process=SimpleNamespace(pid=999999,poll=lambda:0,wait=lambda **kw:0,terminate=lambda:None)
-    monkeypatch.setattr('studio.live_skills.subprocess.Popen',lambda *a,**kw:process)
+    commands=[]
+    def launch(command,**kw):
+        commands.append(command)
+        return process
+    monkeypatch.setattr('studio.live_skills.subprocess.Popen',launch)
     steps=[{'skill':'stand'}]+[{'skill':'backflip60','trigger':True} for _ in range(3)]+[{'skill':'stand'}]
     with TestClient(create_app(tmp_path)) as c:
-        response=c.post('/api/live-skills/composition/start',json={'steps':steps},headers={'X-Studio-Request':'1'})
+        response=c.post('/api/live-skills/composition/start',json={'steps':steps,'compact_backflip_repeat':compact},headers={'X-Studio-Request':'1'})
         assert response.status_code==200,response.text
+        assert ('--experimental-compact-backflip-repeat' in commands[-1]) is compact
+        assert response.json()['compact_backflip_repeat'] is compact
+        if compact:
+            invalid=c.post('/api/live-skills/composition/start',json={'steps':[steps[0],steps[1],steps[-1]],'compact_backflip_repeat':True},headers={'X-Studio-Request':'1'})
+            assert invalid.status_code==422
         saved=json.loads(next((tmp_path/'outputs/live_skills').glob('*/sequence.json')).read_text())
         assert sum(s['trigger'] for s in saved['steps'])==3
         assert [s['skill'] for s in saved['steps']]==[s['skill'] for s in steps]
