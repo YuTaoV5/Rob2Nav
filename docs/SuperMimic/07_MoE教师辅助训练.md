@@ -129,3 +129,16 @@ export SMOKE_RUN="$SUPERMIMIC_HOME/logs/supermimic/填入实际时间戳_velocit
 ```
 
 两个实验同名seed的报告位于不同trial目录，禁止混用或覆盖。现有服务器该对照的进程/state若已存在，先核对，不重复提交。
+
+## 8. 同种子对照已完成
+
+两组均完成4096环境、1200更新，评估时仅运行学生。实际配置审计确认训练参数仅run_name变化、教师合约仅BC权重0.1→0变化，同父模型、训练seed34011、评估34020–34023。
+
+| 教师方式 | 四种子原始目标变化率/URDF限速 | 该单项通过 |
+|---|---|---|
+| 教师数据+BC 0.1 | 1.133 / 1.234 / 1.290 / 1.090 | 0/4 |
+| 仅教师数据，BC 0 | 0.980 / 0.974 / 1.177 / 1.002 | 2/4 |
+
+两组四种子均无跌倒或非足接地。2/4仅指目标变化率门槛，不是整项能力验收；所有模型仍capability_qualified=false。该单一训练种子的对照支持优先诊断仅教师数据候选，不能推断BC普遍有害。下一步定位34022的目标突变，检查指令阶段、动作历史与步态指标，禁止原条件盲目追加长训。完整原速人工复看与实机验证尚未完成。
+
+新候选为 `skills/supermimic/checkpoints/velocity_gait_moe_dataonly_v1_model_1200.pt`，实际配置及独立报告见 `skills/supermimic/evidence/reports/moe_teacher_dataonly/`。网站 `/supermimic.html` 已发布对应原速回放。两个训练流水线均已结束，不重复启动。
