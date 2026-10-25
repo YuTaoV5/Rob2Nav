@@ -1,0 +1,28 @@
+import {useState} from 'react';
+import './SuperMimicDemos.css';
+const demos=[
+ {id:"velocity_moe_continuity_v2_model800",title:"MoE学生连续性优化 · 第800轮",detail:"32秒原速：站立、前后行走、左右侧移、双向转向与停步。步态和指令跟踪对照。研究候选，完整原速人工复看及实机资格未完成。"},
+ {id:"velocity_gait_moe_dataonly_v1_model1200",title:"MoE教师仅采样 · SuperMimic学生第1200轮",detail:"32秒原速：站立、前后行走、左右侧移、双向转向与停步。步态和指令跟踪对照。原始目标变化率仍未全部通过；研究候选，完整原速人工复看及实机资格未完成。"},
+ {id:"velocity_gait_moe_teacher_v1_model1200",title:"MoE教师辅助 · SuperMimic学生第1200轮",detail:"32秒原速：站立、前后行走、左右侧移、双向转向与停步。步态和指令跟踪对照。原始目标变化率仍未全部通过；研究候选，完整原速人工复看及实机资格未完成。"},
+ {id:"velocity_gait_v3_model800",title:"目标连续性优化V3 · 续训第800轮",detail:"32秒原速：站立、前后行走、左右侧移、双向转向与停步。步态和指令跟踪对照。原始目标变化率仍未全部通过；研究候选，完整原速人工复看及实机资格未完成。"},
+ {id:"velocity_gait_v2_model2000",title:"步态优化 V2 · 续训第2,000轮",detail:"32秒原速：站立、前后行走、左右侧移、双向转向与停步。步态和指令跟踪对照。原始目标变化率仍未全部通过；研究候选，完整原速人工复看及实机资格未完成。"},
+ {id:'velocity_model12000_hold',title:'最新速度行走 · 第12,000轮',detail:'32秒原速：站立、前后行走、左右侧移、双向转向和停步。使用控制目标初始化修复；独立评估仍有目标变化率超标，尚未完整验收。'} ,
+ {id:'velocity_model500',title:'速度行走 · 第500轮',detail:'15秒原速记录：站立指令 → 前进0.5m/s → 停步指令。早期检查点，尚未通过行走验收。'}
+];
+function Demo({demo}:{demo:typeof demos[number]}){
+ const [failed,setFailed]=useState(false);
+ const base='/api/files/artifacts/supermimic/'+demo.id;
+ return <article className="supermimic-demo"><h3>{demo.title}</h3>
+ <video controls playsInline preload="metadata" poster={base+'.jpg'} aria-label={demo.title+'仿真视频'} onError={()=>setFailed(true)}>
+ <source src={base+'.webm'} type="video/webm"/><source src={base+'.mp4'} type="video/mp4"/>
+ 当前浏览器无法播放，请使用下方下载链接。
+ </video><p>{demo.detail}</p>
+ {failed&&<p role="alert">播放器未能加载，请下载视频后观看，或刷新页面重试。</p>}
+ <div className="supermimic-demo-links"><a href={base+'.webm'} download>下载WebM</a><a href={base+'.mp4'} download>下载MP4</a></div>
+ </article>;
+}
+export default function SuperMimicDemos(){return <section className="card supermimic-demos" aria-label="SuperMimic仿真演示">
+ <div className="section-header"><div><span className="eyebrow">SUPERMIMIC · MUJOCO</span><h2>SuperMimic 行走演示</h2></div><span className="badge amber">训练中 · 未验收</span></div>
+ <a href="/supermimic.html" aria-label="更多SuperMimic行走演示视频">更多（全部 {demos.length} 个视频） ↗</a><p>点击视频播放，可拖动进度或全屏查看。这里是已录制的真实物理仿真，实时交互仿真接口尚未接入。</p>
+ <div className="supermimic-demo-grid">{demos.slice(0,2).map(d=><Demo key={d.id} demo={d}/>)}</div>
+ </section>;}
