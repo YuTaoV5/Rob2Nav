@@ -152,3 +152,25 @@ export SMOKE_RUN="$SUPERMIMIC_HOME/logs/supermimic/填入实际时间戳_velocit
 配对前进身高0.2924m、滑移0.0464m/s，DF四腿0.557/0.531/0.499/0.550，倾角RMS1.55度。DF腿间差增大，后续仍需关注步态均衡与速度跟踪权衡。完整原速人工复看、统一部署适配和实机仍未完成，capability_qualified=false，不能直接晋级盲楼梯。
 
 检查点 `skills/supermimic/checkpoints/velocity_moe_continuity_v2_model_800.pt`；配置 `skills/supermimic/resources/gait_moe_continuity_v2.json`；全部新旧种子报告在 `skills/supermimic/evidence/reports/moe_continuity_v2/`。可按第7节同样的环境变量设置，改用 `scripts/gait_refinement_pipeline.py --source "$SUPERMIMIC_HOME" --parent "$PARENT" --expected-parent-sha f54551a392112befb3b92985388f66f43fcd8f92c8bd5d43b1bf803b4674ba6f --config "$ROB2NAV/skills/supermimic/resources/gait_moe_continuity_v2.json" --smoke-run "$SMOKE_RUN" --output reproduction/moe_continuity_v2/formal_trial --run-name velocity_moe_continuity_weight4_v2_bounded_20261026 --iterations 800 --seed 34111 --eval-seed-start 34120`。PARENT应指向仅教师数据1200模型；SMOKE_RUN必须先用同父同配置完成32×24烟测，不能沿用其他配置审计。已有服务器任务已结束，不重复执行此复现示例。
+
+## 10. 中间惩罚权重的同种子对照
+
+权重2候选已完成4096环境800轮，与权重4实验使用同一MoE dataonly父模型、训练seed34111、训练预算与优化参数，仅目标变化率权重不同。32×24烟测及正式审计共享奖励误差0、命令填充为0。正式末轮WM loss0.1614、critic loss0.001229。
+
+新独立34220–34223原始目标变化率为0.9913/1.0494/1.0679/0.9990，物理门槛2/4；两次失败发生在切换后退首帧的RR小腿指令。原34020–34023冻结配对为0.9953/0.9730/1.0050/0.9752，目标连续性单项3/4。全部报告保留，不将边缘超限四舍五入为通过。新四种子无跌倒、非足接地、关节越限或实际超速。
+
+同seed33000、8环境配对稳态速度RMSE（剔除阶段首1秒）如下：
+
+| 方案 | 前进 | 后退 | 左移 | 右移 | 停步 |
+|---|---:|---:|---:|---:|---:|
+| MoE仅数据父模型 | .04175 | .02341 | .03243 | .02644 | .00329 |
+| 目标速率权重4 | .05090 | .05341 | .06994 | .04759 | .01229 |
+| 目标速率权重2 | .04754 | .04033 | .05526 | .04549 | .00492 |
+
+单位m/s。权重2部分恢复跟踪，但仍不及父模型，且连续性未全部通过。前进DF腿间差0.06575、倾角RMS1.72度、滑移0.04469m/s；不能称全面改善。下一步应诊断切换与常态动作约束的冲突，禁止继续盲目调整标量或放宽门槛。
+
+研究候选 `skills/supermimic/checkpoints/velocity_moe_continuity_tradeoff_v3_model_800.pt`；配置 `skills/supermimic/resources/gait_moe_continuity_tradeoff_v3.json`；配置审计与报告分别见evidence/config中的tradeoff文件和evidence/reports/moe_continuity_tradeoff_v3。
+
+复现沿用第9节命令，PARENT仍为MoE仅数据1200模型，先按权重2配置完成32×24烟测，再将config换为本节配置、smoke-run换为实际新目录、output设为reproduction/moe_continuity_tradeoff_v3/formal_trial、run-name设为velocity_moe_continuity_weight2_v3_bounded_20261026、seed仍34111、iterations仍800、eval-seed-start设34220。已有任务均结束，不重复提交。
+
+新视频velocity_moe_continuity_tradeoff_v3_model800已发网站，HTTP206验证；概览只显示最新两个，更多页保留历史。完整原速人工复看、统一部署适配、实机未完成，capability_qualified=false。

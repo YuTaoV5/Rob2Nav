@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import './SuperMimicDemos.css';
 const demos=[
+ {id:"velocity_moe_continuity_tradeoff_v3_model800",title:"MoE学生跟踪权衡对照 · 第800轮",detail:"32秒原速：站立、前后行走、左右侧移、双向转向与停步。步态和指令跟踪对照。原始目标变化率仍未全部通过；研究候选，完整原速人工复看及实机资格未完成。"},
  {id:"velocity_moe_continuity_v2_model800",title:"MoE学生连续性优化 · 第800轮",detail:"32秒原速：站立、前后行走、左右侧移、双向转向与停步。步态和指令跟踪对照。研究候选，完整原速人工复看及实机资格未完成。"},
  {id:"velocity_gait_moe_dataonly_v1_model1200",title:"MoE教师仅采样 · SuperMimic学生第1200轮",detail:"32秒原速：站立、前后行走、左右侧移、双向转向与停步。步态和指令跟踪对照。原始目标变化率仍未全部通过；研究候选，完整原速人工复看及实机资格未完成。"},
  {id:"velocity_gait_moe_teacher_v1_model1200",title:"MoE教师辅助 · SuperMimic学生第1200轮",detail:"32秒原速：站立、前后行走、左右侧移、双向转向与停步。步态和指令跟踪对照。原始目标变化率仍未全部通过；研究候选，完整原速人工复看及实机资格未完成。"},
