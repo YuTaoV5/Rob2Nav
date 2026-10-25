@@ -10,6 +10,11 @@ from go2_supermimic.supermimic import state as st
 ap=argparse.ArgumentParser();ap.add_argument("--checkpoint",required=True);ap.add_argument("--seed",type=int,required=True)
 ap.add_argument("--initialize-hold-targets",action="store_true");ap.add_argument("--audit-body-contact",action="store_true");ap.add_argument("--num-envs",type=int,default=128);ap.add_argument("--stage-seconds",type=float,default=10);ap.add_argument("--output",required=True)
 args=ap.parse_args();torch.manual_seed(args.seed)
+ck=torch.load(args.checkpoint,map_location="cuda:0",weights_only=False)
+if ck["cfg"]["task"] not in ("Go2-Velocity-Blind-Flat","Go2-Velocity-Gait-V2"):
+ raise ValueError("Wrong policy observation contract")
+if ck["cfg"]["task"]=="Go2-Velocity-Gait-V2" and not args.initialize_hold_targets:
+ raise ValueError("Gait V2 requires the training reset-hold control contract")
 cfg=v.flat_cfg(True);cfg.scene.num_envs=args.num_envs;cfg.seed=args.seed
 cfg.commands["target"].resampling_time_range=(10000.,10000.)
 if args.initialize_hold_targets:
@@ -17,8 +22,6 @@ if args.initialize_hold_targets:
  cfg=install(cfg)
 env=ManagerBasedRlEnv(cfg=cfg,device="cuda:0");obs,_=env.reset()
 robot=env.scene["robot"];term=env.command_manager.get_term("target");c=st.robot_consts(env)
-ck=torch.load(args.checkpoint,map_location=env.device,weights_only=False)
-if ck["cfg"]["task"]!="Go2-Velocity-Blind-Flat":raise ValueError("Wrong policy observation contract")
 actor=Actor(obs["actor"].shape[-1],tuple(ck["cfg"]["actor_hidden"]),12).to(env.device)
 actor.load_state_dict(ck["actor"]);actor.eval()
 names=env.action_manager.get_term("joint_pos")._target_names
@@ -91,6 +94,7 @@ with torch.inference_mode():
   rows.append({"stage":label,"command":command,"rmse_xy":float((error_xy/count).mean().sqrt()),
                "rmse_yaw":float((error_yaw/count).mean().sqrt())})
 raw={"initialize_hold_targets":args.initialize_hold_targets,"seed":args.seed,"checkpoint":args.checkpoint,"num_envs":N,"stages":rows,
+ "policy_task":ck["cfg"]["task"],"evaluation_reward":"legacy velocity reward; not used for action selection or qualification",
  "physics_dt":env.physics_dt,"control_dt":env.step_dt,"decimation":cfg.decimation,
  "physics_sample_count":physics_samples,"expected_physics_samples":round(args.stage_seconds/env.step_dt)*len(stages)*cfg.decimation,
  "joint_velocity_peak_event":peak_event,"falls_total":int(falls.sum()),"falls_per_env_minute":float(falls.mean())/(len(stages)*args.stage_seconds/60),

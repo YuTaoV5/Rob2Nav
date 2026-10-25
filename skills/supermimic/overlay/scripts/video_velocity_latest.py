@@ -13,6 +13,8 @@ parser.add_argument("--checkpoint",required=True)
 parser.add_argument("--output-dir",required=True)
 parser.add_argument("--seed",type=int,default=32130)
 parser.add_argument("--stage-seconds",type=float,default=4.)
+parser.add_argument("--label",default="model 12000 + reset-hold")
+parser.add_argument("--stem",default="velocity_model12000_hold")
 args=parser.parse_args()
 torch.manual_seed(args.seed)
 p=Path(args.checkpoint)
@@ -46,18 +48,18 @@ with torch.inference_mode():
    if step%2==0:
     image=Image.fromarray(env.render());draw=ImageDraw.Draw(image)
     draw.rectangle((0,0,854,58),fill=(15,18,24))
-    draw.text((10,8),f"SuperMimic | model 12000 + reset-hold | RESEARCH / NOT QUALIFIED",fill="white")
+    draw.text((10,8),f"SuperMimic | {args.label} | RESEARCH / NOT QUALIFIED",fill="white")
     draw.text((10,30),f"t={step*env.step_dt:.2f}s  {name}  cmd={cmd}  falls={falls}",fill="white")
     frames.append(np.asarray(image))
    step+=1
   print("RECORDED",name,step,flush=True)
 fps=round(1/(2*env.step_dt))
-media.write_video(str(out/"velocity_model12000_hold.mp4"),frames,fps=fps)
-(out/"video_model12000_hold_trace.json").write_text(json.dumps(trace))
+media.write_video(str(out/(args.stem+".mp4")),frames,fps=fps)
+(out/(args.stem+"_trace.json")).write_text(json.dumps(trace))
 meta={"model_sha256":hashlib.sha256(p.read_bytes()).hexdigest(),"reset_control_sha256":hashlib.sha256(Path("rob2nav_reset_targets.py").read_bytes()).hexdigest(),
  "seed":args.seed,"frames":len(frames),"fps":fps,"duration_seconds":len(frames)/fps,"falls":falls,
  "initialize_hold_targets":True,"stages":stages,"stage_seconds":stage_seconds,"capability_qualified":False,
  "limitations":["one seed short demonstration","four-seed target rate failure remains","body contact smoke detected calf contact; full-speed visual review pending"]}
-(out/"video_model12000_hold.json").write_text(json.dumps(meta,indent=2))
+(out/(args.stem+".json")).write_text(json.dumps(meta,indent=2))
 env.close();print("VIDEO_COMPLETED",json.dumps(meta),flush=True)
 
