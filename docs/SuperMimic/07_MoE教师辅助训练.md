@@ -142,3 +142,13 @@ export SMOKE_RUN="$SUPERMIMIC_HOME/logs/supermimic/填入实际时间戳_velocit
 两组四种子均无跌倒或非足接地。2/4仅指目标变化率门槛，不是整项能力验收；所有模型仍capability_qualified=false。该单一训练种子的对照支持优先诊断仅教师数据候选，不能推断BC普遍有害。下一步定位34022的目标突变，检查指令阶段、动作历史与步态指标，禁止原条件盲目追加长训。完整原速人工复看与实机验证尚未完成。
 
 新候选为 `skills/supermimic/checkpoints/velocity_gait_moe_dataonly_v1_model_1200.pt`，实际配置及独立报告见 `skills/supermimic/evidence/reports/moe_teacher_dataonly/`。网站 `/supermimic.html` 已发布对应原速回放。两个训练流水线均已结束，不重复启动。
+
+## 9. 连续性有界优化：800轮完成
+
+继承仅教师数据学生1200，保持步态与控制合约，仅目标速率权重1→4；纯学生训练4096环境800轮，seed34111。32×24前置烟测共享奖励误差0、actor梯度非零；正式奖励审计误差0，最终WM loss 0.16、critic loss 0.0006297。
+
+新独立34120–34123目标变化率0.896/0.979/0.929/0.922，原34020–34023冻结配对0.919/0.928/0.903/0.959。八组均无跌倒、非足接地、位置越限或实际速度超限；新四种子物理门槛4/4通过。新旧种子均为每种子128环境80秒、200Hz逐物理步，保留原突变指令，没有输出滤波或门槛放宽。
+
+配对前进身高0.2924m、滑移0.0464m/s，DF四腿0.557/0.531/0.499/0.550，倾角RMS1.55度。DF腿间差增大，后续仍需关注步态均衡与速度跟踪权衡。完整原速人工复看、统一部署适配和实机仍未完成，capability_qualified=false，不能直接晋级盲楼梯。
+
+检查点 `skills/supermimic/checkpoints/velocity_moe_continuity_v2_model_800.pt`；配置 `skills/supermimic/resources/gait_moe_continuity_v2.json`；全部新旧种子报告在 `skills/supermimic/evidence/reports/moe_continuity_v2/`。可按第7节同样的环境变量设置，改用 `scripts/gait_refinement_pipeline.py --source "$SUPERMIMIC_HOME" --parent "$PARENT" --expected-parent-sha f54551a392112befb3b92985388f66f43fcd8f92c8bd5d43b1bf803b4674ba6f --config "$ROB2NAV/skills/supermimic/resources/gait_moe_continuity_v2.json" --smoke-run "$SMOKE_RUN" --output reproduction/moe_continuity_v2/formal_trial --run-name velocity_moe_continuity_weight4_v2_bounded_20261026 --iterations 800 --seed 34111 --eval-seed-start 34120`。PARENT应指向仅教师数据1200模型；SMOKE_RUN必须先用同父同配置完成32×24烟测，不能沿用其他配置审计。已有服务器任务已结束，不重复执行此复现示例。
