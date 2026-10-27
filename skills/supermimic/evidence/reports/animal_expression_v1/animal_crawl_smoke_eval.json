@@ -1,0 +1,95 @@
+{
+  "role": "own_student_teacher_OFF",
+  "checkpoint": "logs/supermimic/2026-10-28_03-47-25_animal_crawl_kine_teacher_smoke_v1_20261028/model_24.pt",
+  "seed": 36710,
+  "seconds": 8,
+  "num_envs": 4,
+  "rows": [
+    {
+      "env": 0,
+      "upright_fraction": 1.0,
+      "mean_pose_rmse": 0.5648698210716248,
+      "legacy_posture_gate": true,
+      "desired_planar_displacement": [
+        3.2758870124816895,
+        0.16954804956912994
+      ],
+      "actual_planar_displacement": [
+        -0.004952669143676758,
+        -0.030817687511444092
+      ],
+      "projected_progress_ratio": -0.0019934107549488544,
+      "locomotion_candidate": false
+    },
+    {
+      "env": 1,
+      "upright_fraction": 1.0,
+      "mean_pose_rmse": 0.5648698210716248,
+      "legacy_posture_gate": true,
+      "desired_planar_displacement": [
+        -0.16954843699932098,
+        3.2758872509002686
+      ],
+      "actual_planar_displacement": [
+        0.03081721067428589,
+        -0.004953265190124512
+      ],
+      "projected_progress_ratio": -0.0019935856107622385,
+      "locomotion_candidate": false
+    },
+    {
+      "env": 2,
+      "upright_fraction": 1.0,
+      "mean_pose_rmse": 0.56486976146698,
+      "legacy_posture_gate": true,
+      "desired_planar_displacement": [
+        -3.2758870124816895,
+        -0.16954834759235382
+      ],
+      "actual_planar_displacement": [
+        0.004953503608703613,
+        0.03081411123275757
+      ],
+      "projected_progress_ratio": -0.001993609359487891,
+      "locomotion_candidate": false
+    },
+    {
+      "env": 3,
+      "upright_fraction": 1.0,
+      "mean_pose_rmse": 0.5648698210716248,
+      "legacy_posture_gate": true,
+      "desired_planar_displacement": [
+        0.16954752802848816,
+        -3.2758872509002686
+      ],
+      "actual_planar_displacement": [
+        -0.030817151069641113,
+        0.004951953887939453
+      ],
+      "projected_progress_ratio": -0.0019931828137487173,
+      "locomotion_candidate": false
+    }
+  ],
+  "body_contact": {
+    "physical_samples": 1920,
+    "nonfoot_ground_contact_samples": 24,
+    "environments_with_nonfoot_ground_contact": 4,
+    "first_contact": {
+      "sample": 0,
+      "environment": 2,
+      "geoms": [
+        "terrain",
+        "robot/head_collision2"
+      ],
+      "distance": -0.011641338467597961
+    },
+    "contact_buffer_overflow": false,
+    "ground_geoms": [
+      "terrain"
+    ],
+    "criterion": "active raw collision contacts with dist<=0; ground versus any robot geom except named foot; no state writes"
+  },
+  "locomotion_gate": "legacy upright/pose gate plus >50% projected desired planar displacement; guards stationary pose-only false positives",
+  "capability_qualified": false,
+  "purpose": "independent smoke-model diagnosis, not formal four-seed qualification"
+}
