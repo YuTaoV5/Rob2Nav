@@ -51,4 +51,6 @@ for style,label in enumerate(task.STYLES):
  mask=torch.arange(args.num_envs)%4==style
  rows.append({'style':label,'rmse_xy':float(err[:,mask,:2].square().sum(-1).mean().sqrt()),'rmse_yaw':float(err[:,mask,2].square().mean().sqrt()),'actual_velocity_spans':(vel[:,mask].amax((0,1))-vel[:,mask].amin((0,1))).tolist(),'falls':int(falls.cpu()[mask].sum())})
 out={'role':'external_moe_plus_authored_rhythm_teacher' if teacher else 'own_supermimic_student','checkpoint':args.checkpoint,'seed':args.seed,'num_envs':args.num_envs,'seconds':12,'styles':rows,'physical':peaks,'body_contact':body.summary(),'physics_samples':samples,'expected_physics_samples':round(12/env.step_dt)*cfg.decimation,'clock_error_seconds':clock_error,'functional_candidate':bool(not falls.any() and all(r['rmse_xy']<.2 and r['rmse_yaw']<.25 for r in rows)),'emotion_perception_validated':False,'capability_qualified':False,'missing':['full uncut visual review','perceived expression review']}
+if args.checkpoint and ck.get('initialization_only',False):
+ out['role']='transferred_actor_initialization_only';out['new_training_performed']=False
 assert samples==out['expected_physics_samples'];Path(args.output).write_text(json.dumps(out,indent=2));print(json.dumps(out),flush=True);env.close()

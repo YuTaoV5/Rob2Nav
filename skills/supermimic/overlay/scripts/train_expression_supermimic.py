@@ -3,10 +3,13 @@
 The existing policy supplies locomotion, the new command program supplies rhythm;
 neither component is described as an existing emotional-control checkpoint.
 """
-import sys,json,hashlib
+import sys,json,hashlib,argparse
 from pathlib import Path
 from dataclasses import asdict
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+parser=argparse.ArgumentParser(add_help=False)
+parser.add_argument('--actor-initialization')
+extra,remaining=parser.parse_known_args();sys.argv=[sys.argv[0]]+remaining
 import torch
 import rob2nav_expression as task
 from rob2nav_moe_teacher import RoboGaugeTeacher
@@ -27,6 +30,14 @@ class Trainer(Original):
   assert cfg.task==task.TASK and cfg.driver_policy and not cfg.resume
   super().__init__(cfg);self.steer=Direct(self.term)
   assert self.obs.shape[-1]==350
+  initialization={'actor':'from_scratch','world_model':'from_scratch','critic':'from_scratch','optimizers':'fresh'}
+  if extra.actor_initialization:
+   ip=Path(extra.actor_initialization);init=torch.load(ip,map_location=self.env.device,weights_only=False)
+   assert init.get('initialization_only') and init.get('new_training_performed') is False
+   assert init['cfg']['task']==task.TASK and init['obs_dim']==350
+   assert init['parent_sha256']=='f54551a392112befb3b92985388f66f43fcd8f92c8bd5d43b1bf803b4674ba6f'
+   self.actor.load_state_dict(init['actor'])
+   initialization.update(actor='warm_start_with_neutral_new_channels',actor_initialization_path=str(ip),actor_initialization_sha256=hashlib.sha256(ip.read_bytes()).hexdigest(),parent_sha256=init['parent_sha256'])
   self.teacher_frames=0;self.bc_steps=0;self.cache=None
   self.bc=torch.optim.SGD(self.actor.parameters(),lr=.0001)
   oa=self.driver.act
@@ -41,6 +52,8 @@ class Trainer(Original):
    return os(action)
   self.env.step=step
   self.contract={'cfg':asdict(cfg),'styles':task.STYLES,'phase_storage':'packed generator.wait seconds; style=index; speed_cap=period seconds','actor_dim':350,'command_dim':28,'active_command_channels':9,'actor_exteroception':False,'teacher':self.driver.metadata,'teacher_role':'existing locomotion weights plus new rhythmic command program; no released emotion weights claimed','shared_clock':'task.advance used in real and imagined transitions','source_sha256':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in [Path(__file__),Path(task.__file__)]},'capability_qualified':False}
+  (self.log_dir/'expression_contract.json').write_text(json.dumps(self.contract,indent=2))
+  self.contract['initialization']=initialization
   (self.log_dir/'expression_contract.json').write_text(json.dumps(self.contract,indent=2))
  def improve_policy(self):
   out=super().improve_policy()
