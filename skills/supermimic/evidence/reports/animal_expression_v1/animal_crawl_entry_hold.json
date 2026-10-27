@@ -1,0 +1,203 @@
+{
+  "initial_control_history_contract": "hold current q in delay buffer and intended-action observation; no qpos/qvel writes",
+  "diagnostic": {
+    "intended_peak_event": {
+      "control_step": 0,
+      "time_before_step": 0.0,
+      "environment": 7,
+      "joint": "RL_calf_joint",
+      "ratio": 4.47825288772583,
+      "previous_target": -2.424654006958008,
+      "next_target": -0.926678478717804
+    },
+    "maximum_intended_rate_after_first_second": 0.6292763948440552,
+    "contact_samples_first_quarter_second": 235,
+    "planar_velocity_rmse_all": 0.43026095628738403,
+    "planar_velocity_rmse_after_one_second": 0.443818598985672,
+    "mean_actual_planar_speed": 0.21007134020328522,
+    "mean_desired_planar_speed": 0.4130817651748657,
+    "contact_samples_after_quarter_second": 7402,
+    "old_reward_difference_same_posture_stationary_vs_reference_speed_max": 0.0,
+    "proposed_velocity_bonus_reference_minus_stationary_mean": 1.9183244705200195,
+    "proposed_bonus": {
+      "weight": 2.0,
+      "sigma_mps": 0.25,
+      "trained_or_qualified": false
+    },
+    "interpretation": "Read-only response/entry diagnosis; velocity reward comparison does not establish the sole cause or prove improved control."
+  },
+  "role": "own_student_teacher_OFF",
+  "checkpoint": "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-28_04-13-29_animal_crawl_kine_student_v1_resetfix_20261028/model_2000.pt",
+  "checkpoint_sha256": "3e185d758bea4fe30851d20c2c52779f73c316f579fc9f287dc1c849ec68a89a",
+  "seed": 36724,
+  "seconds": 8,
+  "num_envs": 8,
+  "joint_perturb_std": 0.025,
+  "perturbation_scope": "normal reset only, no rollout state writes",
+  "initial_joint_state_sha256": "e0fe7e37adb1bca01006bebb2459c86a3d856e7f1325458dbfa3684b86b4fb9a",
+  "initial_tensor_sha256": "1bd4973df2b444e53213d54f7da37cf06c603cd013b34f53e0ebcaa109cacab8",
+  "rows": [
+    {
+      "env": 0,
+      "upright_fraction": 1.0,
+      "mean_pose_rmse": 0.1546613723039627,
+      "legacy_posture_gate": true,
+      "desired_planar_displacement": [
+        3.2758870124816895,
+        0.16954804956912994
+      ],
+      "actual_planar_displacement": [
+        0.5271568298339844,
+        -0.6387432217597961
+      ],
+      "projected_progress_ratio": 0.1504257470369339,
+      "locomotion_candidate": false
+    },
+    {
+      "env": 1,
+      "upright_fraction": 1.0,
+      "mean_pose_rmse": 0.154710590839386,
+      "legacy_posture_gate": true,
+      "desired_planar_displacement": [
+        -0.16954843699932098,
+        3.2758872509002686
+      ],
+      "actual_planar_displacement": [
+        0.6913876533508301,
+        0.5349490642547607
+      ],
+      "projected_progress_ratio": 0.15196850895881653,
+      "locomotion_candidate": false
+    },
+    {
+      "env": 2,
+      "upright_fraction": 1.0,
+      "mean_pose_rmse": 0.15514561533927917,
+      "legacy_posture_gate": true,
+      "desired_planar_displacement": [
+        -3.2758870124816895,
+        -0.16954834759235382
+      ],
+      "actual_planar_displacement": [
+        -0.5368155837059021,
+        0.7021281123161316
+      ],
+      "projected_progress_ratio": 0.15236754715442657,
+      "locomotion_candidate": false
+    },
+    {
+      "env": 3,
+      "upright_fraction": 1.0,
+      "mean_pose_rmse": 0.15591804683208466,
+      "legacy_posture_gate": true,
+      "desired_planar_displacement": [
+        0.16954752802848816,
+        -3.2758872509002686
+      ],
+      "actual_planar_displacement": [
+        -0.6857259273529053,
+        -0.4305199384689331
+      ],
+      "projected_progress_ratio": 0.12026482075452805,
+      "locomotion_candidate": false
+    },
+    {
+      "env": 4,
+      "upright_fraction": 1.0,
+      "mean_pose_rmse": 0.15398558974266052,
+      "legacy_posture_gate": true,
+      "desired_planar_displacement": [
+        3.2758870124816895,
+        0.1695486307144165
+      ],
+      "actual_planar_displacement": [
+        0.5948125720024109,
+        -0.6952759623527527
+      ],
+      "projected_progress_ratio": 0.17013239860534668,
+      "locomotion_candidate": false
+    },
+    {
+      "env": 5,
+      "upright_fraction": 1.0,
+      "mean_pose_rmse": 0.1561570018529892,
+      "legacy_posture_gate": true,
+      "desired_planar_displacement": [
+        -0.1695491373538971,
+        3.2758870124816895
+      ],
+      "actual_planar_displacement": [
+        0.6398144960403442,
+        0.5558242797851562
+      ],
+      "projected_progress_ratio": 0.15913648903369904,
+      "locomotion_candidate": false
+    },
+    {
+      "env": 6,
+      "upright_fraction": 1.0,
+      "mean_pose_rmse": 0.15665052831172943,
+      "legacy_posture_gate": true,
+      "desired_planar_displacement": [
+        -3.2758870124816895,
+        -0.1695481389760971
+      ],
+      "actual_planar_displacement": [
+        -0.4876217842102051,
+        0.6053774356842041
+      ],
+      "projected_progress_ratio": 0.13891522586345673,
+      "locomotion_candidate": false
+    },
+    {
+      "env": 7,
+      "upright_fraction": 1.0,
+      "mean_pose_rmse": 0.15582937002182007,
+      "legacy_posture_gate": true,
+      "desired_planar_displacement": [
+        0.169549822807312,
+        -3.2758874893188477
+      ],
+      "actual_planar_displacement": [
+        -0.6614186763763428,
+        -0.5374534726142883
+      ],
+      "projected_progress_ratio": 0.153203085064888,
+      "locomotion_candidate": false
+    }
+  ],
+  "locomotion_passed": 0,
+  "locomotion_total": 8,
+  "physical": {
+    "velocity_ratio": 0.9428536891937256,
+    "joint_excess_rad": 0.0,
+    "torque_ratio": 1.0,
+    "intended_target_rate_ratio": 4.47825288772583,
+    "applied_target_rate_ratio": 4.47825288772583
+  },
+  "body_contact": {
+    "physical_samples": 1920,
+    "nonfoot_ground_contact_samples": 7637,
+    "environments_with_nonfoot_ground_contact": 8,
+    "first_contact": {
+      "sample": 0,
+      "environment": 0,
+      "geoms": [
+        "terrain",
+        "robot/head_collision2"
+      ],
+      "distance": -0.011641331017017365
+    },
+    "contact_buffer_overflow": false,
+    "ground_geoms": [
+      "terrain"
+    ],
+    "criterion": "active raw collision contacts with dist<=0; ground versus any robot geom except named foot; no state writes"
+  },
+  "physical_samples": 1920,
+  "expected_physical_samples": 1920,
+  "locomotion_gate": "upright fraction >.95, mean pose RMSE <.6, projected desired displacement >50%",
+  "capability_qualified": false,
+  "visual_review_complete": false,
+  "source_sha256": "ed45e674204573164b451566cbad5dfc2b614e4f2dd0ac1a8c312649fa938558"
+}
