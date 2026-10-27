@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import './SuperMimicDemos.css';
 const demos=[
+ {"id": "recovery_student_v1_model4000", "title": "自恢复 · SuperMimic学生第4000轮", "detail": "12秒原速，教师已关闭；独立四种子恢复并稳定2秒 365/512。关节约束另报，研究候选、未获实机资格。"},
  {id:"velocity_moe_continuity_tradeoff_v3_model800",title:"MoE学生跟踪权衡对照 · 第800轮",detail:"32秒原速：站立、前后行走、左右侧移、双向转向与停步。步态和指令跟踪对照。原始目标变化率仍未全部通过；研究候选，完整原速人工复看及实机资格未完成。"},
  {id:"velocity_moe_continuity_v2_model800",title:"MoE学生连续性优化 · 第800轮",detail:"32秒原速：站立、前后行走、左右侧移、双向转向与停步。步态和指令跟踪对照。研究候选，完整原速人工复看及实机资格未完成。"},
  {id:"velocity_gait_moe_dataonly_v1_model1200",title:"MoE教师仅采样 · SuperMimic学生第1200轮",detail:"32秒原速：站立、前后行走、左右侧移、双向转向与停步。步态和指令跟踪对照。原始目标变化率仍未全部通过；研究候选，完整原速人工复看及实机资格未完成。"},
