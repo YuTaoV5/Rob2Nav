@@ -1,0 +1,55 @@
+{
+  "models": [
+    {
+      "role": "parent",
+      "checkpoint": "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-26_02-47-27_velocity_gait_moe_dataonly_v1_bounded_20261026/model_1200.pt",
+      "sha256": "f54551a392112befb3b92985388f66f43fcd8f92c8bd5d43b1bf803b4674ba6f",
+      "cfg": {
+        "task": "Go2-Velocity-Gait-V2",
+        "lr": 5e-05,
+        "actor_lr_scale": 0.25,
+        "critic_warmup_iterations": 50,
+        "actor_ramp_iterations": 100,
+        "seed": 34011,
+        "num_envs": 4096,
+        "iterations": 1200
+      },
+      "saved_actor_lr": 3.75e-06
+    },
+    {
+      "role": "actor_only",
+      "checkpoint": "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-28_01-18-47_expression_rhythm_actorinit_smoke_v2_20261028/model_24.pt",
+      "sha256": "6a3ec0502af73b891eba8bd98a8360a27a2c1b939bdacae2fa0789e458013a26",
+      "cfg": {
+        "task": "Go2-SuperMimic-Expression-Rhythm-V1",
+        "lr": 0.0002,
+        "actor_lr_scale": 1.0,
+        "critic_warmup_iterations": 4,
+        "actor_ramp_iterations": 4,
+        "seed": 36201,
+        "num_envs": 32,
+        "iterations": 24
+      },
+      "saved_actor_lr": 0.00019999969364764065
+    },
+    {
+      "role": "actor_wm",
+      "checkpoint": "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-28_01-47-47_expression_rhythm_actor_wm_smoke_v3_20261028/model_24.pt",
+      "sha256": "00845bbd14270274b60d32c740d6c5431ad2abcf76c7d829f0e5bbe7a5708720",
+      "cfg": {
+        "task": "Go2-SuperMimic-Expression-Rhythm-V1",
+        "lr": 0.0002,
+        "actor_lr_scale": 1.0,
+        "critic_warmup_iterations": 4,
+        "actor_ramp_iterations": 4,
+        "seed": 36201,
+        "num_envs": 32,
+        "iterations": 24
+      },
+      "saved_actor_lr": 0.00019999969364764065
+    }
+  ],
+  "actor_only_to_parent_final_lr_ratio": 53.333251639370836,
+  "training_started": false,
+  "causal_mechanism_proven": false
+}

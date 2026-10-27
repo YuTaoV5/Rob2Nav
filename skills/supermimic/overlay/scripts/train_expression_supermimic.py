@@ -9,6 +9,7 @@ from dataclasses import asdict
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 parser=argparse.ArgumentParser(add_help=False)
 parser.add_argument('--actor-initialization')
+parser.add_argument('--world-model-parent')
 extra,remaining=parser.parse_known_args();sys.argv=[sys.argv[0]]+remaining
 import torch
 import rob2nav_expression as task
@@ -38,6 +39,18 @@ class Trainer(Original):
    assert init['parent_sha256']=='f54551a392112befb3b92985388f66f43fcd8f92c8bd5d43b1bf803b4674ba6f'
    self.actor.load_state_dict(init['actor'])
    initialization.update(actor='warm_start_with_neutral_new_channels',actor_initialization_path=str(ip),actor_initialization_sha256=hashlib.sha256(ip.read_bytes()).hexdigest(),parent_sha256=init['parent_sha256'])
+  if extra.world_model_parent:
+   assert extra.actor_initialization,'World-model trial requires the audited actor initialization'
+   wp=Path(extra.world_model_parent);wh=hashlib.sha256(wp.read_bytes()).hexdigest()
+   assert wh=='f54551a392112befb3b92985388f66f43fcd8f92c8bd5d43b1bf803b4674ba6f'
+   audit_path=Path(__file__).resolve().parents[1]/'reproduction/animal_expression_v1/world_model_transfer_audit.json'
+   wa=json.loads(audit_path.read_text());assert wa['parent_sha256']==wh and all(wa['physical_factory_fields_equal'].values())
+   scores={r['model']:r['per_horizon_common_normalized_mse'][-1] for r in wa['rows']}
+   assert scores['pretrained']<scores['normalization_only']
+   parent=torch.load(wp,map_location='cpu',weights_only=False)
+   assert tuple(parent['cfg']['wm_hidden'])==tuple(cfg.wm_hidden)
+   self.wm.load_state_dict(parent['world_model'])
+   initialization.update(world_model='warm_start_weights_and_normalizers',world_model_parent=str(wp),world_model_parent_sha256=wh,world_model_audit_sha256=hashlib.sha256(audit_path.read_bytes()).hexdigest(),critic='from_scratch_new_reward_and_83D_input')
   self.teacher_frames=0;self.bc_steps=0;self.cache=None
   self.bc=torch.optim.SGD(self.actor.parameters(),lr=.0001)
   oa=self.driver.act
