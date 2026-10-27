@@ -1,0 +1,88 @@
+{
+  "role": "own_supermimic_student",
+  "checkpoint": "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-28_00-36-04_expression_rhythm_moe_student_v1_bounded_20261028/model_2000.pt",
+  "seed": 36122,
+  "num_envs": 128,
+  "seconds": 12,
+  "styles": [
+    {
+      "style": "joyful_steps",
+      "rmse_xy": 0.15059982240200043,
+      "rmse_yaw": 0.09114103019237518,
+      "actual_velocity_spans": [
+        0.3718329966068268,
+        0.30496326088905334,
+        1.134800910949707
+      ],
+      "falls": 0
+    },
+    {
+      "style": "firm_march",
+      "rmse_xy": 0.22325582802295685,
+      "rmse_yaw": 0.09262117743492126,
+      "actual_velocity_spans": [
+        0.3439137935638428,
+        0.3246781826019287,
+        1.0993740558624268
+      ],
+      "falls": 0
+    },
+    {
+      "style": "slow_sway",
+      "rmse_xy": 0.042319174855947495,
+      "rmse_yaw": 0.09952159970998764,
+      "actual_velocity_spans": [
+        0.38434910774230957,
+        0.2997943162918091,
+        1.2772358655929565
+      ],
+      "falls": 0
+    },
+    {
+      "style": "playful_dance",
+      "rmse_xy": 0.13093584775924683,
+      "rmse_yaw": 0.29460638761520386,
+      "actual_velocity_spans": [
+        0.38485342264175415,
+        0.2899409532546997,
+        1.2509428262710571
+      ],
+      "falls": 0
+    }
+  ],
+  "physical": {
+    "velocity_ratio": 0.42221197485923767,
+    "joint_excess_rad": 0.0,
+    "torque_ratio": 0.6972333192825317,
+    "target_rate_ratio": 0.6906037330627441
+  },
+  "body_contact": {
+    "physical_samples": 2400,
+    "nonfoot_ground_contact_samples": 94,
+    "environments_with_nonfoot_ground_contact": 3,
+    "first_contact": {
+      "sample": 1036,
+      "environment": 123,
+      "geoms": [
+        "terrain",
+        "robot/FL_calf_collision1"
+      ],
+      "distance": -9.264051914215088e-05
+    },
+    "contact_buffer_overflow": false,
+    "ground_geoms": [
+      "terrain"
+    ],
+    "criterion": "active raw collision contacts with dist<=0; ground versus any robot geom except named foot; no state writes"
+  },
+  "physics_samples": 2400,
+  "expected_physics_samples": 2400,
+  "clock_error_seconds": 4.5821070671081543e-07,
+  "functional_candidate": false,
+  "emotion_perception_validated": false,
+  "capability_qualified": false,
+  "missing": [
+    "full uncut visual review",
+    "perceived expression review"
+  ]
+}

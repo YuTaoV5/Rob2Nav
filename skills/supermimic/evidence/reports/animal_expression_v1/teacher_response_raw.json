@@ -1,0 +1,80 @@
+{
+  "role": "external_moe_plus_authored_rhythm_teacher",
+  "checkpoint": null,
+  "seed": 36130,
+  "num_envs": 8,
+  "seconds": 12,
+  "styles": [
+    {
+      "style": "joyful_steps",
+      "rmse_xy": 0.09206903725862503,
+      "rmse_yaw": 0.15219584107398987,
+      "actual_velocity_spans": [
+        0.29624122381210327,
+        0.29559189081192017,
+        1.3385555744171143
+      ],
+      "falls": 0
+    },
+    {
+      "style": "firm_march",
+      "rmse_xy": 0.08171867579221725,
+      "rmse_yaw": 0.17729021608829498,
+      "actual_velocity_spans": [
+        0.41908860206604004,
+        0.39937615394592285,
+        0.9984009265899658
+      ],
+      "falls": 0
+    },
+    {
+      "style": "slow_sway",
+      "rmse_xy": 0.03456345945596695,
+      "rmse_yaw": 0.08718542009592056,
+      "actual_velocity_spans": [
+        0.12200292944908142,
+        0.08365549892187119,
+        0.4724864363670349
+      ],
+      "falls": 0
+    },
+    {
+      "style": "playful_dance",
+      "rmse_xy": 0.07956109195947647,
+      "rmse_yaw": 0.17068615555763245,
+      "actual_velocity_spans": [
+        0.21645981073379517,
+        0.35349923372268677,
+        1.442552089691162
+      ],
+      "falls": 0
+    }
+  ],
+  "physical": {
+    "velocity_ratio": 0.8615620136260986,
+    "joint_excess_rad": 0.0,
+    "torque_ratio": 1.0,
+    "target_rate_ratio": 1.3720502853393555
+  },
+  "body_contact": {
+    "physical_samples": 2400,
+    "nonfoot_ground_contact_samples": 0,
+    "environments_with_nonfoot_ground_contact": 0,
+    "first_contact": null,
+    "contact_buffer_overflow": false,
+    "ground_geoms": [
+      "terrain"
+    ],
+    "criterion": "active raw collision contacts with dist<=0; ground versus any robot geom except named foot; no state writes"
+  },
+  "physics_samples": 2400,
+  "expected_physics_samples": 2400,
+  "clock_error_seconds": 4.5821070671081543e-07,
+  "functional_candidate": true,
+  "emotion_perception_validated": false,
+  "capability_qualified": false,
+  "missing": [
+    "full uncut visual review",
+    "perceived expression review"
+  ]
+}
