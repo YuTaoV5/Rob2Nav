@@ -40,8 +40,14 @@ def command_observation(phase):
  return torch.cat((q,z,g,cyclic,torch.zeros((len(phase),10),device=phase.device)),-1)
 
 def advance(g,dt):
- assert bool(((dt-1/60).abs()<1e-7).all()) if isinstance(dt,torch.Tensor) else abs(dt-1/60)<1e-7
- out=dict(g);out['wait']=g['wait']+1.;out['chase_vel']=torch.zeros_like(g['chase_vel']);return out
+ if isinstance(dt,torch.Tensor):
+  valid=(dt==0)|((dt-1/60).abs()<1e-7);assert bool(valid.all())
+  frames=(dt>0).to(g['wait'])
+ else:
+  assert dt==0 or abs(dt-1/60)<1e-7;frames=float(dt>0)
+ # mjlab passes zero elapsed time to environments reset on this control step.
+ # Their new episode remains at frame zero; all other environments advance one.
+ out=dict(g);out['wait']=g['wait']+frames;out['chase_vel']=torch.zeros_like(g['chase_vel']);return out
 
 def reward(s,phase,action,previous,default_q,scale):
  goal,z,gravity,_=desired(phase);_,_,limits,_=parameters(s.device)

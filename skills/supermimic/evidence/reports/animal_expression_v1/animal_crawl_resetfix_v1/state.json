@@ -1,0 +1,144 @@
+{
+  "phase": "training",
+  "capability_qualified": false,
+  "video_published": false,
+  "replacement": {
+    "original_run": "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-28_04-04-47_animal_crawl_kine_student_v1_bounded_20261028",
+    "original_failure": "zero elapsed time on normal episode reset",
+    "original_last_log": 700,
+    "original_save_interval": 1000,
+    "original_checkpoints_present": false,
+    "restart": "from scratch, no optimizer/model continuation claimed",
+    "reset_contract_audit": {
+      "passed": true,
+      "num_envs": 4,
+      "control_steps": 735,
+      "physics_steps": 2940,
+      "reset_environment_events": 4,
+      "mixed_zero_and_normal_dt_passed": true,
+      "errors": {
+        "phase": 0.0,
+        "target_history": 0.0,
+        "intended_action_history": 0.0
+      },
+      "task_source_sha256": "bee3f1fd311acc1cb48e83bd32cdedfcd27d82329cff5e35ea89be52ff157596",
+      "meaning": "complete-episode control contract, no training or functional qualification"
+    },
+    "new_save_interval": 100
+  },
+  "preflight": {
+    "evaluator_distinct_initial_states": true,
+    "smoke_audit": {
+      "training_completed": true,
+      "reward_max_error": 0.0,
+      "actor_target_history_error": 0.0,
+      "actor_intended_action_history_error": 0.0,
+      "clock_frame_error": 0.0,
+      "command_padding_zero": true,
+      "teacher_frames": 544,
+      "bc_steps": 16,
+      "capability_qualified": false
+    },
+    "teacher_motion_response": {
+      "source": "existing frozen teacher final saved trace, no new physical run",
+      "time_seconds": 7.516666666666667,
+      "control_step": 451,
+      "projected_reference_progress_ratio": [
+        0.9624289870262146,
+        1.0983116626739502,
+        1.1312861442565918,
+        -0.08604951947927475
+      ],
+      "actual_displacement": [
+        [
+          2.9696786403656006,
+          0.11368335783481598
+        ],
+        [
+          -0.37221449613571167,
+          3.377441167831421
+        ],
+        [
+          -3.463998556137085,
+          -0.6958485245704651
+        ],
+        [
+          0.2472185343503952,
+          0.27774137258529663
+        ]
+      ],
+      "reference_displacement": [
+        [
+          3.084259510040283,
+          0.1465093344449997
+        ],
+        [
+          -0.14650951325893402,
+          3.0842597484588623
+        ],
+        [
+          -3.084259271621704,
+          -0.14650960266590118
+        ],
+        [
+          0.14650915563106537,
+          -3.0842597484588623
+        ]
+      ],
+      "legacy_posture_gate_passed": 4,
+      "qualification": "motion response diagnostic, not independent strict qualification"
+    },
+    "teacher_acceptance": "functional research teacher under user rule; physical failures and fourth heading failure retained",
+    "smoke_functional_failure_retained": true
+  },
+  "source_sha256": {
+    "rob2nav_animal.py": "bee3f1fd311acc1cb48e83bd32cdedfcd27d82329cff5e35ea89be52ff157596",
+    "rob2nav_kine_teacher.py": "ac8a5da38115c14d4b6abd4b0914b613ef695705d49eb02605206aba76bea8da",
+    "rob2nav_kine_reference.py": "f3ae322a70e10d30f2b2a41a26ddf121967609d0b6a71a39a7b3c966c388d370",
+    "scripts/train_animal_supermimic.py": "5fab36559d63695cebf00508f42401c30220cdba432fd01315e62f73cb2d33e1",
+    "scripts/eval_animal_student_v2.py": "fd29fe8ce52d5af89936be01bd9bb59b315e96df59f4bbee925f19e2429bb93f"
+  },
+  "command": [
+    "/root/gpufree-data/envs/go2-supermimic/bin/python",
+    "-u",
+    "scripts/train_animal_supermimic.py",
+    "--task",
+    "Go2-SuperMimic-Animal-Crawl-V1",
+    "--num-envs",
+    "4096",
+    "--iterations",
+    "2000",
+    "--buffer-len",
+    "400",
+    "--imag-batch",
+    "4096",
+    "--warmup-iterations",
+    "300",
+    "--critic-warmup-iterations",
+    "0",
+    "--actor-ramp-iterations",
+    "300",
+    "--lr",
+    ".0001",
+    "--actor-lr-scale",
+    ".25",
+    "--lr-decay",
+    "2000",
+    "--lr-final-frac",
+    ".3",
+    "--driver-policy",
+    "/root/gpufree-data/go2-supermimic/reproduction/animal_expression_v1/teachers/solo8_crawl_slow/logs/model.pt",
+    "--driver-frac",
+    ".5",
+    "--driver-fade",
+    "1200",
+    "1700",
+    "--seed",
+    "36711",
+    "--run-name",
+    "animal_crawl_kine_student_v1_resetfix_20261028",
+    "--save-interval",
+    "100"
+  ],
+  "child_pid": 166285
+}
