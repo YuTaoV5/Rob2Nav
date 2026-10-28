@@ -34,3 +34,7 @@ Web浏览、MuJoCo推理、Isaac训练、机器人本地控制使用不同环境
 旧英文地址保留兼容入口，网站显示中文正式文档。`python scripts/check_documentation.py`检查网站收录的路径、链接、Bash语法及主要手册的命令选项；该检查不运行GPU训练、导航任务或机器人动作。
 
 第三方源码与资源各自保留原条款，见[第三方说明](THIRD_PARTY_NOTICES.md)。原始模型、配置、日志和哈希证据不因文档整理而重写。
+
+## 语音任务与实机导航接入
+
+独立语音服务、地图地址标注、ROS1 SCAN 到 MoE 的状态机和技能调度已加入。见 [语音控制](docs/voice-control.md) 和 [服务器部署](docs/voice-server-deployment.md)。Studio 的“语音任务”页面使用同源代理。demo 不推理运动权重；live 保留原设备资格、唯一 DDS writer 和 watchdog，未资格的翻腾/倒立继续阻止。

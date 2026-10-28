@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "map_id": "demo-map-not-a-real-site",
+  "frame_id": "nav_odom",
+  "navigation_frame": "nav_odom",
+  "pcd_sha256": null,
+  "T_navigation_map": null,
+  "route_start_radius": 1.0,
+  "places": [
+    {"id":"home","name":"起点","floor":"一楼","xyz":[0,0,0.4],"yaw":0,"aliases":["原点"],"skills":["backflip","sideflip","handstand"],"zone_radius":0.5},
+    {"id":"hall","name":"走廊","floor":"一楼","xyz":[1.5,0,0.4],"yaw":0,"aliases":[],"skills":[],"zone_radius":0.5},
+    {"id":"office","name":"一楼会议室","floor":"一楼","xyz":[3,1,0.4],"yaw":1.57,"aliases":["会议室","办公室"],"skills":[],"zone_radius":0.5}
+  ],
+  "edges": [
+    {"from":"home","to":"hall","bidirectional":true},
+    {"from":"hall","to":"office","bidirectional":true}
+  ]
+}
