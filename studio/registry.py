@@ -41,7 +41,18 @@ def resolve_recipe(config,require_ready=False):
 
 def capabilities(catalog,jobs):
     data=registry();result=copy.deepcopy(data)
+    media_path=Path(__file__).with_name('supermimic_media.json')
+    media_overrides=json.loads(media_path.read_text(encoding='utf-8')) if media_path.exists() else {}
     for skill in result['capabilities']:
+        # Attach recordings to existing skill IDs without changing recipes or acceptance.
+        override=media_overrides.get(skill['id'],{})
+        reviewed_media=override.get('curated_media',[])
+        if reviewed_media:
+            paths={m['path'] for m in reviewed_media}
+            skill['curated_media']=copy.deepcopy(reviewed_media)+[m for m in skill.get('curated_media',[]) if m['path'] not in paths]
+            skill['preferred_video']=reviewed_media[0]['path']
+            for field in ('local_status','description'):
+                if field in override:skill[field]=override[field]
         skill['manuals']=[dict(kind=kind,label=label,path=path,url='#reports?path='+quote(path,safe=''))
             for kind,label in [('training','训练手册'),('simulation','仿真手册'),('deployment','部署手册')]
             for path in [indexed_manual(catalog.get('reports',[]),skill['id'],kind)] if any(r['path']==path for r in catalog.get('reports',[]))]
