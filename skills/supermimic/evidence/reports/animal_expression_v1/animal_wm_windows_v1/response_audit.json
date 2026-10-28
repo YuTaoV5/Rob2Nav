@@ -1,0 +1,56 @@
+{
+  "policy_updated": false,
+  "physics_executed": false,
+  "rows": [
+    {
+      "arm": "unconstrained",
+      "dataset": "animal_action_response_audit",
+      "one_step_response_norm": 0.011202163994312286,
+      "two_step_relative_error": 0.8895359635353088,
+      "two_step_cosine": 0.5486693382263184,
+      "wm_artifact_sha256": "7bf779182bf366b805f440d99720bad3c53a04855dc0c5da2b86906d46e5118a"
+    },
+    {
+      "arm": "unconstrained",
+      "dataset": "animal_action_response_prefix120_seed36726",
+      "one_step_response_norm": 0.009649776853621006,
+      "two_step_relative_error": 0.8890592455863953,
+      "two_step_cosine": 0.5589380264282227,
+      "wm_artifact_sha256": "7bf779182bf366b805f440d99720bad3c53a04855dc0c5da2b86906d46e5118a"
+    },
+    {
+      "arm": "unconstrained",
+      "dataset": "animal_action_response_prefix240_seed36727",
+      "one_step_response_norm": 0.00966870877891779,
+      "two_step_relative_error": 0.9266553521156311,
+      "two_step_cosine": 0.4498216509819031,
+      "wm_artifact_sha256": "7bf779182bf366b805f440d99720bad3c53a04855dc0c5da2b86906d46e5118a"
+    },
+    {
+      "arm": "delayed_input",
+      "dataset": "animal_action_response_audit",
+      "one_step_response_norm": 0.0,
+      "two_step_relative_error": 0.8990693092346191,
+      "two_step_cosine": 0.5472962260246277,
+      "wm_artifact_sha256": "8c2fea718f6ba71b7a78be83e72a37a2565d1764f60095908d4a7bcbb0eefb3b"
+    },
+    {
+      "arm": "delayed_input",
+      "dataset": "animal_action_response_prefix120_seed36726",
+      "one_step_response_norm": 0.0,
+      "two_step_relative_error": 0.9035205841064453,
+      "two_step_cosine": 0.5406458973884583,
+      "wm_artifact_sha256": "8c2fea718f6ba71b7a78be83e72a37a2565d1764f60095908d4a7bcbb0eefb3b"
+    },
+    {
+      "arm": "delayed_input",
+      "dataset": "animal_action_response_prefix240_seed36727",
+      "one_step_response_norm": 0.0,
+      "two_step_relative_error": 0.9348047375679016,
+      "two_step_cosine": 0.4305227994918823,
+      "wm_artifact_sha256": "8c2fea718f6ba71b7a78be83e72a37a2565d1764f60095908d4a7bcbb0eefb3b"
+    }
+  ],
+  "source_sha256": "72221f9ce1ae57bda8f8c020cde0b3ba98e8c12ee91109817fae5f701f845261",
+  "limitations": "Fixed baseline state finite difference; physical branches retain prior recorded start mismatches/noise. Three local counterfactual response sets only, not a new functional trial. No further fitting or threshold changes."
+}

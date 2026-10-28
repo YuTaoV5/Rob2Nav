@@ -1,0 +1,443 @@
+/root/gpufree-data/envs/go2-supermimic/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+Setting seed: 37000
+Warp 1.18.0 initialized:
+   CUDA Toolkit 13.4, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA L40" (44 GiB, sm_89, mempool enabled)
+   Kernel cache:
+     /root/.cache/warp/1.18.0
+Module mujoco_warp._src.smooth b9cc505 load on device 'cuda:0' took 0.94 ms  (cached)
+Module _nxn_broadphase__locals__kernel_3a0c7ab9 3a0c7ab load on device 'cuda:0' took 0.34 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_f173d362 f173d36 load on device 'cuda:0' took 0.71 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_f173d362 c570b25 load on device 'cuda:0' took 0.55 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_c206fcb1 c206fcb load on device 'cuda:0' took 0.61 ms  (cached)
+Module mujoco_warp._src.constraint 9435a53 load on device 'cuda:0' took 0.32 ms  (cached)
+Module _friction_dof__locals__kernel_35a89db9 35a89db load on device 'cuda:0' took 0.37 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_6395e840 6395e84 load on device 'cuda:0' took 0.35 ms  (cached)
+Module _efc_contact_init__locals__kernel_a68d1f95 a68d1f9 load on device 'cuda:0' took 0.32 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_9a227029 8139c0c load on device 'cuda:0' took 0.38 ms  (cached)
+Module _efc_contact_update__locals__kernel_55bfdad1 55bfdad load on device 'cuda:0' took 0.31 ms  (cached)
+Module mujoco_warp._src.sensor 764597f load on device 'cuda:0' took 0.77 ms  (cached)
+Module mujoco_warp._src.forward f44d3e1 load on device 'cuda:0' took 0.54 ms  (cached)
+Module mujoco_warp._src.passive 80f3681 load on device 'cuda:0' took 0.60 ms  (cached)
+Module mujoco_warp._src.forward 0a75030 load on device 'cuda:0' took 1.72 ms  (cached)
+Module _qfrc_smooth__locals__kernel_2c4e0694 2c4e069 load on device 'cuda:0' took 0.33 ms  (cached)
+Module mujoco_warp._src.support f39c2de load on device 'cuda:0' took 0.37 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_a304cbc7 092260f load on device 'cuda:0' took 34.36 ms  (cached)
+Module _solve_init_dof__locals__kernel_618a11c7 618a11c load on device 'cuda:0' took 0.35 ms  (cached)
+Module mujoco_warp._src.solver c97221b load on device 'cuda:0' took 0.66 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_4396b4dc 4396b4d load on device 'cuda:0' took 0.32 ms  (cached)
+Module mul_m_kernel__locals___mul_m_74986a16 74986a1 load on device 'cuda:0' took 0.31 ms  (cached)
+Module _update_constraint_efc__locals__kernel_ed085732 ed08573 load on device 'cuda:0' took 0.33 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_bd324b86 bd324b8 load on device 'cuda:0' took 0.52 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_ada3cc5f ada3cc5 load on device 'cuda:0' took 0.32 ms  (cached)
+Module _update_gradient_grad__locals__kernel_45d59ec9 45d59ec load on device 'cuda:0' took 0.34 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_1ab9953e b88d9f6 load on device 'cuda:0' took 0.81 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_99ac2110 42358df load on device 'cuda:0' took 44.93 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_9aa9e5aa 5235421 load on device 'cuda:0' took 0.48 ms  (cached)
+Module _contact_sort__locals__contact_sort_adeecb09 788a659 load on device 'cuda:0' took 0.39 ms  (cached)
+Module mujoco_warp._src.derivative 1d93a53 load on device 'cuda:0' took 0.45 ms  (cached)
+Module _next_time_builder__locals___next_time_cc50a46c cc50a46 load on device 'cuda:0' took 0.35 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_c7eeecfb c7eeecf load on device 'cuda:0' took 0.33 ms  (cached)
+Module reset_data__locals__reset_M_d1ea7a8e d1ea7a8 load on device 'cuda:0' took 0.30 ms  (cached)
+Module reset_data__locals__reset_mocap_b017f38a b017f38 load on device 'cuda:0' took 0.29 ms  (cached)
+Module reset_data__locals__reset_contact_757d9bde 757d9bd load on device 'cuda:0' took 0.29 ms  (cached)
+Module reset_data__locals__reset_sleep_6b3be194 6b3be19 load on device 'cuda:0' took 0.30 ms  (cached)
+Module reset_data__locals__reset_nworld_e471a890 e471a89 load on device 'cuda:0' took 0.33 ms  (cached)
+Module mujoco_warp._src.render_util 9978d2d load on device 'cuda:0' took 0.46 ms  (cached)
+Module mujoco_warp._src.bvh 7dab8b4 load on device 'cuda:0' took 0.50 ms  (cached)
+Module mujoco_warp._src.ray cba3709 load on device 'cuda:0' took 0.56 ms  (cached)
+
++-----------------------------------------------+
+|                Base Environment               |
++------------------------+----------------------+
+| Property               | Value                |
++------------------------+----------------------+
+| Number of environments | 104                  |
+| Environment device     | cuda:0               |
+| Environment seed       | 37000                |
+| Physics step-size      | 0.004166666666666667 |
+| Environment step-size  | 0.016666666666666666 |
++------------------------+----------------------+
+
+[INFO] <EventManager> contains 2 active terms.
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++-------+-----------------------------+
+| Index | Name                        |
++-------+-----------------------------+
+|   0   | reset_reference             |
+|   1   | initialize_hold_targets     |
++-------+-----------------------------+
++---------------------------------------+
+| Active Event Terms in Mode: 'startup' |
++------------+--------------------------+
+|   Index    | Name                     |
++------------+--------------------------+
+|     0      | encoder_bias             |
++------------+--------------------------+
+
+[INFO] <CommandManager> contains 1 active terms.
++--------------------------------+
+|      Active Command Terms      |
++-------+--------+---------------+
+| Index | Name   |      Type     |
++-------+--------+---------------+
+|   0   | target | AnimalCommand |
++-------+--------+---------------+
+
+[INFO] <ActionManager> contains 1 active terms.
++---------------------------------+
+| Active Action Terms (shape: 12) |
++-------+-----------+-------------+
+| Index | Name      |   Dimension |
++-------+-----------+-------------+
+|   0   | joint_pos |          12 |
++-------+-----------+-------------+
+
+[INFO] <ObservationManager> contains 1 groups.
++------------------------------------------------------------+
+| Active Observation Terms in Group: 'actor' (shape: (350,)) |
++--------+------------------------+--------------------------+
+| Index  | Name                   |          Shape           |
++--------+------------------------+--------------------------+
+|   0    | base_ang_vel           |     (15,)  ← 5×(3,)      |
+|   1    | projected_gravity      |     (15,)  ← 5×(3,)      |
+|   2    | joint_pos              |     (60,)  ← 5×(12,)     |
+|   3    | joint_vel              |     (60,)  ← 5×(12,)     |
+|   4    | actions                |     (60,)  ← 5×(12,)     |
+|   5    | target                 |    (140,)  ← 5×(28,)     |
++--------+------------------------+--------------------------+
+
+[INFO] <TerminationManager> contains 1 active terms.
++-----------------------------+
+|   Active Termination Terms  |
++-------+----------+----------+
+| Index | Name     | Time Out |
++-------+----------+----------+
+|   0   | time_out |   True   |
++-------+----------+----------+
+
+[INFO] <RewardManager> contains 1 active terms.
++-------------------------+
+|   Active Reward Terms   |
++-------+--------+--------+
+| Index | Name   | Weight |
++-------+--------+--------+
+|   0   | animal |    1.0 |
++-------+--------+--------+
+
+[INFO] <NullCurriculumManager> (inactive)
+[INFO] <MetricsManager> contains 1 active terms.
++-------------------------+
+|   Active Metrics Terms  |
++-------+-----------------+
+| Index | Name            |
++-------+-----------------+
+|   0   | mean_action_acc |
++-------+-----------------+
+
+[INFO] <NullRecorderManager> (inactive)
+{
+  "phase": "completed_pending_review",
+  "forks": [
+    {
+      "seed": 37000,
+      "prefix": 30,
+      "epsilon": 0.05,
+      "split": "train",
+      "transitions": 832,
+      "baseline_repeat_velocity_gap": 1.707467617961811e-06,
+      "real_two_step_effect_norm": 0.18652726709842682,
+      "real_one_step_response_norm": 9.169882105197757e-05,
+      "parent_two_step_response_relative_error": 0.8584549427032471,
+      "parent_two_step_response_cosine": 0.6310603022575378,
+      "start_state_max_gap": 7.390975952148438e-05,
+      "pre_pulse_physical_max_gap": {
+        "qpos": 1.995381236076355,
+        "qvel": 7.390975952148438e-05,
+        "ctrl": 0.0001652240753173828,
+        "act": 0.0,
+        "qacc": 0.0167999267578125,
+        "qacc_warmstart": 0.013046741485595703
+      },
+      "action_history_error": 0.0,
+      "artifact_sha256": "a5c13959c9c112497d96233004b08e31fd7b7400b267344e48564164382514c2",
+      "bytes": 932357
+    },
+    {
+      "seed": 37000,
+      "prefix": 30,
+      "epsilon": 0.15,
+      "split": "train",
+      "transitions": 832,
+      "baseline_repeat_velocity_gap": 1.5253870060405461e-06,
+      "real_two_step_effect_norm": 0.1864299178123474,
+      "real_one_step_response_norm": 2.7724658139050007e-05,
+      "parent_two_step_response_relative_error": 0.8585330843925476,
+      "parent_two_step_response_cosine": 0.6306170225143433,
+      "start_state_max_gap": 6.079673767089844e-05,
+      "pre_pulse_physical_max_gap": {
+        "qpos": 1.9953811168670654,
+        "qvel": 6.079673767089844e-05,
+        "ctrl": 0.00013256072998046875,
+        "act": 0.0,
+        "qacc": 0.0153961181640625,
+        "qacc_warmstart": 0.009968757629394531
+      },
+      "action_history_error": 0.0,
+      "artifact_sha256": "1ba24433cb65ed190d7eb0bd8339956ff74f4639c0432988b0e8222aca6922e8",
+      "bytes": 932357
+    },
+    {
+      "seed": 37001,
+      "prefix": 90,
+      "epsilon": 0.05,
+      "split": "train",
+      "transitions": 832,
+      "baseline_repeat_velocity_gap": 1.8400972976451158e-06,
+      "real_two_step_effect_norm": 0.17799054086208344,
+      "real_one_step_response_norm": 9.565001528244466e-05,
+      "parent_two_step_response_relative_error": 0.8977101445198059,
+      "parent_two_step_response_cosine": 0.5177949070930481,
+      "start_state_max_gap": 5.3612515330314636e-05,
+      "pre_pulse_physical_max_gap": {
+        "qpos": 1.9698381423950195,
+        "qvel": 5.3612515330314636e-05,
+        "ctrl": 0.00014162063598632812,
+        "act": 0.0,
+        "qacc": 0.009415626525878906,
+        "qacc_warmstart": 0.012806892395019531
+      },
+      "action_history_error": 0.0,
+      "artifact_sha256": "021c7660c688b1a94c85d5a229782dbc090df54427922681ff95736f81b1c87e",
+      "bytes": 943877
+    },
+    {
+      "seed": 37001,
+      "prefix": 90,
+      "epsilon": 0.15,
+      "split": "train",
+      "transitions": 832,
+      "baseline_repeat_velocity_gap": 2.4904561541916337e-06,
+      "real_two_step_effect_norm": 0.17712675034999847,
+      "real_one_step_response_norm": 2.8949272746103816e-05,
+      "parent_two_step_response_relative_error": 0.8944405913352966,
+      "parent_two_step_response_cosine": 0.5283396244049072,
+      "start_state_max_gap": 4.506111145019531e-05,
+      "pre_pulse_physical_max_gap": {
+        "qpos": 1.9698381423950195,
+        "qvel": 4.506111145019531e-05,
+        "ctrl": 0.00014209747314453125,
+        "act": 0.0,
+        "qacc": 0.014527320861816406,
+        "qacc_warmstart": 0.009770393371582031
+      },
+      "action_history_error": 0.0,
+      "artifact_sha256": "40ba2f22b91827bd7bf8280b0a68dd7b3d398fd0dcb423d32c71fbf590be9c34",
+      "bytes": 943877
+    },
+    {
+      "seed": 37002,
+      "prefix": 150,
+      "epsilon": 0.05,
+      "split": "train",
+      "transitions": 832,
+      "baseline_repeat_velocity_gap": 8.362555490748491e-06,
+      "real_two_step_effect_norm": 0.08864680677652359,
+      "real_one_step_response_norm": 0.0005423858528956771,
+      "parent_two_step_response_relative_error": 0.849713146686554,
+      "parent_two_step_response_cosine": 0.602860689163208,
+      "start_state_max_gap": 0.00010263919830322266,
+      "pre_pulse_physical_max_gap": {
+        "qpos": 1.9712412357330322,
+        "qvel": 0.00010263919830322266,
+        "ctrl": 0.0001983642578125,
+        "act": 0.0,
+        "qacc": 0.011932373046875,
+        "qacc_warmstart": 0.0076446533203125
+      },
+      "action_history_error": 0.0,
+      "artifact_sha256": "ccb9a11ff738c786e50e49a471dc5c19ced9c698c723aa9948a576c20db2c0d6",
+      "bytes": 955425
+    },
+    {
+      "seed": 37002,
+      "prefix": 150,
+      "epsilon": 0.15,
+      "split": "train",
+      "transitions": 832,
+      "baseline_repeat_velocity_gap": 1.4291470506577753e-05,
+      "real_two_step_effect_norm": 0.13621999323368073,
+      "real_one_step_response_norm": 0.0001835613657021895,
+      "parent_two_step_response_relative_error": 0.9199954867362976,
+      "parent_two_step_response_cosine": 0.48109790682792664,
+      "start_state_max_gap": 0.00014135241508483887,
+      "pre_pulse_physical_max_gap": {
+        "qpos": 1.9712414741516113,
+        "qvel": 0.00014135241508483887,
+        "ctrl": 0.000232696533203125,
+        "act": 0.0,
+        "qacc": 0.01434326171875,
+        "qacc_warmstart": 0.0103759765625
+      },
+      "action_history_error": 0.0,
+      "artifact_sha256": "a01393c7c322daa2ad05db1d6863168b4580b0889c4180ffd9f005b996c81700",
+      "bytes": 955425
+    },
+    {
+      "seed": 37003,
+      "prefix": 240,
+      "epsilon": 0.05,
+      "split": "train",
+      "transitions": 832,
+      "baseline_repeat_velocity_gap": 1.257471694771084e-06,
+      "real_two_step_effect_norm": 0.17258095741271973,
+      "real_one_step_response_norm": 4.913390876026824e-05,
+      "parent_two_step_response_relative_error": 0.9276100993156433,
+      "parent_two_step_response_cosine": 0.4476807117462158,
+      "start_state_max_gap": 3.516674041748047e-05,
+      "pre_pulse_physical_max_gap": {
+        "qpos": 1.858487606048584,
+        "qvel": 3.516674041748047e-05,
+        "ctrl": 8.440017700195312e-05,
+        "act": 0.0,
+        "qacc": 0.01088714599609375,
+        "qacc_warmstart": 0.009891986846923828
+      },
+      "action_history_error": 0.0,
+      "artifact_sha256": "f3a3a96392c4aabb872122ad65d275de34f75cf93bbc8dcf04931ae8205cb55b",
+      "bytes": 972705
+    },
+    {
+      "seed": 37003,
+      "prefix": 240,
+      "epsilon": 0.15,
+      "split": "train",
+      "transitions": 832,
+      "baseline_repeat_velocity_gap": 1.4537989727614331e-06,
+      "real_two_step_effect_norm": 0.17345017194747925,
+      "real_one_step_response_norm": 1.5490857549593784e-05,
+      "parent_two_step_response_relative_error": 0.9252622127532959,
+      "parent_two_step_response_cosine": 0.4598032832145691,
+      "start_state_max_gap": 3.170967102050781e-05,
+      "pre_pulse_physical_max_gap": {
+        "qpos": 1.8584867715835571,
+        "qvel": 3.170967102050781e-05,
+        "ctrl": 9.72747802734375e-05,
+        "act": 0.0,
+        "qacc": 0.012340545654296875,
+        "qacc_warmstart": 0.00855398178100586
+      },
+      "action_history_error": 0.0,
+      "artifact_sha256": "a112c7bcb3098eccfa48036683b55e7a566d5629ced4a0ac850e2ad90e4f1dcc",
+      "bytes": 972705
+    },
+    {
+      "seed": 37004,
+      "prefix": 360,
+      "epsilon": 0.05,
+      "split": "validation",
+      "transitions": 832,
+      "baseline_repeat_velocity_gap": 4.500150680541992e-06,
+      "real_two_step_effect_norm": 0.17909738421440125,
+      "real_one_step_response_norm": 8.719776815269142e-05,
+      "parent_two_step_response_relative_error": 0.8877184987068176,
+      "parent_two_step_response_cosine": 0.5628157258033752,
+      "start_state_max_gap": 3.7670135498046875e-05,
+      "pre_pulse_physical_max_gap": {
+        "qpos": 1.9951660633087158,
+        "qvel": 3.7670135498046875e-05,
+        "ctrl": 9.5367431640625e-05,
+        "act": 0.0,
+        "qacc": 0.012310981750488281,
+        "qacc_warmstart": 0.0110931396484375
+      },
+      "action_history_error": 0.0,
+      "artifact_sha256": "c69e0dac1eb46581706440bdf2f368f8e8a6af16c09d5c673aff098c9a85904d",
+      "bytes": 995745
+    },
+    {
+      "seed": 37004,
+      "prefix": 360,
+      "epsilon": 0.15,
+      "split": "validation",
+      "transitions": 832,
+      "baseline_repeat_velocity_gap": 2.881208047256223e-06,
+      "real_two_step_effect_norm": 0.17910540103912354,
+      "real_one_step_response_norm": 3.300097887404263e-05,
+      "parent_two_step_response_relative_error": 0.8877168297767639,
+      "parent_two_step_response_cosine": 0.5628416538238525,
+      "start_state_max_gap": 2.8848648071289062e-05,
+      "pre_pulse_physical_max_gap": {
+        "qpos": 1.9951660633087158,
+        "qvel": 2.8848648071289062e-05,
+        "ctrl": 9.918212890625e-05,
+        "act": 0.0,
+        "qacc": 0.014227867126464844,
+        "qacc_warmstart": 0.010699272155761719
+      },
+      "action_history_error": 0.0,
+      "artifact_sha256": "9cc10da05a14526004c943fea94534917edc456526d1ee5fc8ad1f55cefc82bc",
+      "bytes": 995745
+    },
+    {
+      "seed": 37005,
+      "prefix": 450,
+      "epsilon": 0.05,
+      "split": "test",
+      "transitions": 832,
+      "baseline_repeat_velocity_gap": 2.5890526558214333e-06,
+      "real_two_step_effect_norm": 0.17663884162902832,
+      "real_one_step_response_norm": 8.600846194894984e-05,
+      "parent_two_step_response_relative_error": 0.8934202194213867,
+      "parent_two_step_response_cosine": 0.5612311363220215,
+      "start_state_max_gap": 5.412101745605469e-05,
+      "pre_pulse_physical_max_gap": {
+        "qpos": 1.9138261079788208,
+        "qvel": 5.412101745605469e-05,
+        "ctrl": 0.00010275840759277344,
+        "act": 0.0,
+        "qacc": 0.013504981994628906,
+        "qacc_warmstart": 0.008279800415039062
+      },
+      "action_history_error": 0.0,
+      "artifact_sha256": "0067a6bd05bcbaabf938a541bfa356d38cb57c5a0940a8c6314ef7e47d6bb2cb",
+      "bytes": 1013025
+    },
+    {
+      "seed": 37005,
+      "prefix": 450,
+      "epsilon": 0.15,
+      "split": "test",
+      "transitions": 832,
+      "baseline_repeat_velocity_gap": 2.137083129127859e-06,
+      "real_two_step_effect_norm": 0.18278339505195618,
+      "real_one_step_response_norm": 0.028639400377869606,
+      "parent_two_step_response_relative_error": 0.8977948427200317,
+      "parent_two_step_response_cosine": 0.5550286769866943,
+      "start_state_max_gap": 0.24381232261657715,
+      "pre_pulse_physical_max_gap": {
+        "qpos": 1.9178239107131958,
+        "qvel": 0.24381232261657715,
+        "ctrl": 0.27309131622314453,
+        "act": 0.0,
+        "qacc": 2.8442649841308594,
+        "qacc_warmstart": 2.8002681732177734
+      },
+      "action_history_error": 0.0,
+      "artifact_sha256": "26aef79a0839b19b1542c03d667faf1b3b0774dfe33dec4ddd89cddbb1c59382",
+      "bytes": 1013025
+    }
+  ],
+  "policy_updated": false,
+  "world_model_updated": false,
+  "seed": 37005,
+  "prefix": 450,
+  "epsilon": 0.15,
+  "source_sha256": "143ef762cd98be26d71da19c89c16c5984438ce4ac86e78f0a81d8576019d130",
+  "parent_sha256": "3e185d758bea4fe30851d20c2c52779f73c316f579fc9f287dc1c849ec68a89a",
+  "limitations": "Parallel different environment instances with corresponding heading and identical intended action prefix; physical starts NOT asserted identical. Qpos comparison subtracts environment origin on clones only. Prefix/seed jointly change; initial poses not perturbed. Pulses are excitation data, not a functional policy or physical-envelope acceptance. No failure/contact filtering, no model/actor update, no physical state writes except normal resets."
+}

@@ -1,0 +1,58 @@
+{
+  "phase": "completed_pending_review",
+  "capability_qualified": false,
+  "video_published": false,
+  "source_sha256": {
+    "rob2nav_expression.py": "a7dbef8d78c93826fb93b4e89fd81a77501b18bfb7b46a4a0c27d554b06be773",
+    "scripts/train_expression_supermimic.py": "64b17f29104a966cae55aa10ae9128d203cdbaed43b1dd9aa3438e8a41c781a1",
+    "scripts/eval_expression.py": "9562dbea37ac3cbd46a52412684fe1db5cafde36f738ba9d229484b2647288f7",
+    "rob2nav_moe_teacher.py": "27928843265715eed3d5bf74ec38bf633a954096e417f2ced9461df3e2ae46bb"
+  },
+  "preflight": {
+    "teacher_functional": true,
+    "teacher_physical_limits_passed": false,
+    "teacher_emotion_perception_validated": false,
+    "smoke_audit": {
+      "training_completed": true,
+      "reward_max_error": 0.0,
+      "clock_command_error": 0.0,
+      "teacher_frames": 544,
+      "bc_steps": 16,
+      "command_padding_zero": true,
+      "capability_qualified": false
+    },
+    "smoke_path": "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-28_00-32-44_expression_rhythm_moe_smoke_v1_20261028/expression_audit.json"
+  },
+  "command": [
+    "/root/gpufree-data/envs/go2-supermimic/bin/python",
+    "-u",
+    "scripts/eval_expression.py",
+    "--checkpoint",
+    "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-28_00-36-04_expression_rhythm_moe_student_v1_bounded_20261028/model_2000.pt",
+    "--seed",
+    "36123",
+    "--num-envs",
+    "128",
+    "--output",
+    "/root/gpufree-data/go2-supermimic/reproduction/animal_expression_v1/expression_formal/evaluation_36123.json"
+  ],
+  "checkpoint": "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-28_00-36-04_expression_rhythm_moe_student_v1_bounded_20261028/model_2000.pt",
+  "checkpoint_sha256": "7de82a248e3e00d5e8ef24757067bb929fe8ffde0466bccb89ef5ad6a5009569",
+  "training_audit": {
+    "training_completed": true,
+    "reward_max_error": 0.0,
+    "clock_command_error": 0.0,
+    "teacher_frames": 2988808,
+    "bc_steps": 1399,
+    "command_padding_zero": true,
+    "capability_qualified": false
+  },
+  "evaluations": [
+    "/root/gpufree-data/go2-supermimic/reproduction/animal_expression_v1/expression_formal/evaluation_36120.json",
+    "/root/gpufree-data/go2-supermimic/reproduction/animal_expression_v1/expression_formal/evaluation_36121.json",
+    "/root/gpufree-data/go2-supermimic/reproduction/animal_expression_v1/expression_formal/evaluation_36122.json",
+    "/root/gpufree-data/go2-supermimic/reproduction/animal_expression_v1/expression_formal/evaluation_36123.json"
+  ],
+  "next": "Review functional/physical outcomes and record uncut original-speed student video before publishing.",
+  "updated_at": 1793119343.488059
+}

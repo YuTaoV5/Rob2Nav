@@ -1,0 +1,258 @@
+/root/gpufree-data/go2-supermimic/scripts/fit_animal_wm_windows.py:59: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  if (update+1)%25==0:state['updates']=update+1;state['last_training_loss']=float(l);save()
+{
+  "phase": "completed_pending_review",
+  "contract": [
+    {
+      "seed": 36820,
+      "action_history_error": 0.0,
+      "clock_error": 0.0,
+      "context_change_within_8steps": 0.0
+    },
+    {
+      "seed": 36821,
+      "action_history_error": 0.0,
+      "clock_error": 0.0,
+      "context_change_within_8steps": 0.0
+    },
+    {
+      "seed": 36822,
+      "action_history_error": 0.0,
+      "clock_error": 0.0,
+      "context_change_within_8steps": 0.0
+    },
+    {
+      "seed": 36823,
+      "action_history_error": 0.0,
+      "clock_error": 0.0,
+      "context_change_within_8steps": 0.0
+    }
+  ],
+  "input_clip_audit": {
+    "train_student": {
+      "windows": 960,
+      "feature_fraction_outside_clip": 0.0,
+      "rows_with_any_clipped_feature": 0.0,
+      "max_abs_standardized_input": 2.511826753616333,
+      "current_action_clipped_fraction": 0.0,
+      "previous_action_clipped_fraction": 0.0
+    },
+    "train_teacher": {
+      "windows": 960,
+      "feature_fraction_outside_clip": 3.0505951144732535e-05,
+      "rows_with_any_clipped_feature": 0.004557291977107525,
+      "max_abs_standardized_input": 15.158600807189941,
+      "current_action_clipped_fraction": 0.0,
+      "previous_action_clipped_fraction": 0.0
+    },
+    "validation_student": {
+      "windows": 480,
+      "feature_fraction_outside_clip": 0.0,
+      "rows_with_any_clipped_feature": 0.0,
+      "max_abs_standardized_input": 2.5214595794677734,
+      "current_action_clipped_fraction": 0.0,
+      "previous_action_clipped_fraction": 0.0
+    },
+    "test_student": {
+      "windows": 480,
+      "feature_fraction_outside_clip": 0.0,
+      "rows_with_any_clipped_feature": 0.0,
+      "max_abs_standardized_input": 2.777141809463501,
+      "current_action_clipped_fraction": 0.0,
+      "previous_action_clipped_fraction": 0.0
+    }
+  },
+  "arms": {
+    "unconstrained": {
+      "history": [
+        {
+          "updates": 0,
+          "metrics": {
+            "train_student": {
+              "normalized_8step_state_pose_loss": 0.36013210415840147,
+              "raw_8step_linear_velocity_rmse": 0.09577396911204988,
+              "raw_8step_joint_position_rmse": 0.05179241041553799,
+              "windows": 960
+            },
+            "train_teacher": {
+              "normalized_8step_state_pose_loss": 2.9222272555033366,
+              "raw_8step_linear_velocity_rmse": 0.17163566718957604,
+              "raw_8step_joint_position_rmse": 0.14218453054964805,
+              "windows": 960
+            },
+            "validation_student": {
+              "normalized_8step_state_pose_loss": 0.37497673034667967,
+              "raw_8step_linear_velocity_rmse": 0.09870787880865778,
+              "raw_8step_joint_position_rmse": 0.05332992270870928,
+              "windows": 480
+            },
+            "test_student": {
+              "normalized_8step_state_pose_loss": 0.36169463793436685,
+              "raw_8step_linear_velocity_rmse": 0.09766869131697926,
+              "raw_8step_joint_position_rmse": 0.05196615745498075,
+              "windows": 480
+            }
+          }
+        },
+        {
+          "updates": 50,
+          "metrics": {
+            "train_student": {
+              "normalized_8step_state_pose_loss": 0.2760021100441615,
+              "raw_8step_linear_velocity_rmse": 0.09234270111080371,
+              "raw_8step_joint_position_rmse": 0.04497843174146374,
+              "windows": 960
+            },
+            "train_teacher": {
+              "normalized_8step_state_pose_loss": 2.8231060107549033,
+              "raw_8step_linear_velocity_rmse": 0.17231719564422898,
+              "raw_8step_joint_position_rmse": 0.1417572413703953,
+              "windows": 960
+            },
+            "validation_student": {
+              "normalized_8step_state_pose_loss": 0.28807158867518107,
+              "raw_8step_linear_velocity_rmse": 0.09502266901773987,
+              "raw_8step_joint_position_rmse": 0.04598777359614848,
+              "windows": 480
+            }
+          }
+        },
+        {
+          "updates": 200,
+          "metrics": {
+            "train_student": {
+              "normalized_8step_state_pose_loss": 0.24914618531862895,
+              "raw_8step_linear_velocity_rmse": 0.09048781998812366,
+              "raw_8step_joint_position_rmse": 0.04226924487045963,
+              "windows": 960
+            },
+            "train_teacher": {
+              "normalized_8step_state_pose_loss": 2.6927619775136313,
+              "raw_8step_linear_velocity_rmse": 0.16939805111046166,
+              "raw_8step_joint_position_rmse": 0.13854470928418094,
+              "windows": 960
+            },
+            "validation_student": {
+              "normalized_8step_state_pose_loss": 0.25760298371315005,
+              "raw_8step_linear_velocity_rmse": 0.09305229027942845,
+              "raw_8step_joint_position_rmse": 0.04296361413203689,
+              "windows": 480
+            },
+            "test_student": {
+              "normalized_8step_state_pose_loss": 0.2607694506645203,
+              "raw_8step_linear_velocity_rmse": 0.09294551158432166,
+              "raw_8step_joint_position_rmse": 0.043612636019842464,
+              "windows": 480
+            }
+          }
+        }
+      ],
+      "artifact_sha256": "7bf779182bf366b805f440d99720bad3c53a04855dc0c5da2b86906d46e5118a"
+    },
+    "delayed_input": {
+      "history": [
+        {
+          "updates": 0,
+          "metrics": {
+            "train_student": {
+              "normalized_8step_state_pose_loss": 0.6365914662679036,
+              "raw_8step_linear_velocity_rmse": 0.12821648304248037,
+              "raw_8step_joint_position_rmse": 0.07355198780666075,
+              "windows": 960
+            },
+            "train_teacher": {
+              "normalized_8step_state_pose_loss": 3.839999198913574,
+              "raw_8step_linear_velocity_rmse": 0.18336852337391568,
+              "raw_8step_joint_position_rmse": 0.174928226529114,
+              "windows": 960
+            },
+            "validation_student": {
+              "normalized_8step_state_pose_loss": 0.6538819829622905,
+              "raw_8step_linear_velocity_rmse": 0.13063219406713228,
+              "raw_8step_joint_position_rmse": 0.07451414954055154,
+              "windows": 480
+            },
+            "test_student": {
+              "normalized_8step_state_pose_loss": 0.6226631999015808,
+              "raw_8step_linear_velocity_rmse": 0.1281427448215096,
+              "raw_8step_joint_position_rmse": 0.07237021661956064,
+              "windows": 480
+            }
+          }
+        },
+        {
+          "updates": 50,
+          "metrics": {
+            "train_student": {
+              "normalized_8step_state_pose_loss": 0.3051130702098211,
+              "raw_8step_linear_velocity_rmse": 0.09661848247350081,
+              "raw_8step_joint_position_rmse": 0.05103183957906218,
+              "windows": 960
+            },
+            "train_teacher": {
+              "normalized_8step_state_pose_loss": 3.295162836710612,
+              "raw_8step_linear_velocity_rmse": 0.17829456722785142,
+              "raw_8step_joint_position_rmse": 0.1602360711482806,
+              "windows": 960
+            },
+            "validation_student": {
+              "normalized_8step_state_pose_loss": 0.3171569168567657,
+              "raw_8step_linear_velocity_rmse": 0.09917682749444824,
+              "raw_8step_joint_position_rmse": 0.05200743739707198,
+              "windows": 480
+            }
+          }
+        },
+        {
+          "updates": 200,
+          "metrics": {
+            "train_student": {
+              "normalized_8step_state_pose_loss": 0.2687958965698878,
+              "raw_8step_linear_velocity_rmse": 0.09385807805981262,
+              "raw_8step_joint_position_rmse": 0.045729425842602485,
+              "windows": 960
+            },
+            "train_teacher": {
+              "normalized_8step_state_pose_loss": 3.0002137581507364,
+              "raw_8step_linear_velocity_rmse": 0.1755976492298342,
+              "raw_8step_joint_position_rmse": 0.15081174400097108,
+              "windows": 960
+            },
+            "validation_student": {
+              "normalized_8step_state_pose_loss": 0.27819541096687317,
+              "raw_8step_linear_velocity_rmse": 0.09646567693604534,
+              "raw_8step_joint_position_rmse": 0.04637740962386893,
+              "windows": 480
+            },
+            "test_student": {
+              "normalized_8step_state_pose_loss": 0.2819580912590027,
+              "raw_8step_linear_velocity_rmse": 0.09640630994356517,
+              "raw_8step_joint_position_rmse": 0.04696240279742923,
+              "windows": 480
+            }
+          }
+        }
+      ],
+      "artifact_sha256": "8c2fea718f6ba71b7a78be83e72a37a2565d1764f60095908d4a7bcbb0eefb3b"
+    }
+  },
+  "policy_updated": false,
+  "physics_executed": false,
+  "normalization_updated": false,
+  "current_arm": "delayed_input",
+  "updates": 200,
+  "last_training_loss": 1.9873311519622803,
+  "updates_per_arm": 200,
+  "branch_sha256": {
+    "36820": "505a07de15678727b655a087847d27286b7dc5868c8d2aa5cc014afd37103994",
+    "36821": "11c76dcd75cc86ca01c9c02b30433bf971a8ce8e7590667724592e1585dba3a3",
+    "36822": "c62676bbd2c04f56bf02005e6c1a0af6365ff336484ec932efca14ced6a9a12a",
+    "36823": "df587bed90546011bfc58fd3fae477e1a09192404050c431547fc31f2f7ba73f"
+  },
+  "source_sha256": "edeba21bd5783623e2231d692e08eaa7de12fe9f997647e2e2f6e39e57bf01c9",
+  "parent_sha256": "3e185d758bea4fe30851d20c2c52779f73c316f579fc9f287dc1c849ec68a89a",
+  "deployed": false,
+  "controller_qualified": false,
+  "limitations": "Only fixed reference initial poses; no added initial perturbation. Test/validation student-only complete episodes. Current normalization frozen from original training; no heldout stats update. Raw rollout prediction does not certify action derivatives, policy control or functional crawling. WM artifacts server-only, original actor/checkpoint unchanged."
+}

@@ -1,0 +1,88 @@
+{
+  "role": "own_supermimic_student",
+  "checkpoint": "logs/supermimic/2026-10-28_01-18-47_expression_rhythm_actorinit_smoke_v2_20261028/model_24.pt",
+  "seed": 36212,
+  "num_envs": 8,
+  "seconds": 12,
+  "styles": [
+    {
+      "style": "joyful_steps",
+      "rmse_xy": 0.15226484835147858,
+      "rmse_yaw": 0.12845811247825623,
+      "actual_velocity_spans": [
+        0.48018795251846313,
+        0.46832215785980225,
+        1.007799744606018
+      ],
+      "falls": 0
+    },
+    {
+      "style": "firm_march",
+      "rmse_xy": 0.1816861480474472,
+      "rmse_yaw": 0.13468967378139496,
+      "actual_velocity_spans": [
+        0.5629849433898926,
+        0.3969138264656067,
+        0.8987311124801636
+      ],
+      "falls": 0
+    },
+    {
+      "style": "slow_sway",
+      "rmse_xy": 0.08414604514837265,
+      "rmse_yaw": 0.08228112757205963,
+      "actual_velocity_spans": [
+        0.3211052417755127,
+        0.3537467420101166,
+        0.5613804459571838
+      ],
+      "falls": 0
+    },
+    {
+      "style": "playful_dance",
+      "rmse_xy": 0.1619727909564972,
+      "rmse_yaw": 0.1840926706790924,
+      "actual_velocity_spans": [
+        0.58730149269104,
+        0.6254808902740479,
+        1.5398484468460083
+      ],
+      "falls": 0
+    }
+  ],
+  "physical": {
+    "velocity_ratio": 0.5328761339187622,
+    "joint_excess_rad": 0.0,
+    "torque_ratio": 0.6259991526603699,
+    "target_rate_ratio": 0.9060940146446228
+  },
+  "body_contact": {
+    "physical_samples": 2400,
+    "nonfoot_ground_contact_samples": 321,
+    "environments_with_nonfoot_ground_contact": 1,
+    "first_contact": {
+      "sample": 356,
+      "environment": 3,
+      "geoms": [
+        "terrain",
+        "robot/FL_calf_collision1"
+      ],
+      "distance": -0.00022155512124300003
+    },
+    "contact_buffer_overflow": false,
+    "ground_geoms": [
+      "terrain"
+    ],
+    "criterion": "active raw collision contacts with dist<=0; ground versus any robot geom except named foot; no state writes"
+  },
+  "physics_samples": 2400,
+  "expected_physics_samples": 2400,
+  "clock_error_seconds": 4.5821070671081543e-07,
+  "functional_candidate": true,
+  "emotion_perception_validated": false,
+  "capability_qualified": false,
+  "missing": [
+    "full uncut visual review",
+    "perceived expression review"
+  ]
+}

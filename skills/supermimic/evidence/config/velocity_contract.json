@@ -1,0 +1,148 @@
+{
+  "task": "Go2-Velocity-Blind-Flat",
+  "cfg": {
+    "task": "Go2-Velocity-Blind-Flat",
+    "num_envs": 4096,
+    "buffer_len": 400,
+    "iterations": 12000,
+    "warmup_iterations": 300,
+    "collect_steps": 1,
+    "action_noise": 0.1,
+    "explore_frac": 0.25,
+    "explore_noise": 0.3,
+    "explore_theta": 2.0,
+    "wm_hidden": [
+      1024,
+      1024,
+      1024
+    ],
+    "wm_window": 8,
+    "wm_batch": 2048,
+    "wm_updates": 2,
+    "wm_prioritized_frac": 0.25,
+    "wm_archive_frac": 0.25,
+    "archive_size": 100000,
+    "archive_keep_prob": 0.02,
+    "wm_rewarmup_iterations": 1500,
+    "lr": 0.0002,
+    "actor_lr_scale": 1.0,
+    "lr_final_frac": 0.03,
+    "lr_decay_iterations": 30000,
+    "horizon": 32,
+    "imag_batch": 4096,
+    "actor_hidden": [
+      512,
+      256,
+      128
+    ],
+    "critic_hidden": [
+      512,
+      256,
+      128
+    ],
+    "critic_epochs": 5,
+    "critic_minibatches": 4,
+    "grad_clip": 1.0,
+    "grad_clip_elem": 0.1,
+    "compile": true,
+    "dodge_shaping": 20.0,
+    "dodge_shaping_decay_iterations": 20000,
+    "target_curriculum_iterations": 15000,
+    "terrain_curriculum_iterations": 12000,
+    "sensor_grad": true,
+    "driver_policy": "",
+    "driver_frac": 0.25,
+    "expert_policy": "",
+    "expert_frac": 0.0,
+    "driver_fade": [
+      1000000000,
+      1000000000
+    ],
+    "driver_vmin": 0.5,
+    "driver_vmax": 3.0,
+    "critic_warmup_iterations": 500,
+    "actor_ramp_iterations": 1000,
+    "reset_critic": false,
+    "continue_run": false,
+    "resume": "",
+    "collapse_falls": 3.0,
+    "log_interval": 50,
+    "save_interval": 500,
+    "seed": 32011,
+    "run_name": "velocity_blind_flat_v1",
+    "log_root": "logs/supermimic"
+  },
+  "contract": {
+    "version": "velocity_v1_draft",
+    "command_units": [
+      "m/s",
+      "m/s",
+      "rad/s"
+    ],
+    "actor_target_layout": "vx,vy,wz followed by 25 fixed zeros; 5-frame history",
+    "actor_sources": [
+      "IMU angular velocity",
+      "projected gravity",
+      "joint position",
+      "joint velocity",
+      "last action",
+      "velocity command"
+    ],
+    "command_ranges": [
+      [
+        -0.5,
+        1.0
+      ],
+      [
+        -0.3,
+        0.3
+      ],
+      [
+        -0.8,
+        0.8
+      ]
+    ],
+    "standing_probability": 0.2,
+    "training_ready": false
+  },
+  "reward_weights": {
+    "tracking_xy": 2.0,
+    "tracking_yaw": 1.0,
+    "upright": 1.0,
+    "vertical_velocity": -0.5,
+    "roll_pitch_rate": -0.05,
+    "action_rate": -0.05,
+    "joint_limit": -5.0,
+    "standing_motion": -2.0
+  },
+  "actor_terms": [
+    [
+      "base_ang_vel",
+      3
+    ],
+    [
+      "projected_gravity",
+      3
+    ],
+    [
+      "joint_pos",
+      12
+    ],
+    [
+      "joint_vel",
+      12
+    ],
+    [
+      "actions",
+      12
+    ],
+    [
+      "target",
+      28
+    ]
+  ],
+  "actor_dim": 350,
+  "actor_has_height_scan": false,
+  "actor_has_lidar": false,
+  "source_sha256": "3291eec351cef9cc00d9c49d2cbcc5a609e33d5a5eee1f42872d9cfbf97cb86a"
+}

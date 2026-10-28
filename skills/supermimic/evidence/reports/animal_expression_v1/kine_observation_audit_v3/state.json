@@ -1,0 +1,46 @@
+{
+  "phase": "completed_pending_review",
+  "student_training_started": false,
+  "rows": [
+    {
+      "clip": "ai4_dog_trot_00",
+      "num_envs": 4,
+      "control_steps": 64,
+      "physics_steps_per_control": 4,
+      "control_hz": 60,
+      "physical_controller": "frozen native actor on native observations",
+      "errors": {
+        "history": 0.0,
+        "targets": 9.5367431640625e-07,
+        "actor_action": 5.7220458984375e-06,
+        "cycle_boundary_reference": 4.76837158203125e-07
+      },
+      "clock_matches_native": true,
+      "snapshots_sha256": "0d75cff4ce9c9e92a1a32736c494843197fb9dd3129c4c47420c56e322d9b971",
+      "observation_gate_passed": true
+    },
+    {
+      "clip": "solo8_crawl_slow",
+      "num_envs": 4,
+      "control_steps": 64,
+      "physics_steps_per_control": 4,
+      "control_hz": 60,
+      "physical_controller": "frozen native actor on native observations",
+      "errors": {
+        "history": 0.0,
+        "targets": 1.7881393432617188e-07,
+        "actor_action": 5.304813385009766e-06,
+        "cycle_boundary_reference": 2.384185791015625e-07
+      },
+      "clock_matches_native": true,
+      "snapshots_sha256": "0a36710295bcfb6f4223361f6190d19568257bb806a7a8b9438f5afb0e5d3b03",
+      "observation_gate_passed": true
+    }
+  ],
+  "limitations": [
+    "Native Genesis reconstruction only, not MuJoCo transfer",
+    "No student policy or world-model reward/phase integration yet",
+    "No claim of blind student observation leakage validation yet"
+  ],
+  "updated_at": 1793128950.049202
+}

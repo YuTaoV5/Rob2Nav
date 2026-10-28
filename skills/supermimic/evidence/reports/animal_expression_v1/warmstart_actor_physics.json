@@ -1,0 +1,81 @@
+{
+  "role": "transferred_actor_initialization_only",
+  "checkpoint": "reproduction/animal_expression_v1/warmstart_actor_initialization_only.pt",
+  "seed": 36210,
+  "num_envs": 8,
+  "seconds": 12,
+  "styles": [
+    {
+      "style": "joyful_steps",
+      "rmse_xy": 0.04083775356411934,
+      "rmse_yaw": 0.05747927725315094,
+      "actual_velocity_spans": [
+        0.2661323845386505,
+        0.2318519949913025,
+        0.8972405791282654
+      ],
+      "falls": 0
+    },
+    {
+      "style": "firm_march",
+      "rmse_xy": 0.04183371737599373,
+      "rmse_yaw": 0.043351780623197556,
+      "actual_velocity_spans": [
+        0.2789757251739502,
+        0.14017048478126526,
+        0.4938145875930786
+      ],
+      "falls": 0
+    },
+    {
+      "style": "slow_sway",
+      "rmse_xy": 0.034637536853551865,
+      "rmse_yaw": 0.061274703592061996,
+      "actual_velocity_spans": [
+        0.11242353916168213,
+        0.07854853570461273,
+        0.3720399737358093
+      ],
+      "falls": 0
+    },
+    {
+      "style": "playful_dance",
+      "rmse_xy": 0.05435290187597275,
+      "rmse_yaw": 0.0680484026670456,
+      "actual_velocity_spans": [
+        0.20142093300819397,
+        0.41771596670150757,
+        1.1151632070541382
+      ],
+      "falls": 0
+    }
+  ],
+  "physical": {
+    "velocity_ratio": 0.33739373087882996,
+    "joint_excess_rad": 0.0,
+    "torque_ratio": 0.6169397234916687,
+    "target_rate_ratio": 0.5455122590065002
+  },
+  "body_contact": {
+    "physical_samples": 2400,
+    "nonfoot_ground_contact_samples": 0,
+    "environments_with_nonfoot_ground_contact": 0,
+    "first_contact": null,
+    "contact_buffer_overflow": false,
+    "ground_geoms": [
+      "terrain"
+    ],
+    "criterion": "active raw collision contacts with dist<=0; ground versus any robot geom except named foot; no state writes"
+  },
+  "physics_samples": 2400,
+  "expected_physics_samples": 2400,
+  "clock_error_seconds": 4.5821070671081543e-07,
+  "functional_candidate": true,
+  "emotion_perception_validated": false,
+  "capability_qualified": false,
+  "missing": [
+    "full uncut visual review",
+    "perceived expression review"
+  ],
+  "new_training_performed": false
+}

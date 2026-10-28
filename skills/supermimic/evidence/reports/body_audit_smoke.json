@@ -1,0 +1,154 @@
+{
+  "initialize_hold_targets": true,
+  "seed": 32200,
+  "checkpoint": "logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_12000.pt",
+  "num_envs": 2,
+  "stages": [
+    {
+      "stage": "stand",
+      "command": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rmse_xy": 0.009300517849624157,
+      "rmse_yaw": 0.013350567780435085
+    },
+    {
+      "stage": "forward",
+      "command": [
+        0.6,
+        0.0,
+        0.0
+      ],
+      "rmse_xy": 0.028896184638142586,
+      "rmse_yaw": 0.04913843050599098
+    },
+    {
+      "stage": "backward",
+      "command": [
+        -0.3,
+        0.0,
+        0.0
+      ],
+      "rmse_xy": 0.026102568954229355,
+      "rmse_yaw": 0.038876354694366455
+    },
+    {
+      "stage": "left",
+      "command": [
+        0.0,
+        0.25,
+        0.0
+      ],
+      "rmse_xy": 0.0242786668241024,
+      "rmse_yaw": 0.04056039825081825
+    },
+    {
+      "stage": "right",
+      "command": [
+        0.0,
+        -0.25,
+        0.0
+      ],
+      "rmse_xy": 0.02471693605184555,
+      "rmse_yaw": 0.053387172520160675
+    },
+    {
+      "stage": "turn_left",
+      "command": [
+        0.0,
+        0.0,
+        0.6
+      ],
+      "rmse_xy": 0.030498076230287552,
+      "rmse_yaw": 0.07259959727525711
+    },
+    {
+      "stage": "turn_right",
+      "command": [
+        0.0,
+        0.0,
+        -0.6
+      ],
+      "rmse_xy": 0.026511110365390778,
+      "rmse_yaw": 0.04506424069404602
+    },
+    {
+      "stage": "stop",
+      "command": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rmse_xy": 0.009301376529037952,
+      "rmse_yaw": 0.02361752651631832
+    }
+  ],
+  "physics_dt": 0.005,
+  "control_dt": 0.02,
+  "decimation": 4,
+  "physics_sample_count": 3200,
+  "expected_physics_samples": 3200,
+  "joint_velocity_peak_event": {
+    "stage": "backward",
+    "sample": 816,
+    "time": 4.08,
+    "environment": 1,
+    "joint": "FL_calf_joint",
+    "velocity": 6.91834831237793,
+    "velocity_limit": 20.06999969482422,
+    "command": [
+      -0.3,
+      0.0,
+      0.0
+    ]
+  },
+  "falls_total": 0,
+  "falls_per_env_minute": 0.0,
+  "max_joint_velocity_ratio": 0.34471094608306885,
+  "max_joint_limit_excess_rad": 0.0,
+  "max_joint_torque_ratio": 0.6249602437019348,
+  "max_target_rate_ratio": 0.48460954427719116,
+  "target_rate_peak_event": {
+    "stage": "backward",
+    "control_index": 4,
+    "time_in_stage": 0.08,
+    "environment": 1,
+    "joint": "FL_calf_joint",
+    "ratio": 0.48460954427719116,
+    "command": [
+      -0.3,
+      0.0,
+      0.0
+    ],
+    "previous_target": -1.7268444299697876,
+    "target": -1.5323221683502197
+  },
+  "actor_height_scan": false,
+  "actor_lidar": false,
+  "strict_validation_complete": false,
+  "body_contact_audit": {
+    "physical_samples": 3200,
+    "nonfoot_ground_contact_samples": 3701,
+    "environments_with_nonfoot_ground_contact": 2,
+    "first_contact": {
+      "sample": 118,
+      "environment": 1,
+      "geoms": [
+        "terrain",
+        "robot/FL_calf_collision1"
+      ],
+      "distance": -9.639188647270203e-06
+    },
+    "contact_buffer_overflow": false,
+    "ground_geoms": [
+      "terrain"
+    ],
+    "criterion": "active raw collision contacts with dist<=0; ground versus any robot geom except named foot; no state writes"
+  },
+  "missing_checks": [
+    "uncut original-speed video review"
+  ],
+  "capability_qualified": false
+}

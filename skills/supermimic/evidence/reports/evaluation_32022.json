@@ -1,0 +1,106 @@
+{
+  "seed": 32022,
+  "checkpoint": "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_12000.pt",
+  "num_envs": 128,
+  "stages": [
+    {
+      "stage": "stand",
+      "command": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rmse_xy": 0.004381299018859863,
+      "rmse_yaw": 0.001453880686312914
+    },
+    {
+      "stage": "forward",
+      "command": [
+        0.6,
+        0.0,
+        0.0
+      ],
+      "rmse_xy": 0.03461943566799164,
+      "rmse_yaw": 0.05945007875561714
+    },
+    {
+      "stage": "backward",
+      "command": [
+        -0.3,
+        0.0,
+        0.0
+      ],
+      "rmse_xy": 0.023671511560678482,
+      "rmse_yaw": 0.03420288488268852
+    },
+    {
+      "stage": "left",
+      "command": [
+        0.0,
+        0.25,
+        0.0
+      ],
+      "rmse_xy": 0.02665068209171295,
+      "rmse_yaw": 0.04504728317260742
+    },
+    {
+      "stage": "right",
+      "command": [
+        0.0,
+        -0.25,
+        0.0
+      ],
+      "rmse_xy": 0.025068072602152824,
+      "rmse_yaw": 0.0682147890329361
+    },
+    {
+      "stage": "turn_left",
+      "command": [
+        0.0,
+        0.0,
+        0.6
+      ],
+      "rmse_xy": 0.02629740536212921,
+      "rmse_yaw": 0.08457054942846298
+    },
+    {
+      "stage": "turn_right",
+      "command": [
+        0.0,
+        0.0,
+        -0.6
+      ],
+      "rmse_xy": 0.019755909219384193,
+      "rmse_yaw": 0.06890184432268143
+    },
+    {
+      "stage": "stop",
+      "command": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rmse_xy": 0.0028829025104641914,
+      "rmse_yaw": 0.0028873449191451073
+    }
+  ],
+  "physics_dt": 0.005,
+  "control_dt": 0.02,
+  "decimation": 4,
+  "physics_sample_count": 16000,
+  "expected_physics_samples": 16000,
+  "falls_total": 0,
+  "falls_per_env_minute": 0.0,
+  "max_joint_velocity_ratio": 1.128275752067566,
+  "max_joint_limit_excess_rad": 0.0,
+  "max_joint_torque_ratio": 1.0,
+  "max_target_rate_ratio": 0.8903701305389404,
+  "actor_height_scan": false,
+  "actor_lidar": false,
+  "strict_validation_complete": false,
+  "missing_checks": [
+    "non-foot body contact",
+    "uncut original-speed video review"
+  ],
+  "capability_qualified": false
+}

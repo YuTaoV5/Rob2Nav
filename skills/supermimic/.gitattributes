@@ -1,0 +1,15 @@
+* text eol=lf
+checkpoints/** -text
+*.npz -text
+evidence/source_snapshot/** -text -whitespace
+resources/*.patch -text -whitespace
+overlay/** whitespace=-blank-at-eof
+
+*.mp4 -text
+*.jpg -text
+*.webm -text
+
+# Raw replay tensor snapshots are binary, including those outside checkpoints.
+*.pt -text
+
+evidence/reports/animal_expression_v1/animal_velocity_mechanism_v1/failed_source_snapshot.py -text
