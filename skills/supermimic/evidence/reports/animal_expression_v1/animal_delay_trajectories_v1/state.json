@@ -1,0 +1,153 @@
+{
+  "phase": "completed_pending_review",
+  "episodes": [
+    {
+      "seed": 36820,
+      "split": "train",
+      "environments": 16,
+      "controls": 480,
+      "transitions": 7680,
+      "nonoverlap_valid_8step_windows": 960,
+      "reset_events": 0,
+      "finite": true,
+      "executed_equals_previous": true,
+      "artifact_sha256": "505a07de15678727b655a087847d27286b7dc5868c8d2aa5cc014afd37103994",
+      "bytes": 8201041
+    },
+    {
+      "seed": 36821,
+      "split": "train",
+      "environments": 16,
+      "controls": 480,
+      "transitions": 7680,
+      "nonoverlap_valid_8step_windows": 960,
+      "reset_events": 0,
+      "finite": true,
+      "executed_equals_previous": true,
+      "artifact_sha256": "11c76dcd75cc86ca01c9c02b30433bf971a8ce8e7590667724592e1585dba3a3",
+      "bytes": 8201041
+    },
+    {
+      "seed": 36822,
+      "split": "validation",
+      "environments": 16,
+      "controls": 480,
+      "transitions": 7680,
+      "nonoverlap_valid_8step_windows": 960,
+      "reset_events": 0,
+      "finite": true,
+      "executed_equals_previous": true,
+      "artifact_sha256": "c62676bbd2c04f56bf02005e6c1a0af6365ff336484ec932efca14ced6a9a12a",
+      "bytes": 8201041
+    },
+    {
+      "seed": 36823,
+      "split": "test",
+      "environments": 16,
+      "controls": 480,
+      "transitions": 7680,
+      "nonoverlap_valid_8step_windows": 960,
+      "reset_events": 0,
+      "finite": true,
+      "executed_equals_previous": true,
+      "artifact_sha256": "df587bed90546011bfc58fd3fae477e1a09192404050c431547fc31f2f7ba73f",
+      "bytes": 8201041
+    }
+  ],
+  "policy_updated": false,
+  "world_model_updated": false,
+  "seed": 36823,
+  "control_step": 480,
+  "metadata": {
+    "student_parent_sha256": "3e185d758bea4fe30851d20c2c52779f73c316f579fc9f287dc1c849ec68a89a",
+    "teacher": {
+      "clip": "solo8_crawl_slow",
+      "checkpoint_sha256": "17cf8cba50db6b2a0bac9d0ecb863a32ab5b38b77ff9c4306ece3fe2335cdf87",
+      "role": "external_frozen_teacher",
+      "control_hz": 60,
+      "physics_hz": 240,
+      "PD": [
+        30,
+        1.5
+      ],
+      "configured_latency": 0.02,
+      "executed_latency_control_steps": 1,
+      "native_action_names": [
+        "FR_hip_joint",
+        "FR_thigh_joint",
+        "FR_calf_joint",
+        "FL_hip_joint",
+        "FL_thigh_joint",
+        "FL_calf_joint",
+        "RR_hip_joint",
+        "RR_thigh_joint",
+        "RR_calf_joint",
+        "RL_hip_joint",
+        "RL_thigh_joint",
+        "RL_calf_joint"
+      ],
+      "mjlab_action_names": [
+        "FL_hip_joint",
+        "FL_thigh_joint",
+        "FL_calf_joint",
+        "FR_hip_joint",
+        "FR_thigh_joint",
+        "FR_calf_joint",
+        "RL_hip_joint",
+        "RL_thigh_joint",
+        "RL_calf_joint",
+        "RR_hip_joint",
+        "RR_thigh_joint",
+        "RR_calf_joint"
+      ],
+      "reference_joint_names": [
+        "FL_hip_joint",
+        "FR_hip_joint",
+        "RL_hip_joint",
+        "RR_hip_joint",
+        "FL_thigh_joint",
+        "FR_thigh_joint",
+        "RL_thigh_joint",
+        "RR_thigh_joint",
+        "FL_calf_joint",
+        "FR_calf_joint",
+        "RL_calf_joint",
+        "RR_calf_joint"
+      ],
+      "physical_differences": [
+        "MuJoCo/mjlab Go2 asset and solver instead of Genesis",
+        "Rob2Nav DC motor torque-speed curves retained",
+        "No Genesis domain randomization reproduced in this frozen diagnostic"
+      ],
+      "student_training_started": false
+    },
+    "roles": [
+      "student_noise_.05",
+      "student_noise_.05",
+      "student_noise_.05",
+      "student_noise_.05",
+      "student_noise_.15",
+      "student_noise_.15",
+      "student_noise_.15",
+      "student_noise_.15",
+      "external_teacher",
+      "external_teacher",
+      "external_teacher",
+      "external_teacher",
+      "external_teacher",
+      "external_teacher",
+      "external_teacher",
+      "external_teacher"
+    ],
+    "control_hz": 60,
+    "physics_hz": 240,
+    "window": 8,
+    "initial_perturbation_added": false,
+    "control": "normal task reset, one previous intended-action control frame physically executed; no rollout state writes",
+    "no_envelope_or_contact_filtering": true,
+    "actor_dimension": 350,
+    "actor_actual_root_or_linear_velocity": false
+  },
+  "source_sha256": "eaedab1b80a94de3c0dd62d2a14896be02d0df6c52604ccc5e7a2a804059fb0c",
+  "limitations": "Frozen mixed-policy data only; teacher trajectories can fail or contact body and are retained. Fixed normal reference reset, no added joint perturbation. Seed/episode split disjoint, environments within one episode share simulation context. No functional qualification or WM fitting."
+}
