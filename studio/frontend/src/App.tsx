@@ -1,3 +1,4 @@
+import VoiceControl from './VoiceControl';
 import ResearchNavigation from './ResearchNavigation';
 import HomeOverview from './HomeOverview';
 import ReportsLibrary from './ReportsLibrary';
@@ -24,7 +25,7 @@ const TerrainPreview=lazy(()=>import('./RobotViewer').then(m=>({default:m.Terrai
 type Obj=Record<string,any>;
 type Catalog={evaluations:Obj[];runs:Obj[];reports:Obj[];videos:Obj[];models:Obj[];indexed_at:number};
 const empty:Catalog={evaluations:[],runs:[],reports:[],videos:[],models:[],indexed_at:0};
-const pages=[['overview','工作台',LayoutDashboard],['capabilities','能力总览',Boxes],['training','训练方案',FlaskConical],['experiments','任务队列',Terminal],['configure','创建实验',SlidersHorizontal],['simulation','在线仿真',Video],['deployment','部署框架',ShieldCheck],['navigation','导航',Map],['compare','基准对比',Layers3],['robot','机器人与感知',Bot],['sensors','传感器实验室',Radio],['models','模型与证据',Database],['reports','研究报告',BookOpen],['jobs','任务队列',Terminal]] as const;
+const pages=[['overview','工作台',LayoutDashboard],['capabilities','能力总览',Boxes],['training','训练方案',FlaskConical],['experiments','任务队列',Terminal],['configure','创建实验',SlidersHorizontal],['simulation','在线仿真',Video],['deployment','部署框架',ShieldCheck],['navigation','导航',Map],['voice','语音任务',Radio],['compare','基准对比',Layers3],['robot','机器人与感知',Bot],['sensors','传感器实验室',Radio],['models','模型与证据',Database],['reports','研究报告',BookOpen],['jobs','任务队列',Terminal]] as const;
 async function api(path:string,body?:unknown,signal?:AbortSignal){const r=await fetch('/api/'+path,{...(body!==undefined?{method:'POST',headers:{'Content-Type':'application/json','X-Studio-Request':'1'},body:JSON.stringify(body)}:{}),signal});const d=await r.json();if(!r.ok)throw new Error(typeof d.detail==='string'?d.detail:JSON.stringify(d.detail));return d;}
 const file=(path:string)=>'/api/files/'+path.split('/').map(encodeURIComponent).join('/');
 const num=(v:any,d=0)=>v===null||v===undefined?'—':Number(v).toLocaleString('zh-CN',{maximumFractionDigits:d});
@@ -64,7 +65,7 @@ export default function App(){
    <div className="project-switch" title="当前Go2工作区"><span className="project-avatar">G2</span><span><b>Go2 感知运动控制</b><small>Rob2Nav workspace</small></span></div>
    <button className="button primary sidebar-create" onClick={()=>navigate('configure')}><Plus size={17}/>创建实验</button>
    <div className="nav-label">工作空间</div>
-   <nav aria-label="主导航">{pages.filter(p=>['overview','experiments','simulation','navigation','robot'].includes(p[0])).map(([id,label,Icon])=><button key={id} className={(page===id||(id==='experiments'&&page==='jobs')||(id==='robot'&&page==='sensors'))?'active':''} onClick={()=>navigate(id)}><Icon size={18}/><span>{label}</span>{id==='experiments'&&running>0&&<em>{running}</em>}</button>)}<button onClick={()=>window.location.assign('/handshake')}><Hand size={18}/><span>握手互动</span></button></nav>
+   <nav aria-label="主导航">{pages.filter(p=>['overview','experiments','simulation','navigation','voice','robot'].includes(p[0])).map(([id,label,Icon])=><button key={id} className={(page===id||(id==='experiments'&&page==='jobs')||(id==='robot'&&page==='sensors'))?'active':''} onClick={()=>navigate(id)}><Icon size={18}/><span>{label}</span>{id==='experiments'&&running>0&&<em>{running}</em>}</button>)}<button onClick={()=>window.location.assign('/handshake')}><Hand size={18}/><span>握手互动</span></button></nav>
    <div className="sidebar-bottom"><nav className="utility-nav" aria-label="研究与证据快捷入口">{pages.filter(p=>['capabilities','training','compare','models','reports','deployment'].includes(p[0])).sort((a,b)=>['capabilities','training','compare','models','reports','deployment'].indexOf(a[0])-['capabilities','training','compare','models','reports','deployment'].indexOf(b[0])).map(([id,label,Icon])=><button key={id} className={page===id?'active':''} onClick={()=>navigate(id)} title={label} aria-label={label}><Icon size={19}/><span className="utility-tooltip">{label}</span></button>)}</nav><div className="sidebar-user"><span>YT</span><div><b>Robotics workspace</b><small>Go2 · 私有实验空间</small></div></div></div>
   </aside>
   <div className="workspace">
@@ -78,6 +79,7 @@ export default function App(){
      {['robot','sensors'].includes(page)&&<><div className="page-heading"><div><div className="eyebrow">ROBOT WORKSPACE</div><h1>机器人与感知</h1><p>查看Go2结构、检查关节姿态与传感器安装几何。</p></div></div><div className="section-tabs"><button className={page==='robot'?'active':''} onClick={()=>navigate('robot')}><Boxes size={16}/>机器人模型</button><button className={page==='sensors'?'active':''} onClick={()=>navigate('sensors')}><Radio size={16}/>传感器安装</button></div>{page==='robot'&&<Suspense fallback={<div className="loading">加载三维查看器…</div>}><RobotViewer/></Suspense>}</>}
      {page==='deployment'&&<Deployment onSimulate={()=>navigate('simulation')}/>}
      {page==='navigation'&&<Navigation/>}
+     {page==='voice'&&<VoiceControl/>}
      {['capabilities','training'].includes(page)&&<CapabilityHub key={page} view={page==='training'?'训练方案':'能力矩阵'} data={capabilityData} focus={focusSkill} onRecipe={openRecipe} onEvaluation={id=>{const e=catalog.evaluations.find(e=>e.id===id);if(e)openEvaluation(e)}} onJob={id=>{setSelectedJobId(id);navigate('jobs')}}/>}
      {page==='configure'&&<ActiveGpuTasks jobs={jobs} resources={resources} onOpen={id=>{setSelectedJobId(id);navigate('jobs')}} onRuns={openHistory}/>}
      {page==='configure'&&schema&&<Configurator recipeId={recipeId} schema={schema} models={catalog.models} resources={resources} notify={notify} onSaved={()=>{api('jobs').then(setJobs);navigate('jobs')}}/>}

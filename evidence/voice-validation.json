@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-28",
+  "scope": "real CPU ASR/TTS on authorized server; synthetic navigation/skill task feedback",
+  "rob2nav_base_commit": "56da4083ee15036060966a64805c0e6a0aef0398",
+  "hardware_tested": false,
+  "ros_runtime_tested": false,
+  "rviz_tested": false,
+  "sglang_omni_runtime_tested": false,
+  "windows_offline_tests": {
+    "scan_bundle": 48,
+    "rob2nav_voice": 39,
+    "rob2nav_deployment_core": 32,
+    "rob2nav_go2edu_pytest": 10,
+    "status": "passed"
+  },
+  "frontend_build": "passed",
+  "studio_browser_demo": "passed; sideflip dispatch through same-origin proxy, synthetic completion",
+  "server": {
+    "gpu": "NVIDIA L40",
+    "python": "3.12.3",
+    "directory": "/root/scan-voice-20261028",
+    "asr": "real model sample passed",
+    "tts": "real model synthesis passed",
+    "robot_connected": false,
+    "roundtrip": "passed: six actual TTS/ASR commands through HTTP and demo FSM",
+    "service": "127.0.0.1:8096",
+    "service_state": "DISABLED",
+    "inference_provider": "CPU, two threads; GPU not used",
+    "source_manifest": "voice-server-source.json",
+    "timing_evidence": "voice-server-latency.json",
+    "roundtrip_evidence": "voice-server-roundtrip.json"
+  },
+  "target_5090": "not_tested; connection not provided",
+  "remaining": [
+    "5090 target connection and deployment",
+    "real microphone/noise accuracy and acoustic latency",
+    "real ROS/Docker/RViz runtime and network",
+    "measured MID360 mounting and actual map registration",
+    "device qualification for every skill and failure-stop acceptance",
+    "physical stairs/ramp acceptance"
+  ],
+  "asr_limitations": "Initial short synthetic utterances misrecognized and rejected; documented in initial-phrase-audit. Full tested phrases and dictionary/deterministic TTS passed; real microphone accuracy untested."
+}
