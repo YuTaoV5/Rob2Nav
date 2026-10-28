@@ -30,14 +30,19 @@
     "timing_evidence": "voice-server-latency.json",
     "roundtrip_evidence": "voice-server-roundtrip.json"
   },
-  "target_5090": "not_tested; connection not provided",
+  "target_5090": "user-managed LAN server; inaccessible to current agent; user performs deployment and on-site acceptance",
   "remaining": [
-    "5090 target connection and deployment",
+    "User deployment and benchmark on LAN 5090",
     "real microphone/noise accuracy and acoustic latency",
     "real ROS/Docker/RViz runtime and network",
     "measured MID360 mounting and actual map registration",
     "device qualification for every skill and failure-stop acceptance",
     "physical stairs/ramp acceptance"
   ],
-  "asr_limitations": "Initial short synthetic utterances misrecognized and rejected; documented in initial-phrase-audit. Full tested phrases and dictionary/deterministic TTS passed; real microphone accuracy untested."
+  "asr_limitations": "Initial short synthetic utterances misrecognized and rejected; documented in initial-phrase-audit. Full tested phrases and dictionary/deterministic TTS passed; real microphone accuracy untested.",
+  "deployment_responsibility": {
+    "agent": "Validate reproducible software flow on the previously authorized server",
+    "user": "Deploy on LAN 5090 and verify ROS/RViz, calibration, map registration and robot actions",
+    "ssh_details_required": false
+  }
 }
