@@ -26,6 +26,7 @@ public:
     Joints actor(const Observation& observation) const;
     Targets infer(Observation sensors, float elapsed) const;
     bool stairs() const { return stairs_; }
+    bool requiresBodyVelocity() const { return requires_body_velocity_; }
     bool validSensors(const Joints& q, const Joints& dq) const;
 
 private:
@@ -36,6 +37,7 @@ private:
         std::vector<float> bias;
     };
     bool stairs_ = false;
+    bool requires_body_velocity_ = false;
     Joints defaults_{};
     std::array<Vec3, JointCount> limits_{};
     std::array<Layer, 4> layers_{};

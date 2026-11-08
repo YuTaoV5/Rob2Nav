@@ -24,6 +24,17 @@ if(BUILD_TESTING)
     add_test(NAME controller COMMAND as2w_controller_test
              "${CMAKE_CURRENT_SOURCE_DIR}/models/recovery-r12.bin"
              "${CMAKE_CURRENT_SOURCE_DIR}/models/stairs-r17-3000.bin")
+    set(students "${CMAKE_CURRENT_SOURCE_DIR}/recovery-students/selected")
+    foreach(name recovery-r09-no-velocity recovery-r12-no-velocity recovery-r13-no-velocity
+                 r12-alternate-delivery/recovery-r12-no-velocity-alt100)
+        get_filename_component(label "${name}" NAME)
+        add_test(NAME "${label}" COMMAND as2w_deploy verify
+                 "${students}/${name}.bin" "${students}/${name}.fixture")
+        add_test(NAME "controller-${label}" COMMAND as2w_controller_test
+                 "${CMAKE_CURRENT_SOURCE_DIR}/models/recovery-r12.bin"
+                 "${CMAKE_CURRENT_SOURCE_DIR}/models/stairs-r17-3000.bin"
+                 "${students}/${name}.bin")
+    endforeach()
 endif()
 
 option(AS2W_SDK2_SHADOW "Build the read-only SDK2 DDS probe" OFF)

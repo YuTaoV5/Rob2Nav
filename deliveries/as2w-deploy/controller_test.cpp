@@ -12,7 +12,7 @@ void check(bool condition, const char* message) {
 }
 
 int main(int argc, char** argv) {
-    if (argc != 3) return 2;
+    if (argc != 3 && argc != 4) return 2;
     try {
         as2w::Policy recovery(argv[1]), stairs(argv[2]);
         as2w::Controller control(recovery), blind(stairs);
@@ -34,6 +34,19 @@ int main(int argc, char** argv) {
               "Leg and wheel gain mapping differed");
         check(control.step(state, .051f)[0].kp == 0.f && !control.armed(), "Watchdog failed");
         state.velocity_valid = false;
+        if (argc == 4) {
+            as2w::Policy student(argv[3]);
+            check(!student.stairs() && !student.requiresBodyVelocity(), "Unexpected student policy mode");
+            as2w::Controller recovery_student(student);
+            state.body_velocity.fill(std::numeric_limits<float>::quiet_NaN());
+            recovery_student.arm();
+            for (int i = 0; i < 100; ++i) {
+                check(recovery_student.step(state, 0.f)[0].kp == 0.f && recovery_student.armed(),
+                      "Recovery student failed its passive phase without odometry");
+            }
+            check(recovery_student.step(state, 0.f)[0].kp == 55.f,
+                  "Recovery student did not activate without odometry");
+        }
         blind.arm();
         check(blind.step(state, 0.f)[0].kp == 55.f, "Blind policy unexpectedly required odometry");
         state.gyro[0] = std::numeric_limits<float>::quiet_NaN();

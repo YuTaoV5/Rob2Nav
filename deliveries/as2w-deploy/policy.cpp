@@ -51,8 +51,9 @@ Policy::Policy(const std::string& path) {
         throw std::runtime_error("Invalid AS2-W actor: " + path);
     }
     const auto mode = readWord(source);
-    if (mode > 1) throw std::runtime_error("Unknown policy mode");
+    if (mode > 2) throw std::runtime_error("Unknown policy mode");
     stairs_ = mode == 1;
+    requires_body_velocity_ = mode == 0;
     readFloats(source, defaults_);
     for (std::size_t i = 0; i < JointCount; ++i) {
         auto& limit = limits_[i];
@@ -97,7 +98,7 @@ Joints Policy::actor(const Observation& obs) const {
 
 Targets Policy::infer(Observation obs, float elapsed) const {
     if (!std::isfinite(elapsed) || elapsed < 0.f) throw std::invalid_argument("Invalid episode time");
-    if (stairs_) std::fill_n(obs.begin(), 3, 0.f);
+    if (!requiresBodyVelocity()) std::fill_n(obs.begin(), 3, 0.f);
     obs[9] = stairs_ ? .4f : std::clamp((elapsed - 2.f) / 4.f, 0.f, 1.f);
     for (std::size_t i = 0; i < JointCount; ++i) {
         auto& position = obs[10 + i];
@@ -144,7 +145,7 @@ CommandFrame Controller::step(const State& state, float age_s) {
     if (ticks_ >= horizon || !std::isfinite(age_s) || age_s < 0.f || age_s > .05f ||
         !policy_.validSensors(state.q, state.dq) || !finite(state.gyro) ||
         !finite(state.body_to_world_wxyz) ||
-        (!policy_.stairs() && (!state.velocity_valid || !finite(state.body_velocity)))) {
+        (policy_.requiresBodyVelocity() && (!state.velocity_valid || !finite(state.body_velocity)))) {
         stop();
         return output;
     }
@@ -158,7 +159,9 @@ CommandFrame Controller::step(const State& state, float age_s) {
     const float w = q[0], x = q[1], y = q[2], z = q[3];
     const Vec3 gravity{{2.f*(w*y - x*z), -2.f*(w*x + y*z), -1.f + 2.f*(x*x + y*y)}};
     Observation obs{};
-    if (!policy_.stairs()) std::copy(state.body_velocity.begin(), state.body_velocity.end(), obs.begin());
+    if (policy_.requiresBodyVelocity()) {
+        std::copy(state.body_velocity.begin(), state.body_velocity.end(), obs.begin());
+    }
     std::copy(state.gyro.begin(), state.gyro.end(), obs.begin() + 3);
     std::copy(gravity.begin(), gravity.end(), obs.begin() + 6);
     std::copy(state.q.begin(), state.q.end(), obs.begin() + 10);

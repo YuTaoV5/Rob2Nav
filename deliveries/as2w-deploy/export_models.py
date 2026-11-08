@@ -21,6 +21,7 @@ MODELS = {
     "stairs-r17-3000": (1, "blind-stairs-imitation-r17-to5000-model_2999.pt"),
 }
 WIDTHS = (58, 128, 128, 128, 16)
+MODE_NAMES = ("recovery", "stairs", "recovery-no-velocity")
 
 
 def floats(values):
@@ -35,6 +36,8 @@ def main():
     parser.add_argument("results", type=Path, help="as2w-results from the verified handoff")
     parser.add_argument("output", type=Path)
     parser.add_argument("--onnx", action="store_true", help="Also export and verify static-batch ONNX actors")
+    parser.add_argument("--student-checkpoints", type=Path, nargs="+",
+                        help="Export only the supplied velocity-free recovery students")
     args = parser.parse_args()
     torch.set_num_threads(1)
     spec = importlib.util.spec_from_file_location("reference", args.results / "export-as2w-policy.py")
@@ -59,9 +62,18 @@ def main():
     raw[:, 22:26] *= 30.
     elapsed = np.linspace(0., 9., len(raw), dtype=np.float32)
     elapsed[:4] = [0., 1.98, 2., 6.]
-    for label, (mode, filename) in MODELS.items():
-        checkpoint = args.results / "fall-baseline" / filename
+    if args.student_checkpoints:
+        entries = [(path.stem, 2, path) for path in args.student_checkpoints]
+        if len({label for label, _, _ in entries}) != len(entries):
+            parser.error("Student checkpoint names must be unique")
+    else:
+        entries = [(label, mode, args.results / "fall-baseline" / filename)
+                   for label, (mode, filename) in MODELS.items()]
+    for label, mode, checkpoint in entries:
+        filename = checkpoint.name
         state = torch.load(checkpoint, weights_only=True, map_location="cpu")["model_state_dict"]
+        if mode == 2 and torch.count_nonzero(state["actor.0.weight"][:, :3]):
+            raise ValueError(f"Student still depends on body velocity: {filename}")
         payload = b"AS2WMLP1" + struct.pack("<I", mode)
         payload += floats(defaults) + floats(limits)
         layers = []
@@ -75,7 +87,7 @@ def main():
             layers.append(linear)
             if i < 3:
                 layers.append(nn.ELU())
-        module = reference.AS2WPolicy(nn.Sequential(*layers), defaults, limits, bool(mode)).eval()
+        module = reference.AS2WPolicy(nn.Sequential(*layers), defaults, limits, mode == 1).eval()
         with torch.inference_mode():
             action, leg, wheel, active = module(torch.from_numpy(raw), torch.from_numpy(elapsed))
         if not torch.isfinite(action).all():
@@ -84,7 +96,7 @@ def main():
         fixture = np.column_stack((elapsed, raw, action, leg, wheel, active))
         np.savetxt(args.output / f"{label}.fixture", fixture, fmt="%.9g")
         manifest["models"][label] = {
-            "mode": "stairs" if mode else "recovery",
+            "mode": MODE_NAMES[mode],
             "source_checkpoint": filename,
             "source_sha256": hashlib.sha256(checkpoint.read_bytes()).hexdigest(),
             "actor_sha256": hashlib.sha256(payload).hexdigest(),
@@ -95,7 +107,12 @@ def main():
 
             target = args.output / f"{label}.onnx"
             actor = module.actor
-            example = torch.zeros((1, WIDTHS[0]))
+            input_offset = 0
+            if mode == 2:
+                actor = nn.Sequential(nn.ConstantPad1d((3, 0), 0.), actor).eval()
+                input_offset = 3
+                manifest["models"][label]["onnx_observation_size"] = WIDTHS[0] - input_offset
+            example = torch.zeros((1, WIDTHS[0] - input_offset))
             torch.onnx.export(actor, example, str(target), input_names=["obs"], output_names=["actions"],
                               opset_version=17, dynamo=False)
             model = onnx.load(target)
@@ -103,7 +120,7 @@ def main():
             runner = ReferenceEvaluator(model)
             with torch.inference_mode():
                 for row in raw[:8]:
-                    obs = row.reshape(1, -1)
+                    obs = row[input_offset:].reshape(1, -1)
                     [result] = runner.run(None, {"obs": obs})
                     np.testing.assert_allclose(result, actor(torch.from_numpy(obs)).numpy(),
                                                atol=3e-6, rtol=1e-5)

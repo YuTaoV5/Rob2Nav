@@ -39,13 +39,42 @@ python verify_mujoco.py build/as2w_deploy /path/to/as2w-results replay.json
 
 ## 控制接口
 
-控制周期为 20 ms。顺序为四腿各一组髋、股、胫及四轮，每组内按 FL、FR、RL、RR 排列。使用标定后的绝对编码器弧度和角速度。IMU 输入为机体角速度及 body-to-world、wxyz 四元数。四轮角度按训练的 4π 周期回绕。恢复需要实时机体系线速度估计，前 2 s 保持被动但更新动作历史。盲爬楼固定前向指令 0.4 m/s，线速度槽填零。
+控制周期为 20 ms。顺序为四腿各一组髋、股、胫及四轮，每组内按 FL、FR、RL、RR 排列。使用标定后的绝对编码器弧度和角速度。IMU 输入为机体角速度及 body-to-world、wxyz 四元数。四轮角度按训练的 4π 周期回绕。原版恢复模型需要实时机体系线速度估计。恢复模型前 2 s 保持被动并更新动作历史。盲爬楼固定前向指令 0.4 m/s，线速度槽填零。
+
+## 无机身线速度的恢复学生
+
+`train_recovery_student.py` 让原检查点在训练仿真中使用真值线速度给出动作标签，学生只看本体观测。后续轮次用学生驱动仿真，在学生访问到的状态上继续收集教师标签。开发集用于选模，正式评估沿用原来的六组场景和 1 秒连续站稳门槛。
+
+```bash
+python train_recovery_student.py /path/to/as2w-results TEACHER.pt STUDENT.pt
+python train_recovery_student.py /path/to/as2w-results TEACHER.pt STUDENT.pt \
+    --evaluate student --report student.jsonl
+python export_models.py /path/to/as2w-results recovery-students --onnx \
+    --student-checkpoints STUDENT.pt
+```
+
+学生的 C++ 模型在内部将前三个线速度槽置零，沿用恢复动作历史与启用时序。学生 ONNX actor 的输入为 `obs[1,55]`，从机体系角速度开始，后续顺序与原 actor 一致。ONNX 调用方需按恢复协议重建观测、限幅动作并生成电机目标。
+
+服务器复测使用 MuJoCo 3.17.0，目录包含选出的学生权重、正式场景与新种子的逐场结果、训练配置和 R12 备选的补测。 [学生模型与证据](recovery-students/selected/) · [配对评估汇总](recovery-students/selected/comparison.json)
+
+下表为相同场景和验收门槛下的通过数，箭头从各自的有速度教师指向无速度学生。
+
+| 模型 | 原 240 场 | 新种子 A（96 场） | 新种子 B（96 场） |
+| --- | ---: | ---: | ---: |
+| R09 | 230 → 229 | 78 → 77 | — |
+| R12 主选 | 232 → 233 | 85 → 78 | 84 → 78 |
+| R12 备选 | 232 → 228 | 85 → 85 | 84 → 82 |
+| R13 | 232 → 234 | 89 → 88 | 91 → 87 |
+
+R13 学生是替换原 R12 起身策略的首选仿真候选，在三组评估中分别多通过 2、3、3 场。真机通过率和碰撞峰值仍待验收。 [R13 无速度 ONNX](recovery-students/selected/recovery-r13-no-velocity.onnx)
 
 腿使用位置 PD，轮使用速度 PD。腿的训练增益为 55/2，轮为 0/2，前馈扭矩为零。控制器在输入异常、状态包超过 50 ms、或超出单回合时限时锁回被动，重新开始需显式调用 `arm()`。此处输出的是模型坐标下的目标，低层发送端应使用对应固件定义的被动或制动语义和硬件限值。
 
 ## SDK2 与真机接入
 
 公开 SDK2 的 As2 示例使用 `unitree_go::msg::dds_::SportModeState_` 读取 `rt/lf/sportmodestate`。仓库中的公开 As2 示例目录提供 Sport 与音频，没有可核对 AS2-W 电机索引和接管语义的低层例程。Go2-W 的 `unitree_go::LowState_` 只用于可配置的只读协议探测。 [As2 状态示例](https://github.com/unitreerobotics/unitree_sdk2/blob/main/example/as2/sport/as2_sport_state.cpp) · [Go2-W 低层示例](https://github.com/unitreerobotics/unitree_sdk2/blob/main/example/go2w/go2w_stand_example.cpp)
+
+官方资料说明，关闭内置运控后真机无法读取 `SportModeState`。公开的 HG 和 Go2 低层消息都没有机身线速度字段。 [运控关闭后的消息行为](https://github.com/unitreerobotics/unitree_mujoco/blob/main/readme.md#supported-unitree-sdk2-messages) · [HG LowState](https://github.com/unitreerobotics/unitree_sdk2/blob/main/include/unitree/idl/hg/LowState_.hpp) · [Go2 LowState](https://github.com/unitreerobotics/unitree_sdk2/blob/main/include/unitree/idl/go2/LowState_.hpp)
 
 ```bash
 cmake -S . -B build -DAS2W_SDK2_SHADOW=ON -DCMAKE_PREFIX_PATH=/path/to/sdk2/install
@@ -56,4 +85,4 @@ build/as2w_sdk2_shadow low eth0 VERIFIED_LOWSTATE_TOPIC models/stairs-r17-3000.b
 
 第二条探测命令只在固件确认兼容该消息类型后使用。`calibrated.map` 按清单中的 16 个关节依次各写一行，每行是关节名、DDS 槽位、方向（+1 或 -1）、编码器零位（弧度）。槽位不可重复。转换为 `q_sim = sign * (q_sdk - offset)`，速度按同一方向转换。需实测关节正方向、零位和 IMU 安装方向。程序只订阅和打印预演目标。
 
-实际发令前还需对应 AS2-W X/EDU 固件的 `LowCmd/LowState` 定义、16 轴索引、轮速语义、CRC、接管与急停接口。恢复策略另外需要在低层接管后持续可用的机体系速度估计。当前可选 SDK2 程序尚未在 Linux SDK 或实机上运行。
+实际发令前还需对应 AS2-W X/EDU 固件的 `LowCmd/LowState` 定义、16 轴索引、轮速语义、CRC、接管与急停接口。原版恢复策略另外需要在低层接管后持续可用的机体系速度估计。当前可选 SDK2 程序尚未在 Linux SDK 或实机上运行。

@@ -31,7 +31,9 @@ void sport(const char* nic) {
 
 void low(const char* nic, const char* topic, const char* model, const char* calibration) {
     as2w::Policy policy(model);
-    if (!policy.stairs()) throw std::runtime_error("Recovery shadow requires a verified body-velocity source");
+    if (policy.requiresBodyVelocity()) {
+        throw std::runtime_error("Recovery shadow requires a verified body-velocity source");
+    }
     const auto mapping = as2w::loadMapping(calibration, LowState_{}.motor_state().size());
     unitree::robot::ChannelFactory::Instance()->Init(0, nic);
     std::mutex lock;
