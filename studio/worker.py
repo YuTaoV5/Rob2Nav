@@ -39,7 +39,7 @@ def execute(jobs,job,root,python,mujoco_python=None):
     (folder/'resolved_config.json').write_text(json.dumps(config.model_dump(),indent=2))
     from .upstreams import pie_python
     runtime=pie_python(root) if config.simulation_policy=='pie' else python if config.simulation_policy=='checkpoint' else mujoco_python
-    cmd=prepare_as2w(config,root,run) if config.robot_id=='as2w' else (
+    cmd=prepare_as2w(config,root,run,mujoco_python,python) if config.robot_id=='as2w' else (
         simulation_command(config,root,run,runtime) if config.task=='simulation' else command(config,root,run,config_path,python,mujoco_python))
     (folder/'command.json').write_text(json.dumps(cmd,indent=2))
     detail={'stage':'training','run':str(run.relative_to(root)),

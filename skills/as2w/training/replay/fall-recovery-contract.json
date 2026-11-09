@@ -1,0 +1,115 @@
+{
+  "control_dt": 0.02,
+  "settle_seconds": 2.0,
+  "recovery_seconds": 4.0,
+  "policy_observations": [
+    {
+      "name": "base_lin_vel",
+      "shape": [
+        3
+      ]
+    },
+    {
+      "name": "base_ang_vel",
+      "shape": [
+        3
+      ]
+    },
+    {
+      "name": "projected_gravity",
+      "shape": [
+        3
+      ]
+    },
+    {
+      "name": "velocity_commands",
+      "shape": [
+        1
+      ]
+    },
+    {
+      "name": "joint_pos",
+      "shape": [
+        16
+      ]
+    },
+    {
+      "name": "joint_vel",
+      "shape": [
+        16
+      ]
+    },
+    {
+      "name": "actions",
+      "shape": [
+        16
+      ]
+    }
+  ],
+  "action_terms": [
+    {
+      "name": "joint_pos",
+      "joints": [
+        "FL_hip",
+        "FR_hip",
+        "RL_hip",
+        "RR_hip",
+        "FL_thigh",
+        "FR_thigh",
+        "RL_thigh",
+        "RR_thigh",
+        "FL_calf",
+        "FR_calf",
+        "RL_calf",
+        "RR_calf"
+      ],
+      "scale": 0.35
+    },
+    {
+      "name": "wheel_vel",
+      "joints": [
+        "FL_foot",
+        "FR_foot",
+        "RL_foot",
+        "RR_foot"
+      ],
+      "scale": 6.0
+    }
+  ],
+  "joint_names": [
+    "FL_hip",
+    "FR_hip",
+    "RL_hip",
+    "RR_hip",
+    "FL_thigh",
+    "FR_thigh",
+    "RL_thigh",
+    "RR_thigh",
+    "FL_calf",
+    "FR_calf",
+    "RL_calf",
+    "RR_calf",
+    "FL_foot",
+    "FR_foot",
+    "RL_foot",
+    "RR_foot"
+  ],
+  "default_joint_pos": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929,
+    -1.600000023841858,
+    -1.600000023841858,
+    -1.600000023841858,
+    -1.600000023841858,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ]
+}
