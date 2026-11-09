@@ -5,15 +5,18 @@ from typing import Literal
 from pydantic import BaseModel, Field, ConfigDict, model_validator, field_validator
 
 from rob2nav.experiment_schema import REWARDS, reward_schema
+from .experiment_workflow import AS2W_RECIPE, validate_as2w
 
 class RunConfig(BaseModel):
     model_config=ConfigDict(extra='forbid',allow_inf_nan=False)
     name:str=Field(default='Go2 感知实验',min_length=1,max_length=80)
-    adapter:Literal['moe','ame','nju','robogauge','pie','him','wtw','wmp','mid360','leggedskilldeploy']='moe'
+    adapter:Literal['moe','ame','nju','robogauge','pie','him','wtw','wmp','mid360','leggedskilldeploy','as2w']='moe'
     recipe_id:str=Field(default='',max_length=80)
     capability_id:str=Field(default='',max_length=80)
-    robot_id:Literal['go2','go1','g1_29dof','custom_dog']='go2'
+    robot_id:Literal['go2','go1','g1_29dof','custom_dog','as2w']='go2'
     algorithm_id:str=Field(default='moe_terrain_ppo',max_length=80)
+    parent_job_id:str|None=Field(default=None,pattern=r'^[a-f0-9]{16}$')
+    parent_case:str|None=Field(default=None,max_length=120)
     task:Literal['train','simulation']='train'
     simulation_policy:Literal['baseline','checkpoint','pie','lsd_loco','lsd_jump','lsd_backflip','lsd_sideflip']='baseline'
     difficulty:float=Field(default=1.,ge=0,le=1)
@@ -68,6 +71,10 @@ class RunConfig(BaseModel):
 
     @model_validator(mode='after')
     def consistency(self):
+        if self.recipe_id==AS2W_RECIPE or self.robot_id=='as2w' or self.adapter=='as2w':
+            return validate_as2w(self)
+        if 'eval_terrain' in self.recipe_options and (self.recipe_id or self.task!='train' or self.recipe_options['eval_terrain'] not in ('all','flat','stairs','platform','ame_stakes','ame_alternate')):
+            raise ValueError('该 Go2 训练配方不支持所选验收地形')
         from .registry import resolve_recipe
         recipe=resolve_recipe(self)
         if recipe and recipe['execution']=='manual_cli' and self.task=='train':

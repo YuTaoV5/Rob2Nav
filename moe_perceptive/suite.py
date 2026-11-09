@@ -1,7 +1,7 @@
 """Matched baseline/trained first-episode cases, including original 20 cm stakes."""
 import argparse,json,subprocess
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--moe',required=True);p.add_argument('--checkpoint')
+p=argparse.ArgumentParser();p.add_argument('--terrain',choices=['flat','stairs','platform','ame_stakes','ame_alternate']);p.add_argument('--moe',required=True);p.add_argument('--checkpoint')
 p.add_argument('--output',required=True);p.add_argument('--python',default='/root/isaacsim/python.sh')
 p.add_argument('--seed',type=int,default=801)
 p.add_argument('--num-envs',type=int,default=32);p.add_argument('--video-narrow',action='store_true')
@@ -13,6 +13,7 @@ p.add_argument('--sensor-rig',choices=['original','near_down60','near_down60_fro
 out=Path(a.output);out.mkdir(parents=True,exist_ok=False);records=[]
 cases=[('flat',0.),('stairs',.5),('platform',.5)]+[(k,d) for k in ('ame_stakes','ame_alternate') for d in (0.,.5,1.)]
 for kind,difficulty in cases:
+    if a.terrain and kind!=a.terrain:continue
     name=f'{kind}_{difficulty:.2f}';target=out/name
     command=[a.python,'-m','moe_perceptive.evaluate','--headless','--moe',a.moe,'--kind',kind,
         '--difficulty',str(difficulty),'--seed',str(a.seed),'--num-envs',str(a.num_envs),'--output',str(target),

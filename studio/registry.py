@@ -19,6 +19,8 @@ def registry():
         for key,field in fields.items():
             options.setdefault(key,field['default'])
             metadata[key]={**metadata.get(key,{}),**field}
+    from .experiment_workflow import as2w_recipes
+    data['recipes'].extend(as2w_recipes())
     return data
 
 

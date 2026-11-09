@@ -148,6 +148,23 @@ def main(extension=None):
             trace[-1].update(standard_pose_error=float(np.max(abs(data.qpos[qids]-[POSE[n] for n in module.JOINT_NAMES]))),
                 max_joint_speed=float(np.max(abs(data.qvel[dids]))),
                 all_feet_ground=all(value>4. for value in foot_forces.values()),foot_forces_N=foot_forces)
+            trace[-1]['pts_s']=round(next_trace,6)
+            if exported.get('studio_reward_context') and extension is None:
+                reward_cfg=exported['studio_reward_context']
+                root_id=model.body('base').id
+                velocity_local=np.zeros(6)
+                velocity_world=np.zeros(6)
+                mujoco.mj_objectVelocity(model,data,mujoco.mjtObj.mjOBJ_BODY,root_id,velocity_local,1)
+                mujoco.mj_objectVelocity(model,data,mujoco.mjtObj.mjOBJ_BODY,root_id,velocity_world,0)
+                reward_time=next_trace-(float(contract.get('entry_seconds',1.)) if delayed else 0.)
+                pitch=velocity_local[1]*(1. if a.direction=='front' else -1.)
+                raw=dict(ang_vel_z=float(abs(velocity_local[2])),
+                         gravity_y=float(data.xmat[root_id].reshape(3,3)[2,1]**2),
+                         ang_vel_y=float(np.clip(pitch,-reward_cfg['max_pitch_rate'],reward_cfg['max_pitch_rate']))
+                         if reward_cfg['takeoff_start']<reward_time<reward_cfg['rotation_end'] else 0.,
+                         lin_vel_z=float(min(velocity_world[5],reward_cfg['max_upward_velocity']))
+                         if reward_cfg['takeoff_start']<reward_time<reward_cfg['takeoff_end'] else 0.)
+                trace[-1]['studio_raw']=raw
             next_trace+=.02
         if a.video and data.time>=next_frame:
             if writer is None:

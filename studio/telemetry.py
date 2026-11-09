@@ -48,7 +48,8 @@ def metrics(folder, tags=None, exact=False):
 def checkpoints(root,job):
     folder=root/'outputs/studio/runs'/job['id']
     candidates=[]
-    for p in folder.glob('model_*.pt'):
+    weights_folder=folder/'checkpoint' if job.get('config',{}).get('robot_id')=='as2w' else folder
+    for p in weights_folder.glob('model_*.pt'):
         match=re.fullmatch(r'model_(\d+)\.pt',p.name)
         if match:candidates.append({'path':p.relative_to(root).as_posix(),'iteration':int(match[1]),'bytes':p.stat().st_size})
     candidates.sort(key=lambda c:c['iteration'])

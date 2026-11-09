@@ -12,7 +12,7 @@ const labels:Record<string,{label:string;help:string}>={
 export default function TrainingRecipeFields({recipe,config,update}:{recipe:Obj;config:Obj;update:(key:string,value:any)=>void}){
  const options=config.recipe_options||{};
  const setOption=(key:string,value:any)=>update('recipe_options',{...options,[key]:value});
- const keys=Object.keys(recipe.defaults?.recipe_options||{});
+ const keys=Object.keys(recipe.defaults?.recipe_options||{}).filter(key=>key!=='reward_scales_json'||!options.fixstand_roundtrip||(options.rebound_cycles??1)!==1);
  return <div className="recipe-training-fields">
   <div className="section-header"><div><span className="eyebrow">REPRODUCTION WORKFLOW</span><h2>训练手册与任务步骤</h2></div><span className="badge cyan">专用训练器已接入</span></div>
   <p>选用配方后自动填充推荐值；以下参数仍可调整。执行模块与参数由服务端白名单校验，参考动作限项目内NPZ，训练完成不等于技能通过。</p>

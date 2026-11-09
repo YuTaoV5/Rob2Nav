@@ -1,6 +1,7 @@
 """Export a completed run and enforce all four-seed motion/control gates."""
 import argparse
 import json
+import hashlib
 import os
 from pathlib import Path
 import subprocess
@@ -42,15 +43,22 @@ def main():
     elif a.kind in ('backflip','frontflip'):from skills.backflip.export_cpu import export
     else:from rob2nav.export_actor import export
     export(model,run/'exported');reports=[]
+    protocol=None
+    if a.kind in ('backflip','frontflip'):
+        import mujoco
+        protocol=dict(kind=a.kind,seeds=list(range(a.seed_start,a.seed_start+4)),seconds=5,physics_hz=1000,
+            mujoco=mujoco.__version__,evaluator_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+            playback_sha256=hashlib.sha256((ROOT/'skills/backflip/simulate.py').read_bytes()).hexdigest(),
+            upstream=subprocess.check_output(['git','-C',str(a.source),'rev-parse','HEAD'],text=True).strip())
     for seed in range(a.seed_start,a.seed_start+4):
         out=run/f'seed_{seed}'
         cmd=simulation_arguments(a.kind,run,a.source,a.motion)
         subprocess.run([sys.executable,'-m',*cmd,'--physics-hz','1000','--fixstand-roundtrip','--diagnostics',
-            '--seed',str(seed),'--output',str(out),*(['--video'] if seed==a.seed_start else [])],check=True)
+            '--seed',str(seed),'--output',str(out),*(['--video'] if seed==a.seed_start or a.kind in ('backflip','frontflip') else [])],check=True)
         d=json.loads((out/'summary.json').read_text());reports.append(dict(seed=seed,motion_pass=d['successes']==d['total'],
             constraints_pass=d['hardware_constraints_pass'],passed=d['successes']==d['total'] and d['hardware_constraints_pass'],summary=str(out/'summary.json')))
-        (run/'evaluation.json').write_text(json.dumps(dict(status='evaluating',episodes=reports,hardware_qualified=False),indent=2)+'\n')
-    (run/'evaluation.json').write_text(json.dumps(dict(status='passed_simulation_only' if all(r['passed'] for r in reports) else 'not_accepted',episodes=reports,hardware_qualified=False),indent=2)+'\n')
+        (run/'evaluation.json').write_text(json.dumps(dict(status='evaluating',episodes=reports,protocol=protocol,hardware_qualified=False),indent=2)+'\n')
+    (run/'evaluation.json').write_text(json.dumps(dict(status='passed_simulation_only' if all(r['passed'] for r in reports) else 'not_accepted',episodes=reports,protocol=protocol,hardware_qualified=False),indent=2)+'\n')
 
 
 if __name__=='__main__':main()

@@ -65,6 +65,7 @@ def export(checkpoint,output,*,rebound=False,landing=False):
         policy_sha256=hashlib.sha256((output/'policy.onnx').read_bytes()).hexdigest(),actor_input_dim=60,
         actor_output_dim=12,onnx_max_error=error,fixstand_roundtrip=contract,control_contract=controller,
         reward_scale_overrides=env.get('reward_scale_overrides',{}),actual_reward_scales=env['rewards']['scales'],
+        studio_reward_context={k:env['rewards'][k] for k in ('takeoff_start','takeoff_end','rotation_end','max_pitch_rate','max_upward_velocity')},
         entry_training_contract_verified=True,rebound_contract=rebound_contract,teacher_retention=teacher_record,capability_verified=False),indent=2)+'\n')
 
 

@@ -1,0 +1,38 @@
+.experiment-tools {display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.experiment-steps {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin-bottom:18px}
+.experiment-step-card {position:relative;display:flex;align-items:center;gap:12px;min-width:0;min-height:76px;padding:12px 16px;text-align:left;font:inherit;color:inherit;background:var(--card,#fff);border:1px solid var(--line,#cedbec);border-radius:12px;cursor:pointer}
+.experiment-step-card:not(:last-child)::after {content:"→";position:absolute;left:100%;width:28px;text-align:center;color:var(--muted,#61799a);pointer-events:none}
+.experiment-step-card strong,.experiment-step-card small {display:block}
+.experiment-step-card small {margin-top:4px;color:var(--muted,#526b8a)}
+.experiment-step-number {display:grid;place-items:center;flex:0 0 30px;height:30px;border-radius:50%;background:#eaf1fc;color:#234e9c;font-weight:700}
+.experiment-step-card:hover,.experiment-step-card[aria-current=step] {border-color:#3565e6;background:#eef4ff}
+.experiment-step-card[aria-current=step] {box-shadow:inset 0 0 0 1px #3565e6}
+.experiment-step-card[aria-current=step] .experiment-step-number {background:#2855d9;color:white}
+.experiment-step-card:focus-visible {outline:2px solid #2855d9;outline-offset:3px}
+@media (max-width:600px) {
+  .experiment-steps {gap:15px}
+  .experiment-step-card {flex-direction:column;justify-content:center;gap:5px;min-height:72px;padding:7px 3px;text-align:center;font-size:12px}
+  .experiment-step-card:not(:last-child)::after {width:15px;top:50%;transform:translateY(-50%)}
+  .experiment-step-card small {display:none}
+  .experiment-step-number {flex:0 0 23px;width:23px;height:23px}
+}
+.experiment-selectors,.experiment-reward-grid,.experiment-videos {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,245px),1fr));gap:12px}
+.experiment-rewards {display:grid;gap:12px}
+.experiment-rewards h3,.experiment-reward-card h4 {margin:0}
+.experiment-reward-card {border:1px solid var(--line,#6691b950);border-radius:10px;padding:13px;display:grid;align-content:start;gap:8px;min-width:0}
+.experiment-reward-card.focused {border-color:var(--accent,#58a6ff);outline:1px solid var(--accent,#58a6ff)}
+.experiment-reward-card p {margin:0}
+.experiment-formula {display:block;overflow-wrap:anywhere;background:#7794c016;padding:7px;border-radius:4px}
+.experiment-kind {border:1px solid currentColor;border-radius:999px;padding:1px 7px;font-size:.8rem}
+.experiment-kind.reward {color:#3a9779}.experiment-kind.penalty {color:#bd6d27}
+.experiment-parameter {margin:0}.experiment-parameter button {justify-self:start}
+.experiment-next {display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+.experiment-diff {max-height:250px;overflow:auto}
+.experiment-videos video {width:100%;max-height:260px;object-fit:contain;background:#0b1018;border-radius:7px}
+.experiment-videos h4,.experiment-videos p,.experiment-diagnostics .section-header p {margin:3px 0 7px}
+.experiment-diagnostics figure {margin:2px 0}
+.experiment-diagnostics figcaption {font-size:.9rem}
+.experiment-timeline input {width:100%}
+.experiment-diagnostics {display:grid;gap:12px}
+
+.experiment-add-reward {order:-1;min-height:76px;align-self:start;justify-content:center}

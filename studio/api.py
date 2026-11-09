@@ -107,9 +107,18 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
     def get_capabilities():return capabilities(catalog.get(),jobs.all())
 
     from rob2nav.experiment_schema import METHODS, reward_schema
+    from .experiment_workflow import AS2W_RECIPE, as2w_commands, as2w_progress, manifest
+    from .experiment_review import mount_experiment_review
+    mount_experiment_review(app, root, jobs)
 
     @app.post('/api/experiment-preview')
     def experiment_preview(config:RunConfig):return {'rewards':reward_schema(config),'overrides':config.overrides()}
+
+    @app.post('/api/experiment-rewards')
+    def experiment_rewards(config:RunConfig):
+        from .registry import resolve_recipe
+        try:return manifest(root, config, resolve_recipe(config))
+        except (ValueError, OSError, StopIteration) as exc:raise HTTPException(422, str(exc)) from exc
 
     @app.get('/api/schema')
     def schema():return {'config':RunConfig.model_json_schema(),'defaults':RunConfig().model_dump(),'rewards':REWARDS,'methods':METHODS,'registry':registry(),
@@ -186,6 +195,13 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
     def preflight(config):
         errors=[];warnings=[]
         output=root/'outputs/studio/runs/PREVIEW'
+        if config.robot_id=='as2w':
+            try:cmd=as2w_commands(config,root,output)[0]
+            except (ValueError,OSError,StopIteration) as exc:cmd=[];errors.append(str(exc))
+            if not Path('/isaac-sim/python.sh').is_file():errors.append('缺少 AS2-W Isaac Sim 运行时')
+            if not allow_training:warnings.append('当前服务为只读训练模式')
+            return dict(valid=not errors,errors=errors,warnings=warnings,command=cmd,resolved=config.model_dump(),
+                        environment_steps=config.num_envs*24*config.iterations,rewards={})
         from .upstreams import pie_python
         manual=config.task=='train' and config.recipe_id in ('navigation_ppo','sideflip_native_ppo','upright_walk_ppo','backflip_native_ppo','frontflip_native_ppo')
         runtime=pie_python(root) if config.task=='simulation' and config.simulation_policy=='pie' else mujoco_python if (config.task=='simulation' and config.simulation_policy!='checkpoint') or config.recipe_id=='navigation_ppo' else sim_python
@@ -218,6 +234,7 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
         for job in result:
             job['weights']=checkpoints(root,job)
             folder=root/'outputs/studio/runs'/job['id'];status=folder/'status.json';job['progress']=read_json(status)
+            if job['config'].get('robot_id')=='as2w':job['progress']={**(job['progress'] or {}),**as2w_progress(folder)}
             try:job['progress_updated']=status.stat().st_mtime
             except OSError:job['progress_updated']=None
             if job['state']=='evaluating' and job['detail'].get('stage')=='evaluation':
@@ -243,7 +260,14 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
         return replay(root/'outputs/studio/runs'/key,after)
 
     @app.post('/api/jobs')
-    def save(config:RunConfig):return jobs.create(config.model_dump(exclude_none=True))
+    def save(config:RunConfig):
+        if config.parent_job_id:
+            try:parent=jobs.get(config.parent_job_id)
+            except KeyError as exc:raise HTTPException(422,'找不到父实验') from exc
+            if any(parent['config'].get(field,'go2' if field=='robot_id' else '')!=getattr(config,field)
+                   for field in ('recipe_id','robot_id')):
+                raise HTTPException(422,'候选实验的机器人和技能必须与父实验一致')
+        return jobs.create(config.model_dump(exclude_none=True))
 
     @app.post('/api/jobs/{key}/submit')
     def submit(key:str):
@@ -290,6 +314,9 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
                 yield 'event: status\ndata: '+json.dumps({'jobs':jobs.all(),'time':time.time()})+'\n\n'
                 await asyncio.sleep(3)
         return StreamingResponse(generate(),media_type='text/event-stream',headers={'Cache-Control':'no-cache','X-Accel-Buffering':'no'})
+
+    from .as2w_routes import mount_as2w
+    mount_as2w(app, root, False)
 
     dist=Path(__file__).parent/'frontend/dist'
     @app.get('/{path:path}')

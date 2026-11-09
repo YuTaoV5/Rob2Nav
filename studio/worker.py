@@ -12,6 +12,7 @@ import zipfile
 from .jobs import Jobs
 from .config import RunConfig,command,simulation_command
 from .catalog import read_json
+from .experiment_workflow import AS2W_RECIPE, prepare_as2w
 
 
 def checked_training(folder,expected_iterations=None):
@@ -38,7 +39,8 @@ def execute(jobs,job,root,python,mujoco_python=None):
     (folder/'resolved_config.json').write_text(json.dumps(config.model_dump(),indent=2))
     from .upstreams import pie_python
     runtime=pie_python(root) if config.simulation_policy=='pie' else python if config.simulation_policy=='checkpoint' else mujoco_python
-    cmd=simulation_command(config,root,run,runtime) if config.task=='simulation' else command(config,root,run,config_path,python,mujoco_python)
+    cmd=prepare_as2w(config,root,run) if config.robot_id=='as2w' else (
+        simulation_command(config,root,run,runtime) if config.task=='simulation' else command(config,root,run,config_path,python,mujoco_python))
     (folder/'command.json').write_text(json.dumps(cmd,indent=2))
     detail={'stage':'training','run':str(run.relative_to(root)),
             'config_sha256':hashlib.sha256((folder/'resolved_config.json').read_bytes()).hexdigest(),
@@ -58,7 +60,7 @@ def execute(jobs,job,root,python,mujoco_python=None):
                     # MoE checks the same flag at the next rollout boundary,
                     # saves an atomic stop checkpoint, then exits. Other jobs
                     # have no cooperative checkpoint contract.
-                    if stage!='training' or config.recipe_id in ('navigation_ppo','sideflip_native_ppo','upright_walk_ppo','backflip_native_ppo','frontflip_native_ppo'):os.killpg(proc.pid,signal.SIGINT)
+                    if stage!='training' or config.robot_id=='as2w' or config.recipe_id in ('navigation_ppo','sideflip_native_ppo','upright_walk_ppo','backflip_native_ppo','frontflip_native_ppo'):os.killpg(proc.pid,signal.SIGINT)
                     stopped=True;deadline=time.monotonic()+45
                 if stopped and time.monotonic()>deadline:
                     os.killpg(proc.pid,signal.SIGKILL)
@@ -73,6 +75,17 @@ def execute(jobs,job,root,python,mujoco_python=None):
         if total!=1 or not (run/'episode_0.mp4').exists():raise RuntimeError('Simulation output incomplete')
         note='Native checkpoint inference; inspect checkpoint provenance.' if config.simulation_policy=='checkpoint' else 'Historical MoE/IK/NJU skill composition, not new learned perceptive policy.' if config.simulation_policy=='baseline' else 'Reviewed upstream policy inference; not independently validated skill performance.'
         detail.update(result={'successes':result.get('successes'),'total':total},note=note)
+        jobs.update(key,'succeeded',detail)
+        return
+    if config.robot_id=='as2w':
+        launch([*cmd,'--phase','train'],'training')
+        checkpoint=run/'checkpoint'/f'model_{config.iterations-1}.pt'
+        if not checkpoint.is_file():raise RuntimeError('AS2-W final checkpoint is missing')
+        launch([*cmd,'--phase','evaluate'],'evaluation')
+        comparison=read_json(run/'comparison.json')
+        if not comparison:raise RuntimeError('AS2-W paired MuJoCo evidence is missing')
+        detail.update(checkpoint=checkpoint.relative_to(root).as_posix(),artifacts=[str(checkpoint)],
+                      simulation_acceptance='paired_evaluation_complete',hardware_qualified=False)
         jobs.update(key,'succeeded',detail)
         return
     launch(cmd,'training')
@@ -120,11 +133,14 @@ def execute(jobs,job,root,python,mujoco_python=None):
         evaluate=[sys.executable,'-m','moe_perceptive.suite','--moe',str(root/'vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt'),
                   '--checkpoint',str(ck),'--memory-lifetime',str(config.memory_lifetime),'--sensor-rig',config.sensor_rig,
                   '--video-narrow','--output',str(output)]
+        selected=config.recipe_options.get('eval_terrain','all')
+        if selected!='all':evaluate+=['--terrain',selected]
         if config.mode=='teacher':evaluate.append('--teacher-map')
         if config.navigation:evaluate.append('--navigation')
         launch(evaluate,'evaluation')
         summaries=list(output.glob('*/summary.json'))
-        if len(summaries)!=9:raise RuntimeError('Incomplete strict evaluation: expected nine summaries')
+        expected=9 if selected=='all' else 3 if selected.startswith('ame_') else 1
+        if len(summaries)!=expected:raise RuntimeError('Incomplete strict terrain evaluation')
         results=[read_json(p) for p in summaries]
         if any(not d or d.get('total')!=32 for d in results):raise RuntimeError('Invalid first-episode evaluation counts')
         detail['evaluation']=[{'case':p.parent.name,'successes':d['successes'],'total':d['total']} for p,d in zip(summaries,results)]
