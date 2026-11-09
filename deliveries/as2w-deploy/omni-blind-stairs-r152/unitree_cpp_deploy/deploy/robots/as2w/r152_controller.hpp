@@ -12,7 +12,7 @@
 namespace as2w_r152 {
 inline constexpr std::size_t MotorCount = 16;
 inline constexpr std::size_t ObservationCount = 41;
-inline constexpr std::size_t StateCount = 844;
+inline constexpr std::size_t StateCount = 1193;
 using Vector3 = std::array<float, 3>;
 using Motors = std::array<float, MotorCount>;
 using Observation = std::array<float, ObservationCount>;

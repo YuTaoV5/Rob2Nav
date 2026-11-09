@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
             if (episode != previous_episode) controller.arm();
             previous_episode = episode;
             const auto out = controller.replay(observation);
-            if (!out.active) throw std::runtime_error("R41 stopped during replay");
+            if (!out.active) throw std::runtime_error("AS2-W R177 stopped during replay");
             for (std::size_t i = 0; i < expected.size(); ++i) {
                 maximum = std::max(maximum, std::abs(out.action[i] - expected[i]));
                 const auto motor = out.motors[i];

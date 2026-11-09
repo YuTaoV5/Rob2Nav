@@ -28,7 +28,7 @@ class StraightRoll:
         self.forward += np.clip(command[0]-self.forward,-step,step)
         side = np.array((-1.,1.,-1.,1.))
         ends = np.array((1.,1.,-1.,-1.))
-        dz = -self.height + np.clip(.075*obs[6]*ends+.07*obs[7]*side,-.025,.025)
+        dz = -self.height + np.clip(-.075*obs[6]*ends+.07*obs[7]*side,-.025,.025)
         delta = np.column_stack((np.zeros(4),np.zeros(4),dz))
         legs = np.einsum("lij,lj->il",self.inverse,delta).reshape(12)/.35
         steer = np.clip(.16*command[2] - self.yaw_p*self.heading - self.yaw_d*(yaw-command[2]),-.20,.20)
