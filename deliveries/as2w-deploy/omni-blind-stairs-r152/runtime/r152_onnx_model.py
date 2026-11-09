@@ -318,7 +318,7 @@ class R152Step(nn.Module):
         heading = (heading+self.dt*(yaw-command[2])).clamp(-.5,.5)
         slew = self.dt*self.straight_slew
         forward = forward+(command[0]-forward).clamp(-slew,slew)
-        dz=-self.straight_height+(.075*gravity[0]*self.straight_ends
+        dz=-self.straight_height+(-.075*gravity[0]*self.straight_ends
                                   +.07*gravity[1]*self.sides).clamp(-.025,.025)
         zero=torch.zeros_like(dz)
         delta=torch.stack((zero,zero,dz),dim=1)

@@ -307,7 +307,8 @@ def evaluate(model, contract, state, seed, roll, capture=None, limits=None, acti
     return result
 
 
-def load_flat_model(disable_self_collision, ground_friction_priority, terrain=None, seed=0):
+def load_flat_model(disable_self_collision, ground_friction_priority, terrain=None, seed=0,
+                    stair_rise=None, nominal_overlap_filter=False):
     path = ROOT / "local-step-diagnostic/as2w_flat.xml"
     if terrain is None:
         model = mj.MjModel.from_xml_path(str(path))
@@ -333,7 +334,7 @@ def load_flat_model(disable_self_collision, ground_friction_priority, terrain=No
             ground_geom.set("hfield", "rough_ground")
             del ground_geom.attrib["size"]
         else:
-            rise = (.06, .08, .10)[seed % 3]
+            rise = (.06, .08, .10)[seed % 3] if stair_rise is None else float(stair_rise)
             tread = (.31, .35, .39)[(seed // 3) % 3]
             for level in range(1, 6):
                 start = .7 + (level - 1) * tread
@@ -343,6 +344,15 @@ def load_flat_model(disable_self_collision, ground_friction_priority, terrain=No
                               size=f"{length/2} 1.25 {top/2}",
                               pos=f"{start+length/2} 0 {top/2}", group="5",
                               friction=ground_geom.attrib["friction"])
+        if nominal_overlap_filter:
+            from as2w_contacts import NOMINAL_OVERLAPS
+            if disable_self_collision:
+                raise ValueError("The near-joint filter requires self contacts to remain enabled")
+            contact = xml.find("contact")
+            if contact is None:
+                contact = ET.SubElement(xml, "contact")
+            for a,b in sorted(NOMINAL_OVERLAPS):
+                ET.SubElement(contact, "exclude", body1=a, body2=b)
         model = mj.MjModel.from_xml_string(ET.tostring(xml, encoding="unicode"))
     ground = model.geom("ground").id
     surface_ids = [ground]

@@ -30,7 +30,7 @@ std::string checked_model(const std::filesystem::path& path) {
     Ort::Session session(env, path.c_str(), options);
     Ort::AllocatorWithDefaultOptions allocator;
     if (session.GetInputCount() != 2 || session.GetOutputCount() != 2) {
-        throw std::runtime_error("R41 ONNX must expose obs/state and actions/next_state");
+        throw std::runtime_error("AS2-W R177 ONNX must expose obs/state and actions/next_state");
     }
     for (std::size_t i = 0; i < 2; ++i) {
         const auto input = session.GetInputNameAllocated(i, allocator);
@@ -46,7 +46,7 @@ std::string checked_model(const std::filesystem::path& path) {
             || in.GetShape() != input_shape || out.GetShape() != output_shape
             || in.GetElementType() != ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT
             || out.GetElementType() != ONNX_TENSOR_ELEMENT_DATA_TYPE_FLOAT) {
-            throw std::runtime_error("R41 ONNX tensor contract mismatch");
+            throw std::runtime_error("AS2-W R177 ONNX tensor contract mismatch");
         }
     }
     return path.string();
@@ -64,10 +64,13 @@ Config load_config(const std::filesystem::path& path) {
     config.velocity = read_array<float, MotorCount>(root["velocity_limit"]);
     config.command_limit = read_array<float, 3>(root["command_limit"]);
     config.dt = root["step_dt"].as<float>();
+    if (root["state_size"].as<std::size_t>() != StateCount) {
+        throw std::runtime_error("AS2-W state_size does not match this rl_deploy build");
+    }
     if (!std::isfinite(config.dt) || std::abs(config.dt - .02f) > 1e-6f
         || !finite(config.defaults) || !finite(config.lower) || !finite(config.upper)
         || !finite(config.velocity) || !finite(config.command_limit)) {
-        throw std::runtime_error("Invalid AS2-W R41 control contract");
+        throw std::runtime_error("Invalid AS2-W AS2-W R177 control contract");
     }
     for (std::size_t i = 0; i < MotorCount; ++i) {
         if (config.joint_names[i].empty() || config.lower[i] > config.upper[i] || config.velocity[i] <= 0.f) {
@@ -145,7 +148,7 @@ Targets Controller::replay(const Observation& observation) {
         const auto& action = result.at("actions");
         const auto& next = result.at("next_state");
         if (action.size() != MotorCount || next.size() != StateCount || !finite(action) || !finite(next)) {
-            throw std::runtime_error("Invalid R41 inference output");
+            throw std::runtime_error("Invalid AS2-W R177 inference output");
         }
         Targets targets;
         for (std::size_t i = 0; i < MotorCount; ++i) {

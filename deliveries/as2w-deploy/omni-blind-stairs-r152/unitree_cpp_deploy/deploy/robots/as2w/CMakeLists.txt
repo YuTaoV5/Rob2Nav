@@ -36,3 +36,7 @@ if(AS2W_SDK2_SHADOW)
   add_executable(as2w_r152_shadow shadow.cpp)
   target_link_libraries(as2w_r152_shadow PRIVATE as2w_r152 unitree_sdk2 Threads::Threads)
 endif()
+
+# Offline entry point for the stateful policy and motor mapping.
+add_executable(rl_deploy replay.cpp)
+target_link_libraries(rl_deploy PRIVATE as2w_r152)
