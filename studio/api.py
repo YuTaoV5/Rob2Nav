@@ -196,9 +196,9 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
         errors=[];warnings=[]
         output=root/'outputs/studio/runs/PREVIEW'
         if config.robot_id=='as2w':
-            try:cmd=as2w_commands(config,root,output)[0]
+            try:cmd=as2w_commands(config,root,output,mujoco_python,sim_python)[0]
             except (ValueError,OSError,StopIteration) as exc:cmd=[];errors.append(str(exc))
-            if not Path('/isaac-sim/python.sh').is_file():errors.append('缺少 AS2-W Isaac Sim 运行时')
+            if not sim_python.is_file():errors.append('缺少 AS2-W Isaac Sim 运行时，请设置 --sim-python')
             if not allow_training:warnings.append('当前服务为只读训练模式')
             return dict(valid=not errors,errors=errors,warnings=warnings,command=cmd,resolved=config.model_dump(),
                         environment_steps=config.num_envs*24*config.iterations,rewards={})

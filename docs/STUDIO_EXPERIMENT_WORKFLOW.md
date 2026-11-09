@@ -8,6 +8,8 @@ AS2-W 四轮起身支持额外奖励模板及受限算式。R14、R15、R16 盲�
 
 ## AS2-W 服务器资源
 
-GPU 主机需要已恢复的训练目录，默认位于 `/root/as2w-training`，可用 `ROB2NAV_AS2W_TRAINING` 指定。此目录提供原训练入口、R12 和 R17 初始化权重、`unitree_ros` 模型以及 `replay/fall-recovery-contract.json`。
+新 checkout 默认使用仓库内的 `skills/as2w/training`。它包含四个配方使用的训练脚本、R12 和 R17 初始化权重、`unitree_ros` 模型以及 `replay/fall-recovery-contract.json`。已有服务器可以设置 `ROB2NAV_AS2W_TRAINING=/root/as2w-training` 继续使用自己的训练资源。训练和 MuJoCo 依赖按服务器部署说明安装。
 
-仓库内的评估入口和 MuJoCo XML 位于 `studio/as2w_eval`。已有的独立评估目录可通过 `ROB2NAV_AS2W_EVAL` 指定。使用 `ROB2NAV_AS2W_MUJOCO_PYTHON` 指定 MuJoCo 解释器。训练产物和资产转换缓存按实验隔离。历史 AS2-W 链接可继续查看已归档的运行。
+仓库内的评估入口和 MuJoCo XML 位于 `studio/as2w_eval`。已有的独立评估目录可通过 `ROB2NAV_AS2W_EVAL` 指定。使用 `ROB2NAV_AS2W_MUJOCO_PYTHON` 或 Studio 的 `--mujoco-python` 指定 MuJoCo 解释器。训练产物和资产转换缓存按实验隔离。
+
+在「在线仿真 → 历史回放」搜索 AS2-W 可查看已发布的通过样本。每个视频的记录都保留种子、权重哈希与同轮评估的通过数。短程功能检查与正式训练分开标注。

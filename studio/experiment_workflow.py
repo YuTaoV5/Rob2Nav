@@ -78,10 +78,14 @@ def validate_as2w(config):
     return config
 
 
-def as2w_resources(root):
-    training = Path(os.environ.get("ROB2NAV_AS2W_TRAINING", "/root/as2w-training"))
+def as2w_resources(root, mujoco_python=None):
+    bundled = root / "skills/as2w/training"
+    training = Path(os.environ.get("ROB2NAV_AS2W_TRAINING") or
+                    (bundled if bundled.is_dir() else "/root/as2w-training"))
     harness = Path(os.environ.get("ROB2NAV_AS2W_EVAL", str(root / "studio/as2w_eval")))
-    cpu = Path(os.environ.get("ROB2NAV_AS2W_MUJOCO_PYTHON", str(root.parent / "envs/go2-supermimic/bin/python")))
+    existing_cpu = root.parent / "envs/go2-supermimic/bin/python"
+    cpu = Path(os.environ.get("ROB2NAV_AS2W_MUJOCO_PYTHON") or
+               (existing_cpu if existing_cpu.is_file() else mujoco_python or existing_cpu))
     return training, harness, cpu
 
 
@@ -104,8 +108,8 @@ def as2w_checkpoint(config, root, training):
     return path
 
 
-def as2w_commands(config, root, run):
-    training, harness, cpu = as2w_resources(root)
+def as2w_commands(config, root, run, mujoco_python=None, sim_python=None):
+    training, harness, cpu = as2w_resources(root, mujoco_python)
     baseline = as2w_checkpoint(config, root, training)
     stair = STAIR_RECIPES.get(config.recipe_id)
     source = training / (stair[0] if stair else SOURCE)
@@ -126,11 +130,15 @@ def as2w_commands(config, root, run):
         catalog(source.read_text())
     argv = [sys.executable, str(Path(__file__).with_name("as2w_runner.py")), str(run),
             str(training), str(harness), str(cpu)]
+    if sim_python:
+        argv += ["--sim-python", str(sim_python)]
+    if os.environ.get("ISAACLAB_ROOT"):
+        argv += ["--isaaclab", os.environ["ISAACLAB_ROOT"]]
     return argv, source, baseline
 
 
-def prepare_as2w(config, root, run):
-    argv, trainer, baseline = as2w_commands(config, root, run)
+def prepare_as2w(config, root, run, mujoco_python=None, sim_python=None):
+    argv, trainer, baseline = as2w_commands(config, root, run, mujoco_python, sim_python)
     run.mkdir(parents=True, exist_ok=False)
     values = profile(config)
     diff = {key: dict(before=value, after=values[key]) for key, value in defaults().items()
