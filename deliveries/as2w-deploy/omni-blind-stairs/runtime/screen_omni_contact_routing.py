@@ -19,6 +19,7 @@ class ContactRoutedActor:
         self.gate.load_state_dict(gate["gate_state_dict"])
         self.center, self.scale, self.threshold = (gate[key] for key in ("center", "scale", "threshold"))
         self.required_consecutive = gate.get("required_consecutive", 3)
+        self.blend_seconds = gate.get("blend_seconds", .18)
         self.anchor, self.stair, self.dt = anchor, stair, dt
         self.history = deque(maxlen=HISTORY)
         self.tick = 0
@@ -41,7 +42,7 @@ class ContactRoutedActor:
                 self.switch_tick = self.tick
         anchor = self.anchor(obs)
         if self.switch_tick is not None:
-            blend = min(1., (self.tick - self.switch_tick + 1) * self.dt / .18)
+            blend = min(1., (self.tick - self.switch_tick + 1) * self.dt / self.blend_seconds)
             anchor = (1. - blend) * anchor + blend * self.stair(obs)
         self.tick += 1
         return anchor

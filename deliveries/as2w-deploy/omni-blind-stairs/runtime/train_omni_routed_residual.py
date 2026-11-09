@@ -44,8 +44,15 @@ def make_route(policy, anchor, primary, residual, contract, scale=None, stall_ga
         weight = scale
         if stall_gated:
             slow_wheel_speed = .086 * np.mean(np.sort(obs[38:42])[:2])
-            weight *= np.clip((.28 - slow_wheel_speed) / .22, 0., 1.)
-        return (primary(obs) + weight * residual(obs).clip(-RESIDUAL_LIMIT, RESIDUAL_LIMIT)).clip(-6., 6.)
+            stall = np.clip((.28 - slow_wheel_speed) / .22, 0., 1.)
+            if "rear_floor" in settings:
+                rear_speed = .086 * float(np.mean(obs[40:42]))
+                pitch_weight = np.clip((-obs[6] - .07) / .20, 0., 1.)
+                rear_stall = np.clip((.29 - rear_speed) / .22, 0., 1.)
+                stall = max(stall, settings["rear_floor"] * pitch_weight * rear_stall)
+            weight *= stall
+        limit = settings.get("rear_action_limit", RESIDUAL_LIMIT)
+        return (primary(obs) + weight * residual(obs).clip(-limit, limit)).clip(-6., 6.)
 
     return StairPlaneActor(policy["contact_gate"], anchor, stair, contract["control_dt"],
                            contract["default_joint_pos"], arrays(policy, "wheel_profiles"))
@@ -53,10 +60,11 @@ def make_route(policy, anchor, primary, residual, contract, scale=None, stall_ga
 
 class StairResidualEnvironment(OmniEnvironment):
     def __init__(self, results, policy, refs):
-        super().__init__(results, 0, refs, .48 if refs else 0., stair_speed_control=True)
+        super().__init__(results, 0, refs, .68 if refs else 0., stair_speed_control=True)
         self.policy = policy
         self.anchor, self.primary = (numpy_actor(make_actor(policy[key])) for key in ("anchor", "stair"))
-        self.action_space = gym.spaces.Box(-RESIDUAL_LIMIT, RESIDUAL_LIMIT, shape=(16,), dtype=np.float32)
+        cap = float(policy.get("stair_residual_config", {}).get("rear_action_limit", RESIDUAL_LIMIT))
+        self.action_space = gym.spaces.Box(-cap, cap, shape=(16,), dtype=np.float32)
 
     def sample_scene_seed(self):
         height_index = int(self.np_random.choice(3, p=(.24, .38, .38)))

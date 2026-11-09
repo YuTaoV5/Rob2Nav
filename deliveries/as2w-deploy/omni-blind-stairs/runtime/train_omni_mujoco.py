@@ -33,6 +33,9 @@ class OmniEnvironment(gym.Env):
         self.observation_space = gym.spaces.Box(-np.inf, np.inf, shape=(60,), dtype=np.float32)
         self.action_space = gym.spaces.Box(-6., 6., shape=(16,), dtype=np.float32)
 
+    def sample_scene_seed(self):
+        return int(self.np_random.integers(100_000, 1_000_000_000))
+
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
         options = options or {}
@@ -43,7 +46,7 @@ class OmniEnvironment(gym.Env):
                 and self.np_random.random() < self.reference_probability):
             scene_seed, reference = self.reference_resets[self.np_random.integers(len(self.reference_resets))]
         if scene_seed is None:
-            scene_seed = int(self.np_random.integers(100_000, 1_000_000_000))
+            scene_seed = self.sample_scene_seed()
         rng = np.random.default_rng(scene_seed)
         model = self.model = sim.load_flat_model(True, True, "stairs" if self.stairs else None, scene_seed)
         data = self.data = sim.mj.MjData(model)
@@ -99,7 +102,7 @@ class OmniEnvironment(gym.Env):
         self.torque_low, self.torque_high = model.actuator_ctrlrange[self.motors].T
         if reference is not None:
             # Keep full-course resets in the mixture and train difficult transfers from successful trajectories.
-            anchor = self.np_random.integers(50, min(365, len(reference) - 40))
+            anchor = self.np_random.integers(180, min(395, len(reference) - 35))
             for action in reference[:anchor]:
                 _, _, terminated, truncated, _ = self.step(action)
                 if terminated or truncated:
@@ -158,6 +161,7 @@ class OmniEnvironment(gym.Env):
         reward = (3. * progress + newly_reached + .16 * top
                   + 2. * (self.top_streak == round(.5 / self.dt))
                   - .08 * abs(data.qpos[1]) - .008 * max(impact - 15., 0.) - .12 * excess_speed)
+        self.last_stair_impact = impact
         return reward, impact > 90.
 
     def step(self, action):
