@@ -13,11 +13,8 @@ from PIL import Image, ImageDraw, ImageFont
 import torch
 
 import evaluate_omni_stairs as evaluation
-from screen_omni_estimated_lateral import EstimatedLateralController
-from search_lateral_omni_teacher import course
-from train_omni_routed_residual import arrays, make_route, residual_model
-from train_omni_velocity_estimator import estimator_model
-from train_recovery_student import make_actor, numpy_actor
+from evaluate_omni_joint import make_controller
+from train_omni_stop_transition import load
 
 
 WIDTH, HEIGHT, FPS = 768, 576, 25
@@ -44,6 +41,14 @@ class Video:
             self.renderer = evaluation.sim.mj.Renderer(model, height=HEIGHT, width=WIDTH)
             self.base = model.body("base_link").id
             self.camera = evaluation.sim.mj.MjvCamera()
+            self.scene_option = evaluation.sim.mj.MjvOption()
+            if self.stairs:
+                # The benchmark groups terrain separately for range queries.
+                self.scene_option.geomgroup[5] = 1
+                model.geom("ground").rgba[:] = (.27, .30, .34, 1.)
+                for level in range(1, 6):
+                    shade = .34 + .048 * level
+                    model.geom(f"stair_{level}").rgba[:] = (shade, shade + .10, shade + .14, 1.)
             self.process = subprocess.Popen([
                 "ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
                 "-s", f"{WIDTH}x{HEIGHT}", "-r", str(FPS), "-i", "-", "-an",
@@ -55,7 +60,7 @@ class Video:
         self.camera.distance = 2.75 if self.stairs else 2.0
         self.camera.azimuth = 132 if self.stairs else 128
         self.camera.elevation = -21 if self.stairs else -28
-        self.renderer.update_scene(data, camera=self.camera)
+        self.renderer.update_scene(data, camera=self.camera, scene_option=self.scene_option)
         frame = Image.fromarray(self.renderer.render())
         draw = ImageDraw.Draw(frame)
         draw.rectangle((0, 0, WIDTH, 78), fill=(12, 20, 29))
@@ -82,19 +87,11 @@ def main():
     parser.add_argument("fixed_report", type=Path)
     parser.add_argument("confirmation_report", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--stairs-only", action="store_true")
     args = parser.parse_args()
     torch.set_num_threads(1)
     sim = evaluation.sim
-    contract, limits, geometry = course(args.results.resolve())
-    policy = torch.load(args.policy, weights_only=True, map_location="cpu")
-    anchor, primary = (numpy_actor(make_actor(policy[key])) for key in ("anchor", "stair"))
-    residual = residual_model()
-    residual.load_state_dict(policy["stair_residual"])
-    correction = estimator_model()
-    correction.load_state_dict(policy["estimator"])
-    residual, correction = numpy_actor(residual), numpy_actor(correction)
-    params = np.asarray(policy["parameters"])
-    odometry = arrays(policy, "odometry_profiles")
+    policy, contract, limits, base, build = load(args.results.resolve(), args.policy)
     defaults = np.asarray(contract["default_joint_pos"])
     dt = contract["control_dt"]
     fixed = json.loads(args.fixed_report.read_text())
@@ -103,18 +100,24 @@ def main():
     rendered = []
 
     def controller():
-        base = make_route(policy, anchor, primary, residual, contract)
-        return EstimatedLateralController(base, correction, params, contract, geometry, odometry)
+        return make_controller(policy, contract, build, base())
 
     flat_files = []
-    for name in ("forward", "backward", "left", "right", "turn_left", "turn_right", "diagonal_left", "arc_right"):
-        source = next((r for r in fixed["flat"] if r["command"] == name and r["passed"]), None)
+    names = ("forward", "reverse", "left", "right", "turn_left", "turn_right",
+             "diagonal_left", "arc_right", "reverse_mixed")
+    for name in (() if args.stairs_only else names):
+        if name == "reverse_mixed":
+            source = next((r for r in confirmation["flat"] if r["passed"]
+                           and r["target"][0] < -.12 and abs(r["target"][1]) >= .10
+                           and abs(r["target"][2]) >= .25), None)
+        else:
+            source = next((r for r in fixed["flat"] if r["command"] == name and r["passed"]), None)
         if source is None:
             continue
-        target = np.asarray(evaluation.FLAT_COMMANDS[name])
+        target = np.asarray(source["target"])
         seed = source["seed"]
         path = args.output / f"flat-{name}.mp4"
-        video = Video(path, f"AS2-W flat | {name.replace('_', ' ')} then stop", seed)
+        video = Video(path, f"AS2-W R41 flat | {name.replace('_', ' ')} then stop", seed)
         actor = controller()
         try:
             row = evaluation.flat_episode(None, contract, limits, target, seed, evaluation.gait_clock,
@@ -124,7 +127,7 @@ def main():
         if not row["passed"]:
             raise RuntimeError(f"Flat video did not reproduce the passing result for {name}/{seed}")
         flat_files.append(path)
-        rendered.append({"command": name, "seed": seed, "passed": True})
+        rendered.append({"command": name, "target": target.tolist(), "seed": seed, "passed": True})
     if flat_files:
         listing = args.output / "flat-clips.txt"
         listing.write_text("".join(f"file '{path.name}'\n" for path in flat_files))
@@ -140,7 +143,7 @@ def main():
         stress = sim.sample_dynamics_stress(seed, model.nbody - 1, 16)
         command = np.array((.4, 0., 0.))
         video = Video(args.output / f"stairs-{round(100 * height):02d}cm.mp4",
-                      f"AS2-W blind ascent | five {round(100 * height)} cm risers", seed, True)
+                      f"AS2-W R41 blind ascent | five {round(100 * height)} cm risers", seed, True)
         actor = controller()
 
         def plan(data, obs, elapsed, advance):
