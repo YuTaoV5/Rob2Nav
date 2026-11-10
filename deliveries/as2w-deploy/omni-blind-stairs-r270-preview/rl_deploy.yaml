@@ -1,0 +1,27 @@
+model_version: r270-122880-simulation-preview
+policy_file: unitree_cpp_deploy/logs/as2w/r270-122880/exported/policy.onnx
+contract_file: unitree_cpp_deploy/logs/as2w/r270-122880/params/r270_contract.json
+step_dt: 0.02
+observation_size: 720
+action_size: 16
+measured_base_linear_velocity: false
+command_filter:
+  planar_limit_m_s: 0.15
+  yaw_limit_rad_s: 0.5
+  alpha: 0.12
+  snap_to_zero_threshold: 0.005
+current_frame:
+  '0:3': filtered_remote_vx_vy_yaw_minus_bias
+  '3:6': body_gyro
+  '6:9': projected_gravity
+  '9': constant_0.4
+  '10:26': joint_position_minus_default
+  '26:42': joint_velocity
+  '42:58': previous_clipped_action
+  '58:60': gait_clock_sin_cos
+command_bias: [0.4, 0.0, 0.0]
+gait_period_s: 0.62
+history:
+  frame_slice: [3, 58]
+  offsets_ticks: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]
+  startup_padding: earliest_available_frame
