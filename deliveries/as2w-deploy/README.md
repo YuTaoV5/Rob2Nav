@@ -86,3 +86,5 @@ build/as2w_sdk2_shadow low eth0 VERIFIED_LOWSTATE_TOPIC models/stairs-r17-3000.b
 第二条探测命令只在固件确认兼容该消息类型后使用。`calibrated.map` 按清单中的 16 个关节依次各写一行，每行是关节名、DDS 槽位、方向（+1 或 -1）、编码器零位（弧度）。槽位不可重复。转换为 `q_sim = sign * (q_sdk - offset)`，速度按同一方向转换。需实测关节正方向、零位和 IMU 安装方向。程序只订阅和打印预演目标。
 
 实际发令前还需对应 AS2-W X/EDU 固件的 `LowCmd/LowState` 定义、16 轴索引、轮速语义、CRC、接管与急停接口。原版恢复策略另外需要在低层接管后持续可用的机体系速度估计。当前可选 SDK2 程序尚未在 Linux SDK 或实机上运行。
+
+- [r284-500 平地 PPO 仿真预览](flat-r284-500-preview/README.md) · Isaac PPO、65 维 ONNX、rl_deploy、C++ 回放与视频。
