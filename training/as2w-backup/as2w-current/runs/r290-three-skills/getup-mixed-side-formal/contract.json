@@ -1,0 +1,108 @@
+{
+  "policy": "noninverted_getup",
+  "policy_width": 42,
+  "initial_checkpoint": "/root/gpufree-data/Rob2Nav-runtime/as2w-current/runs/r290-three-skills/getup-symmetric-formal/model_1199.pt",
+  "actions": 12,
+  "iterations": 1200,
+  "num_envs": 384,
+  "seed": 301,
+  "step_dt_s": 0.02,
+  "simulation_safety": {
+    "angle_rad": {
+      "FL_hip": [
+        -0.7065,
+        0.7065
+      ],
+      "FR_hip": [
+        -0.7065,
+        0.7065
+      ],
+      "RL_hip": [
+        -0.7065,
+        0.7065
+      ],
+      "RR_hip": [
+        -0.7065,
+        0.7065
+      ],
+      "FL_thigh": [
+        -1.72,
+        3.2228000000000003
+      ],
+      "FR_thigh": [
+        -1.72,
+        3.2228000000000003
+      ],
+      "RL_thigh": [
+        -1.09,
+        3.851000000000001
+      ],
+      "RR_thigh": [
+        -1.09,
+        3.851000000000001
+      ],
+      "FL_calf": [
+        -2.65093,
+        -0.89197
+      ],
+      "FR_calf": [
+        -2.65093,
+        -0.89197
+      ],
+      "RL_calf": [
+        -2.65093,
+        -0.89197
+      ],
+      "RR_calf": [
+        -2.65093,
+        -0.89197
+      ]
+    },
+    "effort_nm": {
+      "FL_hip": 54.0,
+      "FR_hip": 54.0,
+      "RL_hip": 54.0,
+      "RR_hip": 54.0,
+      "FL_thigh": 54.0,
+      "FR_thigh": 54.0,
+      "RL_thigh": 54.0,
+      "RR_thigh": 54.0,
+      "FL_calf": 81.0,
+      "FR_calf": 81.0,
+      "RL_calf": 81.0,
+      "RR_calf": 81.0,
+      "FL_foot": 13.5,
+      "FR_foot": 13.5,
+      "RL_foot": 13.5,
+      "RR_foot": 13.5
+    },
+    "wheel_rad_s": {
+      "FL_foot": 98.47,
+      "FR_foot": 98.47,
+      "RL_foot": 98.47,
+      "RR_foot": 98.47
+    },
+    "fraction": 0.9,
+    "source": "simulation_urdf_not_hardware_calibration",
+    "min_knee_surface_m": 0.015
+  },
+  "initial_families": [
+    "near_stand",
+    "prone",
+    "left_tilt",
+    "right_tilt"
+  ],
+  "initial_contact": "supported nonwheel contact allowed during recovery only",
+  "supported_pose_bank": "runs/r290-three-skills/supported-getup-poses.json",
+  "supported_side_bank": "runs/r290-three-skills/getup-training-mixed-side.json",
+  "supported_side_probability": 0.65,
+  "staged_rise": true,
+  "leg_kp": 85.0,
+  "support_handoff": true,
+  "fixed_stand_integral": true,
+  "low_support_handoff": true,
+  "recovery_symmetry": true,
+  "roll_brace": false,
+  "observation_packet_loss": 0.02,
+  "predictive_guard": true
+}

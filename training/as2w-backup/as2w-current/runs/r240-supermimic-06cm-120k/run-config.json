@@ -1,0 +1,44 @@
+{
+  "omni_motion_prior": true,
+  "simulator": "MuJoCo",
+  "initial": "runs/r237b-treatment-top070-120k/model_122880.pt",
+  "training_steps": 120000,
+  "seed": 240101,
+  "envs": 48,
+  "replay_seeds": [
+    27001,
+    27002,
+    27004,
+    27011,
+    27016,
+    31001,
+    31009,
+    31011,
+    31016
+  ],
+  "anchor_commands": [
+    "arc_left",
+    "forward",
+    "reverse",
+    "stop",
+    "turn_right"
+  ],
+  "reference_reset_probability": 0.2,
+  "reference_reset_seeds": [
+    27001,
+    27002,
+    27004,
+    27011,
+    27016,
+    31001,
+    31009,
+    31011
+  ],
+  "stair_speed_control": true,
+  "stair_only": true,
+  "stair_rise_m": 0.06,
+  "terminal_penalty": 20.0,
+  "top_reward": 0.7,
+  "learning_rate": 1e-05,
+  "checkpoint_rollouts": 5
+}

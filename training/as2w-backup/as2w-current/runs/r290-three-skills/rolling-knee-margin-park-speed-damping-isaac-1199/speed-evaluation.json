@@ -1,0 +1,503 @@
+{
+  "cap_m_s": 0.3,
+  "gate": false,
+  "safety_gate": false,
+  "summary": {
+    "forward": {
+      "track": 2,
+      "stable": 2,
+      "track_and_brake": 1,
+      "hold": 0,
+      "track_brake_hold": 0,
+      "total": 4,
+      "mean_along_m_s": 0.26751936972141266
+    },
+    "back": {
+      "track": 4,
+      "stable": 4,
+      "track_and_brake": 4,
+      "hold": 0,
+      "track_brake_hold": 0,
+      "total": 4,
+      "mean_along_m_s": 0.2688063010573387
+    }
+  },
+  "turns": {
+    "turn_left": {
+      "passed": 1,
+      "total": 2,
+      "stable": 1,
+      "wrong_direction": 0,
+      "mean_yaw_rad_s": 0.20976153016090393,
+      "min_knee_surface_m": 0.0369727723300457,
+      "mean_vx_m_s": 0.03824150934815407,
+      "rows": [
+        {
+          "passed": true,
+          "alive": true,
+          "direction_ok": true,
+          "translation_ok": true,
+          "mean_velocity": [
+            0.029268240556120872,
+            -0.009000296704471111,
+            0.2035292387008667
+          ],
+          "unloaded_s": 0.04,
+          "min_knee_surface_m": 0.0369727723300457,
+          "nonwheel_frames": 0,
+          "fixed_entry_s": 0.8200000000000001,
+          "fixed_exit_s": 8.86,
+          "first_failure": null
+        },
+        {
+          "passed": false,
+          "alive": false,
+          "direction_ok": true,
+          "translation_ok": true,
+          "mean_velocity": [
+            0.04721478000283241,
+            0.00649269437417388,
+            0.21599382162094116
+          ],
+          "unloaded_s": 0.08,
+          "min_knee_surface_m": 0.04529305174946785,
+          "nonwheel_frames": 0,
+          "fixed_entry_s": 1.62,
+          "fixed_exit_s": 1.58,
+          "first_failure": {
+            "time_s": 0.0,
+            "terms": [
+              "as2w_motion_substep"
+            ]
+          }
+        }
+      ]
+    },
+    "turn_right": {
+      "passed": 0,
+      "total": 2,
+      "stable": 2,
+      "wrong_direction": 0,
+      "mean_yaw_rad_s": -0.15448997914791107,
+      "min_knee_surface_m": 0.020103666931390762,
+      "mean_vx_m_s": 0.0014283284544944763,
+      "rows": [
+        {
+          "passed": false,
+          "alive": true,
+          "direction_ok": true,
+          "translation_ok": true,
+          "mean_velocity": [
+            -0.012816660106182098,
+            -0.009546360932290554,
+            -0.1572447121143341
+          ],
+          "unloaded_s": 0.04,
+          "min_knee_surface_m": 0.020103666931390762,
+          "nonwheel_frames": 0,
+          "fixed_entry_s": 0.08,
+          "fixed_exit_s": 7.44,
+          "first_failure": null
+        },
+        {
+          "passed": false,
+          "alive": true,
+          "direction_ok": true,
+          "translation_ok": true,
+          "mean_velocity": [
+            0.01567331701517105,
+            0.010621301829814911,
+            -0.15173524618148804
+          ],
+          "unloaded_s": 0.04,
+          "min_knee_surface_m": 0.05165077745914459,
+          "nonwheel_frames": 0,
+          "fixed_entry_s": 1.6,
+          "fixed_exit_s": 0.0,
+          "first_failure": null
+        }
+      ]
+    },
+    "arc_left": {
+      "passed": 1,
+      "total": 2,
+      "stable": 2,
+      "wrong_direction": 0,
+      "mean_yaw_rad_s": 0.12681367993354797,
+      "min_knee_surface_m": 0.022232256829738617,
+      "mean_vx_m_s": 0.05895751714706421,
+      "rows": [
+        {
+          "passed": true,
+          "alive": true,
+          "direction_ok": true,
+          "translation_ok": true,
+          "mean_velocity": [
+            0.08358179032802582,
+            -0.009237759746611118,
+            0.11603312194347382
+          ],
+          "unloaded_s": 0.04,
+          "min_knee_surface_m": 0.04006674513220787,
+          "nonwheel_frames": 0,
+          "fixed_entry_s": 2.0,
+          "fixed_exit_s": 5.32,
+          "first_failure": null
+        },
+        {
+          "passed": false,
+          "alive": true,
+          "direction_ok": true,
+          "translation_ok": false,
+          "mean_velocity": [
+            0.0343332439661026,
+            0.007685153279453516,
+            0.13759423792362213
+          ],
+          "unloaded_s": 0.06,
+          "min_knee_surface_m": 0.022232256829738617,
+          "nonwheel_frames": 0,
+          "fixed_entry_s": 2.74,
+          "fixed_exit_s": 0.0,
+          "first_failure": null
+        }
+      ]
+    },
+    "arc_right": {
+      "passed": 0,
+      "total": 2,
+      "stable": 2,
+      "wrong_direction": 0,
+      "mean_yaw_rad_s": -0.11343267560005188,
+      "min_knee_surface_m": 0.02263529598712921,
+      "mean_vx_m_s": 0.06895880401134491,
+      "rows": [
+        {
+          "passed": false,
+          "alive": true,
+          "direction_ok": true,
+          "translation_ok": true,
+          "mean_velocity": [
+            0.06031808257102966,
+            -0.005301516503095627,
+            -0.12763994932174683
+          ],
+          "unloaded_s": 0.04,
+          "min_knee_surface_m": 0.02263529598712921,
+          "nonwheel_frames": 0,
+          "fixed_entry_s": 0.0,
+          "fixed_exit_s": 9.24,
+          "first_failure": null
+        },
+        {
+          "passed": false,
+          "alive": true,
+          "direction_ok": true,
+          "translation_ok": true,
+          "mean_velocity": [
+            0.07759953290224075,
+            0.004733363166451454,
+            -0.09922540187835693
+          ],
+          "unloaded_s": 0.02,
+          "min_knee_surface_m": 0.04243222624063492,
+          "nonwheel_frames": 0,
+          "fixed_entry_s": 1.02,
+          "fixed_exit_s": 0.0,
+          "first_failure": null
+        }
+      ]
+    }
+  },
+  "rows": {
+    "forward": [
+      {
+        "track": false,
+        "stable": false,
+        "brake": false,
+        "hold": false,
+        "park_lock": null,
+        "fixed_entry_s": 0.84,
+        "fixed_exit_s": 4.66,
+        "fixed_exit_window_frames": 100,
+        "fixed_exit_failed_frames": {
+          "wheel_support": 0,
+          "upright": 0,
+          "joint_pose": 0,
+          "linear_speed": 0,
+          "angular_speed": 0
+        },
+        "along_m_s": 0.2658185064792633,
+        "cross_m_s": 0.01263757236301899,
+        "heading_deg": 1.3630188703536987,
+        "brake_s": 3.1,
+        "wheel_unload_s": 0.02,
+        "first_wheel_unload_over_limit": {},
+        "knee_clearance_m": 0.17391416430473328,
+        "knee_surface_clearance_m": 0.12942424416542053,
+        "simulated_effort_ratio": 1.0,
+        "brake_distance_m": 0.07215006649494171,
+        "brake_time_limit_s": 2.5,
+        "brake_distance_limit_m": 0.16249999999999998,
+        "hold_displacement_m": 0.03447167947888374,
+        "hold_heading_deg": 2.715123176574707,
+        "hold_residual_p95_m_s": 0.027117948979139328
+      },
+      {
+        "track": false,
+        "stable": false,
+        "brake": false,
+        "hold": false,
+        "park_lock": null,
+        "fixed_entry_s": 0.54,
+        "fixed_exit_s": 0.0,
+        "fixed_exit_window_frames": 100,
+        "fixed_exit_failed_frames": {
+          "wheel_support": 0,
+          "upright": 0,
+          "joint_pose": 18,
+          "linear_speed": 61,
+          "angular_speed": 0
+        },
+        "along_m_s": 0.2680271565914154,
+        "cross_m_s": 0.009532198309898376,
+        "heading_deg": 1.2082058191299438,
+        "brake_s": 1.84,
+        "wheel_unload_s": 0.1,
+        "first_wheel_unload_over_limit": {
+          "FL_foot": {
+            "time_s": 21.82,
+            "phase": "braking_or_hold"
+          }
+        },
+        "knee_clearance_m": 0.04706928879022598,
+        "knee_surface_clearance_m": 0.015979014337062836,
+        "simulated_effort_ratio": 0.6166717410087585,
+        "brake_distance_m": 0.06124364212155342,
+        "brake_time_limit_s": 2.5,
+        "brake_distance_limit_m": 0.16249999999999998,
+        "hold_displacement_m": 1.5837186574935913,
+        "hold_heading_deg": 3.593444585800171,
+        "hold_residual_p95_m_s": 0.07769371569156647
+      },
+      {
+        "track": true,
+        "stable": true,
+        "brake": true,
+        "hold": false,
+        "park_lock": {
+          "first_lock_s": 1.9000000000000001,
+          "release_to_lock_m": 0.046723708510398865,
+          "post_lock_peak_m": 0.017448168247938156
+        },
+        "fixed_entry_s": 1.32,
+        "fixed_exit_s": 12.66,
+        "fixed_exit_window_frames": 100,
+        "fixed_exit_failed_frames": {
+          "wheel_support": 0,
+          "upright": 0,
+          "joint_pose": 0,
+          "linear_speed": 0,
+          "angular_speed": 0
+        },
+        "along_m_s": 0.26639533042907715,
+        "cross_m_s": 0.010662262327969074,
+        "heading_deg": 0.6384997367858887,
+        "brake_s": 1.46,
+        "wheel_unload_s": 0.02,
+        "first_wheel_unload_over_limit": {},
+        "knee_clearance_m": 0.16055989265441895,
+        "knee_surface_clearance_m": 0.11884120106697083,
+        "simulated_effort_ratio": 0.6540417671203613,
+        "brake_distance_m": 0.06524111330509186,
+        "brake_time_limit_s": 2.5,
+        "brake_distance_limit_m": 0.16249999999999998,
+        "hold_displacement_m": 0.01825600676238537,
+        "hold_heading_deg": 0.8157705068588257,
+        "hold_residual_p95_m_s": 0.024353813380002975
+      },
+      {
+        "track": true,
+        "stable": true,
+        "brake": false,
+        "hold": false,
+        "park_lock": {
+          "first_lock_s": 1.1,
+          "release_to_lock_m": 0.06028149276971817,
+          "post_lock_peak_m": 0.03670697659254074
+        },
+        "fixed_entry_s": 0.1,
+        "fixed_exit_s": 11.88,
+        "fixed_exit_window_frames": 100,
+        "fixed_exit_failed_frames": {
+          "wheel_support": 0,
+          "upright": 0,
+          "joint_pose": 0,
+          "linear_speed": 0,
+          "angular_speed": 0
+        },
+        "along_m_s": 0.2698364853858948,
+        "cross_m_s": 0.005557787138968706,
+        "heading_deg": 1.6397645473480225,
+        "brake_s": 4.14,
+        "wheel_unload_s": 0.02,
+        "first_wheel_unload_over_limit": {},
+        "knee_clearance_m": 0.1511433869600296,
+        "knee_surface_clearance_m": 0.11166771501302719,
+        "simulated_effort_ratio": 0.5400125980377197,
+        "brake_distance_m": 0.09186093509197235,
+        "brake_time_limit_s": 2.5,
+        "brake_distance_limit_m": 0.16249999999999998,
+        "hold_displacement_m": 0.0034978764597326517,
+        "hold_heading_deg": 0.29597941040992737,
+        "hold_residual_p95_m_s": 0.007920670323073864
+      }
+    ],
+    "back": [
+      {
+        "track": true,
+        "stable": true,
+        "brake": true,
+        "hold": false,
+        "park_lock": {
+          "first_lock_s": 1.56,
+          "release_to_lock_m": 0.04957092925906181,
+          "post_lock_peak_m": 0.049792222678661346
+        },
+        "fixed_entry_s": 0.7000000000000001,
+        "fixed_exit_s": 6.62,
+        "fixed_exit_window_frames": 100,
+        "fixed_exit_failed_frames": {
+          "wheel_support": 0,
+          "upright": 0,
+          "joint_pose": 0,
+          "linear_speed": 0,
+          "angular_speed": 0
+        },
+        "along_m_s": 0.2715204060077667,
+        "cross_m_s": 0.01060664001852274,
+        "heading_deg": 0.5906611084938049,
+        "brake_s": 1.56,
+        "wheel_unload_s": 0.02,
+        "first_wheel_unload_over_limit": {},
+        "knee_clearance_m": 0.10778824985027313,
+        "knee_surface_clearance_m": 0.0761045515537262,
+        "simulated_effort_ratio": 0.788571834564209,
+        "brake_distance_m": 0.08110715448856354,
+        "brake_time_limit_s": 2.5,
+        "brake_distance_limit_m": 0.16249999999999998,
+        "hold_displacement_m": 0.049792222678661346,
+        "hold_heading_deg": 0.701023280620575,
+        "hold_residual_p95_m_s": 0.05075205862522125
+      },
+      {
+        "track": true,
+        "stable": true,
+        "brake": true,
+        "hold": false,
+        "park_lock": {
+          "first_lock_s": 2.06,
+          "release_to_lock_m": 0.07559629529714584,
+          "post_lock_peak_m": 0.06269778311252594
+        },
+        "fixed_entry_s": 0.28,
+        "fixed_exit_s": 5.78,
+        "fixed_exit_window_frames": 100,
+        "fixed_exit_failed_frames": {
+          "wheel_support": 0,
+          "upright": 0,
+          "joint_pose": 0,
+          "linear_speed": 0,
+          "angular_speed": 0
+        },
+        "along_m_s": 0.2661897540092468,
+        "cross_m_s": 0.009864280931651592,
+        "heading_deg": 1.5482126474380493,
+        "brake_s": 1.96,
+        "wheel_unload_s": 0.0,
+        "first_wheel_unload_over_limit": {},
+        "knee_clearance_m": 0.13444334268569946,
+        "knee_surface_clearance_m": 0.09854771196842194,
+        "simulated_effort_ratio": 1.0,
+        "brake_distance_m": 0.08347158133983612,
+        "brake_time_limit_s": 2.5,
+        "brake_distance_limit_m": 0.16249999999999998,
+        "hold_displacement_m": 0.06369862705469131,
+        "hold_heading_deg": 3.6959519386291504,
+        "hold_residual_p95_m_s": 0.05516344681382179
+      },
+      {
+        "track": true,
+        "stable": true,
+        "brake": true,
+        "hold": false,
+        "park_lock": {
+          "first_lock_s": 1.1,
+          "release_to_lock_m": 0.04824068397283554,
+          "post_lock_peak_m": 0.03689700365066528
+        },
+        "fixed_entry_s": 0.9,
+        "fixed_exit_s": 6.78,
+        "fixed_exit_window_frames": 100,
+        "fixed_exit_failed_frames": {
+          "wheel_support": 0,
+          "upright": 0,
+          "joint_pose": 0,
+          "linear_speed": 0,
+          "angular_speed": 0
+        },
+        "along_m_s": 0.2681111991405487,
+        "cross_m_s": 0.011064943857491016,
+        "heading_deg": 1.0887731313705444,
+        "brake_s": 2.12,
+        "wheel_unload_s": 0.0,
+        "first_wheel_unload_over_limit": {},
+        "knee_clearance_m": 0.1372501403093338,
+        "knee_surface_clearance_m": 0.0999966710805893,
+        "simulated_effort_ratio": 0.6420015692710876,
+        "brake_distance_m": 0.08717123419046402,
+        "brake_time_limit_s": 2.5,
+        "brake_distance_limit_m": 0.16249999999999998,
+        "hold_displacement_m": 0.048290595412254333,
+        "hold_heading_deg": 0.7967416048049927,
+        "hold_residual_p95_m_s": 0.038622546941041946
+      },
+      {
+        "track": true,
+        "stable": true,
+        "brake": true,
+        "hold": false,
+        "park_lock": {
+          "first_lock_s": 1.18,
+          "release_to_lock_m": 0.07391387969255447,
+          "post_lock_peak_m": 0.06509128212928772
+        },
+        "fixed_entry_s": 2.02,
+        "fixed_exit_s": 4.44,
+        "fixed_exit_window_frames": 100,
+        "fixed_exit_failed_frames": {
+          "wheel_support": 0,
+          "upright": 0,
+          "joint_pose": 0,
+          "linear_speed": 0,
+          "angular_speed": 0
+        },
+        "along_m_s": 0.2694038450717926,
+        "cross_m_s": 0.009071854874491692,
+        "heading_deg": 0.5680531859397888,
+        "brake_s": 1.4000000000000001,
+        "wheel_unload_s": 0.0,
+        "first_wheel_unload_over_limit": {},
+        "knee_clearance_m": 0.1301799714565277,
+        "knee_surface_clearance_m": 0.09379693120718002,
+        "simulated_effort_ratio": 0.6850495338439941,
+        "brake_distance_m": 0.08784980326890945,
+        "brake_time_limit_s": 2.5,
+        "brake_distance_limit_m": 0.16249999999999998,
+        "hold_displacement_m": 0.06641855835914612,
+        "hold_heading_deg": 0.7182217240333557,
+        "hold_residual_p95_m_s": 0.054794978350400925
+      }
+    ]
+  }
+}

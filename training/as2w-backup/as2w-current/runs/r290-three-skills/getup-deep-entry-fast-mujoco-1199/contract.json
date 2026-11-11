@@ -1,0 +1,39 @@
+{
+  "checkpoint": "/root/gpufree-data/Rob2Nav-runtime/as2w-current/runs/r290-three-skills/getup-symmetric-formal/model_1199.pt",
+  "checkpoint_sha256": "3e956238c51fdad8500f9638ef34b872fa4d20227b03e05f5ae2e2fdca03e406",
+  "seed": 9298,
+  "low_support_handoff": true,
+  "mirror_policy": false,
+  "paired_tilt": false,
+  "roll_brace": false,
+  "observation_packet_loss": 0.02,
+  "side_pose_bank": "runs/r290-three-skills/supported-getup-side-holdout.json",
+  "policy_step_s": 0.02,
+  "physics_step_s": 0.00125,
+  "motion_substep_audit": true,
+  "min_knee_center_m": 0.045,
+  "predictive_guard": true,
+  "anchor_wheels_on_handoff": false,
+  "fast_side_entry": true,
+  "evaluated_families": [
+    "left",
+    "right"
+  ],
+  "actuator_delay_ms": [
+    0,
+    5,
+    10,
+    15,
+    20
+  ],
+  "observation_delay_ms": [
+    0,
+    20
+  ],
+  "families": {
+    "prone": "heldout torso support",
+    "left": "random noninverted tilt",
+    "right": "random noninverted tilt",
+    "near_stand": "random standing offset"
+  }
+}

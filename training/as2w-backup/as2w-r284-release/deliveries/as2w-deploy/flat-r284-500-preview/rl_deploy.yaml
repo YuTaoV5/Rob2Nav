@@ -1,0 +1,37 @@
+model_version: r284-500-flat-simulation-preview
+policy_file: unitree_cpp_deploy/logs/as2w/r284-500/exported/policy.onnx
+deploy_parameters: unitree_cpp_deploy/logs/as2w/r284-500/params/deploy.yaml
+step_dt: 0.02
+input_name: obs
+input_shape: [1, 65]
+output_name: actions
+output_shape: [1, 16]
+measured_base_linear_velocity: false
+command_filter:
+  planar_norm_limit_m_s: 0.10
+  yaw_limit_rad_s: 0.30
+  alpha: 0.12
+  snap_to_zero_threshold: 0.005
+  command_bias: [0.4, 0.0, 0.0]
+observation:
+  '0:3': filtered_remote_vx_vy_wz_minus_bias
+  '3:6': body_gyro_rad_s
+  '6:9': projected_gravity_body
+  '9': constant_0.4
+  '10:22': leg_angle_minus_default_rad
+  '22:26': wheel_angle_wrapped_4pi_rad
+  '26:42': joint_velocity_rad_s
+  '42:58': previous_clipped_action
+  '58:60': gait_clock_sin_cos_period_0.62_s
+  '60:64': wheel_displacement_since_zero_entry_scaled_and_clipped
+  '64': filtered_zero_flag
+wheel_memory:
+  scale_rad: 0.20
+  clip: [-3.0, 3.0]
+  period_rad: 12.566370614359172
+  capture_on_filtered_zero_entry: true
+action_mapping:
+  action_clip: [-6.0, 6.0]
+  leg_position_scale_rad: 0.35
+  wheel_speed_scale_rad_s: 16.0
+joint_order: [FL_hip, FR_hip, RL_hip, RR_hip, FL_thigh, FR_thigh, RL_thigh, RR_thigh, FL_calf, FR_calf, RL_calf, RR_calf, FL_foot, FR_foot, RL_foot, RR_foot]

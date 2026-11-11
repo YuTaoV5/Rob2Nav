@@ -1,0 +1,326 @@
+#usda 1.0
+(
+    customLayerData = {
+        string creator = "URDF USD Converter v0.3.2"
+    }
+    defaultPrim = "AS2W"
+    endTimeCode = 1000000
+    kilogramsPerUnit = 1
+    metersPerUnit = 1
+    startTimeCode = 0
+    subLayers = [
+        @./physics.usda@
+    ]
+    upAxis = "Z"
+)
+
+over "AS2W"
+{
+    over "Physics"
+    {
+        over "FL_hip" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+            prepend apiSchemas = ["MjcJointAPI"]
+        )
+        {
+        }
+
+        over "FL_thigh" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+            prepend apiSchemas = ["MjcJointAPI"]
+        )
+        {
+        }
+
+        over "FL_calf" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+            prepend apiSchemas = ["MjcJointAPI"]
+        )
+        {
+        }
+
+        over "FL_foot" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+            prepend apiSchemas = ["MjcJointAPI"]
+        )
+        {
+        }
+
+        over "FR_hip" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+            prepend apiSchemas = ["MjcJointAPI"]
+        )
+        {
+        }
+
+        over "FR_thigh" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+            prepend apiSchemas = ["MjcJointAPI"]
+        )
+        {
+        }
+
+        over "FR_calf" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+            prepend apiSchemas = ["MjcJointAPI"]
+        )
+        {
+        }
+
+        over "FR_foot" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+            prepend apiSchemas = ["MjcJointAPI"]
+        )
+        {
+        }
+
+        over "RL_hip" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+            prepend apiSchemas = ["MjcJointAPI"]
+        )
+        {
+        }
+
+        over "RL_thigh" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+            prepend apiSchemas = ["MjcJointAPI"]
+        )
+        {
+        }
+
+        over "RL_calf" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+            prepend apiSchemas = ["MjcJointAPI"]
+        )
+        {
+        }
+
+        over "RL_foot" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+            prepend apiSchemas = ["MjcJointAPI"]
+        )
+        {
+        }
+
+        over "RR_hip" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+            prepend apiSchemas = ["MjcJointAPI"]
+        )
+        {
+        }
+
+        over "RR_thigh" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+            prepend apiSchemas = ["MjcJointAPI"]
+        )
+        {
+        }
+
+        over "RR_calf" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+            prepend apiSchemas = ["MjcJointAPI"]
+        )
+        {
+        }
+
+        over "RR_foot" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+            prepend apiSchemas = ["MjcJointAPI"]
+        )
+        {
+        }
+
+        def MjcActuator "FL_hip_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, -1.7453292608261108, -0.01745329238474369, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = 60
+            uniform double mjc:forceRange:min = -60
+            uniform double[] mjc:gainPrm = [1.7453292608261108, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            append rel mjc:target = </AS2W/Physics/FL_hip>
+        }
+
+        def MjcActuator "FL_thigh_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, -1.7453292608261108, -0.01745329238474369, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = 60
+            uniform double mjc:forceRange:min = -60
+            uniform double[] mjc:gainPrm = [1.7453292608261108, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            append rel mjc:target = </AS2W/Physics/FL_thigh>
+        }
+
+        def MjcActuator "FL_calf_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, -1.7453292608261108, -0.01745329238474369, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = 90
+            uniform double mjc:forceRange:min = -90
+            uniform double[] mjc:gainPrm = [1.7453292608261108, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            append rel mjc:target = </AS2W/Physics/FL_calf>
+        }
+
+        def MjcActuator "FL_foot_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, -1.7453292608261108, -0.01745329238474369, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = 15
+            uniform double mjc:forceRange:min = -15
+            uniform double[] mjc:gainPrm = [1.7453292608261108, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            append rel mjc:target = </AS2W/Physics/FL_foot>
+        }
+
+        def MjcActuator "FR_hip_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, -1.7453292608261108, -0.01745329238474369, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = 60
+            uniform double mjc:forceRange:min = -60
+            uniform double[] mjc:gainPrm = [1.7453292608261108, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            append rel mjc:target = </AS2W/Physics/FR_hip>
+        }
+
+        def MjcActuator "FR_thigh_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, -1.7453292608261108, -0.01745329238474369, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = 60
+            uniform double mjc:forceRange:min = -60
+            uniform double[] mjc:gainPrm = [1.7453292608261108, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            append rel mjc:target = </AS2W/Physics/FR_thigh>
+        }
+
+        def MjcActuator "FR_calf_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, -1.7453292608261108, -0.01745329238474369, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = 90
+            uniform double mjc:forceRange:min = -90
+            uniform double[] mjc:gainPrm = [1.7453292608261108, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            append rel mjc:target = </AS2W/Physics/FR_calf>
+        }
+
+        def MjcActuator "FR_foot_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, -1.7453292608261108, -0.01745329238474369, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = 15
+            uniform double mjc:forceRange:min = -15
+            uniform double[] mjc:gainPrm = [1.7453292608261108, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            append rel mjc:target = </AS2W/Physics/FR_foot>
+        }
+
+        def MjcActuator "RL_hip_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, -1.7453292608261108, -0.01745329238474369, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = 60
+            uniform double mjc:forceRange:min = -60
+            uniform double[] mjc:gainPrm = [1.7453292608261108, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            append rel mjc:target = </AS2W/Physics/RL_hip>
+        }
+
+        def MjcActuator "RL_thigh_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, -1.7453292608261108, -0.01745329238474369, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = 60
+            uniform double mjc:forceRange:min = -60
+            uniform double[] mjc:gainPrm = [1.7453292608261108, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            append rel mjc:target = </AS2W/Physics/RL_thigh>
+        }
+
+        def MjcActuator "RL_calf_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, -1.7453292608261108, -0.01745329238474369, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = 90
+            uniform double mjc:forceRange:min = -90
+            uniform double[] mjc:gainPrm = [1.7453292608261108, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            append rel mjc:target = </AS2W/Physics/RL_calf>
+        }
+
+        def MjcActuator "RL_foot_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, -1.7453292608261108, -0.01745329238474369, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = 15
+            uniform double mjc:forceRange:min = -15
+            uniform double[] mjc:gainPrm = [1.7453292608261108, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            append rel mjc:target = </AS2W/Physics/RL_foot>
+        }
+
+        def MjcActuator "RR_hip_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, -1.7453292608261108, -0.01745329238474369, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = 60
+            uniform double mjc:forceRange:min = -60
+            uniform double[] mjc:gainPrm = [1.7453292608261108, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            append rel mjc:target = </AS2W/Physics/RR_hip>
+        }
+
+        def MjcActuator "RR_thigh_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, -1.7453292608261108, -0.01745329238474369, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = 60
+            uniform double mjc:forceRange:min = -60
+            uniform double[] mjc:gainPrm = [1.7453292608261108, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            append rel mjc:target = </AS2W/Physics/RR_thigh>
+        }
+
+        def MjcActuator "RR_calf_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, -1.7453292608261108, -0.01745329238474369, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = 90
+            uniform double mjc:forceRange:min = -90
+            uniform double[] mjc:gainPrm = [1.7453292608261108, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            append rel mjc:target = </AS2W/Physics/RR_calf>
+        }
+
+        def MjcActuator "RR_foot_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, -1.7453292608261108, -0.01745329238474369, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = 15
+            uniform double mjc:forceRange:min = -15
+            uniform double[] mjc:gainPrm = [1.7453292608261108, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            append rel mjc:target = </AS2W/Physics/RR_foot>
+        }
+    }
+}
+

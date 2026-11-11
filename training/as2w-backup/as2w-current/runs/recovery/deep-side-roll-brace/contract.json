@@ -1,0 +1,42 @@
+{
+  "checkpoint": "/root/gpufree-data/Rob2Nav-runtime/as2w-current/runs/recovery/deep-side-curriculum/formal/model_1199.pt",
+  "checkpoint_sha256": "4fe19b8e63213eda50c1a0db4056bd413a6490542336ec87ab86d69cf9cf5aa7",
+  "seed": 7301,
+  "low_support_handoff": true,
+  "mirror_policy": false,
+  "paired_tilt": true,
+  "roll_brace": true,
+  "observation_packet_loss": 0.02,
+  "side_pose_bank": null,
+  "policy_step_s": 0.02,
+  "physics_step_s": 0.00125,
+  "motion_substep_audit": true,
+  "min_knee_center_m": 0.045,
+  "predictive_guard": true,
+  "anchor_wheels_on_handoff": false,
+  "observe_after_push_diagnostic": false,
+  "fast_side_entry": false,
+  "evaluated_families": [
+    "prone",
+    "left",
+    "right",
+    "near_stand"
+  ],
+  "actuator_delay_ms": [
+    0,
+    5,
+    10,
+    15,
+    20
+  ],
+  "observation_delay_ms": [
+    0,
+    20
+  ],
+  "families": {
+    "prone": "heldout torso support",
+    "left": "random noninverted tilt",
+    "right": "random noninverted tilt",
+    "near_stand": "random standing offset"
+  }
+}

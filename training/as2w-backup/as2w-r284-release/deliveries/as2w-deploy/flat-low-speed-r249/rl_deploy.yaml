@@ -1,0 +1,50 @@
+model_version: r249-flat-low-speed-preview
+policy_file: weights/policy-r249.onnx
+step_dt: 0.02
+observation_size: 60
+action_size: 16
+measured_base_linear_velocity: false
+observation:
+  0:3: remote_command_vx_vy_yaw - [0.4,0,0]
+  '3:6': imu_gyro_body
+  '6:9': imu_projected_gravity
+  '9': constant_0.4
+  '10:26': joint_position - default_joint_position
+  '26:42': joint_velocity
+  '42:58': previous_final_action
+  58:60: gait_clock_sin_cos
+command_limit:
+- 0.15
+- 0.15
+- 0.5
+low_speed_hind_posture:
+  enabled: true
+  planar_command_threshold_m_s: 0.2
+  action_scale: 0.0
+  action_indices:
+  - 2
+  - 3
+  - 6
+  - 7
+  - 10
+  - 11
+action_mapping:
+  leg_position: default_joint_position + 0.35 * action[0:12]
+  wheel_velocity: 16.0 * action[12:16]
+joint_names:
+- FL_hip
+- FR_hip
+- RL_hip
+- RR_hip
+- FL_thigh
+- FR_thigh
+- RL_thigh
+- RR_thigh
+- FL_calf
+- FR_calf
+- RL_calf
+- RR_calf
+- FL_foot
+- FR_foot
+- RL_foot
+- RR_foot

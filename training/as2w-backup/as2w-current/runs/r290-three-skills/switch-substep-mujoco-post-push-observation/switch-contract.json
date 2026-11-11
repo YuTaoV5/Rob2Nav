@@ -1,0 +1,25 @@
+{
+  "backend": "mujoco",
+  "expanded": true,
+  "seed": 48001,
+  "reverse_order": true,
+  "recalibrate_fixed_exit": false,
+  "fixed_leg_kp": 55.0,
+  "fixed_wheel_kd": 2.0,
+  "observe_after_push_s": 3.0,
+  "motion_substep_audit": {
+    "physics_dt_s": 0.00125
+  },
+  "weights": {
+    "rolling": {
+      "onnx": "/root/gpufree-data/Rob2Nav-runtime/as2w-current/runs/r290-three-skills/onnx-diagnostic/rolling-mirror-750-provenance/policy.onnx",
+      "onnx_sha256": "51ce5e0343406564efc9d6e8cb7d72a180d076112c761e9eec2aecd904dddc20",
+      "checkpoint_sha256": "9b0a9c213cbd17846a887eaf11738ac283553f146f8ce6a74a9ed68c2d26e36f"
+    },
+    "stepping": {
+      "onnx": "/root/gpufree-data/Rob2Nav-runtime/as2w-current/runs/r290-three-skills/onnx-diagnostic/stepping-shaped-200-provenance/policy.onnx",
+      "onnx_sha256": "0e06db0ae6c4598a912cea76ea2d5ad95c331c5ecfdb5b7f970a4ddfab20ac0e",
+      "checkpoint_sha256": "a42495b57830b437bc99e48e558744163a30d2ea60da56f7d94a51927ee48b9f"
+    }
+  }
+}
