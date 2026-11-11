@@ -1,0 +1,112 @@
+{
+  "platform": "Linux-5.15.0-191-generic-x86_64-with-glibc2.39",
+  "config": {
+    "asr": {
+      "backend": "sherpa",
+      "directory": "data/models/voice/asr",
+      "provider": "cpu",
+      "threads": 2,
+      "language": "zh"
+    },
+    "tts": {
+      "backend": "sherpa",
+      "directory": "data/models/voice/tts",
+      "provider": "cpu",
+      "threads": 2,
+      "speed": 1.0,
+      "noise_scale": 0.0,
+      "noise_scale_w": 0.0
+    }
+  },
+  "measurements": [
+    {
+      "run": 0,
+      "phase": "cold",
+      "asr": {
+        "text": "开饭时间早上9点至下午5点。",
+        "asr_ms": 474.5979639701545,
+        "audio_s": 5.592
+      },
+      "tts_uncached": {
+        "tts_ms": 536.7770669981837,
+        "cache_hit": false
+      },
+      "tts_cached": {
+        "tts_ms": 0.0037141144275665283,
+        "cache_hit": true
+      }
+    },
+    {
+      "run": 1,
+      "phase": "warm",
+      "asr": {
+        "text": "开饭时间早上9点至下午5点。",
+        "asr_ms": 248.04485263302922,
+        "audio_s": 5.592
+      },
+      "tts_uncached": {
+        "tts_ms": 498.2811720110476,
+        "cache_hit": false
+      },
+      "tts_cached": {
+        "tts_ms": 0.0033797696232795715,
+        "cache_hit": true
+      }
+    },
+    {
+      "run": 2,
+      "phase": "warm",
+      "asr": {
+        "text": "开饭时间早上9点至下午5点。",
+        "asr_ms": 244.73623605445027,
+        "audio_s": 5.592
+      },
+      "tts_uncached": {
+        "tts_ms": 494.1539219580591,
+        "cache_hit": false
+      },
+      "tts_cached": {
+        "tts_ms": 0.003048218786716461,
+        "cache_hit": true
+      }
+    },
+    {
+      "run": 3,
+      "phase": "warm",
+      "asr": {
+        "text": "开饭时间早上9点至下午5点。",
+        "asr_ms": 247.0229840837419,
+        "audio_s": 5.592
+      },
+      "tts_uncached": {
+        "tts_ms": 498.0464493855834,
+        "cache_hit": false
+      },
+      "tts_cached": {
+        "tts_ms": 0.005085952579975128,
+        "cache_hit": true
+      }
+    },
+    {
+      "run": 4,
+      "phase": "warm",
+      "asr": {
+        "text": "开饭时间早上9点至下午5点。",
+        "asr_ms": 280.3790778852999,
+        "audio_s": 5.592
+      },
+      "tts_uncached": {
+        "tts_ms": 496.9641091302037,
+        "cache_hit": false
+      },
+      "tts_cached": {
+        "tts_ms": 0.0031208619475364685,
+        "cache_hit": true
+      }
+    }
+  ],
+  "note": "ASR timing excludes human speaking; TTS is full short-WAV generation/cache, not acoustic playback or streaming TTFA",
+  "warm_asr_median_ms": 247.53391835838556,
+  "warm_tts_generation_median_ms": 497.50527925789356,
+  "warm_tts_cache_median_ms": 0.00325031578540802
+}

@@ -1,0 +1,85 @@
+[
+  {
+    "name": "后空翻",
+    "profile": "backflip60",
+    "aliases": [
+      "后空翻",
+      "后翻",
+      "做个后空翻",
+      "来个后空翻"
+    ],
+    "manifest": "deployment\\skills\\backflip60.json",
+    "hardware_qualified": false,
+    "simulation_enabled": true,
+    "blocker": "仅仿真：单技能及连续流程四朝向通过；实机未验证",
+    "entry": "four_feet",
+    "atomic": true,
+    "manifest_sha256": "c7a1275d0695686d21a5689ae3985e92827feb89c0f92b1af8fd9344ac2b68eb",
+    "available": true,
+    "expected_policy_sha256": "c8adf96a70cdb9e68f7aa7fe02271ae36908b6c8ab29ad967d03c73a58eaa82d"
+  },
+  {
+    "name": "侧空翻",
+    "profile": "sideflip69",
+    "aliases": [
+      "侧空翻",
+      "侧翻",
+      "做个侧空翻",
+      "来个侧空翻"
+    ],
+    "manifest": "deployment\\skills\\sideflip69.json",
+    "hardware_qualified": false,
+    "simulation_enabled": false,
+    "blocker": "Motor-speed/true stepping validation and recovery exit are not complete",
+    "entry": "four_feet",
+    "atomic": true,
+    "manifest_sha256": "2619df3b644caf7bbe670ce25fc8d39e11bb4b3ec5cba7a2633d770780f16145",
+    "available": true,
+    "expected_policy_sha256": "7616e53e2c95434f824c2728621f8052e2d41a4e033fd00a25f316de211e07e1"
+  },
+  {
+    "name": "倒立",
+    "profile": "upright48",
+    "aliases": [
+      "倒立",
+      "倒立走",
+      "做个倒立",
+      "来个倒立"
+    ],
+    "manifest": "deployment\\skills\\upright48.json",
+    "hardware_qualified": false,
+    "simulation_enabled": false,
+    "blocker": "Motor-speed/true stepping validation and recovery exit are not complete",
+    "entry": "requires_exit_controller",
+    "atomic": true,
+    "manifest_sha256": "66f1c19ef2a03e5c78bf2562c602ddae5a12b9338b3cb6efa4b8cbf06432fba1",
+    "available": true,
+    "expected_policy_sha256": "b44983998121a36fb6cdfc7693fcfb6b56ef5abc12a444d5fb669be49e0cf532"
+  },
+  {
+    "name": "站立",
+    "profile": "stand",
+    "manifest": "deployment\\skills\\stand.json",
+    "hardware_qualified": false,
+    "simulation_enabled": true,
+    "blocker": "No physical Go2 qualification",
+    "entry": "four_feet",
+    "atomic": false,
+    "manifest_sha256": "2dfce941966d3438852a74b6d21e000d4f42ddc26ec0f155e6f5da23f22e9b4c",
+    "available": true,
+    "expected_policy_sha256": ""
+  },
+  {
+    "name": "MoE 行走",
+    "profile": "walk_moe",
+    "manifest": "deployment\\skills\\walk_moe.json",
+    "hardware_qualified": false,
+    "simulation_enabled": true,
+    "blocker": "No physical Go2 qualification",
+    "entry": "four_feet",
+    "atomic": false,
+    "manifest_sha256": "bfae4c6d3d9c958f90e611ce5777061021aeeb610a8ac4601ffc84bf0b297ee7",
+    "available": true,
+    "expected_policy_sha256": "2206659a6a23886446dcfc05d86888d6cdc9b8a4e31f44cbbc4e2d17ba3d6ead"
+  }
+]
