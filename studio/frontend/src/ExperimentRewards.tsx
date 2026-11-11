@@ -7,7 +7,7 @@ export type RewardTerm = {
   description:string; source:string; code?:string; unit?:string; available:boolean; parameters:RewardParameter[];
 };
 export type ExtraReward = {name:string; formula:string; weight:number};
-export type RewardManifest = {terms:RewardTerm[]; note?:string; sourceCode?:string; custom?:{signals:string[];presets:[string,string,number][]}};
+export type RewardManifest = {terms:RewardTerm[]; note?:string; sourceVersion?:string; sourceCode?:string; custom?:{signals:string[];presets:[string,string,number][]}};
 export type CloneExperiment = {config:Record<string,unknown>; term?:string; baseline?:Record<string,number>};
 
 const kindLabels={reward:'奖励',penalty:'惩罚',mixed:'双向'};
@@ -39,6 +39,7 @@ export function RewardEditor({manifest, onChange, focused, pending, error, basel
     <h3>奖励与惩罚</h3>
     {error&&<p className="alert danger" role="alert">{error}</p>}
     {manifest.note&&<p className="muted">{manifest.note}</p>}
+    {manifest.sourceVersion&&<small title={manifest.sourceVersion}>函数与配置 SHA-256 <code>{manifest.sourceVersion.slice(0,12)}</code></small>}
     {manifest.sourceCode&&<details><summary>查看该技能的奖励函数源码</summary><pre className="code">{manifest.sourceCode}</pre></details>}
     {!!(manifest.terms.length||manifest.custom)&&<>
       <div className="experiment-tools">
@@ -74,6 +75,7 @@ export function RewardEditor({manifest, onChange, focused, pending, error, basel
         <h4>{term.label}</h4>
         <p>{term.description}</p>
         <code className="experiment-formula">{term.formula}</code>
+        {!!term.parameters.length&&<small>候选代入值 · {term.parameters.map(p=>p.label+' = '+p.value).join(' · ')}</small>}
         <small>{term.unit&&term.unit+' · '}{term.source}</small>
         {term.code&&<details><summary>查看函数源码</summary><pre className="code">{term.code}</pre></details>}
         {term.parameters.map(param=><RewardInput key={param.id} parameter={param} baseline={baseline?.[param.id]} enabled={term.available} onChange={onChange}/>)}

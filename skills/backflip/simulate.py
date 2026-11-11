@@ -103,7 +103,8 @@ def main(extension=None):
     max_speed=0.;max_excess=0.;air=0.;max_air=0.;bad=False;minimum_up=1.;max_height=0.
     ground_reader=None
     original_reset=module.reset_robot;original_step=mujoco.mj_step
-    writer=None;renderer=None;next_trace=0.;next_frame=0.
+    writer=None;renderer=None;next_trace=0.;telemetry=None
+    from studio.as2w_eval.mujoco_telemetry import PhysicalTelemetry
     def reset(model,data,qids):
         nonlocal resets
         resets+=1
@@ -120,7 +121,7 @@ def main(extension=None):
             data.qpos[qids]+=rng.uniform(-a.initial_joint_noise,a.initial_joint_noise,12)
         mujoco.mj_forward(model,data)
     def step(model,data,*args,**kwargs):
-        nonlocal rotation,angular_travel,max_speed,max_excess,air,max_air,bad,minimum_up,max_height,writer,renderer,next_trace,next_frame,ground_reader
+        nonlocal rotation,angular_travel,max_speed,max_excess,air,max_air,bad,minimum_up,max_height,writer,renderer,next_trace,ground_reader,telemetry
         before_step=float(data.time)
         if extension is not None:extension.before_step()
         result=original_step(model,data,*args,**kwargs)
@@ -148,7 +149,10 @@ def main(extension=None):
             trace[-1].update(standard_pose_error=float(np.max(abs(data.qpos[qids]-[POSE[n] for n in module.JOINT_NAMES]))),
                 max_joint_speed=float(np.max(abs(data.qvel[dids]))),
                 all_feet_ground=all(value>4. for value in foot_forces.values()),foot_forces_N=foot_forces)
-            trace[-1]['pts_s']=round(next_trace,6)
+            if telemetry is None:
+                telemetry=PhysicalTelemetry(model,model.body('base').id,[model.joint(n) for n in module.JOINT_NAMES])
+            trace[-1].update(pts_s=round(next_trace,6),step=len(trace)-1,
+                             sim_time_s=float(data.time),telemetry=telemetry.sample(data))
             if exported.get('studio_reward_context') and extension is None:
                 reward_cfg=exported['studio_reward_context']
                 root_id=model.body('base').id
@@ -165,14 +169,19 @@ def main(extension=None):
                          lin_vel_z=float(min(velocity_world[5],reward_cfg['max_upward_velocity']))
                          if reward_cfg['takeoff_start']<reward_time<reward_cfg['takeoff_end'] else 0.)
                 trace[-1]['studio_raw']=raw
+                trace[-1]['studio_gates']={
+                    'ang_vel_z':True,'gravity_y':True,
+                    'ang_vel_y':reward_cfg['takeoff_start']<reward_time<reward_cfg['rotation_end'],
+                    'lin_vel_z':reward_cfg['takeoff_start']<reward_time<reward_cfg['takeoff_end'],
+                }
+            if a.video:
+                if writer is None:
+                    import imageio.v2 as imageio
+                    writer=imageio.get_writer(a.output/'episode_0.mp4',fps=50,macro_block_size=1)
+                    renderer=mujoco.Renderer(model,height=480,width=640)
+                camera=mujoco.MjvCamera();camera.distance=2.3;camera.azimuth=130;camera.elevation=-15;camera.lookat[:]=data.qpos[:3]
+                renderer.update_scene(data,camera=camera);writer.append_data(renderer.render())
             next_trace+=.02
-        if a.video and data.time>=next_frame:
-            if writer is None:
-                import imageio.v2 as imageio
-                writer=imageio.get_writer(a.output/'episode_0.mp4',fps=25,macro_block_size=1)
-                renderer=mujoco.Renderer(model,height=480,width=640)
-            camera=mujoco.MjvCamera();camera.distance=2.3;camera.azimuth=130;camera.elevation=-15;camera.lookat[:]=data.qpos[:3]
-            renderer.update_scene(data,camera=camera);writer.append_data(renderer.render());next_frame+=.04
         return result
     argv=sys.argv
     module.reset_robot=reset;mujoco.mj_step=step

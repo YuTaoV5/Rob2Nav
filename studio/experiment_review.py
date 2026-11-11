@@ -61,13 +61,20 @@ def go2_trace(run, source):
         terms = {}
         for key, raw in row.get("studio_raw", {}).items():
             if key in scales:
-                terms[key] = dict(raw=raw, weighted=raw * scales[key], label=LABELS.get(key, key))
+                terms[key] = dict(raw=raw, weight=scales[key], gate=row.get("studio_gates", {}).get(key),
+                                  weighted=raw * scales[key], label=LABELS.get(key, key))
         row["terms"] = terms
         row["time"] = row.get("pts_s", row["time"])
         row["signals"] = {k: row[k] for k in ("upright", "speed", "angular_speed", "standard_pose_error") if k in row}
+        if "position" in row and len(row["position"])>=3:
+            row["signals"]["height_m"] = row["position"][2]
+        for foot, force in row.get("foot_forces_N", {}).items():
+            row["signals"][f"{foot} 接触力 N"] = force
         if "all_feet_ground" in row:
             row["signals"]["all_feet_ground"] = int(row["all_feet_ground"])
-    return dict(frames=rows, label="MuJoCo 复算 · 贡献按乘控制步长前显示")
+    aligned=bool(rows and all("step" in row and "telemetry" in row for row in rows))
+    return dict(frames=rows, backend="MuJoCo", video_fps=50 if aligned else None,
+                label="MuJoCo 复算 · 仅显示已匹配公式的项 · 加权值未乘步长")
 
 
 def mount_experiment_review(app, root, jobs):
@@ -110,7 +117,7 @@ def mount_experiment_review(app, root, jobs):
             side: {**{k:v for k,v in value.items() if k!="trace"},
                    "hasTrace": bool(value["trace"] and value["trace"].is_file())}
             for side,value in c["sides"].items()}) for c in cases],
-            train=samples[::max(1,(len(samples)+249)//250)], state=job["state"], isTraining=job["config"].get("task")=="train")
+            train=samples[::max(1,(len(samples)+249)//250)], state=job["state"], isTraining=job["config"].get("task")=="train", canClone=job["state"]!="snapshot")
 
     @app.get("/api/jobs/{key}/experiment-trace")
     def frame_data(key: str, case: str, side: str):
@@ -128,7 +135,7 @@ def mount_experiment_review(app, root, jobs):
         from .config import RunConfig
         from .registry import resolve_recipe
         job, run = get_job(key)
-        if job["config"].get("task") != "train":
+        if job["config"].get("task") != "train" or job["state"] == "snapshot":
             raise HTTPException(422, "请选择训练任务")
         parent = RunConfig.model_validate(job["config"])
         cfg = parent.model_dump()

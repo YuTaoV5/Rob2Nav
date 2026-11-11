@@ -49,6 +49,7 @@ def main():
         protocol=dict(kind=a.kind,seeds=list(range(a.seed_start,a.seed_start+4)),seconds=5,physics_hz=1000,
             mujoco=mujoco.__version__,evaluator_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             playback_sha256=hashlib.sha256((ROOT/'skills/backflip/simulate.py').read_bytes()).hexdigest(),
+            trace_schema=2,video_fps=50,
             upstream=subprocess.check_output(['git','-C',str(a.source),'rev-parse','HEAD'],text=True).strip())
     for seed in range(a.seed_start,a.seed_start+4):
         out=run/f'seed_{seed}'

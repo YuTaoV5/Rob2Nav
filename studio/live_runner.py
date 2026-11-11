@@ -14,23 +14,31 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--stream',type=Path,required=True)
     p.add_argument('--module',required=True);p.add_argument('args',nargs=argparse.REMAINDER)
     a=p.parse_args()
-    if a.module not in ('rob2nav.mujoco_skill','skills.backflip.simulate','go2_nav.terrain_run','rob2nav.deployment.verify_mujoco','studio.jump_demo'):
+    if a.module not in ('rob2nav.mujoco_skill','skills.backflip.simulate','go2_nav.terrain_run','rob2nav.deployment.verify_mujoco','studio.jump_demo','studio.go2_teleop'):
         raise ValueError('Unknown simulation module')
     import mujoco
     from PIL import Image
     from .sim_visuals import reference_ground
+    from .as2w_eval.mujoco_telemetry import PhysicalTelemetry
     stream=a.stream;stream.mkdir(parents=True,exist_ok=True)
     original=mujoco.mj_step;renderer=None;camera=mujoco.MjvCamera()
     camera.distance=2.2;camera.azimuth=130.;camera.elevation=-25.
-    start_wall=None;start_sim=None;next_frame=0.;count=0;last=None;last_model=None
+    start_wall=None;start_sim=None;next_frame=0.;count=0;last=None;last_model=None;sampler=None;telemetry=None
     def atomic(name,payload):
         tmp=stream/(name+'.tmp');tmp.write_bytes(payload);tmp.replace(stream/name)
+    def control():
+        try:
+            cmd=json.loads((stream/'command.json').read_text())
+            if 0.<=time.monotonic()-cmd['stamp']<=.35:return cmd['velocity']
+        except (OSError,ValueError,KeyError,TypeError):
+            pass
+        return [0.,0.,0.]
     def step(model,data,*args,**kw):
-        nonlocal renderer,start_sim,start_wall,next_frame,count,last,last_model
+        nonlocal renderer,start_sim,start_wall,next_frame,count,last,last_model,sampler,telemetry
         result=original(model,data,*args,**kw)
         if model is not last_model:
             if renderer is not None:renderer.close();renderer=None
-            last_model=model;start_sim=None;next_frame=0.
+            last_model=model;start_sim=None;next_frame=0.;sampler=PhysicalTelemetry(model)
         if start_sim is None:start_sim=float(data.time);start_wall=time.monotonic()
         last=(model,data)
         elapsed=float(data.time)-start_sim
@@ -49,8 +57,9 @@ def main():
             reference_ground(renderer.scene,model,data)
             out=io.BytesIO();Image.fromarray(renderer.render()).save(out,format='JPEG',quality=82)
             atomic('frame.jpg',out.getvalue());count+=1
+            telemetry=sampler.sample(data)
             atomic('state.json',json.dumps(dict(phase='RUNNING',time=elapsed,frames=count,
-                position=data.qpos[:3].tolist(),camera=settings,backend='MuJoCo',hardware_enabled=False)).encode())
+                position=data.qpos[:3].tolist(),camera=settings,telemetry=telemetry,command=control(),backend='MuJoCo',hardware_enabled=False)).encode())
             next_frame=elapsed+.1
         delay=elapsed-(time.monotonic()-start_wall)
         if delay>0:time.sleep(min(delay,.1))
@@ -72,7 +81,7 @@ def main():
             out=io.BytesIO();Image.fromarray(renderer.render()).save(out,format='JPEG',quality=82)
             atomic('frame.jpg',out.getvalue())
             atomic('state.json',json.dumps(dict(phase='COMPLETED',time=float(data.time)-start_sim,frames=count,
-                position=data.qpos[:3].tolist(),camera=settings,backend='MuJoCo',hardware_enabled=False)).encode())
+                position=data.qpos[:3].tolist(),camera=settings,telemetry=sampler.sample(data),backend='MuJoCo',hardware_enabled=False)).encode())
             time.sleep(.1)
     finally:
         mujoco.mj_step=original

@@ -15,7 +15,7 @@ from typing import Literal
 
 class Launch(BaseModel):
     model_config=ConfigDict(extra='forbid')
-    skill:Literal['stairs','platform','multiterrain','backflip','sideflip','upright_walk','jump','obstacles']
+    skill:Literal['stairs','platform','multiterrain','backflip','sideflip','upright_walk','jump','obstacles','go2_teleop']
 
 
 class CompositionStep(BaseModel):
@@ -32,6 +32,14 @@ class Composition(BaseModel):
     cycles:int=Field(default=1,ge=1,le=4)
     research_stunts:bool=False
     compact_backflip_repeat:bool=False
+
+
+class SimulationCommand(BaseModel):
+    model_config=ConfigDict(extra="forbid",allow_inf_nan=False)
+    session: str=Field(pattern=r"^[a-f0-9]{12}$")
+    vx: float=Field(ge=-.35,le=.35)
+    vy: float=Field(ge=-.20,le=.20)
+    wz: float=Field(ge=-.50,le=.50)
 
 
 class Camera(BaseModel):
@@ -87,7 +95,11 @@ def mount_live_skills(app,root,python):
             stop();key=uuid.uuid4().hex[:12];out=root/'outputs/live_skills'/key
             stream=out/'stream';stream.mkdir(parents=True)
             note='';policy=None
-            if a.skill=='jump':
+            if a.skill=='go2_teleop':
+                module='studio.go2_teleop'
+                args=['--output',str(out/'evaluation'),'--command',str(stream/'command.json')]
+                note='Go2 步态策略 · 速度命令进入 MuJoCo 控制器。松键、失焦或 350 ms 未收到更新时归零。'
+            elif a.skill=='jump':
                 module='studio.jump_demo';args=['--root',str(root),'--output',str(out/'evaluation')]
                 note='原地跳跃关节动作原语：仅施加有界关节力矩，不施加机身外力；高度与腾空时间以本次评估为准。'
             elif a.skill in ('stairs','platform','multiterrain','obstacles'):
@@ -111,8 +123,20 @@ def mount_live_skills(app,root,python):
             try:proc=subprocess.Popen([str(python),'-m','studio.live_runner','--stream',str(stream),'--module',module,'--',*args],cwd=root,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
             finally:log.close()
             current.clear();current.update(id=key,skill=a.skill,phase='STARTING',note=note,stream=str(stream),hardware_enabled=False)
+            current['manual_control']=a.skill=='go2_teleop'
             last_client=time.monotonic()
             return {k:v for k,v in current.items() if k!='stream'}
+
+    @app.post('/api/live-skills/command')
+    def command(a:SimulationCommand):
+        with lock:
+            if current.get('id')!=a.session or not current.get('manual_control') or current.get('phase')=='STOPPED' or proc is None or proc.poll() is not None:
+                raise HTTPException(409,'当前会话没有可用的仿真速度接口')
+            p=Path(current['stream'])/'command.json'
+            tmp=p.with_suffix('.tmp')
+            tmp.write_text(json.dumps(dict(velocity=[a.vx,a.vy,a.wz],stamp=time.monotonic())))
+            tmp.replace(p)
+            return {'accepted':True}
 
     @app.post('/api/live-skills/composition/start')
     def start_composition(a:Composition):
@@ -158,6 +182,8 @@ def mount_live_skills(app,root,python):
             if not current:return {'phase':'IDLE'}
             s={k:v for k,v in current.items() if k!='stream'}
             s.update(read(Path(current['stream'])/'state.json',{}))
+            if current.get('manual_control'):
+                s['controller']=read(Path(current['stream'])/'controller.json',{})
             if current.get('skill')=='composition':
                 progress=read(Path(current['stream'])/'progress.json',{})
                 if progress:

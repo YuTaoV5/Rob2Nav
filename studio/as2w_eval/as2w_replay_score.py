@@ -1,6 +1,7 @@
 """Evaluate the R13 reward expressions on one AS2-W MuJoCo recording."""
 import numpy as np
 import mujoco as mj
+from mujoco_telemetry import PhysicalTelemetry
 from reward_expression import SIGNALS, expression, reward_specs
 
 
@@ -12,6 +13,7 @@ class ReplayScore:
         self.dt = contract["control_dt"]
         joints = [model.joint(name) for name in contract["joint_names"]]
         self.base = model.body("base_link").id
+        self.telemetry = PhysicalTelemetry(model, self.base, joints)
         self.wheels = [model.jnt_bodyid[j.id] for j in joints[12:]]
         self.leg_qpos = [j.qposadr[0] for j in joints[:12]]
         self.default = np.array(contract["default_joint_pos"][:12])
@@ -49,17 +51,21 @@ class ReplayScore:
         p = self.weights
         weight = (p["upright_weight"], p["pose_weight"], -p["impact_weight"], p["stance_weight"],
                   -(p["effort_base"] + p["effort_righted"] * righted))
-        terms = {key:dict(raw=value,weighted=float(value*scale) if active else 0.)
+        terms = {key:dict(raw=value,weight=float(scale),gate=bool(active),weighted=float(value*scale) if active else 0.)
                  for key,value,scale in zip(("upright","pose","impact","stance","effort"),raw,weight)}
         signals = dict(zip(SIGNALS, raw))
         for i, (spec, fn) in enumerate(self.extra):
             value = float(np.clip(fn(signals), -10., 10.))
-            terms[f"custom_{i}"] = dict(raw=value, weighted=value*spec["weight"] if active else 0., label=spec["name"])
-        self.frames.append(dict(time=len(self.frames)*self.dt, sim_time_s=float(data.time),
+            terms[f"custom_{i}"] = dict(raw=value, weight=spec["weight"], gate=bool(active), weighted=value*spec["weight"] if active else 0., label=spec["name"])
+        self.frames.append(dict(step=len(self.frames), time=len(self.frames)*self.dt, sim_time_s=float(data.time),
+            telemetry=self.telemetry.sample(data),
             terms=terms,
             signals=dict(height_m=height,wheel_min_n=float(vertical.min()),roll_rad=float(np.arctan2(rotation[2,1],upright)),
                          angular_speed=angular,speed=linear,stable_streak_s=self.streak*self.dt,
-                         active=float(active),righted_gate=righted)))
+                         active=float(active),righted_gate=righted,stable_gate=float(stable), nonwheel_impact_n=impact,
+                         **{f"wheel_{leg}_n":float(load) for leg,load in zip(("FL","FR","RL","RR"),vertical)})))
 
     def result(self, profile):
-        return dict(label="MuJoCo 复算 · " + profile + " · 采用 MuJoCo 接触力与控制步长前贡献", frames=self.frames)
+        return dict(schema_version=2, backend="MuJoCo", video_fps=round(1/self.dt), control_dt_s=self.dt,
+                    label="MuJoCo 复算 · " + profile + " · 使用本回合 MuJoCo 接触数据，贡献未乘步长",
+                    frames=self.frames)

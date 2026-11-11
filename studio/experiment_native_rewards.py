@@ -1,5 +1,6 @@
 """Reviewed mapping from the pinned Go2 flip trainer to the common reward editor."""
 import ast
+import hashlib
 from pathlib import Path
 
 FLIP = frozenset(("backflip_native_ppo", "frontflip_native_ppo"))
@@ -54,4 +55,10 @@ def native_manifest(root, config):
              formula=formula, description="按该技能的实际尺度与控制步长计入训练奖励。",
              source=source.name + "/go2_backflip_env.py", code=code, available=True,
              parameters=[dict(id=key,label="权重",value=overrides.get(key,default),default=default,min=-1000.,max=1000.,editable=True)]))
-    return dict(terms=terms, note="单次 FIXSTAND 配方。落地端点附加项由训练器固定计算。")
+    fingerprint=hashlib.sha256()
+    for file in (source/"go2_backflip_env.py",source/"go2_backflip_env_cfg.py",root/"skills/backflip/launcher_patch.py"):
+        fingerprint.update(file.read_bytes())
+    if front:
+        fingerprint.update((root/"skills/frontflip/task.py").read_bytes())
+    return dict(terms=terms, sourceVersion=fingerprint.hexdigest(),
+                note="单次 FIXSTAND 配方。落地端点附加项由训练器固定计算。")
