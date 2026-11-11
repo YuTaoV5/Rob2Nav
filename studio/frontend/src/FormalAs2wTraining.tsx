@@ -6,6 +6,16 @@ type Run = {id: string; recipe: Skill; smoke: boolean; entrypoint: string;
   status?: {state: string; error?: string}};
 const states: Record<string, string> = {queued: '排队中', training: '训练中', trained: '训练结束', failed: '失败'};
 const api = '/api/as2w';
+const steps = [
+  ['任务与权重', '选择技能和对应的起始检查点'],
+  ['训练配置', '选择冒烟或正式训练'],
+  ['核对与提交', '确认参数后提交任务'],
+] as const;
+const recipes: Record<Skill, {checkpoint: string; envs: number; seed: number}> = {
+  rolling: {checkpoint: 'rolling-maneuvers-formal/model_1199.pt', envs: 384, seed: 303},
+  stepping: {checkpoint: 'stepping-go2-reset-exploration-init/model.pt', envs: 256, seed: 305},
+  recovery: {checkpoint: 'getup-symmetric-formal/model_1199.pt', envs: 384, seed: 301},
+};
 
 async function loadRuns(): Promise<Run[]> {
   const response = await fetch(api + '/runs');
@@ -17,6 +27,7 @@ async function loadRuns(): Promise<Run[]> {
 export default function FormalAs2wTraining() {
   const [skill, setSkill] = useState<Skill>('rolling');
   const [smoke, setSmoke] = useState(true);
+  const [step, setStep] = useState(0);
   const [runs, setRuns] = useState<Run[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -54,17 +65,50 @@ export default function FormalAs2wTraining() {
     }
   }
 
-  return <section className="card as2w-section">
+  const recipe = recipes[skill];
+  return <section className="as2w-section" aria-label="AS2-W 训练配方">
     <h2>AS2-W 训练配方</h2>
-    <label>技能 <select value={skill} disabled={busy} onChange={event => setSkill(event.target.value as Skill)}>
-      {Object.entries(skills).map(([id, name]) => <option key={id} value={id}>{name}</option>)}
-    </select></label>
-    <label>运行方式 <select value={smoke ? 'smoke' : 'formal'} disabled={busy}
-      onChange={event => setSmoke(event.target.value === 'smoke')}>
-      <option value="smoke">冒烟检查 · 3 轮</option>
-      <option value="formal">正式训练 · 1200 轮</option>
-    </select></label>
-    <button type="button" disabled={busy} onClick={submit}>{busy ? '正在提交' : '提交训练'}</button>
+    <nav className="experiment-steps" aria-label="AS2-W 创建实验步骤">
+      {steps.map(([label, description], index) => <button type="button" key={label}
+        className="experiment-step-card" aria-current={step === index ? 'step' : undefined}
+        disabled={busy} onClick={() => setStep(index)}>
+        <span className="experiment-step-number" aria-hidden="true">{index + 1}</span>
+        <span><strong>{label}</strong><small>{description}</small></span>
+      </button>)}
+    </nav>
+    <div className="card">
+      {step === 0 && <>
+        <label className="field">技能 <select value={skill} onChange={event => setSkill(event.target.value as Skill)}>
+          {Object.entries(skills).map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+        </select></label>
+        <p>起始检查点 <code>{recipe.checkpoint}</code></p>
+      </>}
+      {step === 1 && <>
+        <label className="field">运行方式 <select value={smoke ? 'smoke' : 'formal'}
+          onChange={event => setSmoke(event.target.value === 'smoke')}>
+          <option value="smoke">冒烟检查 · 3 轮</option>
+          <option value="formal">正式训练 · 1200 轮</option>
+        </select></label>
+        <p>本次使用 {smoke ? 8 : recipe.envs} 个并行环境，随机种子 {recipe.seed}。奖励与课程沿用该技能的正式配方。</p>
+      </>}
+      {step === 2 && <>
+        <h3>核对训练配置</h3>
+        <dl>
+          <dt>技能</dt><dd>{skills[skill]}</dd>
+          <dt>起始检查点</dt><dd><code>{recipe.checkpoint}</code></dd>
+          <dt>运行配置</dt><dd>{smoke ? '3 轮冒烟 · 8 个环境' : `1200 轮正式训练 · ${recipe.envs} 个环境`}</dd>
+          <dt>随机种子</dt><dd>{recipe.seed}</dd>
+        </dl>
+      </>}
+      <div className="experiment-next">
+        {step > 0 && <button type="button" className="button secondary" disabled={busy}
+          onClick={() => setStep(step - 1)}>上一步</button>}
+        {step < 2 && <button type="button" className="button primary"
+          onClick={() => setStep(step + 1)}>下一步</button>}
+        {step === 2 && <button type="button" className="button primary" disabled={busy}
+          onClick={submit}>{busy ? '正在提交' : '提交训练'}</button>}
+      </div>
+    </div>
     {submitted && <p role="status">已提交任务 {submitted}</p>}
     {error && <p role="alert">{error}</p>}
     {runs.length > 0 && <ul>{runs.map(run => <li key={run.id}>
