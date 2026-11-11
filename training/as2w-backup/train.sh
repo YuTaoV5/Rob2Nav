@@ -11,20 +11,9 @@ unset LD_LIBRARY_PATH
 usd="$PWD/runs/r280-isaac-flat-preflight/kit3-as2w.usd/as2w/as2w.usda"
 urdf="$PWD/../dependencies/unitree_ros_as2w/robots/as2w_description/as2w.urdf"
 case "$1" in
- rolling)
-  trainer=train_as2w_isaac_robust.py; count=384
-  init="$d/rolling-maneuvers-formal/model_1199.pt"
-  args=(--checkpoint "$init" --profile expanded --speed-cap 1 --speed-rolling --rolling-fixed-exit --rolling-stand-compensation --rolling-wheel-hold --park-precalibrated --park-continuous-bias --park-straight-bias --rolling-maneuvers --rolling-knee-margin --safety --learning-rate .00010 --seed 303)
-  ;;
- stepping)
-  trainer=train_as2w_isaac_stepping.py; count=256
-  init="$d/stepping-go2-reset-exploration-init/model.pt"
-  args=(--init-checkpoint "$init" --curriculum stairs-sequence-guarded --sequence-period 8 --sequence-stride .35 --sequence-shaped-reward --directed-stair-curriculum --packet-loss .02 --target-margin .05 --stance-margin-reward --sequence-attitude --predictive-guard --privileged-stair-critic --go2-support-reference "$d/go2-as2w-wheel-teacher-projected" --seed 305)
-  ;;
- recovery)
-  trainer=train_as2w_isaac_getup.py; count=384
-  init="$d/getup-symmetric-formal/model_1199.pt"
-  args=(--init-checkpoint "$init" --seed 301 --pose-bank "$d/supported-getup-poses.json" --side-pose-bank "$d/getup-training-mixed-side.json" --side-pose-probability .65 --staged-rise --rise-gain 85 --support-handoff --fixed-stand-integral --low-support-handoff --recovery-symmetry --packet-loss .02 --predictive-guard)
+ rolling|stepping|recovery)
+  recipe="$base/../../skills/as2w/$1/recipes/formal.sh"
+  source "$recipe"
   ;;
  *) echo "Unknown task: $1" >&2; exit 2 ;;
 esac
@@ -33,4 +22,9 @@ for file in "$usd" "$urdf" "$init"; do
 done
 [[ -x "$sim" ]] || { echo "Missing Isaac Sim interpreter: $sim" >&2; exit 1; }
 mkdir -- "$2"
-exec "$sim" "code/$trainer" --viz none --device "${AS2W_DEVICE:-cuda:0}" --usd "$usd" --urdf "$urdf" --num-envs "${AS2W_NUM_ENVS:-$count}" --iterations "${AS2W_ITERATIONS:-1200}" --out "$2" "${args[@]}"
+command=("$sim" "code/$trainer" --viz none --device "${AS2W_DEVICE:-cuda:0}" --usd "$usd" --urdf "$urdf" --num-envs "${AS2W_NUM_ENVS:-$count}" --iterations "${AS2W_ITERATIONS:-1200}" --out "$2" "${args[@]}")
+git -C "$base" rev-parse HEAD > "$2/source-revision.txt" 2>/dev/null || printf 'unknown\n' > "$2/source-revision.txt"
+sha256sum "$recipe" "$init" "$usd" "$urdf" > "$2/input-sha256.txt"
+printf '%q ' "${command[@]}" > "$2/command.sh"
+printf '\n' >> "$2/command.sh"
+exec "${command[@]}"
