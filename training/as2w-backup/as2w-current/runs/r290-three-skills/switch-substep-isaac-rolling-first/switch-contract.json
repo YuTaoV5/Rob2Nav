@@ -1,0 +1,24 @@
+{
+  "backend": "isaacsim_physx",
+  "expanded": true,
+  "seed": 48001,
+  "native_position_pd": true,
+  "reverse_order": false,
+  "recalibrate_fixed_exit": false,
+  "motion_substep_audit": {
+    "physics_dt_s": 0.005,
+    "nonwheel_force_tolerance_n": 0.001
+  },
+  "weights": {
+    "rolling": {
+      "onnx": "/root/gpufree-data/Rob2Nav-runtime/as2w-current/runs/r290-three-skills/onnx-diagnostic/rolling-mirror-750/policy.onnx",
+      "onnx_sha256": "51ce5e0343406564efc9d6e8cb7d72a180d076112c761e9eec2aecd904dddc20",
+      "checkpoint_sha256": null
+    },
+    "stepping": {
+      "onnx": "/root/gpufree-data/Rob2Nav-runtime/as2w-current/runs/r290-three-skills/onnx-diagnostic/stepping-shaped-200/policy.onnx",
+      "onnx_sha256": "0e06db0ae6c4598a912cea76ea2d5ad95c331c5ecfdb5b7f970a4ddfab20ac0e",
+      "checkpoint_sha256": null
+    }
+  }
+}

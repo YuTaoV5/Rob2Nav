@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "status": "simulation_diagnostic",
+  "real_actuation_enabled": false,
+  "policy_period_s": 0.02,
+  "joint_binding": "as2w-official-reference.json",
+  "joint_angles_units": "rad",
+  "angular_velocity_units": "rad/s",
+  "policies": {
+    "rolling": {
+      "input_shape": [1, 65],
+      "output_shape": [1, 16],
+      "observation_ranges": {"command": [0, 3], "body_gyro": [3, 6], "projected_gravity": [6, 9], "height_constant": [9, 10], "joint_position_offset": [10, 26], "joint_velocity": [26, 42], "previous_command": [42, 58], "phase_sin_cos": [58, 60], "zero_command_wheel_memory": [60, 64], "zero_command_flag": [64, 65]},
+      "zero_command_observation": [-0.4, 0, 0],
+      "wheel_angle_wrap_rad": 12.566370614359172,
+      "raw_action_clip": 6.0,
+      "leg_action_to_rad": 0.35,
+      "wheel_action_to_rad_s": 16.0,
+      "controller_source": "as2w_rolling_fixed_exit.py"
+    },
+    "stepping": {
+      "input_shape": [1, 47],
+      "output_shape": [1, 12],
+      "observation_ranges": {"command": [0, 3], "body_gyro": [3, 6], "projected_gravity": [6, 9], "joint_position_offset": [9, 21], "joint_velocity": [21, 33], "previous_command": [33, 45], "phase_sin_cos": [45, 47]},
+      "raw_action_clip": 2.0,
+      "leg_action_to_rad": 0.30,
+      "wheel_position_target_rad": 0.0,
+      "wheel_position_kp": 45.0,
+      "wheel_position_kd": 4.0,
+      "controller_source": "as2w_stepping_control.py"
+    },
+    "getup": {
+      "input_shape": [1, 42],
+      "output_shape": [1, 12],
+      "observation_ranges": {"body_gyro": [0, 3], "projected_gravity": [3, 6], "joint_position_offset": [6, 18], "joint_velocity": [18, 30], "previous_command": [30, 42]},
+      "raw_action_clip": 2.0,
+      "leg_action_to_rad": 0.35,
+      "wheel_position_target_rad": 0.0,
+      "wheel_position_kp": 25.0,
+      "wheel_position_kd": 4.0,
+      "controller_source": "as2w_recovery_control.py"
+    }
+  },
+  "mode_switch": {
+    "entry_blend_s": 0.75,
+    "exit_blend_s": 0.75,
+    "fixed_stand_gate_s": 0.4,
+    "braking_quiet_gate_s": 0.5,
+    "maximum_feedback_age_s": 0.06,
+    "braking_timeout_s": 5.0,
+    "recovery_timeout_s": 12.0,
+    "failure_action": "latch_fault_and_inhibit_actor_output"
+  }
+}

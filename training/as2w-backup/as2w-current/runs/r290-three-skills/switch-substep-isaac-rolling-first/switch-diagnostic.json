@@ -1,0 +1,401 @@
+[
+  {
+    "passed": false,
+    "phases": [
+      {
+        "time_s": 0.0,
+        "state": [
+          "fixed_stand",
+          null
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 4.44,
+        "state": [
+          "enter_policy",
+          "rolling"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 5.2,
+        "state": [
+          "policy_active",
+          "rolling"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 11.0,
+        "state": [
+          "brake_to_stop",
+          "rolling"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 12.5,
+        "state": [
+          "exit_policy",
+          "rolling"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 13.26,
+        "state": [
+          "fixed_stand",
+          null
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 13.700000000000001,
+        "state": [
+          "enter_policy",
+          "stepping"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 14.46,
+        "state": [
+          "policy_active",
+          "stepping"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 28.0,
+        "state": [
+          "brake_to_stop",
+          "stepping"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 29.36,
+        "state": [
+          "exit_policy",
+          "stepping"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 30.78,
+        "state": [
+          "fixed_stand",
+          null
+        ],
+        "fault": null
+      }
+    ],
+    "failure": null,
+    "fixed_stand_violation_frames": {
+      "rolling_exit": {
+        "frames": 1,
+        "speed": 0,
+        "yaw": 0,
+        "upright": 0,
+        "leg_error": 0,
+        "wheel_load": 0,
+        "contact": 0
+      },
+      "stepping_exit": {
+        "frames": 34,
+        "speed": 12,
+        "yaw": 0,
+        "upright": 0,
+        "leg_error": 0,
+        "wheel_load": 0,
+        "contact": 0
+      },
+      "final_stand": {
+        "frames": 411,
+        "speed": 6,
+        "yaw": 0,
+        "upright": 0,
+        "leg_error": 0,
+        "wheel_load": 0,
+        "contact": 0
+      }
+    },
+    "final_stand_s": 0.7999999999999972,
+    "distances_m": {
+      "rolling": 1.1497986316680908,
+      "stepping": 0.3637275695800781
+    },
+    "body_forward_m": {
+      "rolling": 1.1482808038435184,
+      "stepping": 0.3890102960460359
+    },
+    "native_position_pd": true,
+    "expanded": true,
+    "observation_delay_s": 0.0,
+    "target_delay_s": 0.0,
+    "min_knee_surface_m": 0.1255137175321579,
+    "max_effort_fraction_of_guard": 1.0
+  },
+  {
+    "passed": false,
+    "phases": [
+      {
+        "time_s": 0.0,
+        "state": [
+          "fixed_stand",
+          null
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 4.5600000000000005,
+        "state": [
+          "enter_policy",
+          "rolling"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 5.32,
+        "state": [
+          "policy_active",
+          "rolling"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 11.0,
+        "state": [
+          "brake_to_stop",
+          "rolling"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 12.66,
+        "state": [
+          "exit_policy",
+          "rolling"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 16.66,
+        "state": [
+          "fault",
+          null
+        ],
+        "fault": "fixed_stand_timeout"
+      }
+    ],
+    "failure": {
+      "time_s": 16.66,
+      "terms": [
+        "fixed_stand_timeout"
+      ]
+    },
+    "fixed_stand_violation_frames": {
+      "rolling_exit": {
+        "frames": 163,
+        "speed": 3,
+        "yaw": 1,
+        "upright": 0,
+        "leg_error": 163,
+        "wheel_load": 0,
+        "contact": 0
+      }
+    },
+    "final_stand_s": 0.0,
+    "distances_m": {
+      "rolling": 1.130109429359436,
+      "stepping": 0.0
+    },
+    "body_forward_m": {
+      "rolling": 1.1352575009809514,
+      "stepping": 0.0
+    },
+    "native_position_pd": true,
+    "expanded": true,
+    "observation_delay_s": 0.02,
+    "target_delay_s": 0.0,
+    "min_knee_surface_m": 0.1423163115978241,
+    "max_effort_fraction_of_guard": 0.4446277916431427
+  },
+  {
+    "passed": false,
+    "phases": [
+      {
+        "time_s": 0.0,
+        "state": [
+          "fixed_stand",
+          null
+        ],
+        "fault": null
+      }
+    ],
+    "failure": {
+      "time_s": 0.02,
+      "terms": [
+        "as2w_motion_substep"
+      ],
+      "physics_checks": [
+        "nonwheel_contact"
+      ]
+    },
+    "fixed_stand_violation_frames": {},
+    "final_stand_s": 0.0,
+    "distances_m": {
+      "rolling": 0.0,
+      "stepping": 0.0
+    },
+    "body_forward_m": {
+      "rolling": 0.0,
+      "stepping": 0.0
+    },
+    "native_position_pd": true,
+    "expanded": true,
+    "observation_delay_s": 0.02,
+    "target_delay_s": 0.0,
+    "min_knee_surface_m": 0.11898666620254517,
+    "max_effort_fraction_of_guard": 1.0
+  },
+  {
+    "passed": false,
+    "phases": [
+      {
+        "time_s": 0.0,
+        "state": [
+          "fixed_stand",
+          null
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 4.0,
+        "state": [
+          "enter_policy",
+          "rolling"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 4.76,
+        "state": [
+          "policy_active",
+          "rolling"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 11.0,
+        "state": [
+          "brake_to_stop",
+          "rolling"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 12.58,
+        "state": [
+          "exit_policy",
+          "rolling"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 13.34,
+        "state": [
+          "fixed_stand",
+          null
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 13.76,
+        "state": [
+          "enter_policy",
+          "stepping"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 14.52,
+        "state": [
+          "policy_active",
+          "stepping"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 28.0,
+        "state": [
+          "brake_to_stop",
+          "stepping"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 29.44,
+        "state": [
+          "exit_policy",
+          "stepping"
+        ],
+        "fault": null
+      },
+      {
+        "time_s": 30.92,
+        "state": [
+          "fixed_stand",
+          null
+        ],
+        "fault": null
+      }
+    ],
+    "failure": null,
+    "fixed_stand_violation_frames": {
+      "rolling_exit": {
+        "frames": 1,
+        "speed": 0,
+        "yaw": 0,
+        "upright": 0,
+        "leg_error": 0,
+        "wheel_load": 0,
+        "contact": 0
+      },
+      "stepping_exit": {
+        "frames": 37,
+        "speed": 16,
+        "yaw": 0,
+        "upright": 0,
+        "leg_error": 0,
+        "wheel_load": 0,
+        "contact": 0
+      },
+      "final_stand": {
+        "frames": 404,
+        "speed": 12,
+        "yaw": 1,
+        "upright": 0,
+        "leg_error": 0,
+        "wheel_load": 0,
+        "contact": 0
+      }
+    },
+    "final_stand_s": 0.0,
+    "distances_m": {
+      "rolling": 1.2266863510012627,
+      "stepping": 0.336358530446887
+    },
+    "body_forward_m": {
+      "rolling": 1.223814598025055,
+      "stepping": 0.35479034533375
+    },
+    "native_position_pd": true,
+    "expanded": true,
+    "observation_delay_s": 0.02,
+    "target_delay_s": 0.02,
+    "min_knee_surface_m": 0.1272873729467392,
+    "max_effort_fraction_of_guard": 1.0
+  }
+]

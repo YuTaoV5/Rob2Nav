@@ -1,0 +1,33 @@
+{
+  "omni_motion_prior": true,
+  "simulator": "MuJoCo",
+  "initial": "runs/r242-mix06x5-08x1-300k/model_215040.pt",
+  "training_steps": 180000,
+  "seed": 244001,
+  "envs": 48,
+  "replay_seeds": [
+    27001,
+    31012
+  ],
+  "anchor_commands": [
+    "arc_right",
+    "forward",
+    "reverse",
+    "stop",
+    "turn_left"
+  ],
+  "reference_reset_probability": 0.0,
+  "reference_reset_seeds": [],
+  "stair_speed_control": true,
+  "stair_only": true,
+  "stair_rise_m": null,
+  "stair_rises_m": [
+    0.06,
+    0.06,
+    0.08
+  ],
+  "terminal_penalty": 20.0,
+  "top_reward": 0.7,
+  "learning_rate": 1e-05,
+  "checkpoint_rollouts": 5
+}

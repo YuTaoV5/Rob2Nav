@@ -1,0 +1,42 @@
+cmake_minimum_required(VERSION 3.16)
+project(as2w_r152_deploy LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(ONNXRUNTIME_ROOT "" CACHE PATH "Extracted ONNX Runtime package")
+if(NOT ONNXRUNTIME_ROOT)
+  string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" arch)
+  if(arch MATCHES "^(aarch64|arm64)$")
+    set(package onnxruntime-linux-aarch64-gpu-1.16.0)
+  elseif(arch MATCHES "^(x86_64|amd64)$")
+    set(package onnxruntime-linux-x64-gpu-1.24.2)
+  else()
+    message(FATAL_ERROR "Set ONNXRUNTIME_ROOT for ${CMAKE_SYSTEM_PROCESSOR}")
+  endif()
+  set(ONNXRUNTIME_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../thirdparty/${package}")
+endif()
+
+find_package(yaml-cpp REQUIRED)
+find_library(ort_library NAMES onnxruntime libonnxruntime.so.1 PATHS "${ONNXRUNTIME_ROOT}/lib" NO_DEFAULT_PATH REQUIRED)
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../include/isaaclab/algorithms/algorithms.h")
+  message(FATAL_ERROR "Copy this AS2-W target into the pinned unitree_cpp_deploy checkout")
+endif()
+
+add_library(as2w_r152 r152_controller.cpp)
+target_include_directories(as2w_r152 PUBLIC . "${ONNXRUNTIME_ROOT}/include" ../../include)
+target_link_libraries(as2w_r152 PUBLIC "${ort_library}" yaml-cpp)
+
+add_executable(as2w_r152_replay replay.cpp)
+target_link_libraries(as2w_r152_replay PRIVATE as2w_r152)
+
+option(AS2W_SDK2_SHADOW "Build the optional read-only SDK2 probe" OFF)
+if(AS2W_SDK2_SHADOW)
+  find_package(unitree_sdk2 CONFIG REQUIRED)
+  find_package(Threads REQUIRED)
+  add_executable(as2w_r152_shadow shadow.cpp)
+  target_link_libraries(as2w_r152_shadow PRIVATE as2w_r152 unitree_sdk2 Threads::Threads)
+endif()
+
+# Offline entry point for the stateful policy and motor mapping.
+add_executable(rl_deploy replay.cpp)
+target_link_libraries(rl_deploy PRIVATE as2w_r152)

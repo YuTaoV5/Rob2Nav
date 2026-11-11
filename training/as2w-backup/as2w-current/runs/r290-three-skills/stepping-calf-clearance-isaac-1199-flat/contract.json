@@ -1,0 +1,212 @@
+{
+  "backend": "isaacsim_physx",
+  "policy": "as2w_omnidirectional_stepping",
+  "motion_substep_audit": {
+    "physics_dt_s": 0.005,
+    "nonwheel_force_tolerance_n": 0.001
+  },
+  "curriculum": "flat-sequence-guarded",
+  "simulation_safety": {
+    "angle_rad": {
+      "FL_hip": [
+        -0.7065,
+        0.7065
+      ],
+      "FR_hip": [
+        -0.7065,
+        0.7065
+      ],
+      "RL_hip": [
+        -0.7065,
+        0.7065
+      ],
+      "RR_hip": [
+        -0.7065,
+        0.7065
+      ],
+      "FL_thigh": [
+        -1.72,
+        3.2228000000000003
+      ],
+      "FR_thigh": [
+        -1.72,
+        3.2228000000000003
+      ],
+      "RL_thigh": [
+        -1.09,
+        3.851000000000001
+      ],
+      "RR_thigh": [
+        -1.09,
+        3.851000000000001
+      ],
+      "FL_calf": [
+        -2.65093,
+        -0.89197
+      ],
+      "FR_calf": [
+        -2.65093,
+        -0.89197
+      ],
+      "RL_calf": [
+        -2.65093,
+        -0.89197
+      ],
+      "RR_calf": [
+        -2.65093,
+        -0.89197
+      ]
+    },
+    "effort_nm": {
+      "FL_hip": 54.0,
+      "FR_hip": 54.0,
+      "RL_hip": 54.0,
+      "RR_hip": 54.0,
+      "FL_thigh": 54.0,
+      "FR_thigh": 54.0,
+      "RL_thigh": 54.0,
+      "RR_thigh": 54.0,
+      "FL_calf": 81.0,
+      "FR_calf": 81.0,
+      "RL_calf": 81.0,
+      "RR_calf": 81.0,
+      "FL_foot": 13.5,
+      "FR_foot": 13.5,
+      "RL_foot": 13.5,
+      "RR_foot": 13.5
+    },
+    "wheel_rad_s": {
+      "FL_foot": 98.47,
+      "FR_foot": 98.47,
+      "RL_foot": 98.47,
+      "RR_foot": 98.47
+    },
+    "fraction": 0.9,
+    "source": "simulation_urdf_not_hardware_calibration",
+    "min_knee_surface_m": 0.015,
+    "target_margin_rad": 0.05
+  },
+  "calibrated_sequence": true,
+  "sequence_stride_gain": 0.35,
+  "sequence_shaped_reward": true,
+  "directed_stair_curriculum": false,
+  "observation_packet_loss": 0.02,
+  "target_margin_rad": 0.05,
+  "stance_margin_reward": false,
+  "calf_clearance_reward": false,
+  "sequence_attitude": true,
+  "predictive_guard": true,
+  "privileged_stair_critic": false,
+  "actor_terrain_inputs": false,
+  "imu_support_balance": false,
+  "initial_checkpoint": null,
+  "seed": 6302,
+  "num_envs": 40,
+  "iteration_budget": 1,
+  "step_dt": 0.02,
+  "gait": "diagonal_trot",
+  "legs": [
+    "FL",
+    "FR",
+    "RL",
+    "RR"
+  ],
+  "phase_offsets": [
+    0.0,
+    0.5,
+    0.5,
+    0.0
+  ],
+  "period_s": 8.0,
+  "stance_fraction": 0.62,
+  "clearance_m": 0.064,
+  "commands": [
+    [
+      0.1,
+      0.0,
+      0.0
+    ],
+    [
+      -0.1,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.1,
+      0.0
+    ],
+    [
+      0.0,
+      -0.1,
+      0.0
+    ],
+    [
+      0.071,
+      0.071,
+      0.0
+    ],
+    [
+      0.071,
+      -0.071,
+      0.0
+    ],
+    [
+      -0.071,
+      0.071,
+      0.0
+    ],
+    [
+      -0.071,
+      -0.071,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.3
+    ],
+    [
+      0.0,
+      0.0,
+      -0.3
+    ]
+  ],
+  "policy_width": 47,
+  "joint_actions": [
+    "FL_hip",
+    "FR_hip",
+    "RL_hip",
+    "RR_hip",
+    "FL_thigh",
+    "FR_thigh",
+    "RL_thigh",
+    "RR_thigh",
+    "FL_calf",
+    "FR_calf",
+    "RL_calf",
+    "RR_calf"
+  ],
+  "observations": [
+    "command",
+    "body_gyro",
+    "gravity",
+    "leg_q",
+    "leg_dq",
+    "previous_leg_action",
+    "phase_sin_cos"
+  ],
+  "wheel_position_target_rad": 0.0,
+  "wheel_kp": 45.0,
+  "wheel_kd": 4.0,
+  "action_clip": 2.0,
+  "leg_action_scale": 0.3,
+  "checkpoint": "/root/gpufree-data/Rob2Nav-runtime/as2w-current/runs/r290-three-skills/stepping-calf-clearance-formal/model_1199.pt",
+  "checkpoint_sha256": "70fd4a10f01863f7bf7583f0e6c89dd01664857ca88f38804af30a62a48f1c09",
+  "leg_pd": [
+    55.0,
+    2.0
+  ],
+  "leg_pd_group": "all",
+  "body_raise_m": 0.0
+}

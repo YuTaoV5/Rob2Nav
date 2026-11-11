@@ -1,0 +1,42 @@
+{
+  "backend": "isaacsim_physx",
+  "initial_checkpoint": null,
+  "seed": 281,
+  "num_envs": 1024,
+  "steps_per_iteration": 24576,
+  "command_stage": "sagittal",
+  "zero_focus": false,
+  "zero_wheel_memory": true,
+  "policy_width": 65,
+  "iteration_budget": 2500,
+  "policy_features": [
+    "joystick_command",
+    "body_gyro",
+    "gravity",
+    "constant",
+    "joint_q",
+    "joint_dq",
+    "previous_action",
+    "phase"
+  ],
+  "joint_order": [
+    "FL_hip",
+    "FR_hip",
+    "RL_hip",
+    "RR_hip",
+    "FL_thigh",
+    "FR_thigh",
+    "RL_thigh",
+    "RR_thigh",
+    "FL_calf",
+    "FR_calf",
+    "RL_calf",
+    "RR_calf",
+    "FL_foot",
+    "FR_foot",
+    "RL_foot",
+    "RR_foot"
+  ],
+  "step_dt": 0.02,
+  "continued_after_iterations": 250
+}

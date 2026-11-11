@@ -1,0 +1,211 @@
+{
+  "backend": "isaacsim_physx",
+  "policy": "as2w_omnidirectional_stepping",
+  "motion_substep_audit": null,
+  "curriculum": "stairs-sequence-guarded",
+  "simulation_safety": {
+    "angle_rad": {
+      "FL_hip": [
+        -0.7065,
+        0.7065
+      ],
+      "FR_hip": [
+        -0.7065,
+        0.7065
+      ],
+      "RL_hip": [
+        -0.7065,
+        0.7065
+      ],
+      "RR_hip": [
+        -0.7065,
+        0.7065
+      ],
+      "FL_thigh": [
+        -1.72,
+        3.2228000000000003
+      ],
+      "FR_thigh": [
+        -1.72,
+        3.2228000000000003
+      ],
+      "RL_thigh": [
+        -1.09,
+        3.851000000000001
+      ],
+      "RR_thigh": [
+        -1.09,
+        3.851000000000001
+      ],
+      "FL_calf": [
+        -2.65093,
+        -0.89197
+      ],
+      "FR_calf": [
+        -2.65093,
+        -0.89197
+      ],
+      "RL_calf": [
+        -2.65093,
+        -0.89197
+      ],
+      "RR_calf": [
+        -2.65093,
+        -0.89197
+      ]
+    },
+    "effort_nm": {
+      "FL_hip": 54.0,
+      "FR_hip": 54.0,
+      "RL_hip": 54.0,
+      "RR_hip": 54.0,
+      "FL_thigh": 54.0,
+      "FR_thigh": 54.0,
+      "RL_thigh": 54.0,
+      "RR_thigh": 54.0,
+      "FL_calf": 81.0,
+      "FR_calf": 81.0,
+      "RL_calf": 81.0,
+      "RR_calf": 81.0,
+      "FL_foot": 13.5,
+      "FR_foot": 13.5,
+      "RL_foot": 13.5,
+      "RR_foot": 13.5
+    },
+    "wheel_rad_s": {
+      "FL_foot": 98.47,
+      "FR_foot": 98.47,
+      "RL_foot": 98.47,
+      "RR_foot": 98.47
+    },
+    "fraction": 0.9,
+    "source": "simulation_urdf_not_hardware_calibration",
+    "min_knee_surface_m": 0.015,
+    "target_margin_rad": 0.05
+  },
+  "calibrated_sequence": true,
+  "sequence_stride_gain": 0.35,
+  "sequence_shaped_reward": true,
+  "directed_stair_curriculum": true,
+  "observation_packet_loss": 0.02,
+  "target_margin_rad": 0.05,
+  "stance_margin_reward": true,
+  "sequence_attitude": true,
+  "predictive_guard": true,
+  "privileged_stair_critic": true,
+  "actor_terrain_inputs": false,
+  "imu_support_balance": false,
+  "initial_checkpoint": "/root/gpufree-data/Rob2Nav-runtime/as2w-current/runs/r290-three-skills/stepping-go2-reset-exploration-init/model.pt",
+  "seed": 305,
+  "num_envs": 32,
+  "iteration_budget": 5,
+  "step_dt": 0.02,
+  "gait": "diagonal_trot",
+  "legs": [
+    "FL",
+    "FR",
+    "RL",
+    "RR"
+  ],
+  "phase_offsets": [
+    0.0,
+    0.5,
+    0.5,
+    0.0
+  ],
+  "period_s": 8.0,
+  "stance_fraction": 0.62,
+  "clearance_m": 0.064,
+  "commands": [
+    [
+      0.1,
+      0.0,
+      0.0
+    ],
+    [
+      -0.1,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.1,
+      0.0
+    ],
+    [
+      0.0,
+      -0.1,
+      0.0
+    ],
+    [
+      0.071,
+      0.071,
+      0.0
+    ],
+    [
+      0.071,
+      -0.071,
+      0.0
+    ],
+    [
+      -0.071,
+      0.071,
+      0.0
+    ],
+    [
+      -0.071,
+      -0.071,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.3
+    ],
+    [
+      0.0,
+      0.0,
+      -0.3
+    ]
+  ],
+  "policy_width": 47,
+  "joint_actions": [
+    "FL_hip",
+    "FR_hip",
+    "RL_hip",
+    "RR_hip",
+    "FL_thigh",
+    "FR_thigh",
+    "RL_thigh",
+    "RR_thigh",
+    "FL_calf",
+    "FR_calf",
+    "RL_calf",
+    "RR_calf"
+  ],
+  "observations": [
+    "command",
+    "body_gyro",
+    "gravity",
+    "leg_q",
+    "leg_dq",
+    "previous_leg_action",
+    "phase_sin_cos"
+  ],
+  "wheel_position_target_rad": 0.0,
+  "wheel_kp": 45.0,
+  "wheel_kd": 4.0,
+  "action_clip": 2.0,
+  "leg_action_scale": 0.3,
+  "go2_support_reference": {
+    "stairs_up8cm": {
+      "checkpoint": "/root/gpufree-data/Rob2Nav-runtime/as2w-current/runs/r290-three-skills/go2-as2w-wheel-teacher-projected/stairs_up8cm.npz",
+      "checkpoint_sha256": "419f27f297b2856afdb993f4ab6c76cf74e4e9dcaf0be357d8cbc07c74e8c661"
+    },
+    "stairs_down": {
+      "checkpoint": "/root/gpufree-data/Rob2Nav-runtime/as2w-current/runs/r290-three-skills/go2-as2w-wheel-teacher-projected/stairs_down.npz",
+      "checkpoint_sha256": "165b585b01360345f8c5b75d9e93b4322f22a0a13072212b5ef9a58e1512cfdf"
+    }
+  },
+  "warm_start_critic": true
+}
