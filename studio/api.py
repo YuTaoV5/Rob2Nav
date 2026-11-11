@@ -318,7 +318,7 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
         return StreamingResponse(generate(),media_type='text/event-stream',headers={'Cache-Control':'no-cache','X-Accel-Buffering':'no'})
 
     from .as2w_routes import mount_as2w
-    mount_as2w(app, root, False)
+    mount_as2w(app, root, False, allow_formal_training=allow_training)
 
     dist=Path(__file__).parent/'frontend/dist'
     @app.get('/{path:path}')

@@ -23,11 +23,12 @@ class Candidate(BaseModel):
     envs: int = Field(default=256, ge=40, le=2048)
 
 
-def mount_as2w(app, root, allow_training):
+def mount_as2w(app, root, allow_training, *, allow_formal_training=None):
     training = Path(os.environ.get("ROB2NAV_AS2W_TRAINING", "/root/as2w-training"))
     harness = Path(os.environ.get("ROB2NAV_AS2W_EVAL", str(root / "studio/as2w_eval")))
     run_root = root / "outputs/studio/as2w"
-    mount_formal_as2w(app, root, run_root, allow_training)
+    formal_enabled = allow_training if allow_formal_training is None else allow_formal_training
+    mount_formal_as2w(app, root, run_root, formal_enabled)
     source = training / SOURCE
     baseline = training / BASELINE
 
