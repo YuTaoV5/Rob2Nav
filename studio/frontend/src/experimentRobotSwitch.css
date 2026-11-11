@@ -1,0 +1,39 @@
+.experiment-robot-switch {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: min(100%, 280px);
+  padding: 4px;
+  margin: 0 0 18px;
+  border: 1px solid #c7d9d8;
+  border-radius: 999px;
+  background: #eaf2f1;
+}
+.experiment-robot-switch::before {
+  position: absolute;
+  z-index: -1;
+  inset: 4px auto 4px 4px;
+  width: calc(50% - 4px);
+  border-radius: inherit;
+  background: #16665e;
+  content: '';
+  transition: transform 240ms cubic-bezier(.22, 1, .36, 1);
+}
+.experiment-robot-switch[data-robot='as2w']::before { transform: translateX(100%); }
+.experiment-robot-switch button {
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 18px;
+  background: transparent;
+  color: #27413e;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+  transition: color 180ms ease;
+}
+.experiment-robot-switch button[aria-pressed='true'] { color: #fff; }
+.experiment-robot-switch button:focus-visible { outline: 2px solid #13796f; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .experiment-robot-switch::before, .experiment-robot-switch button { transition: none; }
+}

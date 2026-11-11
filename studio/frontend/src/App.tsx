@@ -1,4 +1,4 @@
-import FormalAs2wTraining from './FormalAs2wTraining';
+import './experimentRobotSwitch.css';
 import VoiceControl from './VoiceControl';
 import ResearchNavigation from './ResearchNavigation';
 import HomeOverview from './HomeOverview';
@@ -29,7 +29,7 @@ const TerrainPreview=lazy(()=>import('./RobotViewer').then(m=>({default:m.Terrai
 type Obj=Record<string,any>;
 type Catalog={evaluations:Obj[];runs:Obj[];reports:Obj[];videos:Obj[];models:Obj[];indexed_at:number};
 const empty:Catalog={evaluations:[],runs:[],reports:[],videos:[],models:[],indexed_at:0};
-const pages=[['overview','工作台',LayoutDashboard],['capabilities','能力总览',Boxes],['training','训练方案',FlaskConical],['experiments','任务队列',Terminal],['configure','创建实验',SlidersHorizontal],['simulation','在线仿真',Video],['as2w','AS2-W 奖励实验',FlaskConical],['deployment','部署框架',ShieldCheck],['navigation','导航',Map],['voice','语音任务',Radio],['compare','基准对比',Layers3],['robot','机器人与感知',Bot],['sensors','传感器实验室',Radio],['models','模型与证据',Database],['reports','研究报告',BookOpen],['jobs','任务队列',Terminal]] as const;
+const pages=[['overview','工作台',LayoutDashboard],['capabilities','能力总览',Boxes],['training','训练方案',FlaskConical],['experiments','任务队列',Terminal],['configure','创建实验',SlidersHorizontal],['simulation','在线仿真',Video],['deployment','部署框架',ShieldCheck],['navigation','导航',Map],['voice','语音任务',Radio],['compare','基准对比',Layers3],['robot','机器人与感知',Bot],['sensors','传感器实验室',Radio],['models','模型与证据',Database],['reports','研究报告',BookOpen],['jobs','任务队列',Terminal]] as const;
 async function api(path:string,body?:unknown,signal?:AbortSignal){const r=await fetch('/api/'+path,{...(body!==undefined?{method:'POST',headers:{'Content-Type':'application/json','X-Studio-Request':'1'},body:JSON.stringify(body)}:{}),signal});const d=await r.json();if(!r.ok)throw new Error(typeof d.detail==='string'?d.detail:JSON.stringify(d.detail));return d;}
 const file=(path:string)=>'/api/files/'+path.split('/').map(encodeURIComponent).join('/');
 const num=(v:any,d=0)=>v===null||v===undefined?'—':Number(v).toLocaleString('zh-CN',{maximumFractionDigits:d});
@@ -48,8 +48,19 @@ export default function App(){
  async function refreshResources(){if(resourcePending.current)return;resourcePending.current=true;const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),12000);try{setResources(await api('resources',undefined,controller.signal));setResourceError('')}catch(e){setResourceError(e instanceof DOMException&&e.name==='AbortError'?'资源接口请求超时，请检查隧道连接':String(e))}finally{clearTimeout(timeout);resourcePending.current=false;setResourceLoaded(true)}}
  const [capabilityData,setCapabilityData]=useState<Obj|null>(null),[focusSkill,setFocusSkill]=useState(''),[recipeId,setRecipeId]=useState('');
  const [clone,setClone]=useState<CloneExperiment>();
- const openRecipe=(id:string)=>{setClone(undefined);setRecipeId(id);navigate('configure')};
- const openCandidate=(next:CloneExperiment)=>{setRecipeId('');setClone(next);navigate('configure')};
+ const [experimentRobot,setExperimentRobot]=useState<'go2'|'as2w'>(()=>location.hash.includes('robot=as2w')||location.hash==='#as2w'?'as2w':'go2');
+ function showExperiment(robot:'go2'|'as2w'){
+  setExperimentRobot(robot);
+  navigate('configure?robot='+robot);
+ }
+ function switchExperiment(robot:'go2'|'as2w'){
+  if(robot===experimentRobot)return;
+  setClone(undefined);
+  setRecipeId(robot==='as2w'?(schema?.registry?.recipes.find((r:Obj)=>r.robot==='as2w')?.id||''):'');
+  showExperiment(robot);
+ }
+ const openRecipe=(id:string)=>{setClone(undefined);setRecipeId(id);showExperiment(schema?.registry?.recipes.find((r:Obj)=>r.id===id)?.robot==='as2w'?'as2w':'go2')};
+ const openCandidate=(next:CloneExperiment)=>{setRecipeId('');setClone(next);showExperiment(next.config.robot_id==='as2w'?'as2w':'go2')};
  const [simulationWeight,setSimulationWeight]=useState(''),[simulationTab,setSimulationTab]=useState('online'),[simulationRequest,setSimulationRequest]=useState(0);
  const openWeight=(path:string)=>{setSimulationWeight(path);setSimulationRequest(n=>n+1);setSimulationTab('online');navigate('simulation')};
  const seenCompleted=useRef(new Set<string>());
@@ -58,7 +69,7 @@ export default function App(){
  async function refresh(force=false){setRefreshing(true);try{const results=await Promise.allSettled([api('catalog'+(force?'?refresh=true':'')).then(setCatalog),refreshResources(),api('schema').then(setSchema),api('jobs').then(setJobs)]);const failed=results.find(r=>r.status==='rejected');if(failed?.status==='rejected')throw failed.reason;api('capabilities').then(setCapabilityData).catch(()=>{});setError('')}catch(e){setError(String(e))}finally{setLoading(false);setRefreshing(false)}}
  useEffect(()=>{refresh();const timer=setInterval(()=>{refreshResources();api('jobs').then(setJobs).catch(()=>{});api('capabilities').then(setCapabilityData).catch(()=>{})},8000);const events=new EventSource('/api/events');events.addEventListener('status',e=>{try{const d=JSON.parse((e as MessageEvent).data);setJobs(old=>d.jobs.map((j:Obj)=>({...old.find(o=>o.id===j.id),...j})))}catch{}});return()=>{clearInterval(timer);events.close()}},[]);
  useEffect(()=>{const newly=jobs.filter(j=>j.state==='succeeded'&&!seenCompleted.current.has(j.id));if(newly.length){newly.forEach(j=>seenCompleted.current.add(j.id));api('catalog?refresh=true').then(setCatalog).catch(()=>{})}},[jobs]);
- useEffect(()=>{const read=()=>{const requested=new URLSearchParams(location.hash.split('?')[1]||'').get('path');if(requested){const report=catalog.reports.find(r=>r.path===requested||r.aliases?.includes(requested));if(report)setSelectedReport(report.id)};const p=location.hash.slice(1).split('?')[0];setPage(pages.some(v=>v[0]===p)?p:'overview');if(p==='capabilities')setFocusSkill(new URLSearchParams(location.hash.split('?')[1]||'').get('skill')||'');if(p==='jobs'||p==='experiments'){const job=new URLSearchParams(location.hash.split('?')[1]||'').get('job');if(job)setSelectedJobId(job)}if(p==='simulation'){const ev=new URLSearchParams(location.hash.split('?')[1]||'').get('evaluation');if(ev){setSelectedEval(ev);setSimulationTab('replay')}}};read();window.addEventListener('hashchange',read);return()=>window.removeEventListener('hashchange',read)},[catalog.reports]);
+ useEffect(()=>{const read=()=>{const requested=new URLSearchParams(location.hash.split('?')[1]||'').get('path');if(requested){const report=catalog.reports.find(r=>r.path===requested||r.aliases?.includes(requested));if(report)setSelectedReport(report.id)};const p=location.hash.slice(1).split('?')[0];if(p==='as2w'){location.replace('#configure?robot=as2w');setPage('configure');setExperimentRobot('as2w');return;}setPage(pages.some(v=>v[0]===p)?p:'overview');if(p==='configure')setExperimentRobot(new URLSearchParams(location.hash.split('?')[1]).get('robot')==='as2w'?'as2w':'go2');if(p==='capabilities')setFocusSkill(new URLSearchParams(location.hash.split('?')[1]||'').get('skill')||'');if(p==='jobs'||p==='experiments'){const job=new URLSearchParams(location.hash.split('?')[1]||'').get('job');if(job)setSelectedJobId(job)}if(p==='simulation'){const ev=new URLSearchParams(location.hash.split('?')[1]||'').get('evaluation');if(ev){setSelectedEval(ev);setSimulationTab('replay')}}};read();window.addEventListener('hashchange',read);return()=>window.removeEventListener('hashchange',read)},[catalog.reports]);
  useEffect(()=>{const key=(e:KeyboardEvent)=>{if(e.key==='Escape')setMobile(false)};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key)},[]);
  useEffect(()=>{setMobile(false);window.scrollTo(0,0);document.title=(pages.find(p=>p[0]===page)?.[1]||'工作台')+' · Rob2Nav 第二版'},[page]);
  function navigate(p:string){location.hash=p;setPage(p.split('?')[0]);setMobile(false);window.scrollTo(0,0)}
@@ -83,14 +94,17 @@ export default function App(){
 
      {['capabilities','training','compare','models','reports'].includes(page)&&<ResearchNavigation page={page}/>}
      {['robot','sensors'].includes(page)&&<><div className="page-heading"><div><div className="eyebrow">ROBOT WORKSPACE</div><h1>机器人与感知</h1><p>查看Go2结构、检查关节姿态与传感器安装几何。</p></div></div><div className="section-tabs"><button className={page==='robot'?'active':''} onClick={()=>navigate('robot')}><Boxes size={16}/>机器人模型</button><button className={page==='sensors'?'active':''} onClick={()=>navigate('sensors')}><Radio size={16}/>传感器安装</button></div>{page==='robot'&&<Suspense fallback={<div className="loading">加载三维查看器…</div>}><RobotViewer/></Suspense>}</>}
-     {page==='as2w'&&<As2wWorkspace/>}
      {page==='deployment'&&<Deployment onSimulate={()=>navigate('simulation')}/>}
      {page==='navigation'&&<Navigation/>}
      {page==='voice'&&<VoiceControl/>}
      {['capabilities','training'].includes(page)&&<CapabilityHub key={page} view={page==='training'?'训练方案':'能力矩阵'} data={capabilityData} focus={focusSkill} onRecipe={openRecipe} onEvaluation={id=>{const e=catalog.evaluations.find(e=>e.id===id);if(e)openEvaluation(e)}} onJob={id=>{setSelectedJobId(id);navigate('jobs')}}/>}
      {page==='configure'&&<ActiveGpuTasks jobs={jobs} resources={resources} onOpen={id=>{setSelectedJobId(id);navigate('jobs')}} onRuns={openHistory}/>}
-     {page==='configure'&&<FormalAs2wTraining />}
-     {page==='configure'&&schema&&<Configurator clone={clone} recipeId={recipeId} schema={schema} models={catalog.models} resources={resources} notify={notify} onSaved={(id:string)=>{setSelectedJobId(id);setClone(undefined);api('jobs').then(setJobs);navigate('jobs?job='+id)}}/>}
+     {page==='configure'&&<div className="experiment-robot-switch" data-robot={experimentRobot} role="group" aria-label="选择实验机器人">
+       <button type="button" aria-pressed={experimentRobot==='go2'} onClick={()=>switchExperiment('go2')}>Go2</button>
+       <button type="button" aria-pressed={experimentRobot==='as2w'} onClick={()=>switchExperiment('as2w')}>AS2-W</button>
+     </div>}
+     {page==='configure'&&experimentRobot==='as2w'&&<As2wWorkspace/>}
+     {page==='configure'&&schema&&<Configurator key={experimentRobot} robot={experimentRobot} clone={clone?.config.robot_id===experimentRobot?clone:undefined} recipeId={schema.registry?.recipes.find((r:Obj)=>r.id===recipeId)?.robot===experimentRobot?recipeId:experimentRobot==='as2w'?(schema.registry?.recipes.find((r:Obj)=>r.robot==='as2w')?.id||''):''} schema={schema} models={catalog.models} resources={resources} notify={notify} onSaved={(id:string)=>{setSelectedJobId(id);setClone(undefined);api('jobs').then(setJobs);navigate('jobs?job='+id)}}/>}
      {['jobs','experiments'].includes(page)&&<ActiveGpuTasks jobs={jobs} resources={resources} onOpen={id=>setSelectedJobId(id)} onRuns={openHistory}/>}
      {['jobs','experiments'].includes(page)&&<JobPage onCandidate={openCandidate} onWeight={openWeight} focusId={selectedJobId} jobs={jobs} enabled={resources.training_enabled} refresh={()=>api('jobs').then(setJobs)} notify={notify} create={()=>openRecipe('')} onResult={async(j:Obj)=>{const c=await api("catalog?refresh=true");setCatalog(c);const e=c.evaluations.find((e:Obj)=>e.path.includes(j.id));if(e)openEvaluation(e);else notify("当前任务没有可播放的评估视频，请查看日志。")}}/>}
      {['jobs','experiments'].includes(page)&&<details id="historical-training-curves" className="card"><summary>历史训练记录与曲线（含队列接入前的实验）</summary><Experiments runs={catalog.runs}/></details>}
@@ -131,11 +145,11 @@ function Experiments({runs}:{runs:Obj[]}){
 }
 function PageHeading({eyebrow,title,text,children}:{eyebrow:string;title:string;text:string;children?:React.ReactNode}){return <div className="page-heading"><div><div className="eyebrow">{eyebrow}</div><h1>{title}</h1><p>{text}</p></div>{children}</div>}
 
-function Configurator({schema,models,resources,notify,onSaved,recipeId,clone}:{recipeId:string;schema:Obj;models:Obj[];resources:Obj;notify:(s:string)=>void;onSaved:(id:string)=>void;clone?:CloneExperiment}){
+function Configurator({schema,models,resources,notify,onSaved,recipeId,clone,robot}:{robot:'go2'|'as2w';recipeId:string;schema:Obj;models:Obj[];resources:Obj;notify:(s:string)=>void;onSaved:(id:string)=>void;clone?:CloneExperiment}){
  const [config,setConfig]=useState<Obj>({...schema.defaults}),[tab,setTab]=useState('基础配置'),[step,setStep]=useState(0);
  const [preflight,setPreflight]=useState<Obj|null>(null),[busy,setBusy]=useState(false),[err,setErr]=useState('');
  const [rewardCatalog,setRewardCatalog]=useState<RewardManifest|null>(null),[rewardError,setRewardError]=useState(''),[rewardPending,setRewardPending]=useState(false);
- const isAs2w=config.robot_id==='as2w';
+ const isAs2w=robot==='as2w';
  const isStairs=isAs2w&&config.recipe_id!=='as2w_recovery_ppo';
  const extras=isAs2w?JSON.parse(config.recipe_options?.custom_rewards||'[]'):[];
  const terrain=config.recipe_options?.eval_terrain||(isStairs?'stairs':'all');
@@ -160,9 +174,8 @@ function Configurator({schema,models,resources,notify,onSaved,recipeId,clone}:{r
  const toggle=(k:string,label:string,desc:string)=><label className="toggle-row" key={k}><div><b>{label}</b><small>{desc}</small></div><input type="checkbox" checked={config[k]} onChange={e=>update(k,e.target.checked)}/></label>;
  const recipe=schema.registry?.recipes.find((r:Obj)=>r.id===config.recipe_id);
  const adapter={...(schema.adapters.find((a:Obj)=>a.id===config.adapter)||{name:config.adapter,training:false}),training:recipe?['native','manual_cli'].includes(recipe.execution):config.adapter==='moe'};
- function chooseRecipe(id:string){const r=schema.registry?.recipes.find((r:Obj)=>r.id===id);setConfig({...schema.defaults,...(r?.defaults||{}),name:r?.name||schema.defaults.name});setPreflight(null);setRewardCatalog(null);setErr('');setTab('基础配置');setStep(0)}
+ function chooseRecipe(id:string){const r=schema.registry?.recipes.find((r:Obj)=>r.id===id);setConfig({...schema.defaults,...(r?.defaults||{}),robot_id:robot,name:r?.name||schema.defaults.name});setPreflight(null);setRewardCatalog(null);setErr('');setTab('基础配置');setStep(0)}
  useEffect(()=>{if(clone){setConfig({...schema.defaults,...clone.config});setPreflight(null);setRewardCatalog(null);setStep(1)}else chooseRecipe(recipeId)},[recipeId,clone]);
- const robots=[...new Set<string>(['go2',...(schema.registry?.recipes||[]).map((r:Obj)=>r.robot)])];
  const choices=(schema.registry?.recipes||[]).filter((r:Obj)=>r.robot===config.robot_id);
  const edited=rewardCatalog?.terms.flatMap(term=>term.parameters.filter(p=>p.value!==p.default).map(p=>({id:p.id,label:term.label,before:p.default,after:p.value})))||[];
  const baselineValues=clone?.config.parent_job_id===config.parent_job_id?clone?.baseline:undefined;
@@ -183,7 +196,6 @@ function Configurator({schema,models,resources,notify,onSaved,recipeId,clone}:{r
  <div className="builder-layout"><div>
  {step===0&&<section className="card">
  <div className="experiment-selectors">
- <label className="field"><span>机器人</span><select aria-label="机器人" value={config.robot_id} onChange={e=>{const robot=e.target.value;chooseRecipe(robot==='go2'?'':schema.registry.recipes.find((r:Obj)=>r.robot===robot)?.id||'')}}>{robots.map(robot=><option key={robot} value={robot}>{({go2:'Go2',as2w:'AS2-W'} as Record<string,string>)[robot]||robot}</option>)}</select></label>
  <label className="field"><span>技能与训练方案</span><select aria-label="技能与训练方案" value={config.recipe_id} onChange={e=>chooseRecipe(e.target.value)}>{config.robot_id==='go2'&&<option value="">Go2 感知 MoE · 自定义</option>}{choices.map((r:Obj)=><option key={r.id} value={r.id}>{r.name}{!['native','manual_cli'].includes(r.execution)?' · 待接入':''}</option>)}</select></label>
  </div>
  <p>{recipe?.note||'Go2 感知 MoE 训练。使用受支持的观测与权重合约。'}</p>
