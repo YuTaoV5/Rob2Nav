@@ -1,5 +1,7 @@
 # Rob2Nav
 
+[历史验证与交接报告](docs/archive/root-reports/README.md)
+
 [仓库目录索引](docs/repository-map/README.md) · [AS2-W 三项训练复现](training/as2w-backup/README.md)
 
 当前新增：[使用工作台MoE行走教师辅助训练](docs/SuperMimic/07_MoE教师辅助训练.md)，包含精确适配、质量筛选、教师渐退和纯学生验收。
@@ -24,7 +26,7 @@
 | 连接机载电脑、用键盘控制 | [Go2Edu按键热切换指南](docs/Go2Edu按键热切换指南.md) |
 | 查模型来源、数据和真实验收 | [模型与数据目录](docs/模型与数据目录.md)、[技能模型验收清单](docs/技能模型验收清单.md) |
 | 在云桌面查看实机RViz | [Go2Edu远程RViz部署手册](docs/Go2Edu远程RViz部署手册.md) |
-| 开发交接和历史实验 | [项目交接记录](项目交接记录.md) |
+| 开发交接和历史实验 | [项目交接记录](docs/archive/root-reports/项目交接记录.md) |
 | 查看文档校验范围与复现限制 | [文档校验与迁移记录](docs/文档校验与迁移记录.md) |
 
 ## 路径与环境

@@ -1,0 +1,26 @@
+# 历史验证与交接报告
+
+以下报告从仓库根目录归档至此。
+
+- [ACTIVE_VALIDATION.md](<ACTIVE_VALIDATION.md>)
+- [AME_VALIDATION.md](<AME_VALIDATION.md>)
+- [AME验证记录.md](<AME验证记录.md>)
+- [CRITICAL_AME_VALIDATION.md](<CRITICAL_AME_VALIDATION.md>)
+- [MOE_PERCEPTIVE_VALIDATION.md](<MOE_PERCEPTIVE_VALIDATION.md>)
+- [MoE感知验证记录.md](<MoE感知验证记录.md>)
+- [NARROW_VALIDATION.md](<NARROW_VALIDATION.md>)
+- [PERCEPTIVE_VALIDATION.md](<PERCEPTIVE_VALIDATION.md>)
+- [SENSOR_RESEARCH.md](<SENSOR_RESEARCH.md>)
+- [TERRAIN_VALIDATION.md](<TERRAIN_VALIDATION.md>)
+- [V4_VALIDATION.md](<V4_VALIDATION.md>)
+- [VALIDATION.md](<VALIDATION.md>)
+- [handover.md](<handover.md>)
+- [主动导航验证记录.md](<主动导航验证记录.md>)
+- [传感器研究记录.md](<传感器研究记录.md>)
+- [原始AME验证记录.md](<原始AME验证记录.md>)
+- [地形验证记录.md](<地形验证记录.md>)
+- [感知策略验证记录.md](<感知策略验证记录.md>)
+- [早期验证记录.md](<早期验证记录.md>)
+- [窄桩验证记录.md](<窄桩验证记录.md>)
+- [第四版验证记录.md](<第四版验证记录.md>)
+- [项目交接记录.md](<项目交接记录.md>)

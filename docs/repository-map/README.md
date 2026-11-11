@@ -5,7 +5,7 @@
 | AS2-W 滚动、踏步、起身正式训练 | [复现说明和启动入口](../../training/as2w-backup/README.md) |
 | AS2-W 历史训练脚本和配置 | [代码](../../training/as2w-backup/as2w-current/code) · [按运行批次归档](../../training/as2w-backup/as2w-current/runs) |
 | Go2 各能力训练、仿真、部署 | [按能力选择手册](../新手复现总览.md#3-按能力找手册) · [技能目录](../../skills) |
-| 评测、失败分析和验收 | [验收总览](../../VALIDATION.md) · [历史验证归档](../../artifacts/VALIDATION.md) · [模型验收清单](../技能模型验收清单.md) |
+| 评测、失败分析和验收 | [验收总览](../archive/root-reports/VALIDATION.md) · [历史验证归档](../../artifacts/VALIDATION.md) · [模型验收清单](../技能模型验收清单.md) |
 | 训练日志、诊断回放和中间产物 | [历史实验](../../artifacts) · [全量文件索引](inventory.tsv) |
 | 中间权重、来源和数据 | [模型与数据目录](../模型与数据目录.md) · [权重工作流](../模型管理与权重工作流.md) |
 | 部署包、映射及启动说明 | [AS2-W 部署包](../../deliveries/as2w-deploy) · [部署框架](../../deployment) · [发布记录](../版本发布记录.md) |

@@ -1,4 +1,4 @@
-> 历史记录：运行状态属于记录当时，不是安装或当前任务状态。新用户先读[新手复现总览](docs/新手复现总览.md)；执行命令前按[环境准备](docs/环境准备与路径约定.md)设置变量。原始日志中的机器位置保留于归档，不直接用于新环境。
+> 历史记录：运行状态属于记录当时，不是安装或当前任务状态。新用户先读[新手复现总览](../../新手复现总览.md)；执行命令前按[环境准备](../../环境准备与路径约定.md)设置变量。原始日志中的机器位置保留于归档，不直接用于新环境。
 
 # 原项目 Go2 AME 过桩复现进展
 
@@ -20,7 +20,7 @@ Stage1、level 0、命令 0.5 m/s、seed 801，额外加入 XY ±3 cm 和 yaw ±
 
 完整通过要求前进超过 3.5 m、无失败终止、结束时直立且至少两足支撑。未结束或超时不会计为成功。该组结果不足以进入 Stage2，继续基础阶段训练。
 
-较早的第 700 轮在原 Play 零扰动踏石条件下为 0/32，主要停留在出生平台；这些重复环境具有相同轨迹，不是独立随机试验。[完整 20 秒诊断视频](artifacts/critical_ame/evaluation/stage1_700_stones_l0/episode_0.mp4)。
+较早的第 700 轮在原 Play 零扰动踏石条件下为 0/32，主要停留在出生平台；这些重复环境具有相同轨迹，不是独立随机试验。[完整 20 秒诊断视频](../../../artifacts/critical_ame/evaluation/stage1_700_stones_l0/episode_0.mp4)。
 
 第 2000 检查点零样本测试 Stage2 `double_stakes`，level 0、5 均为 **0/32**。没有据此宣称完成第二阶段训练。
 
@@ -47,17 +47,17 @@ Stage1、level 0、命令 0.5 m/s、seed 801，额外加入 XY ±3 cm 和 yaw ±
 
 ## 稀疏落脚停滞诊断
 
-![保留的原版 PPO 更新链：训练奖励与课程均值不是验证通过率](artifacts/critical_ame/evaluation/figures/training.png)
+![保留的原版 PPO 更新链：训练奖励与课程均值不是验证通过率](../../../artifacts/critical_ame/evaluation/figures/training.png)
 
 按训练时真实环境列分组读取第 1000、1500、2000、2200 检查点的课程状态：`stepping_stones`、`gaps` 两类各自 64 个环境始终为 level 0；其他类别逐步升高。平均课程等级不能反映这两类的失败。
 
 第 2200 轮踏石仍为 0/32。环境 0 在约 1.4 秒、前进约 0.63 米后触发 `bad_orientation`。足端与接触记录显示这条轨迹中前足长时间支撑，机身继续前移后前倾，未形成可靠跨隙落脚。
 
-![第 2200 轮失败首回合的实测足端轨迹与姿态](artifacts/critical_ame/evaluation/diagnostic2200_footmap/foot_diagnostic.png)
+![第 2200 轮失败首回合的实测足端轨迹与姿态](../../../artifacts/critical_ame/evaluation/diagnostic2200_footmap/foot_diagnostic.png)
 
 已有 MLP 教师在同一原生控制器、rough level 0 上完成 32/32，在 double_stakes level 0 上为 0/32。它是外部诊断对照，不计入 AME 成绩。该结果不能证明全部接口正确，也不能将宽地形能力外推为窄桩能力。
 
-另开[外部教师基础步态初始化对照](docs/AME步态初始化说明.md)，保留原版训练。这一分支明确偏离原版从零初始化，须单独报告。
+另开[外部教师基础步态初始化对照](../../AME步态初始化说明.md)，保留原版训练。这一分支明确偏离原版从零初始化，须单独报告。
 
 ## 原始运行失败与修正
 
@@ -71,9 +71,9 @@ Stage1、level 0、命令 0.5 m/s、seed 801，额外加入 XY ±3 cm 和 yaw ±
 
 ## 复现材料与边界
 
-- [运行说明](docs/原始AME训练复现手册.md)：固定版本、训练、续训、评估和修正开关。
-- [归档清单](artifacts/critical_ame/manifest.json)：每个运行是否完成、选取检查点及 SHA256。进行中的运行只提供当时已原子保存的检查点，不能视为已完成。
-- [上游源码指纹和环境](artifacts/critical_ame/upstream_manifest.json)。后续训练/评估另存包装器启动时源码快照；早期原始运行未声称具备该快照。
+- [运行说明](../../原始AME训练复现手册.md)：固定版本、训练、续训、评估和修正开关。
+- [归档清单](../../../artifacts/critical_ame/manifest.json)：每个运行是否完成、选取检查点及 SHA256。进行中的运行只提供当时已原子保存的检查点，不能视为已完成。
+- [上游源码指纹和环境](../../../artifacts/critical_ame/upstream_manifest.json)。后续训练/评估另存包装器启动时源码快照；早期原始运行未声称具备该快照。
 - `python -m critical_ame.verify` 校验已归档权重、现有包装器源码快照和完整视频帧数。
 
 第一阶段保留的 3000 轮 PPO 更新对应 36,864,000 次交互；失败后丢弃的更新和未完成 rollout 不包含在该数值中。零样本 Stage2 测试与 Stage2 训练严格区分。本实验也尚未验证 MuJoCo 或实机部署。

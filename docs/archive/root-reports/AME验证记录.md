@@ -1,4 +1,4 @@
-> 历史记录：运行状态属于记录当时，不是安装或当前任务状态。新用户先读[新手复现总览](docs/新手复现总览.md)；执行命令前按[环境准备](docs/环境准备与路径约定.md)设置变量。原始日志中的机器位置保留于归档，不直接用于新环境。
+> 历史记录：运行状态属于记录当时，不是安装或当前任务状态。新用户先读[新手复现总览](../../新手复现总览.md)；执行命令前按[环境准备](../../环境准备与路径约定.md)设置变量。原始日志中的机器位置保留于归档，不直接用于新环境。
 
 # Go2 地形注意力 PPO 增量实验
 
@@ -25,9 +25,9 @@
 | attention | native | 26/32 | 4/32 | 17/32 |
 | attention | mujoco | 0/5 | 0/5 | 0/5 |
 
-![两组同预算成绩](artifacts/ame/comparison.png)
+![两组同预算成绩](../../../artifacts/ame/comparison.png)
 
-![训练过程，不是独立验证](artifacts/ame/training.png)
+![训练过程，不是独立验证](../../../artifacts/ame/training.png)
 
 作为历史参考，上一版学生在相同任务上的 Isaac 成绩为 32/32、32/32、28/32，MuJoCo 为 4/5、5/5、2/5。历史权重没有本次额外训练量，所以架构比较应优先看上表两组。
 
@@ -37,7 +37,7 @@
 
 ## 注意力检查
 
-![梅花桩局部观测与四头注意力](artifacts/ame/attention.png)
+![梅花桩局部观测与四头注意力](../../../artifacts/ame/attention.png)
 
 图取首回合距 2 秒最近的采样；左侧为有效格上的负高度扫描值，属于相对高度表示。其余为地形 token 权重，各头独立归一化，标题列出 null token 权重。注意力图不能直接视为足端落点或安全约束。
 
@@ -45,12 +45,12 @@
 
 所有视频均为 seed 801 的完整首回合，失败保留；不从测试中挑选成功回合替换。
 
-- [control / stairs，seed 801 完整首回合](artifacts/ame/control_eval/mujoco_stairs/episode_0.mp4)
-- [control / platform，seed 801 完整首回合](artifacts/ame/control_eval/mujoco_platform/episode_0.mp4)
-- [control / stones，seed 801 完整首回合](artifacts/ame/control_eval/mujoco_stones/episode_0.mp4)
-- [attention / stairs，seed 801 完整首回合](artifacts/ame/attention_eval/mujoco_stairs/episode_0.mp4)
-- [attention / platform，seed 801 完整首回合](artifacts/ame/attention_eval/mujoco_platform/episode_0.mp4)
-- [attention / stones，seed 801 完整首回合](artifacts/ame/attention_eval/mujoco_stones/episode_0.mp4)
+- [control / stairs，seed 801 完整首回合](../../../artifacts/ame/control_eval/mujoco_stairs/episode_0.mp4)
+- [control / platform，seed 801 完整首回合](../../../artifacts/ame/control_eval/mujoco_platform/episode_0.mp4)
+- [control / stones，seed 801 完整首回合](../../../artifacts/ame/control_eval/mujoco_stones/episode_0.mp4)
+- [attention / stairs，seed 801 完整首回合](../../../artifacts/ame/attention_eval/mujoco_stairs/episode_0.mp4)
+- [attention / platform，seed 801 完整首回合](../../../artifacts/ame/attention_eval/mujoco_platform/episode_0.mp4)
+- [attention / stones，seed 801 完整首回合](../../../artifacts/ame/attention_eval/mujoco_stones/episode_0.mp4)
 
 `artifacts/ame/manifest.json` 记录权重 SHA256、训练预算与全部评估计数；每组保留训练源文件快照、配置、完整日志、TensorBoard、最终 checkpoint、导出 actor、评估命令/退出码、轨迹和接触指标。`scripts/verify_ame.py` 校验源码字节、权重及视频帧数。
 
@@ -62,4 +62,4 @@
 
 这里仍是速度命令驱动的直行运动技能，尚未接入任意目标导航；没有新增宽深坑跳跃技能、真实 D435i/Mid360 驱动或实机测试。感知使用简化射线、理想位姿与一秒可见点记忆，传感器标定、时延、里程计漂移和真实雷达扫描仍需验证。
 
-方法来源、Go2 适配及复现命令见 [AME 参考说明](docs/AME方法参考.md)。
+方法来源、Go2 适配及复现命令见 [AME 参考说明](../../AME方法参考.md)。
