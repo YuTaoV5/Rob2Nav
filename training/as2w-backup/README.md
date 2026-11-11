@@ -15,3 +15,5 @@ The recipes use the archived upstream checkpoints, seeds 303/305/301 and 1200 it
 The training host reported Isaac Sim 6.2.0-rc.14 and Isaac Lab 28.0.0. The pip freeze files are environment inventories with editable paths, not portable pip install files. Supply the matching NVIDIA runtime separately. Set ISAAC_SIM_PYTHON, ISAACLAB_SOURCE and ISAACLAB_SITE_PACKAGES when your installation uses different paths. The Unitree description is from revision 4005a1b0c3f464f515f380be4145cc617fbca725. The snapshot includes the converted USD, robot description, seed checkpoints, teacher trajectories, contracts and historical evaluation summaries.
 
 The historical weights remain simulation candidates. Rolling training uses a 1 m/s cap in this recipe. The 3 m/s evaluation target remains separate from that training cap. Reports in the archive record the original results and limitations.
+
+The three [skill recipes](../../skills/as2w/README.md) are maintained separately. Each new run records source-revision.txt, input-sha256.txt and command.sh in its output directory.

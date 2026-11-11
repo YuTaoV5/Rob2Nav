@@ -7,6 +7,8 @@ import subprocess
 import sys
 from uuid import uuid4
 
+from .as2w_formal import mount_formal_as2w
+
 from fastapi import HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
@@ -25,6 +27,7 @@ def mount_as2w(app, root, allow_training):
     training = Path(os.environ.get("ROB2NAV_AS2W_TRAINING", "/root/as2w-training"))
     harness = Path(os.environ.get("ROB2NAV_AS2W_EVAL", str(root / "studio/as2w_eval")))
     run_root = root / "outputs/studio/as2w"
+    mount_formal_as2w(app, root, run_root, allow_training)
     source = training / SOURCE
     baseline = training / BASELINE
 

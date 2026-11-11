@@ -1,3 +1,4 @@
+import FormalAs2wTraining from './FormalAs2wTraining';
 import VoiceControl from './VoiceControl';
 import ResearchNavigation from './ResearchNavigation';
 import HomeOverview from './HomeOverview';
@@ -88,6 +89,7 @@ export default function App(){
      {page==='voice'&&<VoiceControl/>}
      {['capabilities','training'].includes(page)&&<CapabilityHub key={page} view={page==='training'?'训练方案':'能力矩阵'} data={capabilityData} focus={focusSkill} onRecipe={openRecipe} onEvaluation={id=>{const e=catalog.evaluations.find(e=>e.id===id);if(e)openEvaluation(e)}} onJob={id=>{setSelectedJobId(id);navigate('jobs')}}/>}
      {page==='configure'&&<ActiveGpuTasks jobs={jobs} resources={resources} onOpen={id=>{setSelectedJobId(id);navigate('jobs')}} onRuns={openHistory}/>}
+     {page==='configure'&&<FormalAs2wTraining />}
      {page==='configure'&&schema&&<Configurator clone={clone} recipeId={recipeId} schema={schema} models={catalog.models} resources={resources} notify={notify} onSaved={(id:string)=>{setSelectedJobId(id);setClone(undefined);api('jobs').then(setJobs);navigate('jobs?job='+id)}}/>}
      {['jobs','experiments'].includes(page)&&<ActiveGpuTasks jobs={jobs} resources={resources} onOpen={id=>setSelectedJobId(id)} onRuns={openHistory}/>}
      {['jobs','experiments'].includes(page)&&<JobPage onCandidate={openCandidate} onWeight={openWeight} focusId={selectedJobId} jobs={jobs} enabled={resources.training_enabled} refresh={()=>api('jobs').then(setJobs)} notify={notify} create={()=>openRecipe('')} onResult={async(j:Obj)=>{const c=await api("catalog?refresh=true");setCatalog(c);const e=c.evaluations.find((e:Obj)=>e.path.includes(j.id));if(e)openEvaluation(e);else notify("当前任务没有可播放的评估视频，请查看日志。")}}/>}
