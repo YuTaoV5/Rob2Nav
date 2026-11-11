@@ -1,0 +1,136 @@
+{
+  "task": "Go2-Velocity-Gait-V2",
+  "cfg": {
+    "task": "Go2-Velocity-Gait-V2",
+    "num_envs": 32,
+    "buffer_len": 40,
+    "iterations": 24,
+    "warmup_iterations": 8,
+    "collect_steps": 1,
+    "action_noise": 0.1,
+    "explore_frac": 0.25,
+    "explore_noise": 0.3,
+    "explore_theta": 2.0,
+    "wm_hidden": [
+      1024,
+      1024,
+      1024
+    ],
+    "wm_window": 8,
+    "wm_batch": 2048,
+    "wm_updates": 2,
+    "wm_prioritized_frac": 0.25,
+    "wm_archive_frac": 0.25,
+    "archive_size": 100000,
+    "archive_keep_prob": 0.02,
+    "wm_rewarmup_iterations": 1500,
+    "lr": 5e-05,
+    "actor_lr_scale": 0.25,
+    "lr_final_frac": 0.03,
+    "lr_decay_iterations": 30000,
+    "horizon": 32,
+    "imag_batch": 128,
+    "actor_hidden": [
+      512,
+      256,
+      128
+    ],
+    "critic_hidden": [
+      512,
+      256,
+      128
+    ],
+    "critic_epochs": 5,
+    "critic_minibatches": 4,
+    "grad_clip": 1.0,
+    "grad_clip_elem": 0.1,
+    "compile": true,
+    "dodge_shaping": 20.0,
+    "dodge_shaping_decay_iterations": 20000,
+    "target_curriculum_iterations": 15000,
+    "terrain_curriculum_iterations": 12000,
+    "sensor_grad": true,
+    "driver_policy": "",
+    "driver_frac": 0.25,
+    "expert_policy": "",
+    "expert_frac": 0.0,
+    "driver_fade": [
+      1000000000,
+      1000000000
+    ],
+    "driver_vmin": 0.5,
+    "driver_vmax": 3.0,
+    "critic_warmup_iterations": 4,
+    "actor_ramp_iterations": 4,
+    "reset_critic": true,
+    "continue_run": false,
+    "resume": "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-26_02-47-27_velocity_gait_moe_dataonly_v1_bounded_20261026/model_1200.pt",
+    "collapse_falls": 3.0,
+    "log_interval": 1,
+    "save_interval": 24,
+    "seed": 34201,
+    "run_name": "velocity_moe_continuity_weight2_smoke_v3",
+    "log_root": "logs/supermimic"
+  },
+  "gait_settings": {
+    "body_height_target": 0.29,
+    "body_height_weight": 0.4,
+    "stance_slip_weight": 0.15,
+    "mapped_target_rate_weight": 2.0,
+    "mapped_target_rate_margin": 0.6,
+    "mapped_target_rate_reduction": "max",
+    "knee_clearance_weight": 0.1,
+    "support_weight": 0.1,
+    "lateral_symmetry_weight": 0.03,
+    "joint_speed_weight": 0.1
+  },
+  "source_sha256": {
+    "rob2nav_gait_v2.py": "1eb47d82d45f3503530a6c75bb545608e7cd5d95cbe4f539735b6f7d5ab864b2",
+    "train_gait.py": "0860c562e3ff8927f044a5fcf7e7a63307fa66e7f02f423ae2fb1fbf197e1363",
+    "rob2nav_velocity.py": "3291eec351cef9cc00d9c49d2cbcc5a609e33d5a5eee1f42872d9cfbf97cb86a"
+  },
+  "initialize_hold_targets": true,
+  "actor_dim": 350,
+  "actor_terms": [
+    [
+      "base_ang_vel",
+      3
+    ],
+    [
+      "projected_gravity",
+      3
+    ],
+    [
+      "joint_pos",
+      12
+    ],
+    [
+      "joint_vel",
+      12
+    ],
+    [
+      "actions",
+      12
+    ],
+    [
+      "target",
+      28
+    ]
+  ],
+  "actor_exteroception": false,
+  "velocity_limits": [
+    30.100000381469727,
+    30.100000381469727,
+    20.06999969482422,
+    30.100000381469727,
+    30.100000381469727,
+    20.06999969482422,
+    30.100000381469727,
+    30.100000381469727,
+    20.06999969482422,
+    30.100000381469727,
+    30.100000381469727,
+    20.06999969482422
+  ],
+  "capability_qualified": false
+}

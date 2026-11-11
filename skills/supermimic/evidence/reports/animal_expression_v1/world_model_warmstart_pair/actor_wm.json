@@ -1,0 +1,88 @@
+{
+  "role": "own_supermimic_student",
+  "checkpoint": "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-28_01-47-47_expression_rhythm_actor_wm_smoke_v3_20261028/model_24.pt",
+  "seed": 36213,
+  "num_envs": 8,
+  "seconds": 12,
+  "styles": [
+    {
+      "style": "joyful_steps",
+      "rmse_xy": 0.5489110946655273,
+      "rmse_yaw": 1.0714998245239258,
+      "actual_velocity_spans": [
+        0.999308705329895,
+        1.8769935369491577,
+        4.80452823638916
+      ],
+      "falls": 18
+    },
+    {
+      "style": "firm_march",
+      "rmse_xy": 0.7062487602233887,
+      "rmse_yaw": 1.141974925994873,
+      "actual_velocity_spans": [
+        0.9792400598526001,
+        1.6657507419586182,
+        5.054695129394531
+      ],
+      "falls": 31
+    },
+    {
+      "style": "slow_sway",
+      "rmse_xy": 0.6168279647827148,
+      "rmse_yaw": 1.1063212156295776,
+      "actual_velocity_spans": [
+        0.9754186868667603,
+        1.6850186586380005,
+        4.1678080558776855
+      ],
+      "falls": 22
+    },
+    {
+      "style": "playful_dance",
+      "rmse_xy": 0.6053987741470337,
+      "rmse_yaw": 0.8746709227561951,
+      "actual_velocity_spans": [
+        1.0715017318725586,
+        1.8199067115783691,
+        5.126175880432129
+      ],
+      "falls": 31
+    }
+  ],
+  "physical": {
+    "velocity_ratio": 1.4344723224639893,
+    "joint_excess_rad": 0.16568195819854736,
+    "torque_ratio": 1.0,
+    "target_rate_ratio": 8.135053634643555
+  },
+  "body_contact": {
+    "physical_samples": 2400,
+    "nonfoot_ground_contact_samples": 8986,
+    "environments_with_nonfoot_ground_contact": 8,
+    "first_contact": {
+      "sample": 45,
+      "environment": 6,
+      "geoms": [
+        "terrain",
+        "robot/RL_thigh_collision"
+      ],
+      "distance": -0.0003776475787162781
+    },
+    "contact_buffer_overflow": false,
+    "ground_geoms": [
+      "terrain"
+    ],
+    "criterion": "active raw collision contacts with dist<=0; ground versus any robot geom except named foot; no state writes"
+  },
+  "physics_samples": 2400,
+  "expected_physics_samples": 2400,
+  "clock_error_seconds": 4.0978193283081055e-08,
+  "functional_candidate": false,
+  "emotion_perception_validated": false,
+  "capability_qualified": false,
+  "missing": [
+    "full uncut visual review",
+    "perceived expression review"
+  ]
+}

@@ -1,3 +1,4 @@
+import SuperMimicDemos from './SuperMimicDemos';
 import {useRef,useState} from 'react';
 import {ArrowRight,ArrowUpRight,ChevronDown,Cpu,Pause,Play,Volume2,VolumeX,Maximize,Video} from 'lucide-react';
 
@@ -70,6 +71,7 @@ export default function HomeOverview({data,catalog,resources,resourceError,resou
    <div className="home-capability-tabs" aria-label="选择预览技能">{ordered.map(s=><button key={s.id} aria-pressed={skill?.id===s.id} className={skill?.id===s.id?'is-selected':''} onClick={()=>onSelect(s.id)}>{presentation[s.id]?.name||s.name}</button>)}</div>
    {skill?<Featured key={skill.id} skill={skill} projects={data?.projects||[]} onSimulate={onSimulate}/>:<div className="home-empty">正在读取能力与真实回放…</div>}
   </section>
+  <SuperMimicDemos/>
   <div className="home-lower">
    <section className="home-activity"><div className="home-section-title"><h2>{active.length?'正在进行':'最近实验'}</h2><button className="home-text-action" onClick={()=>onNavigate('experiments')}>任务队列<ArrowRight size={13}/></button></div>
    {recent.length?recent.map((r:Obj)=><button className="home-run" key={r.id} onClick={()=>onNavigate('experiments')}><div><strong title={r.name}>{runNames[r.name]||r.name}</strong><span>{r.config?.task==='simulation'?'仿真任务':active.length?'训练任务':'历史训练记录'}{r.iteration!=null&&` · ${format(r.iteration)} 次迭代`}</span></div><span className="home-run-state">{stateNames[r.state]||r.state}<ArrowUpRight size={13}/></span></button>):<p className="home-empty">创建实验后，进展会显示在这里。</p>}

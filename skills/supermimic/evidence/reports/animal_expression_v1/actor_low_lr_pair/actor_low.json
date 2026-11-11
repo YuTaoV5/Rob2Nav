@@ -1,0 +1,80 @@
+{
+  "role": "own_supermimic_student",
+  "checkpoint": "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-28_02-10-53_expression_rhythm_actorlow_smoke_v4_20261028/model_24.pt",
+  "seed": 36213,
+  "num_envs": 8,
+  "seconds": 12,
+  "styles": [
+    {
+      "style": "joyful_steps",
+      "rmse_xy": 0.037773821502923965,
+      "rmse_yaw": 0.05035409331321716,
+      "actual_velocity_spans": [
+        0.25940531492233276,
+        0.21640558540821075,
+        1.0418552160263062
+      ],
+      "falls": 0
+    },
+    {
+      "style": "firm_march",
+      "rmse_xy": 0.03536827862262726,
+      "rmse_yaw": 0.04115470498800278,
+      "actual_velocity_spans": [
+        0.30775022506713867,
+        0.11409369111061096,
+        0.4360749423503876
+      ],
+      "falls": 0
+    },
+    {
+      "style": "slow_sway",
+      "rmse_xy": 0.034436967223882675,
+      "rmse_yaw": 0.06250105053186417,
+      "actual_velocity_spans": [
+        0.10793104022741318,
+        0.0967874675989151,
+        0.45657700300216675
+      ],
+      "falls": 0
+    },
+    {
+      "style": "playful_dance",
+      "rmse_xy": 0.054660357534885406,
+      "rmse_yaw": 0.12334044277667999,
+      "actual_velocity_spans": [
+        0.21416154503822327,
+        0.40970176458358765,
+        1.1312353610992432
+      ],
+      "falls": 0
+    }
+  ],
+  "physical": {
+    "velocity_ratio": 0.3507223427295685,
+    "joint_excess_rad": 0.0,
+    "torque_ratio": 0.628140389919281,
+    "target_rate_ratio": 0.5751040577888489
+  },
+  "body_contact": {
+    "physical_samples": 2400,
+    "nonfoot_ground_contact_samples": 0,
+    "environments_with_nonfoot_ground_contact": 0,
+    "first_contact": null,
+    "contact_buffer_overflow": false,
+    "ground_geoms": [
+      "terrain"
+    ],
+    "criterion": "active raw collision contacts with dist<=0; ground versus any robot geom except named foot; no state writes"
+  },
+  "physics_samples": 2400,
+  "expected_physics_samples": 2400,
+  "clock_error_seconds": 4.5821070671081543e-07,
+  "functional_candidate": true,
+  "emotion_perception_validated": false,
+  "capability_qualified": false,
+  "missing": [
+    "full uncut visual review",
+    "perceived expression review"
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "pipeline_pid": 130645,
+  "started_unix": 1792957843.931574,
+  "capability_qualified": false,
+  "phase": "completed_pending_review",
+  "parent_sha256": "f54551a392112befb3b92985388f66f43fcd8f92c8bd5d43b1bf803b4674ba6f",
+  "gait_settings": {
+    "body_height_target": 0.29,
+    "body_height_weight": 0.4,
+    "stance_slip_weight": 0.15,
+    "mapped_target_rate_weight": 4.0,
+    "mapped_target_rate_margin": 0.6,
+    "mapped_target_rate_reduction": "max",
+    "knee_clearance_weight": 0.1,
+    "support_weight": 0.1,
+    "lateral_symmetry_weight": 0.03,
+    "joint_speed_weight": 0.1
+  },
+  "reset_source_sha256": "ef1e2bab0bb8aa18257b5ac3f25004093e600dcefd1836846b1ac4d221f20b4b",
+  "training_source_sha256": {
+    "rob2nav_gait_v2.py": "1eb47d82d45f3503530a6c75bb545608e7cd5d95cbe4f539735b6f7d5ab864b2",
+    "train_gait.py": "0860c562e3ff8927f044a5fcf7e7a63307fa66e7f02f423ae2fb1fbf197e1363",
+    "rob2nav_velocity.py": "3291eec351cef9cc00d9c49d2cbcc5a609e33d5a5eee1f42872d9cfbf97cb86a"
+  },
+  "active_pid": null,
+  "active_command": [
+    "/root/gpufree-data/envs/go2-supermimic/bin/python",
+    "scripts/video_velocity_latest.py",
+    "--checkpoint",
+    "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-26_03-50-54_velocity_moe_continuity_weight4_v2_bounded_20261026/model_800.pt",
+    "--seed",
+    "34130",
+    "--stage-seconds",
+    "4",
+    "--output-dir",
+    "/root/gpufree-data/go2-supermimic/reproduction/moe_continuity_v2/formal_trial/video",
+    "--label",
+    "velocity_moe_continuity_weight4_v2_bounded_20261026 / model 800",
+    "--stem",
+    "velocity_gait_seed34111_model800"
+  ],
+  "checkpoint": "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-26_03-50-54_velocity_moe_continuity_weight4_v2_bounded_20261026/model_800.pt",
+  "checkpoint_sha256": "f029dd270db6fb5e41bd228df625b53cc978b6ed6d19a4a71d17e93184e46b59",
+  "summary": {
+    "checkpoint": "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-26_03-50-54_velocity_moe_continuity_weight4_v2_bounded_20261026/model_800.pt",
+    "independent_physical_gate_passes": 4,
+    "independent_seeds": [
+      34120,
+      34121,
+      34122,
+      34123
+    ],
+    "paired_gait": "/root/gpufree-data/go2-supermimic/reproduction/moe_continuity_v2/formal_trial/paired_gait.json",
+    "video": "/root/gpufree-data/go2-supermimic/reproduction/moe_continuity_v2/formal_trial/video/velocity_gait_seed34111_model800.mp4",
+    "capability_qualified": false,
+    "next": "Compare matched-seed gait and tracking against baseline; review full-speed video; diagnose first failure before another training"
+  }
+}

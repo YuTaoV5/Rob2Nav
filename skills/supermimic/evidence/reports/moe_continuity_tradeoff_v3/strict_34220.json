@@ -1,0 +1,148 @@
+{
+  "initialize_hold_targets": true,
+  "seed": 34220,
+  "checkpoint": "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-26_06-56-00_velocity_moe_continuity_weight2_v3_bounded_20261026/model_800.pt",
+  "num_envs": 128,
+  "stages": [
+    {
+      "stage": "stand",
+      "command": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rmse_xy": 0.010032929480075836,
+      "rmse_yaw": 0.010256019420921803
+    },
+    {
+      "stage": "forward",
+      "command": [
+        0.6,
+        0.0,
+        0.0
+      ],
+      "rmse_xy": 0.05290864035487175,
+      "rmse_yaw": 0.04323321580886841
+    },
+    {
+      "stage": "backward",
+      "command": [
+        -0.3,
+        0.0,
+        0.0
+      ],
+      "rmse_xy": 0.04730241373181343,
+      "rmse_yaw": 0.05001841485500336
+    },
+    {
+      "stage": "left",
+      "command": [
+        0.0,
+        0.25,
+        0.0
+      ],
+      "rmse_xy": 0.05568605661392212,
+      "rmse_yaw": 0.03391151502728462
+    },
+    {
+      "stage": "right",
+      "command": [
+        0.0,
+        -0.25,
+        0.0
+      ],
+      "rmse_xy": 0.05065832659602165,
+      "rmse_yaw": 0.04074496030807495
+    },
+    {
+      "stage": "turn_left",
+      "command": [
+        0.0,
+        0.0,
+        0.6
+      ],
+      "rmse_xy": 0.029661260545253754,
+      "rmse_yaw": 0.07441703975200653
+    },
+    {
+      "stage": "turn_right",
+      "command": [
+        0.0,
+        0.0,
+        -0.6
+      ],
+      "rmse_xy": 0.032405510544776917,
+      "rmse_yaw": 0.07659807801246643
+    },
+    {
+      "stage": "stop",
+      "command": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rmse_xy": 0.006211211439222097,
+      "rmse_yaw": 0.009477034211158752
+    }
+  ],
+  "policy_task": "Go2-Velocity-Gait-V2",
+  "evaluation_reward": "legacy velocity reward; not used for action selection or qualification",
+  "physics_dt": 0.005,
+  "control_dt": 0.02,
+  "decimation": 4,
+  "physics_sample_count": 16000,
+  "expected_physics_samples": 16000,
+  "joint_velocity_peak_event": {
+    "stage": "backward",
+    "sample": 4016,
+    "time": 20.080000000000002,
+    "environment": 100,
+    "joint": "FL_calf_joint",
+    "velocity": 11.166751861572266,
+    "velocity_limit": 20.06999969482422,
+    "command": [
+      -0.3,
+      0.0,
+      0.0
+    ]
+  },
+  "falls_total": 0,
+  "falls_per_env_minute": 0.0,
+  "max_joint_velocity_ratio": 0.5563902258872986,
+  "max_joint_limit_excess_rad": 0.0,
+  "max_joint_torque_ratio": 0.9178805351257324,
+  "max_target_rate_ratio": 0.9912594556808472,
+  "target_rate_peak_event": {
+    "stage": "left",
+    "control_index": 0,
+    "time_in_stage": 0.0,
+    "environment": 101,
+    "joint": "FL_calf_joint",
+    "ratio": 0.9912594556808472,
+    "command": [
+      0.0,
+      0.25,
+      0.0
+    ],
+    "previous_target": -1.7568249702453613,
+    "target": -2.1547164916992188
+  },
+  "actor_height_scan": false,
+  "actor_lidar": false,
+  "strict_validation_complete": false,
+  "body_contact_audit": {
+    "physical_samples": 16000,
+    "nonfoot_ground_contact_samples": 0,
+    "environments_with_nonfoot_ground_contact": 0,
+    "first_contact": null,
+    "contact_buffer_overflow": false,
+    "ground_geoms": [
+      "terrain"
+    ],
+    "criterion": "active raw collision contacts with dist<=0; ground versus any robot geom except named foot; no state writes"
+  },
+  "missing_checks": [
+    "uncut original-speed video review"
+  ],
+  "capability_qualified": false
+}

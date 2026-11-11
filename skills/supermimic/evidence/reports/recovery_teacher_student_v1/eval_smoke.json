@@ -1,0 +1,42 @@
+{
+  "seed": 35102,
+  "num_envs": 2,
+  "seconds": 3.0,
+  "checkpoint": "logs/supermimic/2026-10-26_22-44-40_recovery_fr_teacher_smoke_v1/model_24.pt",
+  "teacher_during_evaluation": false,
+  "functional_successes": 0,
+  "functional_total": 2,
+  "functional_recovery_times_s": [
+    -1.0,
+    -1.0
+  ],
+  "criterion": "upright>.95 height>.24 speed<.2 angvel<.5 at least3 actual foot collision contacts no nonfoot ground contact continuously2s; initial body contact allowed for recovery",
+  "physics_dt": 0.005,
+  "control_dt": 0.02,
+  "physics_samples": 600,
+  "max_joint_velocity_ratio": 0.546675980091095,
+  "max_joint_limit_excess_rad": 0.0,
+  "max_joint_torque_ratio": 0.7281320691108704,
+  "max_target_rate_ratio": 0.4367271661758423,
+  "contact_audit": {
+    "physical_samples": 600,
+    "nonfoot_ground_contact_samples": 3364,
+    "environments_with_nonfoot_ground_contact": 2,
+    "first_contact": {
+      "sample": 0,
+      "environment": 1,
+      "geoms": [
+        "terrain",
+        "robot/RL_calf_collision1"
+      ],
+      "distance": -0.006769707892090082
+    },
+    "contact_buffer_overflow": false,
+    "ground_geoms": [
+      "terrain"
+    ],
+    "criterion": "active raw collision contacts with dist<=0; ground versus any robot geom except named foot; no state writes"
+  },
+  "capability_qualified": false,
+  "hardware_qualified": false
+}

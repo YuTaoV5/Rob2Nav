@@ -1,0 +1,22 @@
+[
+  {
+    "role": "animal_smoke",
+    "path": "logs/supermimic/2026-10-28_03-47-25_animal_crawl_kine_teacher_smoke_v1_20261028/model_24.pt",
+    "cfg_warmup_iterations": 8,
+    "cfg_critic_warmup_iterations": 4,
+    "resume": "",
+    "saved_scheduler_fields": {},
+    "saved_actor_lr": 2.499996170595508e-05,
+    "implementation": "from-scratch BaseTrainer sets actor_frozen_until=0 and policy_start=warmup_iterations; critic_warmup_iterations is applied only in load() branch. Manual actor initialization does not call load(). Independent BC begins after policy_start."
+  },
+  {
+    "role": "expression_actorlow800",
+    "path": "logs/supermimic/2026-10-28_02-35-39_expression_rhythm_actorlow_v4_bounded_20261028/model_800.pt",
+    "cfg_warmup_iterations": 200,
+    "cfg_critic_warmup_iterations": 100,
+    "resume": "",
+    "saved_scheduler_fields": {},
+    "saved_actor_lr": 1.125e-06,
+    "implementation": "from-scratch BaseTrainer sets actor_frozen_until=0 and policy_start=warmup_iterations; critic_warmup_iterations is applied only in load() branch. Manual actor initialization does not call load(). Independent BC begins after policy_start."
+  }
+]

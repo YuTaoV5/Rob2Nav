@@ -1,0 +1,102 @@
+{
+  "teacher": {
+    "policy": "/root/gpufree-data/Rob2Nav/vendor/RoboGauge/resources/models/go2/go2_moe_cts_137k_0.6739.pt",
+    "sha256": "2206659a6a23886446dcfc05d86888d6cdc9b8a4e31f44cbbc4e2d17ba3d6ead",
+    "history_length": 5,
+    "history_layout": "time-major normalized 5x45, same as original TorchScript",
+    "command_scale": [
+      2.0,
+      2.0,
+      0.25
+    ],
+    "teacher_joints": [
+      "FL_hip_joint",
+      "FL_thigh_joint",
+      "FL_calf_joint",
+      "FR_hip_joint",
+      "FR_thigh_joint",
+      "FR_calf_joint",
+      "RL_hip_joint",
+      "RL_thigh_joint",
+      "RL_calf_joint",
+      "RR_hip_joint",
+      "RR_thigh_joint",
+      "RR_calf_joint"
+    ],
+    "native_kp": [
+      20,
+      20,
+      20,
+      20,
+      20,
+      20,
+      20,
+      20,
+      20,
+      20,
+      20,
+      20
+    ],
+    "native_kd": [
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5
+    ],
+    "collection_kp": [
+      17.691802978515625,
+      17.691802978515625,
+      39.806556701660156,
+      17.691802978515625,
+      17.691802978515625,
+      39.806556701660156,
+      17.691802978515625,
+      17.691802978515625,
+      39.806556701660156,
+      17.691802978515625,
+      17.691802978515625,
+      39.806556701660156
+    ],
+    "collection_kd": [
+      1.1262950897216797,
+      1.1262950897216797,
+      2.5341639518737793,
+      1.1262950897216797,
+      1.1262950897216797,
+      2.5341639518737793,
+      1.1262950897216797,
+      1.1262950897216797,
+      2.5341639518737793,
+      1.1262950897216797,
+      1.1262950897216797,
+      2.5341639518737793
+    ],
+    "collection_dynamics": "unchanged SuperMimic actuators; native MoE gains are metadata only"
+  },
+  "same_velocity_command": true,
+  "teacher_fraction": 0.25,
+  "teacher_fade": [
+    600,
+    1000
+  ],
+  "teacher_action_noise": 0.0,
+  "bc_weight": 0.1,
+  "bc_lr": 0.0001,
+  "bc_optimizer": "actor-only no-momentum SGD",
+  "bc_quality_filter": "teacher mapped rate<=.8, post-transition joint speed<=.8 and hard positions valid; no terminal transition",
+  "student_observation_unchanged": true,
+  "source_sha256": {
+    "train_gait_moe.py": "31a41ad045d849e6ae14bf744ca3cab53aef2ba0b8e550c2fb9e1a65ca11cf1c",
+    "rob2nav_moe_teacher.py": "27928843265715eed3d5bf74ec38bf633a954096e417f2ced9461df3e2ae46bb",
+    "train_gait.py": "0860c562e3ff8927f044a5fcf7e7a63307fa66e7f02f423ae2fb1fbf197e1363"
+  },
+  "capability_qualified": false
+}

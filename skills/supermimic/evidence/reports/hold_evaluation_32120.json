@@ -1,0 +1,121 @@
+{
+  "initialize_hold_targets": true,
+  "seed": 32120,
+  "checkpoint": "logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_12000.pt",
+  "num_envs": 128,
+  "stages": [
+    {
+      "stage": "stand",
+      "command": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rmse_xy": 0.00438064755871892,
+      "rmse_yaw": 0.0014664303744211793
+    },
+    {
+      "stage": "forward",
+      "command": [
+        0.6,
+        0.0,
+        0.0
+      ],
+      "rmse_xy": 0.03615400940179825,
+      "rmse_yaw": 0.06118897721171379
+    },
+    {
+      "stage": "backward",
+      "command": [
+        -0.3,
+        0.0,
+        0.0
+      ],
+      "rmse_xy": 0.023768136277794838,
+      "rmse_yaw": 0.033980581909418106
+    },
+    {
+      "stage": "left",
+      "command": [
+        0.0,
+        0.25,
+        0.0
+      ],
+      "rmse_xy": 0.025846637785434723,
+      "rmse_yaw": 0.04637884348630905
+    },
+    {
+      "stage": "right",
+      "command": [
+        0.0,
+        -0.25,
+        0.0
+      ],
+      "rmse_xy": 0.025744318962097168,
+      "rmse_yaw": 0.07007389515638351
+    },
+    {
+      "stage": "turn_left",
+      "command": [
+        0.0,
+        0.0,
+        0.6
+      ],
+      "rmse_xy": 0.027313021942973137,
+      "rmse_yaw": 0.08752254396677017
+    },
+    {
+      "stage": "turn_right",
+      "command": [
+        0.0,
+        0.0,
+        -0.6
+      ],
+      "rmse_xy": 0.0209960900247097,
+      "rmse_yaw": 0.0700855404138565
+    },
+    {
+      "stage": "stop",
+      "command": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rmse_xy": 0.003365705721080303,
+      "rmse_yaw": 0.0033679925836622715
+    }
+  ],
+  "physics_dt": 0.005,
+  "control_dt": 0.02,
+  "decimation": 4,
+  "physics_sample_count": 16000,
+  "expected_physics_samples": 16000,
+  "joint_velocity_peak_event": {
+    "stage": "backward",
+    "sample": 4016,
+    "time": 20.080000000000002,
+    "environment": 43,
+    "joint": "FL_calf_joint",
+    "velocity": 8.816361427307129,
+    "velocity_limit": 20.06999969482422,
+    "command": [
+      -0.3,
+      0.0,
+      0.0
+    ]
+  },
+  "falls_total": 0,
+  "falls_per_env_minute": 0.0,
+  "max_joint_velocity_ratio": 0.43928059935569763,
+  "max_joint_limit_excess_rad": 0.0,
+  "max_joint_torque_ratio": 0.9914999008178711,
+  "max_target_rate_ratio": 0.9637242555618286,
+  "actor_height_scan": false,
+  "actor_lidar": false,
+  "strict_validation_complete": false,
+  "missing_checks": [
+    "non-foot body contact",
+    "uncut original-speed video review"
+  ],
+  "capability_qualified": false
+}

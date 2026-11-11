@@ -1,0 +1,112 @@
+{
+  "role": "own_student_teacher_OFF",
+  "checkpoint": "/root/gpufree-data/go2-supermimic/logs/supermimic/2026-10-28_03-47-25_animal_crawl_kine_teacher_smoke_v1_20261028/model_24.pt",
+  "checkpoint_sha256": "49281040eb8e6ddee3a5f95ecc5ff151b1e2ba81070a156ec7ab37950659c16f",
+  "seed": 36712,
+  "seconds": 8,
+  "num_envs": 4,
+  "joint_perturb_std": 0.025,
+  "perturbation_scope": "normal reset only, no rollout state writes",
+  "initial_joint_state_sha256": "82aac5ada23e15314e8c93bedce122bd5a48b18503989b5fb8c90a9ea6977f70",
+  "initial_tensor_sha256": "385e161c19075fcbe9521bdcfb45549afd3d1e8ac7736303455fa6b8611904ee",
+  "rows": [
+    {
+      "env": 0,
+      "upright_fraction": 1.0,
+      "mean_pose_rmse": 0.5648016333580017,
+      "legacy_posture_gate": true,
+      "desired_planar_displacement": [
+        3.2758870124816895,
+        0.16954804956912994
+      ],
+      "actual_planar_displacement": [
+        -0.004008650779724121,
+        -0.03548508882522583
+      ],
+      "projected_progress_ratio": -0.0017795530147850513,
+      "locomotion_candidate": false
+    },
+    {
+      "env": 1,
+      "upright_fraction": 1.0,
+      "mean_pose_rmse": 0.563571572303772,
+      "legacy_posture_gate": true,
+      "desired_planar_displacement": [
+        -0.16954843699932098,
+        3.2758872509002686
+      ],
+      "actual_planar_displacement": [
+        0.013359129428863525,
+        0.001673579216003418
+      ],
+      "projected_progress_ratio": 0.0002990131906699389,
+      "locomotion_candidate": false
+    },
+    {
+      "env": 2,
+      "upright_fraction": 1.0,
+      "mean_pose_rmse": 0.5632817149162292,
+      "legacy_posture_gate": true,
+      "desired_planar_displacement": [
+        -3.2758870124816895,
+        -0.16954834759235382
+      ],
+      "actual_planar_displacement": [
+        0.01109302043914795,
+        0.017592787742614746
+      ],
+      "projected_progress_ratio": -0.0036544278264045715,
+      "locomotion_candidate": false
+    },
+    {
+      "env": 3,
+      "upright_fraction": 1.0,
+      "mean_pose_rmse": 0.5735597610473633,
+      "legacy_posture_gate": true,
+      "desired_planar_displacement": [
+        0.16954752802848816,
+        -3.2758872509002686
+      ],
+      "actual_planar_displacement": [
+        -0.07351553440093994,
+        0.0023706555366516113
+      ],
+      "projected_progress_ratio": -0.001880114316008985,
+      "locomotion_candidate": false
+    }
+  ],
+  "locomotion_passed": 0,
+  "locomotion_total": 4,
+  "physical": {
+    "velocity_ratio": 0.5428013801574707,
+    "joint_excess_rad": 0.0,
+    "torque_ratio": 1.0,
+    "intended_target_rate_ratio": 0.11209359765052795,
+    "applied_target_rate_ratio": 0.11209359765052795
+  },
+  "body_contact": {
+    "physical_samples": 1920,
+    "nonfoot_ground_contact_samples": 24,
+    "environments_with_nonfoot_ground_contact": 4,
+    "first_contact": {
+      "sample": 0,
+      "environment": 1,
+      "geoms": [
+        "terrain",
+        "robot/head_collision2"
+      ],
+      "distance": -0.01164131611585617
+    },
+    "contact_buffer_overflow": false,
+    "ground_geoms": [
+      "terrain"
+    ],
+    "criterion": "active raw collision contacts with dist<=0; ground versus any robot geom except named foot; no state writes"
+  },
+  "physical_samples": 1920,
+  "expected_physical_samples": 1920,
+  "locomotion_gate": "upright fraction >.95, mean pose RMSE <.6, projected desired displacement >50%",
+  "capability_qualified": false,
+  "visual_review_complete": false,
+  "source_sha256": "fd29fe8ce52d5af89936be01bd9bb59b315e96df59f4bbee925f19e2429bb93f"
+}

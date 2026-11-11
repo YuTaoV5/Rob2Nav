@@ -1,0 +1,107 @@
+PARITY ai4_dog_trot_00 4.064920350543844e-06 2.4868995751603507e-14 1.7763568394002505e-15
+PARITY solo8_crawl_slow 4.657925188666923e-06 1.7763568394002505e-14 3.552713678800501e-15
+{
+  "phase": "completed",
+  "rows": [
+    {
+      "clip": "ai4_dog_trot_00",
+      "native_rows": 32,
+      "audit_inference_dtype": "float64 CPU; native saved actions float32 GPU",
+      "native_parity_tolerance": 0.0001,
+      "teacher_checkpoint_sha256": "396fb7e182f970f01a6bd54bd7e850b4997222d877f922117c125bba88cbd6ae",
+      "source_inputs": [
+        {
+          "seed": 36400,
+          "trace_sha256": "0c9433d585ac32982e43744d36d90905658941c57ddc8e5334dd32f0fbdc8005",
+          "functional_candidate": false
+        },
+        {
+          "seed": 36401,
+          "trace_sha256": "f1a45c037f3523f9c2565c740d5845d3c96011dcabaea97c1ff4054bd1618ee6",
+          "functional_candidate": true
+        },
+        {
+          "seed": 36402,
+          "trace_sha256": "ea060942845e463f003de3a03776dce8b2b207717bbe5d30c62423feafc8ca58",
+          "functional_candidate": true
+        },
+        {
+          "seed": 36403,
+          "trace_sha256": "83691b29d624e2a5a6a2c6ee27e6e6577ba4f6c17868525d991578c645756668",
+          "functional_candidate": true
+        }
+      ],
+      "batch_vs_saved_native_action_max_error": 4.064920350543844e-06,
+      "batch_vs_single_max_error": 2.4868995751603507e-14,
+      "joint_target_roundtrip_max_error": 1.7763568394002505e-15,
+      "target_joint_names": [
+        "FL_calf_joint",
+        "FL_hip_joint",
+        "FL_thigh_joint",
+        "FR_calf_joint",
+        "FR_hip_joint",
+        "FR_thigh_joint",
+        "RL_calf_joint",
+        "RL_hip_joint",
+        "RL_thigh_joint",
+        "RR_calf_joint",
+        "RR_hip_joint",
+        "RR_thigh_joint"
+      ],
+      "configured_action_latency": 0.02,
+      "executed_latency_control_steps": 1
+    },
+    {
+      "clip": "solo8_crawl_slow",
+      "native_rows": 32,
+      "audit_inference_dtype": "float64 CPU; native saved actions float32 GPU",
+      "native_parity_tolerance": 0.0001,
+      "teacher_checkpoint_sha256": "17cf8cba50db6b2a0bac9d0ecb863a32ab5b38b77ff9c4306ece3fe2335cdf87",
+      "source_inputs": [
+        {
+          "seed": 36400,
+          "trace_sha256": "025acaf8e25fdb9d765d47df4243c7117277290b61806051ae5ecd36c01166f1",
+          "functional_candidate": true
+        },
+        {
+          "seed": 36401,
+          "trace_sha256": "a6cf43effd6f73c6cf65b128d48385554264f34acef1dd7ae43eda7f5fce51bb",
+          "functional_candidate": true
+        },
+        {
+          "seed": 36402,
+          "trace_sha256": "ebf3009acaae4f3a16ec696c5e840dd37f8f84b23e6999836a3031b52deba2b5",
+          "functional_candidate": true
+        },
+        {
+          "seed": 36403,
+          "trace_sha256": "db7d2c180ef27753d6d3797df98b1759d2fd5265afdcfd4564f0deef6542dd65",
+          "functional_candidate": true
+        }
+      ],
+      "batch_vs_saved_native_action_max_error": 4.657925188666923e-06,
+      "batch_vs_single_max_error": 1.7763568394002505e-14,
+      "joint_target_roundtrip_max_error": 3.552713678800501e-15,
+      "target_joint_names": [
+        "FL_calf_joint",
+        "FL_hip_joint",
+        "FL_thigh_joint",
+        "FR_calf_joint",
+        "FR_hip_joint",
+        "FR_thigh_joint",
+        "RL_calf_joint",
+        "RL_hip_joint",
+        "RL_thigh_joint",
+        "RR_calf_joint",
+        "RR_hip_joint",
+        "RR_thigh_joint"
+      ],
+      "configured_action_latency": 0.02,
+      "executed_latency_control_steps": 1
+    }
+  ],
+  "simulation_executed": false,
+  "observation_reconstruction_validated": false,
+  "student_trained": false,
+  "meaning": "saved native observation -> frozen actor batched inference and name-based target mapping only; not a MuJoCo closed-loop or phase-task validation"
+}

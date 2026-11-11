@@ -1,0 +1,434 @@
+/root/gpufree-data/envs/go2-supermimic/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+Setting seed: 32011
+Warp 1.18.0 initialized:
+   CUDA Toolkit 13.4, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA L40" (44 GiB, sm_89, mempool enabled)
+   Kernel cache:
+     /root/.cache/warp/1.18.0
+Module mujoco_warp._src.smooth b9cc505 load on device 'cuda:0' took 1.04 ms  (cached)
+Module _nxn_broadphase__locals__kernel_3a0c7ab9 3a0c7ab load on device 'cuda:0' took 0.39 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_f173d362 f173d36 load on device 'cuda:0' took 0.60 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_f173d362 c570b25 load on device 'cuda:0' took 0.60 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_c206fcb1 c206fcb load on device 'cuda:0' took 0.53 ms  (cached)
+Module mujoco_warp._src.constraint 9435a53 load on device 'cuda:0' took 0.33 ms  (cached)
+Module _friction_dof__locals__kernel_35a89db9 35a89db load on device 'cuda:0' took 0.42 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_6395e840 6395e84 load on device 'cuda:0' took 0.39 ms  (cached)
+Module _efc_contact_init__locals__kernel_a68d1f95 a68d1f9 load on device 'cuda:0' took 0.53 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_9a227029 8139c0c load on device 'cuda:0' took 0.42 ms  (cached)
+Module _efc_contact_update__locals__kernel_55bfdad1 55bfdad load on device 'cuda:0' took 0.33 ms  (cached)
+Module mujoco_warp._src.sensor 764597f load on device 'cuda:0' took 0.70 ms  (cached)
+Module mujoco_warp._src.forward f44d3e1 load on device 'cuda:0' took 0.48 ms  (cached)
+Module mujoco_warp._src.passive 80f3681 load on device 'cuda:0' took 0.48 ms  (cached)
+Module mujoco_warp._src.forward 0a75030 load on device 'cuda:0' took 0.48 ms  (cached)
+Module _qfrc_smooth__locals__kernel_2c4e0694 2c4e069 load on device 'cuda:0' took 0.30 ms  (cached)
+Module mujoco_warp._src.support f39c2de load on device 'cuda:0' took 0.31 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_a304cbc7 092260f load on device 'cuda:0' took 28.82 ms  (cached)
+Module _solve_init_dof__locals__kernel_618a11c7 618a11c load on device 'cuda:0' took 0.39 ms  (cached)
+Module mujoco_warp._src.solver c97221b load on device 'cuda:0' took 0.72 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_4396b4dc 4396b4d load on device 'cuda:0' took 0.34 ms  (cached)
+Module mul_m_kernel__locals___mul_m_74986a16 74986a1 load on device 'cuda:0' took 0.31 ms  (cached)
+Module _update_constraint_efc__locals__kernel_ed085732 ed08573 load on device 'cuda:0' took 0.33 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_bd324b86 bd324b8 load on device 'cuda:0' took 0.31 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_ada3cc5f ada3cc5 load on device 'cuda:0' took 0.31 ms  (cached)
+Module _update_gradient_grad__locals__kernel_45d59ec9 45d59ec load on device 'cuda:0' took 0.30 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_1ab9953e b88d9f6 load on device 'cuda:0' took 0.69 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_99ac2110 42358df load on device 'cuda:0' took 30.13 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_9aa9e5aa 5235421 load on device 'cuda:0' took 0.52 ms  (cached)
+Module _contact_sort__locals__contact_sort_adeecb09 788a659 load on device 'cuda:0' took 0.54 ms  (cached)
+Module mujoco_warp._src.derivative 1d93a53 load on device 'cuda:0' took 0.52 ms  (cached)
+Module _next_time_builder__locals___next_time_cc50a46c cc50a46 load on device 'cuda:0' took 0.38 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_c7eeecfb c7eeecf load on device 'cuda:0' took 0.35 ms  (cached)
+Module reset_data__locals__reset_M_d1ea7a8e d1ea7a8 load on device 'cuda:0' took 0.30 ms  (cached)
+Module reset_data__locals__reset_mocap_b017f38a b017f38 load on device 'cuda:0' took 0.30 ms  (cached)
+Module reset_data__locals__reset_contact_757d9bde 757d9bd load on device 'cuda:0' took 0.29 ms  (cached)
+Module reset_data__locals__reset_sleep_6b3be194 6b3be19 load on device 'cuda:0' took 0.30 ms  (cached)
+Module reset_data__locals__reset_nworld_e471a890 e471a89 load on device 'cuda:0' took 0.32 ms  (cached)
+Module mujoco_warp._src.render_util 9978d2d load on device 'cuda:0' took 0.48 ms  (cached)
+Module mujoco_warp._src.bvh 7dab8b4 load on device 'cuda:0' took 0.57 ms  (cached)
+Module mujoco_warp._src.ray cba3709 load on device 'cuda:0' took 0.57 ms  (cached)
+
++---------------------------------+
+|         Base Environment        |
++------------------------+--------+
+| Property               | Value  |
++------------------------+--------+
+| Number of environments | 4096   |
+| Environment device     | cuda:0 |
+| Environment seed       | 32011  |
+| Physics step-size      | 0.005  |
+| Environment step-size  | 0.02   |
++------------------------+--------+
+
+[INFO] <EventManager> contains 2 active terms.
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++--------+----------------------------+
+| Index  | Name                       |
++--------+----------------------------+
+|   0    | reset_base                 |
+|   1    | reset_robot_joints         |
++--------+----------------------------+
++---------------------------------------+
+| Active Event Terms in Mode: 'startup' |
++--------+------------------------------+
+| Index  | Name                         |
++--------+------------------------------+
+|   0    | encoder_bias                 |
+|   1    | base_com                     |
+|   2    | foot_friction_slide          |
+|   3    | foot_friction_spin           |
+|   4    | foot_friction_roll           |
+|   5    | quiet_solver_warnings        |
++--------+------------------------------+
++-----------------------------+
+| Domain Randomization Fields |
++-------+---------------------+
+| Index | Field Name          |
++-------+---------------------+
+|   0   | body_ipos           |
+|   1   | body_subtreemass    |
+|   2   | dof_invweight0      |
+|   3   | body_invweight0     |
+|   4   | tendon_length0      |
+|   5   | tendon_invweight0   |
+|   6   | actuator_acc0       |
+|   7   | geom_friction       |
++-------+---------------------+
+
+Module repeat_array_kernel_31f1cdc7 ab09835 load on device 'cuda:0' took 0.41 ms  (cached)
+Module repeat_array_kernel_31f1cdc7 a2cef03 load on device 'cuda:0' took 0.38 ms  (cached)
+Module repeat_array_kernel_31f1cdc7 eb7f276 load on device 'cuda:0' took 0.37 ms  (cached)
+[INFO] <CommandManager> contains 1 active terms.
++----------------------------------+
+|       Active Command Terms       |
++-------+--------+-----------------+
+| Index | Name   |       Type      |
++-------+--------+-----------------+
+|   0   | target | VelocityCommand |
++-------+--------+-----------------+
+
+[INFO] <ActionManager> contains 1 active terms.
++---------------------------------+
+| Active Action Terms (shape: 12) |
++-------+-----------+-------------+
+| Index | Name      |   Dimension |
++-------+-----------+-------------+
+|   0   | joint_pos |          12 |
++-------+-----------+-------------+
+
+[INFO] <ObservationManager> contains 1 groups.
++------------------------------------------------------------+
+| Active Observation Terms in Group: 'actor' (shape: (350,)) |
++--------+------------------------+--------------------------+
+| Index  | Name                   |          Shape           |
++--------+------------------------+--------------------------+
+|   0    | base_ang_vel           |     (15,)  ← 5×(3,)      |
+|   1    | projected_gravity      |     (15,)  ← 5×(3,)      |
+|   2    | joint_pos              |     (60,)  ← 5×(12,)     |
+|   3    | joint_vel              |     (60,)  ← 5×(12,)     |
+|   4    | actions                |     (60,)  ← 5×(12,)     |
+|   5    | target                 |    (140,)  ← 5×(28,)     |
++--------+------------------------+--------------------------+
+
+[INFO] <TerminationManager> contains 2 active terms.
++------------------------------+
+|   Active Termination Terms   |
++-------+-----------+----------+
+| Index | Name      | Time Out |
++-------+-----------+----------+
+|   0   | time_out  |   True   |
+|   1   | fell_over |  False   |
++-------+-----------+----------+
+
+[INFO] <RewardManager> contains 2 active terms.
++-----------------------------+
+|     Active Reward Terms     |
++-------+------------+--------+
+| Index | Name       | Weight |
++-------+------------+--------+
+|   0   | velocity   |    1.0 |
+|   1   | terminated | -200.0 |
++-------+------------+--------+
+
+[INFO] <NullCurriculumManager> (inactive)
+[INFO] <MetricsManager> contains 1 active terms.
++-------------------------+
+|   Active Metrics Terms  |
++-------+-----------------+
+| Index | Name            |
++-------+-----------------+
+|   0   | mean_action_acc |
++-------+-----------------+
+
+[INFO] <NullRecorderManager> (inactive)
+Module mujoco_warp._src.io cb0c74e load on device 'cuda:0' took 0.62 ms  (cached)
+Module _tile_cholesky_factorize_block__locals__kernel_e7d42b50 8cd77e8 load on device 'cuda:0' took 23.43 ms  (cached)
+Module _tile_cholesky_solve_block__locals__kernel_5a7cc7d4 19d341e load on device 'cuda:0' took 21.51 ms  (cached)
+it 50/12000 | 0.1 min | env_steps 0.2M | wm_loss 2.846 | archive 1148 | hit_rate 0.00/0.00/0.00 | fast_yaw 0
+it 100/12000 | 0.1 min | env_steps 0.5M | wm_loss 2.598 | archive 1438 | hit_rate 0.00/0.00/0.00 | fast_yaw 0
+it 150/12000 | 0.2 min | env_steps 0.7M | wm_loss 2.509 | archive 1607 | hit_rate 0.00/0.00/0.00 | fast_yaw 0
+it 200/12000 | 0.2 min | env_steps 0.9M | wm_loss 2.439 | archive 1724 | hit_rate 0.00/0.00/0.00 | fast_yaw 0
+it 250/12000 | 0.2 min | env_steps 1.1M | wm_loss 2.386 | archive 1825 | hit_rate 0.00/0.00/0.00 | fast_yaw 0
+it 300/12000 | 0.3 min | env_steps 1.3M | wm_loss 2.325 | archive 1905 | hit_rate 0.00/0.00/0.00 | fast_yaw 0
+it 350/12000 | 0.7 min | env_steps 1.5M | wm_loss 2.472 | imagined_return 5.015 | imagined_reward 0.05327 | imagined_survival 0.9999 | actor_grad_norm 1.317 | critic_loss 0.01097 | archive 1965 | hit_rate 0.00/0.00/0.00 | fast_yaw 0
+it 400/12000 | 0.8 min | env_steps 1.7M | wm_loss 2.147 | imagined_return 5.411 | imagined_reward 0.05369 | imagined_survival 0.9999 | actor_grad_norm 1.207 | critic_loss 0.005894 | archive 2011 | hit_rate 0.00/0.00/0.00 | fast_yaw 0
+it 450/12000 | 1.0 min | env_steps 1.9M | wm_loss 2.157 | imagined_return 5.674 | imagined_reward 0.05367 | imagined_survival 0.9999 | actor_grad_norm 0.6987 | critic_loss 0.007253 | archive 2011 | hit_rate 0.00/0.00/0.00 | fast_yaw 0
+it 500/12000 | 1.1 min | env_steps 2.1M | wm_loss 2.041 | imagined_return 5.719 | imagined_reward 0.04579 | imagined_survival 0.9995 | actor_grad_norm 5.367 | critic_loss 0.03964 | archive 2011 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_500.pt
+it 550/12000 | 1.2 min | env_steps 2.3M | wm_loss 2.63 | imagined_return 5.053 | imagined_reward 0.05133 | imagined_survival 0.9996 | actor_grad_norm 1.629 | critic_loss 0.005587 | archive 2011 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1
+it 600/12000 | 1.4 min | env_steps 2.5M | wm_loss 2.426 | imagined_return 5.776 | imagined_reward 0.05017 | imagined_survival 0.9996 | actor_grad_norm 1.942 | critic_loss 0.01748 | archive 2011 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1
+it 650/12000 | 1.5 min | env_steps 2.7M | wm_loss 2.681 | imagined_return 5.848 | imagined_reward 0.0558 | imagined_survival 0.9997 | actor_grad_norm 0.6649 | critic_loss 0.002119 | archive 2012 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1
+it 700/12000 | 1.6 min | env_steps 2.9M | wm_loss 2.835 | imagined_return 5.797 | imagined_reward 0.05498 | imagined_survival 0.9992 | actor_grad_norm 0.8581 | critic_loss 0.002234 | archive 2012 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1
+it 750/12000 | 1.8 min | env_steps 3.1M | wm_loss 3.05 | imagined_return 5.865 | imagined_reward 0.05651 | imagined_survival 0.9993 | actor_grad_norm 1.141 | critic_loss 0.003625 | archive 2014 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1
+it 800/12000 | 1.9 min | env_steps 3.3M | wm_loss 3.698 | imagined_return 5.864 | imagined_reward 0.05518 | imagined_survival 0.9994 | actor_grad_norm 0.6967 | critic_loss 0.002035 | archive 2017 | hit_rate 0.00/0.00/0.00 | fast_yaw 9.28e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1.4
+it 850/12000 | 2.0 min | env_steps 3.5M | wm_loss 3.646 | imagined_return 6.107 | imagined_reward 0.05624 | imagined_survival 0.9987 | actor_grad_norm 0.3321 | critic_loss 0.00306 | archive 2028 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1.46
+it 900/12000 | 2.2 min | env_steps 3.7M | wm_loss 3.539 | imagined_return 5.978 | imagined_reward 0.05572 | imagined_survival 0.9992 | actor_grad_norm 0.9805 | critic_loss 0.003204 | archive 2040 | hit_rate 0.00/0.00/0.00 | fast_yaw 5.37e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1
+it 950/12000 | 2.3 min | env_steps 3.9M | wm_loss 3.856 | imagined_return 5.816 | imagined_reward 0.05512 | imagined_survival 0.9984 | actor_grad_norm 0.7863 | critic_loss 0.003428 | archive 2069 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000283 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 2.62
+it 1000/12000 | 2.4 min | env_steps 4.1M | wm_loss 3.32 | imagined_return 6.076 | imagined_reward 0.05735 | imagined_survival 0.999 | actor_grad_norm 0.2959 | critic_loss 0.001785 | archive 2121 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.8
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_1000.pt
+it 1050/12000 | 2.6 min | env_steps 4.3M | wm_loss 3.406 | imagined_return 6.16 | imagined_reward 0.05701 | imagined_survival 0.9986 | actor_grad_norm 0.4678 | critic_loss 0.001981 | archive 2363 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1.45
+it 1100/12000 | 2.8 min | env_steps 4.5M | wm_loss 3.378 | imagined_return 6.331 | imagined_reward 0.05898 | imagined_survival 0.9989 | actor_grad_norm 0.3571 | critic_loss 0.00155 | archive 2610 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1
+it 1150/12000 | 2.9 min | env_steps 4.8M | wm_loss 3.673 | imagined_return 6.462 | imagined_reward 0.06077 | imagined_survival 0.9988 | actor_grad_norm 0.4541 | critic_loss 0.002776 | archive 2852 | hit_rate 0.00/0.00/0.00 | fast_yaw 3.91e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1
+it 1200/12000 | 3.1 min | env_steps 5.0M | wm_loss 3.66 | imagined_return 6.674 | imagined_reward 0.0594 | imagined_survival 0.9984 | actor_grad_norm 0.504 | critic_loss 0.003321 | archive 3147 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000132 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1.25
+it 1250/12000 | 3.3 min | env_steps 5.2M | wm_loss 3.705 | imagined_return 6.791 | imagined_reward 0.06095 | imagined_survival 0.9973 | actor_grad_norm 0.4695 | critic_loss 0.00615 | archive 3455 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000923 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1.52
+it 1300/12000 | 3.4 min | env_steps 5.4M | wm_loss 3.585 | imagined_return 6.986 | imagined_reward 0.06356 | imagined_survival 0.998 | actor_grad_norm 0.537 | critic_loss 0.00301 | archive 3773 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000771 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1.21
+it 1350/12000 | 3.6 min | env_steps 5.6M | wm_loss 3.531 | imagined_return 7.063 | imagined_reward 0.06346 | imagined_survival 0.9979 | actor_grad_norm 0.5471 | critic_loss 0.003677 | archive 4058 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000483 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1.38
+it 1400/12000 | 3.8 min | env_steps 5.8M | wm_loss 3.137 | imagined_return 7.187 | imagined_reward 0.06721 | imagined_survival 0.9988 | actor_grad_norm 0.6201 | critic_loss 0.002978 | archive 4302 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000205 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1
+it 1450/12000 | 3.9 min | env_steps 6.0M | wm_loss 3.299 | imagined_return 7.237 | imagined_reward 0.06716 | imagined_survival 0.9976 | actor_grad_norm 0.9048 | critic_loss 0.004182 | archive 4439 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000298 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1
+it 1500/12000 | 4.1 min | env_steps 6.2M | wm_loss 3.058 | imagined_return 7.31 | imagined_reward 0.06585 | imagined_survival 0.9975 | actor_grad_norm 0.6493 | critic_loss 0.004692 | archive 4573 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000625 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1.24
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_1500.pt
+it 1550/12000 | 4.3 min | env_steps 6.4M | wm_loss 3.245 | imagined_return 7.438 | imagined_reward 0.06981 | imagined_survival 0.9983 | actor_grad_norm 0.5552 | critic_loss 0.003153 | archive 4681 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000859 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1.07
+it 1600/12000 | 4.4 min | env_steps 6.6M | wm_loss 2.901 | imagined_return 7.438 | imagined_reward 0.07137 | imagined_survival 0.9986 | actor_grad_norm 0.8401 | critic_loss 0.007394 | archive 4806 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.00022 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.8
+it 1650/12000 | 4.6 min | env_steps 6.8M | wm_loss 2.617 | imagined_return 7.604 | imagined_reward 0.07386 | imagined_survival 0.9999 | actor_grad_norm 0.5888 | critic_loss 0.001054 | archive 4917 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000356 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1
+it 1700/12000 | 4.7 min | env_steps 7.0M | wm_loss 2.266 | imagined_return 7.645 | imagined_reward 0.07388 | imagined_survival 0.9994 | actor_grad_norm 0.9182 | critic_loss 0.001392 | archive 5032 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000557 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 1
+it 1750/12000 | 4.9 min | env_steps 7.2M | wm_loss 2.198 | imagined_return 7.694 | imagined_reward 0.07506 | imagined_survival 0.9997 | actor_grad_norm 0.4225 | critic_loss 0.0004576 | archive 5138 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000317 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.8
+it 1800/12000 | 5.1 min | env_steps 7.4M | wm_loss 2.056 | imagined_return 7.692 | imagined_reward 0.07514 | imagined_survival 0.9994 | actor_grad_norm 0.5718 | critic_loss 0.001277 | archive 5221 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000171 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.2
+it 1850/12000 | 5.2 min | env_steps 7.6M | wm_loss 1.718 | imagined_return 7.714 | imagined_reward 0.0758 | imagined_survival 0.9999 | actor_grad_norm 0.5964 | critic_loss 0.0005415 | archive 5293 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000176 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.5
+it 1900/12000 | 5.4 min | env_steps 7.8M | wm_loss 1.615 | imagined_return 7.709 | imagined_reward 0.07508 | imagined_survival 0.9993 | actor_grad_norm 0.6243 | critic_loss 0.0008971 | archive 5351 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000195 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.6
+it 1950/12000 | 5.6 min | env_steps 8.0M | wm_loss 1.459 | imagined_return 7.736 | imagined_reward 0.07501 | imagined_survival 0.9991 | actor_grad_norm 0.6045 | critic_loss 0.0009606 | archive 5407 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.0002 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.316
+it 2000/12000 | 5.7 min | env_steps 8.2M | wm_loss 1.373 | imagined_return 7.743 | imagined_reward 0.07637 | imagined_survival 0.9997 | actor_grad_norm 0.708 | critic_loss 0.003105 | archive 5465 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.00021 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.286
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_2000.pt
+it 2050/12000 | 5.9 min | env_steps 8.4M | wm_loss 1.157 | imagined_return 7.761 | imagined_reward 0.07652 | imagined_survival 0.9997 | actor_grad_norm 0.5915 | critic_loss 0.0005096 | archive 5680 | hit_rate 0.00/0.00/0.00 | fast_yaw 4.88e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 2100/12000 | 6.0 min | env_steps 8.6M | wm_loss 1.244 | imagined_return 7.771 | imagined_reward 0.07689 | imagined_survival 0.9996 | actor_grad_norm 0.4717 | critic_loss 0.001033 | archive 5891 | hit_rate 0.00/0.00/0.00 | fast_yaw 4.88e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.5
+it 2150/12000 | 6.1 min | env_steps 8.8M | wm_loss 1 | imagined_return 7.789 | imagined_reward 0.07717 | imagined_survival 0.9999 | actor_grad_norm 0.4665 | critic_loss 0.00014 | archive 6056 | hit_rate 0.00/0.00/0.00 | fast_yaw 4.88e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.333
+it 2200/12000 | 6.3 min | env_steps 9.1M | wm_loss 0.8905 | imagined_return 7.806 | imagined_reward 0.07745 | imagined_survival 1 | actor_grad_norm 0.3856 | critic_loss 7.991e-05 | archive 6243 | hit_rate 0.00/0.00/0.00 | fast_yaw 1.46e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.2
+it 2250/12000 | 6.4 min | env_steps 9.3M | wm_loss 0.8721 | imagined_return 7.799 | imagined_reward 0.07732 | imagined_survival 1 | actor_grad_norm 0.5566 | critic_loss 0.0008598 | archive 6426 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000166 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 2300/12000 | 6.5 min | env_steps 9.5M | wm_loss 0.7844 | imagined_return 7.806 | imagined_reward 0.07746 | imagined_survival 1 | actor_grad_norm 0.4106 | critic_loss 0.0001221 | archive 6601 | hit_rate 0.00/0.00/0.00 | fast_yaw 9.28e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 2350/12000 | 6.7 min | env_steps 9.7M | wm_loss 0.7519 | imagined_return 7.818 | imagined_reward 0.07761 | imagined_survival 0.9999 | actor_grad_norm 0.4134 | critic_loss 0.0001073 | archive 6781 | hit_rate 0.00/0.00/0.00 | fast_yaw 4.39e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0417
+it 2400/12000 | 6.8 min | env_steps 9.9M | wm_loss 0.7326 | imagined_return 7.826 | imagined_reward 0.07778 | imagined_survival 1 | actor_grad_norm 0.3004 | critic_loss 0.0001052 | archive 6915 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000103 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.286
+it 2450/12000 | 6.9 min | env_steps 10.1M | wm_loss 0.6672 | imagined_return 7.833 | imagined_reward 0.07781 | imagined_survival 0.9999 | actor_grad_norm 0.4169 | critic_loss 0.0002375 | archive 6928 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000103 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.333
+it 2500/12000 | 7.1 min | env_steps 10.3M | wm_loss 0.777 | imagined_return 7.828 | imagined_reward 0.07772 | imagined_survival 1 | actor_grad_norm 0.6438 | critic_loss 0.000264 | archive 6938 | hit_rate 0.00/0.00/0.00 | fast_yaw 4.88e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0556
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_2500.pt
+it 2550/12000 | 7.2 min | env_steps 10.5M | wm_loss 0.6647 | imagined_return 7.835 | imagined_reward 0.07793 | imagined_survival 1 | actor_grad_norm 0.4477 | critic_loss 6.661e-05 | archive 6951 | hit_rate 0.00/0.00/0.00 | fast_yaw 3.42e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 2600/12000 | 7.3 min | env_steps 10.7M | wm_loss 0.7233 | imagined_return 7.834 | imagined_reward 0.078 | imagined_survival 1 | actor_grad_norm 0.2533 | critic_loss 0.0001203 | archive 6962 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000146 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.286
+it 2650/12000 | 7.5 min | env_steps 10.9M | wm_loss 0.6235 | imagined_return 7.832 | imagined_reward 0.07799 | imagined_survival 1 | actor_grad_norm 0.4187 | critic_loss 7.566e-05 | archive 6979 | hit_rate 0.00/0.00/0.00 | fast_yaw 7.32e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.125
+it 2700/12000 | 7.6 min | env_steps 11.1M | wm_loss 0.6303 | imagined_return 7.843 | imagined_reward 0.078 | imagined_survival 1 | actor_grad_norm 0.4495 | critic_loss 7.396e-05 | archive 6987 | hit_rate 0.00/0.00/0.00 | fast_yaw 5.37e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 2750/12000 | 7.7 min | env_steps 11.3M | wm_loss 0.5963 | imagined_return 7.854 | imagined_reward 0.07807 | imagined_survival 0.9999 | actor_grad_norm 0.4363 | critic_loss 7.774e-05 | archive 6995 | hit_rate 0.00/0.00/0.00 | fast_yaw 3.91e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 2800/12000 | 7.9 min | env_steps 11.5M | wm_loss 0.5602 | imagined_return 7.852 | imagined_reward 0.07816 | imagined_survival 1 | actor_grad_norm 0.3796 | critic_loss 8.657e-05 | archive 7007 | hit_rate 0.00/0.00/0.00 | fast_yaw 4.88e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 2850/12000 | 8.0 min | env_steps 11.7M | wm_loss 0.611 | imagined_return 7.866 | imagined_reward 0.07826 | imagined_survival 1 | actor_grad_norm 0.3361 | critic_loss 5.593e-05 | archive 7013 | hit_rate 0.00/0.00/0.00 | fast_yaw 3.42e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 2900/12000 | 8.1 min | env_steps 11.9M | wm_loss 0.5679 | imagined_return 7.862 | imagined_reward 0.07822 | imagined_survival 1 | actor_grad_norm 0.4005 | critic_loss 5.474e-05 | archive 7025 | hit_rate 0.00/0.00/0.00 | fast_yaw 3.91e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.2
+it 2950/12000 | 8.3 min | env_steps 12.1M | wm_loss 0.5372 | imagined_return 7.865 | imagined_reward 0.07827 | imagined_survival 1 | actor_grad_norm 0.4601 | critic_loss 6.79e-05 | archive 7032 | hit_rate 0.00/0.00/0.00 | fast_yaw 2.44e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 3000/12000 | 8.4 min | env_steps 12.3M | wm_loss 0.57 | imagined_return 7.869 | imagined_reward 0.07816 | imagined_survival 1 | actor_grad_norm 0.4028 | critic_loss 6.265e-05 | archive 7052 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_3000.pt
+it 3050/12000 | 8.5 min | env_steps 12.5M | wm_loss 0.5676 | imagined_return 7.868 | imagined_reward 0.0781 | imagined_survival 1 | actor_grad_norm 0.5527 | critic_loss 7.471e-05 | archive 7229 | hit_rate 0.00/0.00/0.00 | fast_yaw 6.84e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.1
+it 3100/12000 | 8.7 min | env_steps 12.7M | wm_loss 0.548 | imagined_return 7.869 | imagined_reward 0.07815 | imagined_survival 1 | actor_grad_norm 0.4808 | critic_loss 8.106e-05 | archive 7405 | hit_rate 0.00/0.00/0.00 | fast_yaw 2.93e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 3150/12000 | 8.8 min | env_steps 12.9M | wm_loss 0.5155 | imagined_return 7.87 | imagined_reward 0.07828 | imagined_survival 1 | actor_grad_norm 0.4112 | critic_loss 7.336e-05 | archive 7585 | hit_rate 0.00/0.00/0.00 | fast_yaw 5.37e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 3200/12000 | 8.9 min | env_steps 13.1M | wm_loss 0.5088 | imagined_return 7.87 | imagined_reward 0.07833 | imagined_survival 1 | actor_grad_norm 0.3576 | critic_loss 3.453e-05 | archive 7748 | hit_rate 0.00/0.00/0.00 | fast_yaw 9.77e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 3250/12000 | 9.0 min | env_steps 13.4M | wm_loss 0.5096 | imagined_return 7.875 | imagined_reward 0.07822 | imagined_survival 1 | actor_grad_norm 0.5408 | critic_loss 4.108e-05 | archive 7949 | hit_rate 0.00/0.00/0.00 | fast_yaw 3.42e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0333
+it 3300/12000 | 9.2 min | env_steps 13.6M | wm_loss 0.5191 | imagined_return 7.868 | imagined_reward 0.07831 | imagined_survival 1 | actor_grad_norm 0.3875 | critic_loss 4.586e-05 | archive 8129 | hit_rate 0.00/0.00/0.00 | fast_yaw 5.37e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0417
+it 3350/12000 | 9.3 min | env_steps 13.8M | wm_loss 0.4875 | imagined_return 7.875 | imagined_reward 0.07841 | imagined_survival 1 | actor_grad_norm 0.2739 | critic_loss 3.728e-05 | archive 8304 | hit_rate 0.00/0.00/0.00 | fast_yaw 4.88e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0417
+it 3400/12000 | 9.4 min | env_steps 14.0M | wm_loss 0.5997 | imagined_return 7.875 | imagined_reward 0.07845 | imagined_survival 1 | actor_grad_norm 0.3868 | critic_loss 4.899e-05 | archive 8457 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.381
+it 3450/12000 | 9.6 min | env_steps 14.2M | wm_loss 0.477 | imagined_return 7.873 | imagined_reward 0.07843 | imagined_survival 1 | actor_grad_norm 0.408 | critic_loss 5.331e-05 | archive 8462 | hit_rate 0.00/0.00/0.00 | fast_yaw 2.44e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 3500/12000 | 9.7 min | env_steps 14.4M | wm_loss 0.5066 | imagined_return 7.883 | imagined_reward 0.07842 | imagined_survival 1 | actor_grad_norm 0.4602 | critic_loss 0.0001039 | archive 8470 | hit_rate 0.00/0.00/0.00 | fast_yaw 6.35e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0556
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_3500.pt
+it 3550/12000 | 9.8 min | env_steps 14.6M | wm_loss 0.589 | imagined_return 7.865 | imagined_reward 0.07734 | imagined_survival 0.9996 | actor_grad_norm 0.4732 | critic_loss 0.0005588 | archive 8481 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.176
+it 3600/12000 | 10.0 min | env_steps 14.8M | wm_loss 0.4908 | imagined_return 7.881 | imagined_reward 0.07703 | imagined_survival 0.9994 | actor_grad_norm 0.3676 | critic_loss 0.0004115 | archive 8490 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 3650/12000 | 10.1 min | env_steps 15.0M | wm_loss 0.4914 | imagined_return 7.875 | imagined_reward 0.07845 | imagined_survival 0.9998 | actor_grad_norm 0.3407 | critic_loss 0.0001946 | archive 8502 | hit_rate 0.00/0.00/0.00 | fast_yaw 4.88e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.2
+it 3700/12000 | 10.2 min | env_steps 15.2M | wm_loss 0.591 | imagined_return 7.876 | imagined_reward 0.07837 | imagined_survival 1 | actor_grad_norm 0.5411 | critic_loss 4.952e-05 | archive 8515 | hit_rate 0.00/0.00/0.00 | fast_yaw 5.37e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.5
+it 3750/12000 | 10.4 min | env_steps 15.4M | wm_loss 0.4809 | imagined_return 7.88 | imagined_reward 0.07842 | imagined_survival 0.9999 | actor_grad_norm 0.4251 | critic_loss 6.83e-05 | archive 8525 | hit_rate 0.00/0.00/0.00 | fast_yaw 2.44e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 3800/12000 | 10.5 min | env_steps 15.6M | wm_loss 0.4469 | imagined_return 7.884 | imagined_reward 0.07845 | imagined_survival 1 | actor_grad_norm 0.3587 | critic_loss 0.0001096 | archive 8528 | hit_rate 0.00/0.00/0.00 | fast_yaw 0.000112 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0667
+it 3850/12000 | 10.6 min | env_steps 15.8M | wm_loss 0.5291 | imagined_return 7.869 | imagined_reward 0.07835 | imagined_survival 0.9998 | actor_grad_norm 0.5197 | critic_loss 0.0005435 | archive 8535 | hit_rate 0.00/0.00/0.00 | fast_yaw 2.44e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0476
+it 3900/12000 | 10.8 min | env_steps 16.0M | wm_loss 0.4746 | imagined_return 7.886 | imagined_reward 0.07855 | imagined_survival 1 | actor_grad_norm 0.3284 | critic_loss 0.000101 | archive 8543 | hit_rate 0.00/0.00/0.00 | fast_yaw 2.93e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.2
+it 3950/12000 | 10.9 min | env_steps 16.2M | wm_loss 0.4817 | imagined_return 7.887 | imagined_reward 0.07861 | imagined_survival 1 | actor_grad_norm 0.2987 | critic_loss 3.429e-05 | archive 8549 | hit_rate 0.00/0.00/0.00 | fast_yaw 1.95e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0526
+it 4000/12000 | 11.0 min | env_steps 16.4M | wm_loss 0.4609 | imagined_return 7.88 | imagined_reward 0.07827 | imagined_survival 0.9997 | actor_grad_norm 0.5184 | critic_loss 9.784e-05 | archive 8573 | hit_rate 0.00/0.00/0.00 | fast_yaw 9.77e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.143
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_4000.pt
+it 4050/12000 | 11.2 min | env_steps 16.6M | wm_loss 0.5255 | imagined_return 7.874 | imagined_reward 0.07823 | imagined_survival 1 | actor_grad_norm 0.6488 | critic_loss 5.507e-05 | archive 8726 | hit_rate 0.00/0.00/0.00 | fast_yaw 8.3e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 4100/12000 | 11.3 min | env_steps 16.8M | wm_loss 0.4706 | imagined_return 7.86 | imagined_reward 0.07826 | imagined_survival 1 | actor_grad_norm 0.7755 | critic_loss 5.315e-05 | archive 8884 | hit_rate 0.00/0.00/0.00 | fast_yaw 9.77e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 4150/12000 | 11.4 min | env_steps 17.0M | wm_loss 0.4849 | imagined_return 7.889 | imagined_reward 0.0785 | imagined_survival 1 | actor_grad_norm 0.4088 | critic_loss 4.857e-05 | archive 9054 | hit_rate 0.00/0.00/0.00 | fast_yaw 5.86e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 4200/12000 | 11.6 min | env_steps 17.2M | wm_loss 0.4485 | imagined_return 7.888 | imagined_reward 0.07856 | imagined_survival 1 | actor_grad_norm 0.3299 | critic_loss 3.876e-05 | archive 9245 | hit_rate 0.00/0.00/0.00 | fast_yaw 7.32e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.333
+it 4250/12000 | 11.7 min | env_steps 17.4M | wm_loss 0.4973 | imagined_return 7.888 | imagined_reward 0.07851 | imagined_survival 1 | actor_grad_norm 0.4246 | critic_loss 4.963e-05 | archive 9393 | hit_rate 0.00/0.00/0.00 | fast_yaw 2.44e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 4300/12000 | 11.8 min | env_steps 17.7M | wm_loss 0.5348 | imagined_return 7.888 | imagined_reward 0.07843 | imagined_survival 0.9999 | actor_grad_norm 0.3302 | critic_loss 7.376e-05 | archive 9573 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 4350/12000 | 12.0 min | env_steps 17.9M | wm_loss 0.4554 | imagined_return 7.877 | imagined_reward 0.07839 | imagined_survival 0.9999 | actor_grad_norm 0.5083 | critic_loss 0.0002199 | archive 9757 | hit_rate 0.00/0.00/0.00 | fast_yaw 9.77e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 4400/12000 | 12.1 min | env_steps 18.1M | wm_loss 0.4574 | imagined_return 7.903 | imagined_reward 0.07859 | imagined_survival 1 | actor_grad_norm 0.3827 | critic_loss 5.425e-05 | archive 9894 | hit_rate 0.00/0.00/0.00 | fast_yaw 4.88e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.136
+it 4450/12000 | 12.2 min | env_steps 18.3M | wm_loss 0.451 | imagined_return 7.89 | imagined_reward 0.07857 | imagined_survival 0.9999 | actor_grad_norm 0.4086 | critic_loss 5.654e-05 | archive 9904 | hit_rate 0.00/0.00/0.00 | fast_yaw 3.42e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0769
+it 4500/12000 | 12.4 min | env_steps 18.5M | wm_loss 0.4523 | imagined_return 7.887 | imagined_reward 0.07845 | imagined_survival 1 | actor_grad_norm 0.5042 | critic_loss 0.0001531 | archive 9907 | hit_rate 0.00/0.00/0.00 | fast_yaw 2.44e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_4500.pt
+it 4550/12000 | 12.5 min | env_steps 18.7M | wm_loss 0.4237 | imagined_return 7.903 | imagined_reward 0.07858 | imagined_survival 0.9999 | actor_grad_norm 0.3169 | critic_loss 5.647e-05 | archive 9915 | hit_rate 0.00/0.00/0.00 | fast_yaw 3.91e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0588
+it 4600/12000 | 12.6 min | env_steps 18.9M | wm_loss 0.4512 | imagined_return 7.895 | imagined_reward 0.07857 | imagined_survival 0.9999 | actor_grad_norm 0.3606 | critic_loss 4.994e-05 | archive 9931 | hit_rate 0.00/0.00/0.00 | fast_yaw 4.88e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.125
+it 4650/12000 | 12.8 min | env_steps 19.1M | wm_loss 0.4048 | imagined_return 7.904 | imagined_reward 0.07866 | imagined_survival 1 | actor_grad_norm 0.3872 | critic_loss 4.407e-05 | archive 9938 | hit_rate 0.00/0.00/0.00 | fast_yaw 1.46e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 4700/12000 | 12.9 min | env_steps 19.3M | wm_loss 0.4517 | imagined_return 7.895 | imagined_reward 0.07863 | imagined_survival 0.9999 | actor_grad_norm 0.3258 | critic_loss 4.535e-05 | archive 9950 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 4750/12000 | 13.0 min | env_steps 19.5M | wm_loss 0.4121 | imagined_return 7.9 | imagined_reward 0.0786 | imagined_survival 1 | actor_grad_norm 0.366 | critic_loss 4.094e-05 | archive 9954 | hit_rate 0.00/0.00/0.00 | fast_yaw 4.88e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 4800/12000 | 13.2 min | env_steps 19.7M | wm_loss 0.4688 | imagined_return 7.892 | imagined_reward 0.07862 | imagined_survival 1 | actor_grad_norm 0.3775 | critic_loss 2.68e-05 | archive 9959 | hit_rate 0.00/0.00/0.00 | fast_yaw 1.46e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0667
+it 4850/12000 | 13.3 min | env_steps 19.9M | wm_loss 0.4564 | imagined_return 7.9 | imagined_reward 0.07858 | imagined_survival 1 | actor_grad_norm 0.5612 | critic_loss 2.636e-05 | archive 9964 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 4900/12000 | 13.4 min | env_steps 20.1M | wm_loss 0.4074 | imagined_return 7.889 | imagined_reward 0.0787 | imagined_survival 1 | actor_grad_norm 0.3477 | critic_loss 9.571e-05 | archive 9973 | hit_rate 0.00/0.00/0.00 | fast_yaw 3.91e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.375
+it 4950/12000 | 13.6 min | env_steps 20.3M | wm_loss 0.3917 | imagined_return 7.896 | imagined_reward 0.07862 | imagined_survival 1 | actor_grad_norm 0.4909 | critic_loss 3.965e-05 | archive 9980 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 5000/12000 | 13.7 min | env_steps 20.5M | wm_loss 0.4364 | imagined_return 7.915 | imagined_reward 0.07865 | imagined_survival 1 | actor_grad_norm 0.3101 | critic_loss 4.913e-05 | archive 10003 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_5000.pt
+it 5050/12000 | 13.8 min | env_steps 20.7M | wm_loss 0.4263 | imagined_return 7.897 | imagined_reward 0.07863 | imagined_survival 1 | actor_grad_norm 0.2816 | critic_loss 2.904e-05 | archive 10146 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 5100/12000 | 14.0 min | env_steps 20.9M | wm_loss 0.4188 | imagined_return 7.902 | imagined_reward 0.07861 | imagined_survival 1 | actor_grad_norm 0.3923 | critic_loss 2.362e-05 | archive 10284 | hit_rate 0.00/0.00/0.00 | fast_yaw 1.95e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 5150/12000 | 14.1 min | env_steps 21.1M | wm_loss 0.4283 | imagined_return 7.9 | imagined_reward 0.07867 | imagined_survival 1 | actor_grad_norm 0.3372 | critic_loss 6.353e-05 | archive 10419 | hit_rate 0.00/0.00/0.00 | fast_yaw 4.88e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.6
+it 5200/12000 | 14.2 min | env_steps 21.3M | wm_loss 0.4239 | imagined_return 7.898 | imagined_reward 0.07855 | imagined_survival 0.9997 | actor_grad_norm 0.351 | critic_loss 0.0001085 | archive 10568 | hit_rate 0.00/0.00/0.00 | fast_yaw 9.77e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 5250/12000 | 14.4 min | env_steps 21.5M | wm_loss 0.4203 | imagined_return 7.901 | imagined_reward 0.07867 | imagined_survival 1 | actor_grad_norm 0.3221 | critic_loss 2.485e-05 | archive 10727 | hit_rate 0.00/0.00/0.00 | fast_yaw 1.95e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 5300/12000 | 14.5 min | env_steps 21.7M | wm_loss 0.4085 | imagined_return 7.897 | imagined_reward 0.07866 | imagined_survival 1 | actor_grad_norm 0.2614 | critic_loss 2.978e-05 | archive 10863 | hit_rate 0.00/0.00/0.00 | fast_yaw 1.95e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 5350/12000 | 14.6 min | env_steps 22.0M | wm_loss 0.4226 | imagined_return 7.902 | imagined_reward 0.07862 | imagined_survival 1 | actor_grad_norm 0.3966 | critic_loss 4.867e-05 | archive 11016 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0833
+it 5400/12000 | 14.8 min | env_steps 22.2M | wm_loss 0.399 | imagined_return 7.905 | imagined_reward 0.07877 | imagined_survival 1 | actor_grad_norm 0.1935 | critic_loss 2.203e-05 | archive 11139 | hit_rate 0.00/0.00/0.00 | fast_yaw 1.46e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.087
+it 5450/12000 | 14.9 min | env_steps 22.4M | wm_loss 0.3814 | imagined_return 7.899 | imagined_reward 0.07878 | imagined_survival 1 | actor_grad_norm 0.2745 | critic_loss 3.324e-05 | archive 11146 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 5500/12000 | 15.0 min | env_steps 22.6M | wm_loss 0.3932 | imagined_return 7.902 | imagined_reward 0.07871 | imagined_survival 1 | actor_grad_norm 0.2621 | critic_loss 4.581e-05 | archive 11154 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_5500.pt
+it 5550/12000 | 15.2 min | env_steps 22.8M | wm_loss 0.4071 | imagined_return 7.898 | imagined_reward 0.07867 | imagined_survival 0.9999 | actor_grad_norm 0.3503 | critic_loss 0.0001751 | archive 11165 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0556
+it 5600/12000 | 15.3 min | env_steps 23.0M | wm_loss 0.3834 | imagined_return 7.9 | imagined_reward 0.07871 | imagined_survival 1 | actor_grad_norm 0.2834 | critic_loss 5.035e-05 | archive 11179 | hit_rate 0.00/0.00/0.00 | fast_yaw 9.77e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.111
+it 5650/12000 | 15.4 min | env_steps 23.2M | wm_loss 0.3836 | imagined_return 7.9 | imagined_reward 0.07875 | imagined_survival 0.9999 | actor_grad_norm 0.3005 | critic_loss 4.632e-05 | archive 11191 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 5700/12000 | 15.6 min | env_steps 23.4M | wm_loss 0.3915 | imagined_return 7.909 | imagined_reward 0.07876 | imagined_survival 1 | actor_grad_norm 0.3954 | critic_loss 2.922e-05 | archive 11206 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 5750/12000 | 15.7 min | env_steps 23.6M | wm_loss 0.375 | imagined_return 7.912 | imagined_reward 0.07884 | imagined_survival 1 | actor_grad_norm 0.2112 | critic_loss 2.908e-05 | archive 11208 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 5800/12000 | 15.8 min | env_steps 23.8M | wm_loss 0.369 | imagined_return 7.911 | imagined_reward 0.07876 | imagined_survival 1 | actor_grad_norm 0.3464 | critic_loss 3.528e-05 | archive 11215 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 5850/12000 | 16.0 min | env_steps 24.0M | wm_loss 0.412 | imagined_return 7.905 | imagined_reward 0.07873 | imagined_survival 1 | actor_grad_norm 0.306 | critic_loss 2.576e-05 | archive 11222 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 5900/12000 | 16.1 min | env_steps 24.2M | wm_loss 0.3788 | imagined_return 7.905 | imagined_reward 0.07878 | imagined_survival 1 | actor_grad_norm 0.3815 | critic_loss 1.696e-05 | archive 11230 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 5950/12000 | 16.2 min | env_steps 24.4M | wm_loss 0.3945 | imagined_return 7.907 | imagined_reward 0.07879 | imagined_survival 1 | actor_grad_norm 0.2526 | critic_loss 3.229e-05 | archive 11235 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 6000/12000 | 16.3 min | env_steps 24.6M | wm_loss 0.3591 | imagined_return 7.904 | imagined_reward 0.0787 | imagined_survival 1 | actor_grad_norm 0.3467 | critic_loss 2.654e-05 | archive 11248 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_6000.pt
+it 6050/12000 | 16.5 min | env_steps 24.8M | wm_loss 0.3807 | imagined_return 7.911 | imagined_reward 0.07879 | imagined_survival 1 | actor_grad_norm 0.2527 | critic_loss 1.572e-05 | archive 11384 | hit_rate 0.00/0.00/0.00 | fast_yaw 4.88e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 6100/12000 | 16.6 min | env_steps 25.0M | wm_loss 0.3834 | imagined_return 7.907 | imagined_reward 0.07875 | imagined_survival 1 | actor_grad_norm 0.3077 | critic_loss 3.04e-05 | archive 11534 | hit_rate 0.00/0.00/0.00 | fast_yaw 2.93e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 6150/12000 | 16.7 min | env_steps 25.2M | wm_loss 0.3822 | imagined_return 7.901 | imagined_reward 0.07878 | imagined_survival 1 | actor_grad_norm 0.2993 | critic_loss 5.143e-05 | archive 11685 | hit_rate 0.00/0.00/0.00 | fast_yaw 4.88e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 6200/12000 | 16.9 min | env_steps 25.4M | wm_loss 0.3801 | imagined_return 7.908 | imagined_reward 0.07869 | imagined_survival 1 | actor_grad_norm 0.4859 | critic_loss 8.719e-05 | archive 11819 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 6250/12000 | 17.0 min | env_steps 25.6M | wm_loss 0.4304 | imagined_return 7.918 | imagined_reward 0.07881 | imagined_survival 1 | actor_grad_norm 0.2612 | critic_loss 0.0002583 | archive 11968 | hit_rate 0.00/0.00/0.00 | fast_yaw 9.77e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0333
+it 6300/12000 | 17.1 min | env_steps 25.8M | wm_loss 0.3954 | imagined_return 7.912 | imagined_reward 0.07868 | imagined_survival 1 | actor_grad_norm 0.3461 | critic_loss 2.781e-05 | archive 12109 | hit_rate 0.00/0.00/0.00 | fast_yaw 3.42e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 6350/12000 | 17.3 min | env_steps 26.1M | wm_loss 0.4045 | imagined_return 7.905 | imagined_reward 0.07873 | imagined_survival 1 | actor_grad_norm 0.4143 | critic_loss 2.122e-05 | archive 12259 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 6400/12000 | 17.4 min | env_steps 26.3M | wm_loss 0.3666 | imagined_return 7.9 | imagined_reward 0.07882 | imagined_survival 1 | actor_grad_norm 0.2906 | critic_loss 2.626e-05 | archive 12370 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 6450/12000 | 17.5 min | env_steps 26.5M | wm_loss 0.3892 | imagined_return 7.914 | imagined_reward 0.0789 | imagined_survival 0.9999 | actor_grad_norm 0.2725 | critic_loss 0.0001247 | archive 12378 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 6500/12000 | 17.7 min | env_steps 26.7M | wm_loss 0.3786 | imagined_return 7.911 | imagined_reward 0.07879 | imagined_survival 1 | actor_grad_norm 0.383 | critic_loss 2.636e-05 | archive 12383 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_6500.pt
+it 6550/12000 | 17.8 min | env_steps 26.9M | wm_loss 0.3655 | imagined_return 7.914 | imagined_reward 0.07884 | imagined_survival 1 | actor_grad_norm 0.2549 | critic_loss 9.607e-05 | archive 12391 | hit_rate 0.00/0.00/0.00 | fast_yaw 9.77e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 6600/12000 | 17.9 min | env_steps 27.1M | wm_loss 0.4026 | imagined_return 7.914 | imagined_reward 0.07885 | imagined_survival 1 | actor_grad_norm 0.2021 | critic_loss 2.085e-05 | archive 12398 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 6650/12000 | 18.1 min | env_steps 27.3M | wm_loss 0.3503 | imagined_return 7.915 | imagined_reward 0.07892 | imagined_survival 0.9999 | actor_grad_norm 0.1563 | critic_loss 2.157e-05 | archive 12409 | hit_rate 0.00/0.00/0.00 | fast_yaw 4.88e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 6700/12000 | 18.2 min | env_steps 27.5M | wm_loss 0.3887 | imagined_return 7.916 | imagined_reward 0.07892 | imagined_survival 1 | actor_grad_norm 0.2844 | critic_loss 2.661e-05 | archive 12414 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.5
+it 6750/12000 | 18.3 min | env_steps 27.7M | wm_loss 0.3789 | imagined_return 7.908 | imagined_reward 0.07883 | imagined_survival 1 | actor_grad_norm 0.3636 | critic_loss 1.645e-05 | archive 12415 | hit_rate 0.00/0.00/0.00 | fast_yaw 9.77e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.167
+it 6800/12000 | 18.5 min | env_steps 27.9M | wm_loss 0.3599 | imagined_return 7.907 | imagined_reward 0.07875 | imagined_survival 0.9997 | actor_grad_norm 0.2498 | critic_loss 0.0002328 | archive 12418 | hit_rate 0.00/0.00/0.00 | fast_yaw 9.77e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 6850/12000 | 18.6 min | env_steps 28.1M | wm_loss 0.3605 | imagined_return 7.907 | imagined_reward 0.07883 | imagined_survival 1 | actor_grad_norm 0.2849 | critic_loss 2.796e-05 | archive 12424 | hit_rate 0.00/0.00/0.00 | fast_yaw 9.77e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0476
+it 6900/12000 | 18.7 min | env_steps 28.3M | wm_loss 0.381 | imagined_return 7.905 | imagined_reward 0.07887 | imagined_survival 0.9999 | actor_grad_norm 0.2516 | critic_loss 3.583e-05 | archive 12425 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 6950/12000 | 18.9 min | env_steps 28.5M | wm_loss 0.3747 | imagined_return 7.913 | imagined_reward 0.07888 | imagined_survival 1 | actor_grad_norm 0.2684 | critic_loss 4.989e-05 | archive 12433 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 7000/12000 | 19.0 min | env_steps 28.7M | wm_loss 0.4035 | imagined_return 7.905 | imagined_reward 0.07873 | imagined_survival 0.9999 | actor_grad_norm 0.2575 | critic_loss 2.742e-05 | archive 12446 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_7000.pt
+it 7050/12000 | 19.1 min | env_steps 28.9M | wm_loss 0.3743 | imagined_return 7.919 | imagined_reward 0.07881 | imagined_survival 1 | actor_grad_norm 0.2787 | critic_loss 2.728e-05 | archive 12593 | hit_rate 0.00/0.00/0.00 | fast_yaw 3.91e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 7100/12000 | 19.3 min | env_steps 29.1M | wm_loss 0.3744 | imagined_return 7.912 | imagined_reward 0.07884 | imagined_survival 1 | actor_grad_norm 0.3244 | critic_loss 1.746e-05 | archive 12732 | hit_rate 0.00/0.00/0.00 | fast_yaw 9.77e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 7150/12000 | 19.4 min | env_steps 29.3M | wm_loss 0.3536 | imagined_return 7.913 | imagined_reward 0.07885 | imagined_survival 0.9998 | actor_grad_norm 0.301 | critic_loss 8.941e-05 | archive 12873 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 7200/12000 | 19.5 min | env_steps 29.5M | wm_loss 0.3822 | imagined_return 7.912 | imagined_reward 0.07881 | imagined_survival 1 | actor_grad_norm 0.4229 | critic_loss 2.297e-05 | archive 13006 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 7250/12000 | 19.7 min | env_steps 29.7M | wm_loss 0.3486 | imagined_return 7.918 | imagined_reward 0.07887 | imagined_survival 1 | actor_grad_norm 0.269 | critic_loss 2.735e-05 | archive 13150 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 7300/12000 | 19.8 min | env_steps 29.9M | wm_loss 0.3642 | imagined_return 7.911 | imagined_reward 0.07882 | imagined_survival 1 | actor_grad_norm 0.2987 | critic_loss 1.786e-05 | archive 13292 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0417
+it 7350/12000 | 19.9 min | env_steps 30.1M | wm_loss 0.3433 | imagined_return 7.918 | imagined_reward 0.07888 | imagined_survival 1 | actor_grad_norm 0.2512 | critic_loss 2.221e-05 | archive 13402 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 7400/12000 | 20.1 min | env_steps 30.4M | wm_loss 0.3521 | imagined_return 7.919 | imagined_reward 0.07893 | imagined_survival 0.9999 | actor_grad_norm 0.2464 | critic_loss 2.744e-05 | archive 13497 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0435
+it 7450/12000 | 20.2 min | env_steps 30.6M | wm_loss 0.3458 | imagined_return 7.915 | imagined_reward 0.07889 | imagined_survival 0.9999 | actor_grad_norm 0.3352 | critic_loss 9.045e-05 | archive 13502 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0714
+it 7500/12000 | 20.3 min | env_steps 30.8M | wm_loss 0.354 | imagined_return 7.917 | imagined_reward 0.07898 | imagined_survival 1 | actor_grad_norm 0.2754 | critic_loss 1.439e-05 | archive 13507 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_7500.pt
+it 7550/12000 | 20.5 min | env_steps 31.0M | wm_loss 0.3389 | imagined_return 7.912 | imagined_reward 0.07884 | imagined_survival 1 | actor_grad_norm 0.386 | critic_loss 2.489e-05 | archive 13511 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 7600/12000 | 20.6 min | env_steps 31.2M | wm_loss 0.3298 | imagined_return 7.917 | imagined_reward 0.0789 | imagined_survival 0.9999 | actor_grad_norm 0.2337 | critic_loss 4.484e-05 | archive 13519 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 7650/12000 | 20.7 min | env_steps 31.4M | wm_loss 0.3794 | imagined_return 7.917 | imagined_reward 0.07893 | imagined_survival 1 | actor_grad_norm 0.2054 | critic_loss 1.769e-05 | archive 13525 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 7700/12000 | 20.8 min | env_steps 31.6M | wm_loss 0.3424 | imagined_return 7.919 | imagined_reward 0.07896 | imagined_survival 1 | actor_grad_norm 0.3164 | critic_loss 2.456e-05 | archive 13534 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 7750/12000 | 21.0 min | env_steps 31.8M | wm_loss 0.3584 | imagined_return 7.915 | imagined_reward 0.07893 | imagined_survival 1 | actor_grad_norm 0.3071 | critic_loss 2.318e-05 | archive 13538 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 7800/12000 | 21.1 min | env_steps 32.0M | wm_loss 0.3411 | imagined_return 7.916 | imagined_reward 0.07892 | imagined_survival 1 | actor_grad_norm 0.2246 | critic_loss 1.563e-05 | archive 13540 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 7850/12000 | 21.2 min | env_steps 32.2M | wm_loss 0.3373 | imagined_return 7.915 | imagined_reward 0.07889 | imagined_survival 1 | actor_grad_norm 0.26 | critic_loss 5.548e-05 | archive 13545 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 7900/12000 | 21.4 min | env_steps 32.4M | wm_loss 0.3326 | imagined_return 7.92 | imagined_reward 0.07894 | imagined_survival 1 | actor_grad_norm 0.2783 | critic_loss 1.358e-05 | archive 13548 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 7950/12000 | 21.5 min | env_steps 32.6M | wm_loss 0.3271 | imagined_return 7.917 | imagined_reward 0.07896 | imagined_survival 1 | actor_grad_norm 0.2438 | critic_loss 1.148e-05 | archive 13555 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 8000/12000 | 21.6 min | env_steps 32.8M | wm_loss 0.3295 | imagined_return 7.916 | imagined_reward 0.07882 | imagined_survival 1 | actor_grad_norm 0.4476 | critic_loss 5.954e-05 | archive 13563 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_8000.pt
+it 8050/12000 | 21.8 min | env_steps 33.0M | wm_loss 0.3429 | imagined_return 7.915 | imagined_reward 0.07891 | imagined_survival 1 | actor_grad_norm 0.2681 | critic_loss 1.661e-05 | archive 13686 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0909
+it 8100/12000 | 21.9 min | env_steps 33.2M | wm_loss 0.34 | imagined_return 7.916 | imagined_reward 0.07892 | imagined_survival 1 | actor_grad_norm 0.2694 | critic_loss 1.203e-05 | archive 13817 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 8150/12000 | 22.0 min | env_steps 33.4M | wm_loss 0.3364 | imagined_return 7.922 | imagined_reward 0.07894 | imagined_survival 1 | actor_grad_norm 0.2707 | critic_loss 2.253e-05 | archive 13966 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 8200/12000 | 22.2 min | env_steps 33.6M | wm_loss 0.3594 | imagined_return 7.92 | imagined_reward 0.07896 | imagined_survival 1 | actor_grad_norm 0.2793 | critic_loss 2.65e-05 | archive 14076 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 8250/12000 | 22.3 min | env_steps 33.8M | wm_loss 0.3257 | imagined_return 7.912 | imagined_reward 0.07891 | imagined_survival 1 | actor_grad_norm 0.3208 | critic_loss 1.859e-05 | archive 14194 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 8300/12000 | 22.4 min | env_steps 34.0M | wm_loss 0.3594 | imagined_return 7.917 | imagined_reward 0.07888 | imagined_survival 0.9999 | actor_grad_norm 0.3003 | critic_loss 5.931e-05 | archive 14334 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 8350/12000 | 22.6 min | env_steps 34.2M | wm_loss 0.342 | imagined_return 7.919 | imagined_reward 0.07892 | imagined_survival 1 | actor_grad_norm 0.2645 | critic_loss 2.663e-05 | archive 14451 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 8400/12000 | 22.7 min | env_steps 34.4M | wm_loss 0.3493 | imagined_return 7.92 | imagined_reward 0.07894 | imagined_survival 1 | actor_grad_norm 0.2834 | critic_loss 1.79e-05 | archive 14551 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 8450/12000 | 22.8 min | env_steps 34.7M | wm_loss 0.3343 | imagined_return 7.92 | imagined_reward 0.07898 | imagined_survival 1 | actor_grad_norm 0.3328 | critic_loss 1.762e-05 | archive 14556 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 8500/12000 | 23.0 min | env_steps 34.9M | wm_loss 0.3252 | imagined_return 7.924 | imagined_reward 0.07895 | imagined_survival 1 | actor_grad_norm 0.2481 | critic_loss 1.433e-05 | archive 14563 | hit_rate 0.00/0.00/0.00 | fast_yaw 4.88e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_8500.pt
+it 8550/12000 | 23.1 min | env_steps 35.1M | wm_loss 0.3652 | imagined_return 7.917 | imagined_reward 0.07891 | imagined_survival 1 | actor_grad_norm 0.2439 | critic_loss 1.244e-05 | archive 14570 | hit_rate 0.00/0.00/0.00 | fast_yaw 3.42e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 8600/12000 | 23.2 min | env_steps 35.3M | wm_loss 0.3284 | imagined_return 7.925 | imagined_reward 0.07892 | imagined_survival 1 | actor_grad_norm 0.2964 | critic_loss 1.498e-05 | archive 14577 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 8650/12000 | 23.4 min | env_steps 35.5M | wm_loss 0.3331 | imagined_return 7.925 | imagined_reward 0.07899 | imagined_survival 1 | actor_grad_norm 0.1921 | critic_loss 1.196e-05 | archive 14585 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 8700/12000 | 23.5 min | env_steps 35.7M | wm_loss 0.3208 | imagined_return 7.917 | imagined_reward 0.07898 | imagined_survival 0.9999 | actor_grad_norm 0.2461 | critic_loss 0.0001735 | archive 14591 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 8750/12000 | 23.6 min | env_steps 35.9M | wm_loss 0.3328 | imagined_return 7.92 | imagined_reward 0.07896 | imagined_survival 1 | actor_grad_norm 0.365 | critic_loss 1.272e-05 | archive 14594 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 8800/12000 | 23.8 min | env_steps 36.1M | wm_loss 0.3386 | imagined_return 7.919 | imagined_reward 0.07895 | imagined_survival 1 | actor_grad_norm 0.4078 | critic_loss 1.017e-05 | archive 14599 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.0667
+it 8850/12000 | 23.9 min | env_steps 36.3M | wm_loss 0.3256 | imagined_return 7.917 | imagined_reward 0.07897 | imagined_survival 0.9999 | actor_grad_norm 0.2472 | critic_loss 6.329e-05 | archive 14601 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 8900/12000 | 24.0 min | env_steps 36.5M | wm_loss 0.3457 | imagined_return 7.921 | imagined_reward 0.079 | imagined_survival 1 | actor_grad_norm 0.2023 | critic_loss 1.019e-05 | archive 14605 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 8950/12000 | 24.2 min | env_steps 36.7M | wm_loss 0.3438 | imagined_return 7.924 | imagined_reward 0.079 | imagined_survival 1 | actor_grad_norm 0.3244 | critic_loss 3.88e-05 | archive 14608 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9000/12000 | 24.3 min | env_steps 36.9M | wm_loss 0.3657 | imagined_return 7.92 | imagined_reward 0.07893 | imagined_survival 1 | actor_grad_norm 0.2477 | critic_loss 1.752e-05 | archive 14634 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_9000.pt
+it 9050/12000 | 24.4 min | env_steps 37.1M | wm_loss 0.3341 | imagined_return 7.922 | imagined_reward 0.07892 | imagined_survival 1 | actor_grad_norm 0.2618 | critic_loss 1.583e-05 | archive 14750 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9100/12000 | 24.6 min | env_steps 37.3M | wm_loss 0.3366 | imagined_return 7.925 | imagined_reward 0.07897 | imagined_survival 1 | actor_grad_norm 0.2282 | critic_loss 1.14e-05 | archive 14860 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9150/12000 | 24.7 min | env_steps 37.5M | wm_loss 0.3276 | imagined_return 7.924 | imagined_reward 0.07897 | imagined_survival 1 | actor_grad_norm 0.2136 | critic_loss 1.231e-05 | archive 14988 | hit_rate 0.00/0.00/0.00 | fast_yaw 1.95e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9200/12000 | 24.8 min | env_steps 37.7M | wm_loss 0.3366 | imagined_return 7.922 | imagined_reward 0.07897 | imagined_survival 1 | actor_grad_norm 0.2766 | critic_loss 1.311e-05 | archive 15107 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9250/12000 | 25.0 min | env_steps 37.9M | wm_loss 0.4 | imagined_return 7.922 | imagined_reward 0.079 | imagined_survival 1 | actor_grad_norm 0.2188 | critic_loss 1.723e-05 | archive 15202 | hit_rate 0.00/0.00/0.00 | fast_yaw 1.95e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9300/12000 | 25.1 min | env_steps 38.1M | wm_loss 0.3443 | imagined_return 7.919 | imagined_reward 0.07892 | imagined_survival 1 | actor_grad_norm 0.2793 | critic_loss 1.519e-05 | archive 15315 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9350/12000 | 25.2 min | env_steps 38.3M | wm_loss 0.3511 | imagined_return 7.924 | imagined_reward 0.07894 | imagined_survival 1 | actor_grad_norm 0.3136 | critic_loss 1.364e-05 | archive 15419 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9400/12000 | 25.4 min | env_steps 38.5M | wm_loss 0.3391 | imagined_return 7.923 | imagined_reward 0.07899 | imagined_survival 1 | actor_grad_norm 0.3272 | critic_loss 1.588e-05 | archive 15517 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9450/12000 | 25.5 min | env_steps 38.7M | wm_loss 0.3407 | imagined_return 7.926 | imagined_reward 0.07899 | imagined_survival 1 | actor_grad_norm 0.2373 | critic_loss 1.24e-05 | archive 15523 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9500/12000 | 25.7 min | env_steps 39.0M | wm_loss 0.354 | imagined_return 7.92 | imagined_reward 0.079 | imagined_survival 1 | actor_grad_norm 0.2263 | critic_loss 1.588e-05 | archive 15529 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_9500.pt
+it 9550/12000 | 25.8 min | env_steps 39.2M | wm_loss 0.3603 | imagined_return 7.924 | imagined_reward 0.07901 | imagined_survival 1 | actor_grad_norm 0.2131 | critic_loss 1.691e-05 | archive 15536 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9600/12000 | 25.9 min | env_steps 39.4M | wm_loss 0.3385 | imagined_return 7.922 | imagined_reward 0.07892 | imagined_survival 1 | actor_grad_norm 0.3492 | critic_loss 1.573e-05 | archive 15547 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9650/12000 | 26.1 min | env_steps 39.6M | wm_loss 0.3384 | imagined_return 7.927 | imagined_reward 0.07902 | imagined_survival 1 | actor_grad_norm 0.2735 | critic_loss 9.97e-06 | archive 15554 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9700/12000 | 26.2 min | env_steps 39.8M | wm_loss 0.3258 | imagined_return 7.923 | imagined_reward 0.07902 | imagined_survival 1 | actor_grad_norm 0.313 | critic_loss 1.745e-05 | archive 15557 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9750/12000 | 26.3 min | env_steps 40.0M | wm_loss 0.3115 | imagined_return 7.927 | imagined_reward 0.07904 | imagined_survival 1 | actor_grad_norm 0.2315 | critic_loss 8.427e-06 | archive 15561 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9800/12000 | 26.5 min | env_steps 40.2M | wm_loss 0.3397 | imagined_return 7.921 | imagined_reward 0.07892 | imagined_survival 1 | actor_grad_norm 0.3212 | critic_loss 1.774e-05 | archive 15563 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9850/12000 | 26.6 min | env_steps 40.4M | wm_loss 0.317 | imagined_return 7.924 | imagined_reward 0.07895 | imagined_survival 1 | actor_grad_norm 0.2616 | critic_loss 2.053e-05 | archive 15570 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9900/12000 | 26.7 min | env_steps 40.6M | wm_loss 0.3289 | imagined_return 7.924 | imagined_reward 0.07903 | imagined_survival 1 | actor_grad_norm 0.2547 | critic_loss 1.507e-05 | archive 15576 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 9950/12000 | 26.9 min | env_steps 40.8M | wm_loss 0.3415 | imagined_return 7.927 | imagined_reward 0.07905 | imagined_survival 1 | actor_grad_norm 0.201 | critic_loss 9.472e-06 | archive 15580 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10000/12000 | 27.0 min | env_steps 41.0M | wm_loss 0.3222 | imagined_return 7.926 | imagined_reward 0.07901 | imagined_survival 1 | actor_grad_norm 0.1707 | critic_loss 1.19e-05 | archive 15592 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_10000.pt
+it 10050/12000 | 27.1 min | env_steps 41.2M | wm_loss 0.3438 | imagined_return 7.929 | imagined_reward 0.07902 | imagined_survival 1 | actor_grad_norm 0.2185 | critic_loss 9.682e-06 | archive 15682 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10100/12000 | 27.2 min | env_steps 41.4M | wm_loss 0.3219 | imagined_return 7.928 | imagined_reward 0.07902 | imagined_survival 1 | actor_grad_norm 0.2081 | critic_loss 1.229e-05 | archive 15779 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10150/12000 | 27.4 min | env_steps 41.6M | wm_loss 0.3175 | imagined_return 7.927 | imagined_reward 0.07901 | imagined_survival 1 | actor_grad_norm 0.3659 | critic_loss 1.102e-05 | archive 15890 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.167
+it 10200/12000 | 27.5 min | env_steps 41.8M | wm_loss 0.3221 | imagined_return 7.93 | imagined_reward 0.07905 | imagined_survival 1 | actor_grad_norm 0.2102 | critic_loss 2.928e-05 | archive 16010 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10250/12000 | 27.6 min | env_steps 42.0M | wm_loss 0.3227 | imagined_return 7.924 | imagined_reward 0.07898 | imagined_survival 1 | actor_grad_norm 0.3655 | critic_loss 1.206e-05 | archive 16113 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10300/12000 | 27.8 min | env_steps 42.2M | wm_loss 0.3026 | imagined_return 7.925 | imagined_reward 0.07896 | imagined_survival 1 | actor_grad_norm 0.1958 | critic_loss 3.833e-05 | archive 16233 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10350/12000 | 27.9 min | env_steps 42.4M | wm_loss 0.3172 | imagined_return 7.93 | imagined_reward 0.07903 | imagined_survival 1 | actor_grad_norm 0.324 | critic_loss 1.274e-05 | archive 16339 | hit_rate 0.00/0.00/0.00 | fast_yaw 3.42e-05 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10400/12000 | 28.0 min | env_steps 42.6M | wm_loss 0.4416 | imagined_return 7.939 | imagined_reward 0.07908 | imagined_survival 1 | actor_grad_norm 0.2135 | critic_loss 4.699e-05 | archive 16436 | hit_rate 0.00/0.00/0.00 | fast_yaw 9.77e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10450/12000 | 28.2 min | env_steps 42.8M | wm_loss 0.3177 | imagined_return 7.928 | imagined_reward 0.07908 | imagined_survival 1 | actor_grad_norm 0.2431 | critic_loss 9.707e-06 | archive 16440 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10500/12000 | 28.3 min | env_steps 43.0M | wm_loss 0.3408 | imagined_return 7.927 | imagined_reward 0.07901 | imagined_survival 1 | actor_grad_norm 0.3825 | critic_loss 2.988e-05 | archive 16442 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_10500.pt
+it 10550/12000 | 28.5 min | env_steps 43.3M | wm_loss 0.328 | imagined_return 7.927 | imagined_reward 0.07898 | imagined_survival 0.9999 | actor_grad_norm 0.296 | critic_loss 0.000221 | archive 16449 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10600/12000 | 28.6 min | env_steps 43.5M | wm_loss 0.3118 | imagined_return 7.926 | imagined_reward 0.07903 | imagined_survival 1 | actor_grad_norm 0.1695 | critic_loss 1.032e-05 | archive 16455 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10650/12000 | 28.7 min | env_steps 43.7M | wm_loss 0.3348 | imagined_return 7.928 | imagined_reward 0.07905 | imagined_survival 1 | actor_grad_norm 0.2623 | critic_loss 1.063e-05 | archive 16458 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10700/12000 | 28.8 min | env_steps 43.9M | wm_loss 0.3175 | imagined_return 7.929 | imagined_reward 0.07908 | imagined_survival 1 | actor_grad_norm 0.26 | critic_loss 9.462e-06 | archive 16464 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10750/12000 | 29.0 min | env_steps 44.1M | wm_loss 0.3095 | imagined_return 7.929 | imagined_reward 0.07903 | imagined_survival 1 | actor_grad_norm 0.271 | critic_loss 8.701e-06 | archive 16468 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10800/12000 | 29.1 min | env_steps 44.3M | wm_loss 0.3191 | imagined_return 7.926 | imagined_reward 0.07901 | imagined_survival 1 | actor_grad_norm 0.3323 | critic_loss 1.007e-05 | archive 16472 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10850/12000 | 29.2 min | env_steps 44.5M | wm_loss 0.3044 | imagined_return 7.931 | imagined_reward 0.07906 | imagined_survival 1 | actor_grad_norm 0.203 | critic_loss 8.952e-06 | archive 16478 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10900/12000 | 29.4 min | env_steps 44.7M | wm_loss 0.3074 | imagined_return 7.929 | imagined_reward 0.07906 | imagined_survival 1 | actor_grad_norm 0.2551 | critic_loss 1.835e-05 | archive 16481 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 10950/12000 | 29.5 min | env_steps 44.9M | wm_loss 0.3117 | imagined_return 7.932 | imagined_reward 0.07909 | imagined_survival 1 | actor_grad_norm 0.2178 | critic_loss 1.701e-05 | archive 16486 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 11000/12000 | 29.6 min | env_steps 45.1M | wm_loss 0.3121 | imagined_return 7.93 | imagined_reward 0.07904 | imagined_survival 1 | actor_grad_norm 0.1719 | critic_loss 8.762e-06 | archive 16494 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_11000.pt
+it 11050/12000 | 29.8 min | env_steps 45.3M | wm_loss 0.3039 | imagined_return 7.927 | imagined_reward 0.07897 | imagined_survival 1 | actor_grad_norm 0.3796 | critic_loss 1.237e-05 | archive 16593 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 11100/12000 | 29.9 min | env_steps 45.5M | wm_loss 0.3102 | imagined_return 7.928 | imagined_reward 0.079 | imagined_survival 1 | actor_grad_norm 0.3434 | critic_loss 9.241e-06 | archive 16675 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 11150/12000 | 30.0 min | env_steps 45.7M | wm_loss 0.3135 | imagined_return 7.93 | imagined_reward 0.07905 | imagined_survival 1 | actor_grad_norm 0.3134 | critic_loss 8.842e-06 | archive 16777 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 11200/12000 | 30.2 min | env_steps 45.9M | wm_loss 0.3097 | imagined_return 7.934 | imagined_reward 0.07907 | imagined_survival 1 | actor_grad_norm 0.2946 | critic_loss 8.846e-06 | archive 16868 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 11250/12000 | 30.3 min | env_steps 46.1M | wm_loss 0.3197 | imagined_return 7.93 | imagined_reward 0.07906 | imagined_survival 1 | actor_grad_norm 0.2099 | critic_loss 9.653e-06 | archive 16956 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 11300/12000 | 30.4 min | env_steps 46.3M | wm_loss 0.3193 | imagined_return 7.931 | imagined_reward 0.07906 | imagined_survival 1 | actor_grad_norm 0.2599 | critic_loss 7.675e-06 | archive 17060 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 11350/12000 | 30.6 min | env_steps 46.5M | wm_loss 0.3076 | imagined_return 7.929 | imagined_reward 0.07904 | imagined_survival 1 | actor_grad_norm 0.2596 | critic_loss 8.209e-06 | archive 17150 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 11400/12000 | 30.7 min | env_steps 46.7M | wm_loss 0.3608 | imagined_return 7.931 | imagined_reward 0.0791 | imagined_survival 1 | actor_grad_norm 0.3092 | critic_loss 7.668e-06 | archive 17233 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 11450/12000 | 30.8 min | env_steps 46.9M | wm_loss 0.324 | imagined_return 7.929 | imagined_reward 0.07909 | imagined_survival 1 | actor_grad_norm 0.2139 | critic_loss 1.073e-05 | archive 17238 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 11500/12000 | 31.0 min | env_steps 47.1M | wm_loss 0.3198 | imagined_return 7.929 | imagined_reward 0.07908 | imagined_survival 1 | actor_grad_norm 0.2082 | critic_loss 9.786e-06 | archive 17242 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_11500.pt
+it 11550/12000 | 31.1 min | env_steps 47.3M | wm_loss 0.3089 | imagined_return 7.932 | imagined_reward 0.07908 | imagined_survival 1 | actor_grad_norm 0.2556 | critic_loss 1.49e-05 | archive 17249 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 11600/12000 | 31.2 min | env_steps 47.6M | wm_loss 0.3173 | imagined_return 7.931 | imagined_reward 0.07905 | imagined_survival 1 | actor_grad_norm 0.3079 | critic_loss 9.517e-06 | archive 17253 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.111
+it 11650/12000 | 31.4 min | env_steps 47.8M | wm_loss 0.308 | imagined_return 7.93 | imagined_reward 0.07905 | imagined_survival 1 | actor_grad_norm 0.213 | critic_loss 1.766e-05 | archive 17256 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 11700/12000 | 31.5 min | env_steps 48.0M | wm_loss 0.3271 | imagined_return 7.931 | imagined_reward 0.07909 | imagined_survival 1 | actor_grad_norm 0.235 | critic_loss 1.496e-05 | archive 17261 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 11750/12000 | 31.6 min | env_steps 48.2M | wm_loss 0.324 | imagined_return 7.932 | imagined_reward 0.07909 | imagined_survival 1 | actor_grad_norm 0.2652 | critic_loss 8.076e-06 | archive 17265 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 11800/12000 | 31.7 min | env_steps 48.4M | wm_loss 0.3125 | imagined_return 7.931 | imagined_reward 0.07902 | imagined_survival 1 | actor_grad_norm 0.2165 | critic_loss 2.346e-05 | archive 17267 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 11850/12000 | 31.9 min | env_steps 48.6M | wm_loss 0.3163 | imagined_return 7.931 | imagined_reward 0.07907 | imagined_survival 1 | actor_grad_norm 0.2278 | critic_loss 1.277e-05 | archive 17271 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 11900/12000 | 32.0 min | env_steps 48.8M | wm_loss 0.31 | imagined_return 7.933 | imagined_reward 0.07907 | imagined_survival 1 | actor_grad_norm 0.287 | critic_loss 1.451e-05 | archive 17273 | hit_rate 0.00/0.00/0.00 | fast_yaw 9.77e-06 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.111
+it 11950/12000 | 32.1 min | env_steps 49.0M | wm_loss 0.3157 | imagined_return 7.931 | imagined_reward 0.07904 | imagined_survival 0.9998 | actor_grad_norm 0.2861 | critic_loss 2.574e-05 | archive 17279 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0
+it 12000/12000 | 32.3 min | env_steps 49.2M | wm_loss 0.3098 | imagined_return 7.925 | imagined_reward 0.07909 | imagined_survival 1 | actor_grad_norm 0.1829 | critic_loss 1.128e-05 | archive 17295 | hit_rate 0.00/0.00/0.00 | fast_yaw 0 | tags 0 | hits 0 | dist 0 | obstacle_contact 0 | fell_over 0.125
+saved logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_12000.pt
+VELOCITY_AUDIT {"reward_max_error": 0.0, "padded_channels_zero": true, "policy_has_no_ball_positions": true, "actor_no_height_scan": true, "simulation_reward_parity": true, "training_completed": true, "capability_qualified": false}

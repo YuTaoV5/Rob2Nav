@@ -1,0 +1,130 @@
+{
+  "physical_initial_qpos_qvel_unchanged": true,
+  "same_initial_policy_vs_zero": true,
+  "baseline_peak_ratio": 1.12807592706533,
+  "hold_policy_entry_peak_ratio": 0.30005730142864234,
+  "hold_default_entry_peak_ratio": 0.35622106836278106,
+  "counterfactual_full": {
+    "initialize_hold_targets": true,
+    "seed": 32024,
+    "checkpoint": "logs/supermimic/2026-10-25_22-25-07_velocity_blind_flat_v1/model_12000.pt",
+    "num_envs": 4,
+    "stages": [
+      {
+        "stage": "stand",
+        "command": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rmse_xy": 0.004536990541964769,
+        "rmse_yaw": 0.0012086424976587296
+      },
+      {
+        "stage": "forward",
+        "command": [
+          0.6,
+          0.0,
+          0.0
+        ],
+        "rmse_xy": 0.039370354264974594,
+        "rmse_yaw": 0.06070519983768463
+      },
+      {
+        "stage": "backward",
+        "command": [
+          -0.3,
+          0.0,
+          0.0
+        ],
+        "rmse_xy": 0.023322638124227524,
+        "rmse_yaw": 0.03502367064356804
+      },
+      {
+        "stage": "left",
+        "command": [
+          0.0,
+          0.25,
+          0.0
+        ],
+        "rmse_xy": 0.030007999390363693,
+        "rmse_yaw": 0.04681483656167984
+      },
+      {
+        "stage": "right",
+        "command": [
+          0.0,
+          -0.25,
+          0.0
+        ],
+        "rmse_xy": 0.029976975172758102,
+        "rmse_yaw": 0.07546095550060272
+      },
+      {
+        "stage": "turn_left",
+        "command": [
+          0.0,
+          0.0,
+          0.6
+        ],
+        "rmse_xy": 0.030349209904670715,
+        "rmse_yaw": 0.08677732944488525
+      },
+      {
+        "stage": "turn_right",
+        "command": [
+          0.0,
+          0.0,
+          -0.6
+        ],
+        "rmse_xy": 0.022084752097725868,
+        "rmse_yaw": 0.06266890466213226
+      },
+      {
+        "stage": "stop",
+        "command": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rmse_xy": 0.0034086513333022594,
+        "rmse_yaw": 0.005793173797428608
+      }
+    ],
+    "physics_dt": 0.005,
+    "control_dt": 0.02,
+    "decimation": 4,
+    "physics_sample_count": 16000,
+    "expected_physics_samples": 16000,
+    "joint_velocity_peak_event": {
+      "stage": "backward",
+      "sample": 4012,
+      "time": 20.06,
+      "environment": 3,
+      "joint": "FL_thigh_joint",
+      "velocity": -12.492801666259766,
+      "velocity_limit": 30.100000381469727,
+      "command": [
+        -0.3,
+        0.0,
+        0.0
+      ]
+    },
+    "falls_total": 0,
+    "falls_per_env_minute": 0.0,
+    "max_joint_velocity_ratio": 0.4150432348251343,
+    "max_joint_limit_excess_rad": 0.0,
+    "max_joint_torque_ratio": 0.7330717444419861,
+    "max_target_rate_ratio": 0.5372992157936096,
+    "actor_height_scan": false,
+    "actor_lidar": false,
+    "strict_validation_complete": false,
+    "missing_checks": [
+      "non-foot body contact",
+      "uncut original-speed video review"
+    ],
+    "capability_qualified": false
+  },
+  "capability_qualified": false,
+  "note": "Controller-reset contract correction, not a new trained weight; no qpos/qvel edits or discarded startup samples"
+}

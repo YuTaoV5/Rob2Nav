@@ -1,0 +1,68 @@
+{
+  "phase": "completed_pending_review",
+  "student_training_started": false,
+  "teacher": {
+    "clip": "solo8_crawl_slow",
+    "checkpoint_sha256": "17cf8cba50db6b2a0bac9d0ecb863a32ab5b38b77ff9c4306ece3fe2335cdf87",
+    "role": "external_frozen_teacher",
+    "control_hz": 60,
+    "physics_hz": 240,
+    "PD": [
+      30,
+      1.5
+    ],
+    "configured_latency": 0.02,
+    "executed_latency_control_steps": 1,
+    "native_action_names": [
+      "FR_hip_joint",
+      "FR_thigh_joint",
+      "FR_calf_joint",
+      "FL_hip_joint",
+      "FL_thigh_joint",
+      "FL_calf_joint",
+      "RR_hip_joint",
+      "RR_thigh_joint",
+      "RR_calf_joint",
+      "RL_hip_joint",
+      "RL_thigh_joint",
+      "RL_calf_joint"
+    ],
+    "mjlab_action_names": [
+      "FL_hip_joint",
+      "FL_thigh_joint",
+      "FL_calf_joint",
+      "FR_hip_joint",
+      "FR_thigh_joint",
+      "FR_calf_joint",
+      "RL_hip_joint",
+      "RL_thigh_joint",
+      "RL_calf_joint",
+      "RR_hip_joint",
+      "RR_thigh_joint",
+      "RR_calf_joint"
+    ],
+    "reference_joint_names": [
+      "FL_hip_joint",
+      "FR_hip_joint",
+      "RL_hip_joint",
+      "RR_hip_joint",
+      "FL_thigh_joint",
+      "FR_thigh_joint",
+      "RL_thigh_joint",
+      "RR_thigh_joint",
+      "FL_calf_joint",
+      "FR_calf_joint",
+      "RL_calf_joint",
+      "RR_calf_joint"
+    ],
+    "physical_differences": [
+      "MuJoCo/mjlab Go2 asset and solver instead of Genesis",
+      "Rob2Nav DC motor torque-speed curves retained",
+      "No Genesis domain randomization reproduced in this frozen diagnostic"
+    ],
+    "student_training_started": false
+  },
+  "functional_passed": 4,
+  "report": "reproduction/animal_expression_v1/mujoco_teacher_crawl_v1/report.json",
+  "updated_at": 1793129937.4402416
+}

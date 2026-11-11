@@ -1,0 +1,91 @@
+{
+  "source": "https://github.com/lu-yidan/FR-Net",
+  "checkpoint_sha256": "e19fb55a201b99c104018763d1354bf1a52d6d4e11752a75118f360b71faf505",
+  "model_sha256": "fb81da82a8b5949bc0a45d5bf3a5003507c53d731cd43caf690cf729d05479d3",
+  "joint_order": [
+    "FL_hip_joint",
+    "FL_thigh_joint",
+    "FL_calf_joint",
+    "FR_hip_joint",
+    "FR_thigh_joint",
+    "FR_calf_joint",
+    "RL_hip_joint",
+    "RL_thigh_joint",
+    "RL_calf_joint",
+    "RR_hip_joint",
+    "RR_thigh_joint",
+    "RR_calf_joint"
+  ],
+  "kp": 30,
+  "kd": 0.8,
+  "action_scale": 0.25,
+  "action_clip": 10,
+  "control_dt": 0.02,
+  "physics_dt": 0.005,
+  "scope": "MuJoCo sim-to-sim screening, not native Isaac verification; native fixed PD nominal, no gain randomization",
+  "criterion": "after initial fallen contact, upright height>.24 and 3 foot support, speed<.2 angular<.5 and no nonfoot ground contact continuously2s; full rollout joint/target gates",
+  "trials": [
+    {
+      "seed": 35010,
+      "pose": "back",
+      "recovered": true,
+      "recovery_time_s": 5.2,
+      "max_joint_velocity_ratio": 1.972367807396149,
+      "max_joint_limit_excess_rad": 0.2021665551037657,
+      "max_target_rate_ratio": 2.6993143897063705,
+      "physical_gate_passed": false
+    },
+    {
+      "seed": 35010,
+      "pose": "left",
+      "recovered": true,
+      "recovery_time_s": 3.215,
+      "max_joint_velocity_ratio": 1.8884775309414716,
+      "max_joint_limit_excess_rad": 0.2142233996675149,
+      "max_target_rate_ratio": 2.593138233369182,
+      "physical_gate_passed": false
+    },
+    {
+      "seed": 35010,
+      "pose": "right",
+      "recovered": true,
+      "recovery_time_s": 3.4,
+      "max_joint_velocity_ratio": 2.4424518845703176,
+      "max_joint_limit_excess_rad": 0.21988275395208,
+      "max_target_rate_ratio": 3.038032707077506,
+      "physical_gate_passed": false
+    },
+    {
+      "seed": 35010,
+      "pose": "nose",
+      "recovered": true,
+      "recovery_time_s": 3.575,
+      "max_joint_velocity_ratio": 2.4533045647914897,
+      "max_joint_limit_excess_rad": 0.1634052459835864,
+      "max_target_rate_ratio": 2.916393496233489,
+      "physical_gate_passed": false
+    },
+    {
+      "seed": 35010,
+      "pose": "tail",
+      "recovered": true,
+      "recovery_time_s": 3.37,
+      "max_joint_velocity_ratio": 2.373327025144348,
+      "max_joint_limit_excess_rad": 0.19131849499918818,
+      "max_target_rate_ratio": 3.18812088522082,
+      "physical_gate_passed": false
+    },
+    {
+      "seed": 35010,
+      "pose": "upright",
+      "recovered": true,
+      "recovery_time_s": 2.35,
+      "max_joint_velocity_ratio": 1.5405454737889819,
+      "max_joint_limit_excess_rad": 0.0,
+      "max_target_rate_ratio": 1.9764182991689274,
+      "physical_gate_passed": false
+    }
+  ],
+  "teacher_qualified": false,
+  "capability_qualified": false
+}
