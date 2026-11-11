@@ -1,4 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
+import FormalAs2wTraining from './FormalAs2wTraining';
 import './as2wWorkspace.css';
 
 type Parameter = {id:string; default:number; min:number; max:number};
@@ -9,7 +10,7 @@ type Sample = {step:number; dt:number; total:number; terms:Record<string,{raw:nu
 type Case = {valid:boolean; case_id:string; terrain:string; seed:number; pose:string; success:boolean; stable_s:number; max_upright_cosine?:number; peak_impact_n:number; video:string|null};
 type Comparison = {backend:string; baseline:{cases:Case[]}; candidate:{cases:Case[]}};
 type Status = {state:string; error?:string};
-type Run = {id:string; updates:number; smoke:boolean; status?:Status};
+type Run = {id:string; entrypoint?:string; updates:number; smoke:boolean; status?:Status};
 type Detail = {parameters:Record<string,number>|null; status:Status; latest:Sample|null; samples:Sample[]; comparison:Comparison|null};
 
 async function request<T>(path:string, body?:object):Promise<T> {
@@ -91,7 +92,8 @@ export default function As2wWorkspace() {
   useEffect(()=>{
     let current=true;
     const refresh=()=>request<Run[]>('/runs').then(rows=>{
-      if(current){setRuns(rows);setRun(id=>id||rows[0]?.id||'');}
+      const experiments = rows.filter(row => !row.entrypoint);
+      if(current){setRuns(experiments);setRun(id=>id||experiments[0]?.id||'');}
     }).catch(e=>{if(current)setError(e.message);});
     refresh();
     const timer=setInterval(refresh,5000);
@@ -117,7 +119,7 @@ export default function As2wWorkspace() {
       const payload={parameters:Object.fromEntries(Object.entries(values).map(([key,value])=>[key,Number(value)])),updates,envs};
       if(submit) {
         const result=await request<{id:string}>('/runs',payload);
-        setRuns(await request<Run[]>('/runs'));setRun(result.id);setPlan(undefined);
+        setRuns((await request<Run[]>('/runs')).filter(row => !row.entrypoint));setRun(result.id);setPlan(undefined);
       } else setPlan(await request<Plan>('/preview',payload));
     } catch(e) {setError(e instanceof Error?e.message:String(e));}
     finally {setBusy(false);}
@@ -127,6 +129,7 @@ export default function As2wWorkspace() {
     <header className="page-heading"><div className="eyebrow">AS2-W · ISAAC LAB → MUJOCO</div><h1>AS2-W 奖励实验</h1>
       <p>查看恢复任务的真实奖励函数，预览参数调整，再用同一批场景比较候选策略。</p></header>
     {error&&<p role="alert" className="alert danger">{error}</p>}
+    <FormalAs2wTraining />
     {!config ? <p>正在读取服务器上的奖励模块…</p> : <>
       <section className="card as2w-section"><h2>四轮起身与站稳</h2><p>候选从服务器的 R12 权重开始，用 R13 恢复奖励训练。起身缓冲期内，本页各项贡献均为零。</p>
         <details><summary>展开服务器原始函数 · {config.function}</summary><p>{config.source} · 第 {config.line} 行</p><pre>{config.code}</pre></details>
