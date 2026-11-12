@@ -85,6 +85,16 @@ def validate_as2w(config):
     return config
 
 
+def training_isaac_python(config, default):
+    """Select a configured legacy runtime only for the pinned training recipes."""
+    legacy = os.environ.get("ROB2NAV_LEGACY_ISAAC_PY")
+    if legacy and config.task == "train" and (
+        config.robot_id == "as2w" or config.recipe_id in ("backflip_native_ppo", "frontflip_native_ppo")
+    ):
+        return Path(legacy)
+    return default
+
+
 def as2w_resources(root, mujoco_python=None):
     bundled = root / "skills/as2w/training"
     training = Path(os.environ.get("ROB2NAV_AS2W_TRAINING") or

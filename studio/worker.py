@@ -12,7 +12,7 @@ import zipfile
 from .jobs import Jobs
 from .config import RunConfig,command,simulation_command
 from .catalog import read_json
-from .experiment_workflow import AS2W_RECIPE, prepare_as2w
+from .experiment_workflow import AS2W_RECIPE, prepare_as2w, training_isaac_python
 
 
 def checked_training(folder,expected_iterations=None):
@@ -34,6 +34,7 @@ def checked_training(folder,expected_iterations=None):
 def execute(jobs,job,root,python,mujoco_python=None):
     key=job['id'];folder=jobs.folder(key);folder.mkdir(parents=True,exist_ok=True)
     config=RunConfig.model_validate(job['config']);run=root/'outputs/studio/runs'/key
+    python=training_isaac_python(config,python)
     manual=config.task=='train' and config.recipe_id in ('navigation_ppo','sideflip_native_ppo','upright_walk_ppo','backflip_native_ppo','frontflip_native_ppo')
     config_path=folder/'studio_config.json';config_path.write_text(json.dumps({'recipe_id':config.recipe_id,'recipe_options':config.recipe_options,'seed':config.seed,'iterations':config.iterations,'num_envs':config.num_envs} if manual else config.overrides(),indent=2))
     (folder/'resolved_config.json').write_text(json.dumps(config.model_dump(),indent=2))
