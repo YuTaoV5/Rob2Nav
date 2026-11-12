@@ -21,9 +21,9 @@ def velocity_command(path, now):
     return np.zeros(3)
 
 
-def publish(path, phase, velocity, fault=""):
+def publish(path, phase, velocity, fault="", score=None):
     temp = path.with_suffix(".tmp")
-    temp.write_text(json.dumps(dict(phase=phase, velocity=velocity.tolist(), fault=fault)))
+    temp.write_text(json.dumps(dict(phase=phase, velocity=velocity.tolist(), fault=fault, score=score)))
     temp.replace(path)
 
 
@@ -46,12 +46,14 @@ def main():
             target = velocity_command(args.command, time.monotonic())
             change = np.array([.50, .50, .70]) * dt
             command += np.clip(target - command, -change, change)
-            _, _, _, _, info = env.step(command / scale)
+            _, reward, _, _, info = env.step(command / scale)
+            score = dict(time=float(env.data.time) - env.start_time, step=i + 1,
+                         total=reward, terms=info["reward_terms"])
             if info["fallen"] or info["collision"]:
-                publish(status, "FAULT", np.zeros(3), "仿真检测到倒地或碰撞")
+                publish(status, "FAULT", np.zeros(3), "仿真检测到倒地或碰撞", score)
                 break
             if i % 5 == 0:
-                publish(status, "ACTIVE", command)
+                publish(status, "ACTIVE", command, score=score)
         else:
             publish(status, "COMPLETED", np.zeros(3))
         args.output.mkdir(parents=True, exist_ok=True)

@@ -1,4 +1,5 @@
 import {useEffect,useRef,useState} from 'react';
+import {Curve} from './ExperimentReview';
 import SimulationTelemetry,{type PhysicalFrame} from './SimulationTelemetry';
 type Obj=Record<string,any>;
 async function api(path:string,body?:unknown){const r=await fetch('/api/live-skills/'+path,body===undefined?{cache:'no-store'}:{method:'POST',headers:{'Content-Type':'application/json','X-Studio-Request':'1'},body:JSON.stringify(body)});if(!r.ok)throw Error(await r.text());return r.json()}
@@ -8,6 +9,14 @@ export default function LiveSkillPanel(){
  const cam=useRef({...initialCamera}),drag=useRef<Obj|null>(null),cameraTimer=useRef<ReturnType<typeof setTimeout>|null>(null),imageRef=useRef('');
  const imageNode=useRef<HTMLImageElement>(null);
  const [samples,setSamples]=useState<PhysicalFrame[]>([]);
+ const [rewardSamples,setRewardSamples]=useState<{step:number;time:number;total:number;terms:Record<string,number>}[]>([]);
+ const [rewardTerm,setRewardTerm]=useState('total');
+ useEffect(()=>{setRewardSamples([])},[state.id]);
+ useEffect(()=>{
+   const score=state.controller?.score;
+   if(!score)return;
+   setRewardSamples(old=>old.at(-1)?.step===score.step?old:[...old.slice(-239),score]);
+ },[state.id,state.controller?.score?.step]);
  const keys=useRef(new Set<string>());
  const [control,setControl]=useState(false);
  const session=state.manual_control&&['RUNNING','STARTING'].includes(state.phase)?state.id:'';
@@ -57,7 +66,14 @@ export default function LiveSkillPanel(){
  return <section className="card"><div className="section-header"><div><span className="eyebrow">LIVE SKILLS / MUJOCO</span><h2>部署技能到仿真</h2><p>从工作台选择技能，在服务器实际运行物理推理。视角操作只改变相机。</p></div></div><div className="online-controls"><label>工作台技能<select aria-label="工作台仿真技能" value={skill} onChange={e=>{setSkill(e.target.value);setError('')}}>{skills.map(s=><option value={s.id} key={s.id}>{s.name}</option>)}<option value="go2_teleop">Go2 步态 · 手柄与键盘</option><option value="handshake">左右爪托手互动</option><option value="scan">SCAN 原生规划仿真</option></select></label>{!embedded&&<><button className="button primary" disabled={busy} onClick={launch}>{busy?'正在部署…':'部署并启动 MuJoCo'}</button><button className="button secondary" onClick={()=>api('stop',{}).catch(e=>setError(String(e)))}>停止仿真</button></>}<a className="button quiet" href={'#reports?path='+encodeURIComponent(skill==='handshake'?'go2_nav/paw_contact/DEPLOYMENT.md':skill==='scan'?'skills/navigation/SCAN_SIMULATION.md':`skills/${skill}/SIMULATION.md`)}>仿真手册</a></div>
  {error&&<div className="alert danger">{error}</div>}
  {embedded?<iframe key={skill} title={skill+'实时仿真'} src={skill==='navigation'?'/navigation-live':skill==='handshake'?'/handshake':'/scan-live'} style={{width:'100%',height:940,border:0,borderRadius:12}}/>:<><div className="terrain-meta"><span>{names[state.phase]||state.phase}</span><span>{state.skill||'—'}</span><span>{Number(state.time||0).toFixed(2)} s · {state.frames||0} 帧</span></div><p>{state.note}</p>{image?<img ref={imageNode} src={image} alt="所选技能的实时 MuJoCo 物理画面" style={{width:'100%',maxHeight:640,objectFit:'contain',background:'#e7ebf0',touchAction:'none',cursor:'grab',borderRadius:12}} draggable={false} onContextMenu={e=>e.preventDefault()} onPointerDown={e=>{drag.current={x:e.clientX,y:e.clientY,pan:e.button===2||e.shiftKey};e.currentTarget.setPointerCapture(e.pointerId)}} onPointerUp={()=>drag.current=null} onPointerCancel={()=>drag.current=null} onPointerMove={e=>{const d=drag.current;if(!d)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;d.x=e.clientX;d.y=e.clientY;if(d.pan){cam.current.pan_x=Math.max(-10,Math.min(10,cam.current.pan_x-dx*.005));cam.current.pan_y=Math.max(-10,Math.min(10,cam.current.pan_y+dy*.005))}else{cam.current.azimuth=((cam.current.azimuth-dx*.4+540)%360)-180;cam.current.elevation=Math.max(-89,Math.min(-5,cam.current.elevation-dy*.3))}sendCamera()}}/>:<div className="empty"><h3>{names[state.phase]}</h3><p>点击部署后加载真实策略；不会用历史视频替代实时结果。</p></div>}<div className="viewport-toolbar"><span>左键拖动旋转 · 右键或 Shift 拖动平移 · 滚轮缩放</span><button className="button quiet" onClick={()=>{cam.current={...initialCamera};sendCamera()}}>重置相机</button></div><SimulationTelemetry frames={samples}/>
- {state.telemetry&&<small>在线物理流未记录训练奖励。具备逐步奖励的评估请到历史回放 → 任务诊断。</small>}
+ {!!rewardSamples.length?<section className="sim-inspector">
+   <header><h3>在线导航环境奖励</h3><span>MuJoCo 实际计算 · 按环境步</span></header>
+   <label>奖励项 <select aria-label="在线奖励项" value={rewardTerm} onChange={e=>setRewardTerm(e.target.value)}>
+     {Object.entries({total:'总奖励',progress:'目标进度',time_cost:'时间代价',command_change:'指令变化',success:'到达奖励',failure:'碰撞或倒地'}).map(([k,v])=><option key={k} value={k}>{v}</option>)}
+   </select></label>
+   <Curve series={[{name:'加权贡献',points:rewardSamples.map(r=>[r.time,rewardTerm==='total'?r.total:r.terms[rewardTerm]])}]} max={rewardSamples.at(-1)!.time} time={0} label="导航环境奖励 / 模拟秒"/>
+   <small>这是 Go2 导航环境的实际奖励。步态策略训练时的分项取决于原训练器。</small>
+ </section>:state.telemetry&&<small>该会话尚无在线奖励采样。支持逐步复算的评估可在历史回放 → 任务诊断查看。</small>}
  {state.manual_control&&<section className="sim-inspector">
    <header><h3>仿真速度控制</h3><span>Go2 · {state.controller?.phase??'等待控制器'}</span></header>
    <label><input type="checkbox" checked={control} disabled={!session} onChange={e=>setControl(e.target.checked)}/> 接入键盘或手柄</label>

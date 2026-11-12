@@ -186,6 +186,23 @@ def as2w_progress(folder):
 
 
 def manifest(root, config, recipe):
+    from .experiment_native_rewards import FLIP
+    data = reward_manifest(root, config, recipe)
+    recovery = config.recipe_id == AS2W_RECIPE
+    stairs = config.recipe_id in STAIR_RECIPES
+    native_flip = config.recipe_id in FLIP and bool(config.recipe_options.get("fixstand_roundtrip"))
+    single_flip = native_flip and config.recipe_options.get("rebound_cycles", 1) == 1
+    terms = data["terms"]
+    data["support"] = {
+        "editable": any(t["available"] and any(p["editable"] for p in t["parameters"]) for t in terms),
+        "training_terms": "recorded" if recovery or single_flip or not recipe else "recipe",
+        "mujoco_replay": "paired" if recovery or single_flip else "recorded" if stairs or native_flip else "recipe",
+        "mujoco_reward": "recomputed" if recovery else "subset" if single_flip else "unavailable",
+    }
+    return data
+
+
+def reward_manifest(root, config, recipe):
     if config.recipe_id in STAIR_RECIPES:
         file, flags = STAIR_RECIPES[config.recipe_id]
         source = (as2w_resources(root)[0] / file).read_text()
