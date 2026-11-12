@@ -1,0 +1,43 @@
+{
+  "matching_checkpoint": true,
+  "shared_contract_mismatches": {},
+  "onnx_integrity": true,
+  "onnx_inference_parity": true,
+  "missing_cases": {
+    "mujoco": [],
+    "isaac": []
+  },
+  "mujoco": {
+    "gate": false,
+    "safety_gate": true,
+    "passed": {
+      "forward": 8,
+      "back": 8,
+      "turn_left": 2,
+      "turn_right": 1,
+      "arc_left": 4,
+      "arc_right": 4
+    }
+  },
+  "isaac": {
+    "gate": false,
+    "safety_gate": false
+  },
+  "not_covered": [
+    "source equivalence",
+    "full joystick timing",
+    "hardware mapping",
+    "ARM64 shadow"
+  ],
+  "hardware_log_replay": {
+    "matching_checkpoint": true,
+    "input_sha256": {
+      "fixture_archive": "15b1cac5c81d3c20b18150301fa9855e242974d3cea7af3cc472e96d6071f9f6",
+      "baseline_checkpoint": "bb5c9735b5bd37ef4bdd2bd13f9d45395d8dc9b4c888c36955de1a345d55776d",
+      "candidate_checkpoint": "e46954b697ae8c4de2530ebae8f7c520f8f222bdd6a117195ff57bc4d3327769"
+    },
+    "moving_frames": 487,
+    "matching_onnx": true,
+    "onnx_max_action_error": 4.76837158203125e-06
+  }
+}
