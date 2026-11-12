@@ -7,7 +7,7 @@ export type RewardTerm = {
   description:string; source:string; code?:string; unit?:string; available:boolean; parameters:RewardParameter[];
 };
 export type ExtraReward = {name:string; formula:string; weight:number};
-export type RewardManifest = {terms:RewardTerm[]; note?:string; sourceCode?:string; custom?:{signals:string[];presets:[string,string,number][]}};
+export type RewardManifest = {terms:RewardTerm[]; support?:{editable:boolean;training_terms:string;mujoco_replay:string;mujoco_reward:string}; note?:string; sourceVersion?:string; sourceCode?:string; custom?:{signals:string[];presets:[string,string,number][]}};
 export type CloneExperiment = {config:Record<string,unknown>; term?:string; baseline?:Record<string,number>};
 
 const kindLabels={reward:'奖励',penalty:'惩罚',mixed:'双向'};
@@ -39,6 +39,13 @@ export function RewardEditor({manifest, onChange, focused, pending, error, basel
     <h3>奖励与惩罚</h3>
     {error&&<p className="alert danger" role="alert">{error}</p>}
     {manifest.note&&<p className="muted">{manifest.note}</p>}
+    {manifest.support&&<div className="experiment-tools" aria-label="技能支持能力">
+      <small>参数 · {manifest.support.editable?'可编辑':'只读或原配方'}</small>
+      <small>训练分项 · {manifest.support.training_terms==='recorded'?'记录到训练日志':'取决于原训练器'}</small>
+      <small>MuJoCo 回放 · {manifest.support.mujoco_replay==='paired'?'支持同协议配对':manifest.support.mujoco_replay==='recorded'?'原配方录制':'沿用原流程'}</small>
+      <small>逐步奖励 · {manifest.support.mujoco_reward==='recomputed'?'支持复算':manifest.support.mujoco_reward==='subset'?'支持已接入分项':'该配方未接入'}</small>
+    </div>}
+    {manifest.sourceVersion&&<small title={manifest.sourceVersion}>函数与配置 SHA-256 <code>{manifest.sourceVersion.slice(0,12)}</code></small>}
     {manifest.sourceCode&&<details><summary>查看该技能的奖励函数源码</summary><pre className="code">{manifest.sourceCode}</pre></details>}
     {!!(manifest.terms.length||manifest.custom)&&<>
       <div className="experiment-tools">
@@ -74,6 +81,7 @@ export function RewardEditor({manifest, onChange, focused, pending, error, basel
         <h4>{term.label}</h4>
         <p>{term.description}</p>
         <code className="experiment-formula">{term.formula}</code>
+        {!!term.parameters.length&&<small>候选代入值 · {term.parameters.map(p=>p.label+' = '+p.value).join(' · ')}</small>}
         <small>{term.unit&&term.unit+' · '}{term.source}</small>
         {term.code&&<details><summary>查看函数源码</summary><pre className="code">{term.code}</pre></details>}
         {term.parameters.map(param=><RewardInput key={param.id} parameter={param} baseline={baseline?.[param.id]} enabled={term.available} onChange={onChange}/>)}

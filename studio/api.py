@@ -109,7 +109,7 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
     def get_capabilities():return capabilities(catalog.get(),jobs.all())
 
     from rob2nav.experiment_schema import METHODS, reward_schema
-    from .experiment_workflow import AS2W_RECIPE, as2w_commands, as2w_progress, manifest
+    from .experiment_workflow import AS2W_RECIPE, as2w_commands, as2w_progress, manifest, training_isaac_python
     from .experiment_review import mount_experiment_review
     mount_experiment_review(app, root, jobs)
 
@@ -197,17 +197,18 @@ def create_app(root=None,allow_training=False,sim_python=None,mujoco_python=None
     def preflight(config):
         errors=[];warnings=[]
         output=root/'outputs/studio/runs/PREVIEW'
+        selected_sim=training_isaac_python(config,sim_python)
         if config.robot_id=='as2w':
-            try:cmd=as2w_commands(config,root,output,mujoco_python,sim_python)[0]
+            try:cmd=as2w_commands(config,root,output,mujoco_python,selected_sim)[0]
             except (ValueError,OSError,StopIteration) as exc:cmd=[];errors.append(str(exc))
-            if not sim_python.is_file():errors.append('缺少 AS2-W Isaac Sim 运行时，请设置 --sim-python')
+            if not selected_sim.is_file():errors.append('缺少 AS2-W Isaac Sim 运行时，请设置 --sim-python')
             if not allow_training:warnings.append('当前服务为只读训练模式')
             return dict(valid=not errors,errors=errors,warnings=warnings,command=cmd,resolved=config.model_dump(),
                         environment_steps=config.num_envs*24*config.iterations,rewards={})
         from .upstreams import pie_python
         manual=config.task=='train' and config.recipe_id in ('navigation_ppo','sideflip_native_ppo','upright_walk_ppo','backflip_native_ppo','frontflip_native_ppo')
-        runtime=pie_python(root) if config.task=='simulation' and config.simulation_policy=='pie' else mujoco_python if (config.task=='simulation' and config.simulation_policy!='checkpoint') or config.recipe_id=='navigation_ppo' else sim_python
-        try:cmd=simulation_command(config,root,output,runtime) if config.task=='simulation' else command(config,root,output,root/'outputs/studio/PREVIEW.json',sim_python,mujoco_python)
+        runtime=pie_python(root) if config.task=='simulation' and config.simulation_policy=='pie' else mujoco_python if (config.task=='simulation' and config.simulation_policy!='checkpoint') or config.recipe_id=='navigation_ppo' else selected_sim
+        try:cmd=simulation_command(config,root,output,runtime) if config.task=='simulation' else command(config,root,output,root/'outputs/studio/PREVIEW.json',selected_sim,mujoco_python)
         except ValueError as e:cmd=[];errors.append(str(e))
         if not runtime.is_file():errors.append('当前主机没有所选任务的执行解释器；可保存草稿，在服务器运行。')
         if manual:

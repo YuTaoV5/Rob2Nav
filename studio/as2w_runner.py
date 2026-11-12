@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import shutil
 import sys
 
 if __package__:
@@ -88,11 +89,12 @@ def evaluate(python, harness, run, label, checkpoint, env, stages):
     target = run / label
     target.mkdir()
     training = Path(env.get("ROB2NAV_AS2W_TRAINING", "/root/as2w-training"))
-    for name in ("evaluate-fall-baseline.py", "official-model", "local-step-diagnostic"):
+    for name in ("evaluate-fall-baseline.py", "official-model"):
         asset = harness / name
         if name == "official-model" and not asset.exists():
             asset = training / "unitree_ros"
         (target / name).symlink_to(asset)
+    shutil.copytree(harness / "local-step-diagnostic", target / "local-step-diagnostic")
     # The existing evaluator resolves its location; run its contents in the
     # isolated output folder so filenames and model assets remain colocated.
     (target / "evaluate-fall-baseline.py").unlink()
@@ -100,10 +102,12 @@ def evaluate(python, harness, run, label, checkpoint, env, stages):
     script.write_bytes((harness / script.name).read_bytes())
     scorer = harness / "as2w_replay_score.py"
     if scorer.is_file() and "stairs" not in stages:
-        (target / scorer.name).symlink_to(scorer)
+        shutil.copy2(scorer, target / scorer.name)
+        telemetry = harness / "mujoco_telemetry.py"
+        shutil.copy2(telemetry, target / telemetry.name)
         helper = harness / "reward_expression.py"
         if helper.is_file():
-            (target / helper.name).symlink_to(helper)
+            shutil.copy2(helper, target / helper.name)
         params = run / "parameters.json" if label == "candidate" else checkpoint.parent.parent / "parameters.json"
         profile = "候选训练配置" if label == "candidate" else "基线训练配置"
         if not params.is_file():
@@ -205,7 +209,8 @@ def main():
         record_failed_replays(args.mujoco_python, run, env, base, result)
         write(run / "comparison.json", {"baseline": base, "candidate": result, "backend": "MuJoCo",
               "protocol": {"flags": EVAL_FLAGS, "terrain": stages, "evaluator_sha256": digest(harness / "evaluate-fall-baseline.py"),
-                           "contract_sha256": digest((run / "baseline/fall-baseline/fall-recovery-contract.json").resolve())}})
+                           "contract_sha256": digest((run / "baseline/fall-baseline/fall-recovery-contract.json").resolve()),
+                           "diagnostic_sha256": digest(harness / "as2w_replay_score.py") if (harness / "as2w_replay_score.py").is_file() else None}})
         write(status, {"state": "succeeded"})
     except Exception as exc:
         write(status, {"state": "failed", "phase": phase, "error": str(exc)})

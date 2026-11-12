@@ -276,8 +276,17 @@ class Go2MaplessEnv(gym.Env):
         self.steps += 1
         self._sense()
         info = self._info()
-        reward = 8*(before-info["distance"]) - .02 - .03*float(np.sum((self.command-previous)**2))
-        reward += 30*info["success"] - 20*(info["collision"] or info["fallen"])
+        progress = 8 * (before - info["distance"])
+        time_cost = -.02
+        command_change = -.03 * float(np.sum((self.command - previous)**2))
+        success_reward = 30 * info["success"]
+        failure_cost = -20 * (info["collision"] or info["fallen"])
+        reward = progress + time_cost + command_change + success_reward + failure_cost
+        info["reward_terms"] = {
+            "progress": float(progress), "time_cost": time_cost,
+            "command_change": command_change, "success": float(success_reward),
+            "failure": float(failure_cost),
+        }
         terminated = info["success"] or info["collision"] or info["fallen"]
         truncated = info["seconds"] >= self.cfg["max_seconds"]
         return self._observation(), float(reward), bool(terminated), bool(truncated), info

@@ -55,6 +55,7 @@ def terrain_choices(config):
 def profile(config):
     options = dict(config.recipe_options)
     options.pop("eval_terrain", None)
+    options.pop("validation_only", None)
     extra = reward_specs(options.pop("custom_rewards", "[]"))
     if config.recipe_id in STAIR_RECIPES:
         if extra or options:
@@ -69,13 +70,29 @@ def validate_as2w(config):
         "as2w", "as2w", AS2W_RECIPE, "train", "initialize",
     ) or config.rewards or config.capability_id:
         raise ValueError("AS2-W 恢复技能要求匹配的训练配方和仅权重初始化")
-    if not config.auto_evaluate or not 40 <= config.num_envs <= 2048 or not 2000 <= config.iterations <= 40000:
+    validation = config.recipe_options.get("validation_only", False)
+    if type(validation) is not bool:
+        raise ValueError("链路验证开关必须为布尔值")
+    if validation and (config.recipe_id != AS2W_RECIPE or terrain_choices(config) != ("flat",)
+                       or not 3 <= config.iterations <= 32 or config.num_envs != 40):
+        raise ValueError("起身链路验证使用 40 个环境、3–32 轮与平地评估")
+    if not config.auto_evaluate or not 40 <= config.num_envs <= 2048 or not (validation or 2000 <= config.iterations <= 40000):
         raise ValueError("AS2-W 正式训练需要 40–2048 个环境、2000–40000 轮及独立 MuJoCo 评估")
     if 12001 <= config.seed <= 12004 or 27001 <= config.seed <= 27016:
         raise ValueError("训练种子不能使用 MuJoCo 留出场景的种子")
     terrain_choices(config)
     profile(config)
     return config
+
+
+def training_isaac_python(config, default):
+    """Select a configured legacy runtime only for the pinned training recipes."""
+    legacy = os.environ.get("ROB2NAV_LEGACY_ISAAC_PY")
+    if legacy and config.task == "train" and (
+        config.robot_id == "as2w" or config.recipe_id in ("backflip_native_ppo", "frontflip_native_ppo")
+    ):
+        return Path(legacy)
+    return default
 
 
 def as2w_resources(root, mujoco_python=None):
@@ -145,7 +162,7 @@ def prepare_as2w(config, root, run, mujoco_python=None, sim_python=None):
             if key in values and value != values[key]}
     write(run / "parameters.json", values)
     write(run / "manifest.json", dict(updates=config.iterations, envs=config.num_envs, seed=config.seed,
-          smoke=False, diff=diff, trainer_sha256=digest(trainer), baseline_sha256=digest(baseline),
+          smoke=config.recipe_options.get("validation_only",False), diff=diff, trainer_sha256=digest(trainer), baseline_sha256=digest(baseline),
           baseline_checkpoint=str(baseline), recipe=config.recipe_id, evaluation_terrains=terrain_choices(config)))
     return argv
 
@@ -169,6 +186,23 @@ def as2w_progress(folder):
 
 
 def manifest(root, config, recipe):
+    from .experiment_native_rewards import FLIP
+    data = reward_manifest(root, config, recipe)
+    recovery = config.recipe_id == AS2W_RECIPE
+    stairs = config.recipe_id in STAIR_RECIPES
+    native_flip = config.recipe_id in FLIP and bool(config.recipe_options.get("fixstand_roundtrip"))
+    single_flip = native_flip and config.recipe_options.get("rebound_cycles", 1) == 1
+    terms = data["terms"]
+    data["support"] = {
+        "editable": any(t["available"] and any(p["editable"] for p in t["parameters"]) for t in terms),
+        "training_terms": "recorded" if recovery or single_flip or not recipe else "recipe",
+        "mujoco_replay": "paired" if recovery or single_flip else "recorded" if stairs or native_flip else "recipe",
+        "mujoco_reward": "recomputed" if recovery else "subset" if single_flip else "unavailable",
+    }
+    return data
+
+
+def reward_manifest(root, config, recipe):
     if config.recipe_id in STAIR_RECIPES:
         file, flags = STAIR_RECIPES[config.recipe_id]
         source = (as2w_resources(root)[0] / file).read_text()
@@ -186,7 +220,7 @@ def manifest(root, config, recipe):
         source = (as2w_resources(root)[0] / SOURCE).read_text()
         values = profile(config)
         result = catalog(source, values)
-        return dict(sourceCode=result["code"], custom=dict(signals=SIGNALS, presets=PRESETS), terms=[
+        return dict(sourceCode=result["code"], sourceVersion=digest(as2w_resources(root)[0] / SOURCE), custom=dict(signals=SIGNALS, presets=PRESETS), terms=[
             dict(id=term["id"], label=term["name"], kind=term["kind"], group="起身与站稳",
                  formula=term["formula"], description=term["help"], source=result["source"],
                  available=True, parameters=[dict(id=p["id"], label=AS2W_LABELS[p["id"]], value=values[p["id"]],
