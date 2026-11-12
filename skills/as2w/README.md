@@ -3,6 +3,7 @@
 | Skill | Training recipe | Scope |
 |---|---|---|
 | Rolling | [formal.sh](rolling/recipes/formal.sh) | Straight rolling, turning, braking and fixed stand |
+| Rolling, filtered low speed | [filtered.sh](rolling/recipes/filtered.sh) | Opt-in 0.20 m/s controller and reward smoke test |
 | Stepping | [formal.sh](stepping/recipes/formal.sh) | Omnidirectional stepping and stairs |
 | Recovery | [formal.sh](recovery/recipes/formal.sh) | Rising from prone and side tilt |
 

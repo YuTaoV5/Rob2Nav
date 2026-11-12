@@ -31,6 +31,8 @@ def run(args, physics):
     cfg.as2w_pure_turn_common_scale = args.pure_turn_common_scale
     cfg.as2w_rolling_maneuvers = args.rolling_maneuvers
     cfg.as2w_ignore_lateral_command = args.speed_rolling
+    cfg.as2w_rolling_low_speed_smooth = args.rolling_low_speed_smooth
+    cfg.as2w_rolling_leg_filter_hz = args.rolling_leg_filter_hz
     if args.speed_cap and not args.evaluate:
         from as2w_isaac_speed_range import configure_speed
         configure_speed(cfg, args.speed_cap, args.speed_rolling, fixed_exit=args.rolling_fixed_exit)
@@ -38,6 +40,16 @@ def run(args, physics):
             cfg.as2w_motion_start_s = 4.
             cfg.as2w_park_until_s = 7.
             cfg.episode_length_s = 23.
+    if args.rolling_low_speed_smooth and not args.evaluate:
+        from isaaclab.managers import RewardTermCfg
+        from as2w_isaac_speed_range import rolling_unslewed_leg_rate
+        cfg.rewards.rolling_unslewed_leg_rate = RewardTermCfg(func=rolling_unslewed_leg_rate, weight=-.10)
+        cfg.rewards.action_rate_l2.weight = -.02
+    if args.rolling_leg_filter_hz and not args.evaluate:
+        from isaaclab.managers import RewardTermCfg
+        from as2w_rolling_filtered import rolling_phase_cost
+
+        cfg.rewards.rolling_phase_cost = RewardTermCfg(func=rolling_phase_cost, weight=-.35)
     if args.teleop:
         from as2w_isaac_teleop import configure_teleop
         configure_teleop(cfg, args.teleop)
@@ -108,6 +120,8 @@ def run(args, physics):
             "park_continuous_bias": args.park_continuous_bias,
             "park_straight_bias": args.park_straight_bias,
             "rolling_maneuvers": args.rolling_maneuvers,
+            "rolling_low_speed_smooth": args.rolling_low_speed_smooth,
+            "wrapped_leg_slew_rad_s": .9 if args.rolling_low_speed_smooth else None,
             "rolling_knee_margin_m": .10 if args.rolling_knee_margin else None,
             "suppress_pure_turn_common": args.suppress_pure_turn_common,
             "pure_turn_common_scale": args.pure_turn_common_scale,
@@ -115,6 +129,7 @@ def run(args, physics):
             "seed": args.seed, "num_envs": args.num_envs, "iterations": args.iterations,
             "physics_step_s": env.physics_dt, "policy_step_s": env.step_dt,
             "pose_source": "simulation_proxy_no_raw_lowstate",
+            "rolling_leg_filter_hz": args.rolling_leg_filter_hz,
             "policy_width": 65, "actions": 16, "evaluate": args.evaluate,
         }, indent=2) + "\n")
         if args.evaluate:
@@ -155,6 +170,7 @@ def main():
     parser.add_argument("--iterations", type=int, default=300)
     parser.add_argument("--seed", type=int, default=286)
     parser.add_argument("--learning-rate", type=float, default=1e-4)
+    parser.add_argument("--rolling-leg-filter-hz", type=float, default=0.)
     parser.add_argument("--evaluate", action="store_true")
     parser.add_argument("--safety", action="store_true")
     mode = parser.add_mutually_exclusive_group()
@@ -175,6 +191,7 @@ def main():
     parser.add_argument("--suppress-pure-turn-common",action="store_true")
     parser.add_argument("--pure-turn-common-scale",type=float,default=1.)
     parser.add_argument("--rolling-knee-margin",action="store_true")
+    parser.add_argument("--rolling-low-speed-smooth",action="store_true")
     parser.add_argument("--rolling-maneuvers",action="store_true")
     parser.add_argument("--turn-yaw-slew",type=float,default=0.)
     parser.add_argument("--speed-cap", type=float, default=0.)
@@ -195,6 +212,12 @@ def main():
         parser.error("Turn yaw slew requires rolling evaluation and a 0–3 rad/s² cap")
     if args.rolling_knee_margin and not (args.speed_rolling and args.safety and args.rolling_fixed_exit and not args.evaluate):
         parser.error("--rolling-knee-margin requires guarded rolling fixed-exit training")
+    if args.rolling_low_speed_smooth and not (args.rolling_fixed_exit and args.speed_rolling and args.speed_cap == .2):
+        parser.error("Low-speed smooth curriculum requires rolling fixed exit at a 0.2 m/s cap")
+    if not 0. <= args.rolling_leg_filter_hz <= 20. or (
+        args.rolling_leg_filter_hz and not (args.rolling_fixed_exit and args.rolling_low_speed_smooth)
+    ):
+        parser.error("Leg filtering requires the guarded low-speed rolling profile and a cutoff in (0, 20] Hz")
     if args.rolling_maneuvers and not (args.speed_rolling and args.park_straight_bias and not args.evaluate):
         parser.error("Maneuver curriculum requires rolling training with straight-mode bias")
     if args.park_straight_bias and not args.park_continuous_bias:

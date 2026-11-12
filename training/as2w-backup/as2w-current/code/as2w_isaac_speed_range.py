@@ -55,6 +55,16 @@ class RollingSpeedCommands(SpeedRangeCommands):
         self.goals = torch.cat((self.goals[:2], self.goals[-2:]))
 
     def sample_motion(self, shape):
+        if getattr(self._env.cfg, "as2w_rolling_low_speed_smooth", False):
+            draw = torch.rand((shape[0], 3), device=self.device)
+            sign = torch.where(draw[:, 0] < .5, -1., 1.)
+            cmd = torch.zeros(shape, device=self.device)
+            turn = draw[:, 2] < .40
+            arc = (draw[:, 2] >= .40) & (draw[:, 2] < .55)
+            cmd[:, 0] = torch.where(turn, 0., sign * (.03 + .17 * draw[:, 1]))
+            cmd[:, 2] = torch.where(turn | arc, sign * (.035 + .085 * draw[:, 1]), 0.)
+            cmd[arc, 0] = .05
+            return cmd
         low = TeleopCommands.sample_motion(self, shape)
         low[:, 1] = 0.
         draw = torch.rand((shape[0], 3), device=self.device)
@@ -91,10 +101,18 @@ def rolling_turn_error(env):
     robot = env.scene["robot"]
     xy = robot.data.root_lin_vel_b.torch[:, :2]
     yaw = robot.data.root_ang_vel_b.torch[:, 2]
-    turn = command[:, 2].abs() >= .04
+    yaw_command = command[:, 2].abs()
+    if getattr(env.cfg, "as2w_rolling_leg_filter_hz", 0.):
+        turn = (yaw_command / .04).clamp(max=1.)
+    else:
+        turn = yaw_command >= .04
     translation_error = (xy-command[:, :2]).norm(dim=1)/.08
     yaw_error = (yaw-command[:, 2]).abs()/.20
     return turn * (translation_error.clamp(max=3.) + yaw_error.clamp(max=3.))
+
+
+def rolling_unslewed_leg_rate(env):
+    return env.rolling_leg_rate_cost
 
 
 def configure_speed(cfg, cap, rolling=False, *, fixed_exit=False):
@@ -138,6 +156,15 @@ class RollingFixedExitEnvironment(RobustEnvironment):
 
     def _reset_idx(self, ids):
         super()._reset_idx(ids)
+        if hasattr(self, "rolling_filtered_legs"):
+            self.rolling_filtered_legs[ids] = 0.
+        if hasattr(self, "rolling_motion_seen"):
+            self.rolling_motion_seen[ids] = False
+            self.rolling_quiet_time[ids] = 0.
+            self.rolling_park_latched[ids] = False
+        if hasattr(self, "rolling_slew_legs"):
+            self.rolling_slew_legs[ids] = 0.
+            self.rolling_leg_rate_cost[ids] = 0.
         if hasattr(self,"rolling_stand_offset"):
             self.rolling_stand_offset[ids] = 0.
         if hasattr(self,"rolling_wheel_hold_frames"):
@@ -149,6 +176,16 @@ class RollingFixedExitEnvironment(RobustEnvironment):
                                             rolling_stand_bias, rolling_wheel_hold)
 
         cmd = self.command_manager.get_command("base_velocity")
+        cutoff = getattr(self.cfg, "as2w_rolling_leg_filter_hz", 0.)
+        if cutoff:
+            from as2w_rolling_filtered import filter_leg_residual, update_rolling_phase_cost
+
+            if not hasattr(self, "rolling_filtered_legs"):
+                self.rolling_filtered_legs = torch.zeros_like(action[:, :12])
+            self.rolling_phase_penalty = update_rolling_phase_cost(self, cmd)
+            self.rolling_filtered_legs[:] = filter_leg_residual(
+                self.rolling_filtered_legs, action[:, :12], self.step_dt, cutoff)
+            action = torch.cat((self.rolling_filtered_legs, action[:, 12:]), dim=1)
         legs, wheels = rolling_fixed_exit(action, cmd,
             pure_turn_common_scale=getattr(self.cfg,"as2w_pure_turn_common_scale",1.))
         if self.cfg.as2w_rolling_stand_compensation:
@@ -184,4 +221,13 @@ class RollingFixedExitEnvironment(RobustEnvironment):
             legs = legs + stand
             if self.cfg.as2w_rolling_loaded_stance:
                 legs = legs + rolling_loaded_stance(self.rolling_stand_offset,cmd,-sensed[:,3:6])
+        if getattr(self.cfg, "as2w_rolling_low_speed_smooth", False):
+            if not hasattr(self, "rolling_slew_legs"):
+                self.rolling_slew_legs = torch.zeros_like(legs)
+                self.rolling_leg_rate_cost = torch.zeros_like(cmd[:, 0])
+            delta = legs - self.rolling_slew_legs
+            step_limit = .9 * self.step_dt / .35
+            self.rolling_leg_rate_cost[:] = ((delta.abs() / step_limit - 1.).clamp(0., 8.).square()).mean(dim=1)
+            self.rolling_slew_legs += delta.clamp(-step_limit, step_limit)
+            legs = self.rolling_slew_legs
         return super().step(torch.cat((legs, wheels), dim=1))

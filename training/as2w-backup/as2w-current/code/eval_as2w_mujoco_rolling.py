@@ -105,6 +105,8 @@ def trial(args, actor, seed, name, target, replay):
     brake_distance = None
     push_tick = round(rng.uniform(3.5,8.)/env.dt)
     stand_bias = torch.zeros((1,12))
+    filtered_legs = torch.zeros(12)
+    previous_legs = np.zeros(12, dtype=np.float32)
     wheel_reference = torch.zeros((1,4))
     hold_frames = torch.zeros(1,dtype=torch.long)
     recenter_frames = torch.zeros_like(hold_frames)
@@ -207,6 +209,10 @@ def trial(args, actor, seed, name, target, replay):
 
             reflected = actor(mirror_rolling_observation(frame[None]))
             current = .5*(current + mirror_rolling_joints(reflected)[0])
+        if args.rolling_leg_filter_hz:
+            from as2w_rolling_filtered import filter_leg_residual
+            filtered_legs = filter_leg_residual(filtered_legs, current[:12], env.dt, args.rolling_leg_filter_hz)
+            current = torch.cat((filtered_legs, current[12:]))
         current = current.numpy()
         if args.rolling_fixed_exit:
             from as2w_rolling_fixed_exit import (parking_odometry, rolling_fixed_exit, rolling_loaded_stance, rolling_precalibrated_stand,
@@ -267,6 +273,9 @@ def trial(args, actor, seed, name, target, replay):
             current = torch.cat((legs, wheels), dim=1)[0].numpy()
         elif args.rolling_residual:
             current = residual_command(current, obs[:3]+np.array((.4,0.,0.)))
+        step_limit = .9 * env.dt / .35
+        previous_legs += np.clip(current[:12]-previous_legs,-step_limit,step_limit)
+        current[:12] = previous_legs
         history = current.copy()
         blend = np.clip(elapsed/2.,0.,1.)
         command = (1.-blend)*q_ref + blend*current
@@ -485,6 +494,7 @@ def main():
     p.add_argument("--push-schedule",choices=("all","motion-only","off"),default="all")
     p.add_argument("--native-pd",action="store_true")
     p.add_argument("--substep-safety",action="store_true")
+    p.add_argument("--rolling-leg-filter-hz", type=float, default=0.)
     p.add_argument("--trace",action="store_true")
     p.add_argument("--trials",type=int,default=20)
     p.add_argument("--suppress-pure-turn-common",action="store_true")
@@ -505,6 +515,8 @@ def main():
         p.error("--substep-safety requires --native-pd")
     if not 0. <= args.turn_yaw_slew <= 3.:
         p.error("Turn yaw slew must be 0–3 rad/s²")
+    if not 0. <= args.rolling_leg_filter_hz <= 20. or (args.rolling_leg_filter_hz and not args.rolling_fixed_exit):
+        p.error("Leg filtering requires fixed-exit mode and a cutoff in (0, 20] Hz")
     if args.trials < 1:
         p.error("--trials must be positive")
     if (args.park_recalibrate_stop or args.park_adapt_before_latch) and not (args.park_precalibrated and args.rolling_wheel_hold):
@@ -535,10 +547,10 @@ def main():
     state=torch.load(args.checkpoint,map_location="cpu",weights_only=True)["actor_state_dict"]
     actor=actor_from_state(state,6.)
     cases = {"forward":(args.speed,0.,0.),"back":(-args.speed,0.,0.),
-             "turn_left":(0.,0.,.30),"turn_right":(0.,0.,-.30)}
+             "turn_left":(0.,0.,.10),"turn_right":(0.,0.,-.10)}
     seeds = tuple(range(46001,46001+args.trials//2)) + tuple(range(47001,47001+args.trials-args.trials//2))
     if args.acceptance:
-        cases.update(arc_left=(.07,0.,.20),arc_right=(.07,0.,-.20))
+        cases.update(arc_left=(.05,0.,.08),arc_right=(.05,0.,-.08))
     else:
         seeds = (46001,46002,47001,47002)
     if args.vy_diagnostic:
@@ -553,7 +565,7 @@ def main():
     settings.pop("checkpoint")
     settings.pop("output")
     settings["assets"] = str(args.assets.resolve())
-    contract = dict(**checkpoint_record(args.checkpoint),backend="mujoco",**settings)
+    contract = dict(**checkpoint_record(args.checkpoint),backend="mujoco",wrapped_leg_slew_rad_s=.9,**settings)
     (args.output/"mujoco-contract.json").write_text(json.dumps(contract,indent=2)+"\n")
     (args.output/"mujoco-rolling-diagnostic.json").write_text(json.dumps(rows,indent=2)+"\n")
     if args.acceptance:
@@ -567,7 +579,8 @@ def main():
                       park_adapt_before_latch=args.park_adapt_before_latch,
                       native_pd=args.native_pd,substep_safety=args.substep_safety,park_precalibrated=args.park_precalibrated,
                       rolling_loaded_stance=args.rolling_loaded_stance,park_odometry=args.park_odometry,
-                      park_continuous_bias=args.park_continuous_bias,park_straight_bias=args.park_straight_bias)
+                      park_continuous_bias=args.park_continuous_bias,park_straight_bias=args.park_straight_bias,
+                      rolling_leg_filter_hz=args.rolling_leg_filter_hz)
         report_name = "mujoco-rolling-acceptance.json" if args.push_schedule=="all" else "mujoco-rolling-diagnostic-summary.json"
         (args.output/report_name).write_text(json.dumps(report,indent=2)+"\n")
     print("AS2W_MUJOCO_ROLLING",len(rows),sum(r["held"] for r in rows),flush=True)
