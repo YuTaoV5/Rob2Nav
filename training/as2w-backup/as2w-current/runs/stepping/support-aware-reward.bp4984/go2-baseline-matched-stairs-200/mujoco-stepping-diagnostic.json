@@ -1,0 +1,770 @@
+{
+  "up": {
+    "passed": 0,
+    "total": 4,
+    "rows": [
+      {
+        "passed": false,
+        "failure": "joint_angle",
+        "failure_time_s": 3.3899999999999997,
+        "failure_joints": [
+          {
+            "name": "FL_hip",
+            "angle_rad": 0.7075700721205925,
+            "target_rad": 0.3484782075881958,
+            "lower_rad": -0.7065,
+            "upper_rad": 0.7065,
+            "velocity_rad_s": 1.7068621633441414,
+            "actuator_effort_nm": -20.67894623322956,
+            "effort_limit_nm": 54.0
+          }
+        ],
+        "failure_up_body": [
+          -0.41506172952848364,
+          -0.0794582661343298,
+          0.9063168014683106
+        ],
+        "failure_detail": {
+          "wheel_vertical_load_n": [
+            0.0,
+            145.02233565983178,
+            0.0,
+            0.0
+          ],
+          "simultaneous_nonwheel_contact": false
+        },
+        "seed": 8302,
+        "lifts": [
+          1,
+          1,
+          0,
+          0
+        ],
+        "signed_progress": -0.020322930879290668,
+        "fixed_exit_s": 0.0,
+        "fixed_entry_s": 0.0,
+        "travel_m": 0.23042855493909387,
+        "forward_progress_m": 0.19322138805892003,
+        "signed_elevation_m": 0.0,
+        "motion_base_height_m": 0.36845611623409813,
+        "nonwheel_frames": 0,
+        "min_distal_calf_surface_m": [
+          -0.018158989653311863,
+          0.01806505204824166,
+          0.019553221178354036,
+          0.006847742905519233
+        ],
+        "distal_calf_warning_s": [
+          2.0999999999999783,
+          null,
+          null,
+          0.00125
+        ],
+        "min_calf_hull_vertex_gap_m": [
+          0.0052716709794979055,
+          0.031964900502208626,
+          0.03820765168572787,
+          0.025680447652970284
+        ],
+        "calf_hull_warning_s": [
+          2.570000000000052,
+          null,
+          null,
+          null
+        ],
+        "min_calf_geom_distance_m": [
+          0.005271671368930003,
+          0.031964901060512085,
+          0.038207655554798145,
+          0.025680452128310133
+        ],
+        "calf_geom_warning_s": [
+          2.570000000000052,
+          null,
+          null,
+          null
+        ],
+        "min_knee_surface_m": 0.11865068816413846,
+        "max_effort_fraction_of_guard": 0.7437850524176761
+      },
+      {
+        "passed": false,
+        "failure": "joint_angle",
+        "failure_time_s": 2.6212500000000003,
+        "failure_joints": [
+          {
+            "name": "FR_hip",
+            "angle_rad": 0.7068013006508077,
+            "target_rad": 0.28989367477843553,
+            "lower_rad": -0.7065,
+            "upper_rad": 0.7065,
+            "velocity_rad_s": 0.4140670906349679,
+            "actuator_effort_nm": -23.2632720990791,
+            "effort_limit_nm": 54.0
+          }
+        ],
+        "failure_up_body": [
+          -0.07652578397501238,
+          0.18276805752557682,
+          0.9801732711798133
+        ],
+        "failure_detail": {
+          "wheel_vertical_load_n": [
+            0.0,
+            151.9375344544145,
+            0.0,
+            83.55947734286313
+          ],
+          "simultaneous_nonwheel_contact": false
+        },
+        "seed": 8303,
+        "lifts": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "signed_progress": 0.03741897306118642,
+        "fixed_exit_s": 0.0,
+        "fixed_entry_s": 1.1400000000000001,
+        "travel_m": 0.21611303016472178,
+        "forward_progress_m": -0.007593663685097878,
+        "signed_elevation_m": 0.0,
+        "motion_base_height_m": 0.36585109755065265,
+        "nonwheel_frames": 0,
+        "min_distal_calf_surface_m": [
+          -0.006048613417197757,
+          0.026574207015951423,
+          0.00899267867565981,
+          0.010854921717421862
+        ],
+        "distal_calf_warning_s": [
+          0.00125,
+          null,
+          0.00125,
+          0.00125
+        ],
+        "min_calf_hull_vertex_gap_m": [
+          0.016100035606011753,
+          0.0435426580008664,
+          0.027649722062725895,
+          0.02951748572215518
+        ],
+        "calf_hull_warning_s": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "min_calf_geom_distance_m": [
+          0.01610003596517176,
+          0.043542657109524346,
+          0.02764972613905417,
+          0.029517490255724865
+        ],
+        "calf_geom_warning_s": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "min_knee_surface_m": 0.12923019456893503,
+        "max_effort_fraction_of_guard": 0.43080133516813146
+      },
+      {
+        "passed": false,
+        "failure": "nonwheel_contact",
+        "failure_time_s": 4.92125,
+        "failure_joints": [],
+        "failure_up_body": [
+          -0.1985552994570238,
+          0.2642476322922903,
+          0.9437949893305496
+        ],
+        "failure_detail": {
+          "links": [
+            "FL_calf"
+          ],
+          "contacts": [
+            {
+              "link": "FL_calf",
+              "robot_geom": "",
+              "point_link_m": [
+                -0.0025485163886512278,
+                -0.03204428615613188,
+                -0.24418726793003237
+              ],
+              "terrain": "ground",
+              "point_world_m": [
+                0.40557943482550957,
+                0.4229810949070656,
+                -9.996699461549408e-06
+              ],
+              "normal_world": [
+                0.0,
+                0.0,
+                1.0
+              ],
+              "separation_m": -1.9993398923098815e-05,
+              "normal_force_n": 90.37737564199307
+            }
+          ],
+          "swing_lift_weight": [
+            0.0,
+            0.0,
+            0.0,
+            0.8153848052024841
+          ],
+          "wheel_tread_clearance_m": [
+            -0.041149227612578776,
+            -0.0033169832297419988,
+            0.006403434951151643,
+            -0.0074979136135545355
+          ],
+          "min_knee_envelope_m": 0.16462102124712258,
+          "calf_geom_distances_m": [
+            -1.9993398923098815e-05,
+            0.04273726464707367,
+            0.051086021897902706,
+            0.0379618672753666
+          ]
+        },
+        "seed": 8304,
+        "lifts": [
+          1,
+          1,
+          0,
+          1
+        ],
+        "signed_progress": -0.03863983722011269,
+        "fixed_exit_s": 0.0,
+        "fixed_entry_s": 0.0,
+        "travel_m": 0.3670399624359281,
+        "forward_progress_m": 0.35852788986992157,
+        "signed_elevation_m": 0.0,
+        "motion_base_height_m": 0.35820158420936254,
+        "nonwheel_frames": 1,
+        "min_distal_calf_surface_m": [
+          -0.017208867498448466,
+          0.019485314623252148,
+          0.00989764122940362,
+          0.019568199004079495
+        ],
+        "distal_calf_warning_s": [
+          2.0874999999999764,
+          null,
+          0.00125,
+          null
+        ],
+        "min_calf_hull_vertex_gap_m": [
+          -1.9996355256540754e-05,
+          0.034524516689186796,
+          0.0303981410739938,
+          0.035150172761995696
+        ],
+        "calf_hull_warning_s": [
+          2.1987499999999938,
+          null,
+          null,
+          null
+        ],
+        "min_calf_geom_distance_m": [
+          -1.9993398923098815e-05,
+          0.034524517882593184,
+          0.03039814518577663,
+          0.035150173937255544
+        ],
+        "calf_geom_warning_s": [
+          2.1987499999999938,
+          null,
+          null,
+          null
+        ],
+        "min_knee_surface_m": 0.13026008681249723,
+        "max_effort_fraction_of_guard": 0.7391436926075827
+      },
+      {
+        "passed": false,
+        "failure": "nonwheel_contact",
+        "failure_time_s": 3.7425,
+        "failure_joints": [],
+        "failure_up_body": [
+          -0.2744988031715997,
+          0.00958106103965823,
+          0.9615397081383136
+        ],
+        "failure_detail": {
+          "links": [
+            "FL_calf"
+          ],
+          "contacts": [
+            {
+              "link": "FL_calf",
+              "robot_geom": "",
+              "point_link_m": [
+                -0.006135770082554309,
+                -0.032023857396228025,
+                -0.243670577847991
+              ],
+              "terrain": "ground",
+              "point_world_m": [
+                0.21339650959151907,
+                0.5643439221483585,
+                -4.513158287709068e-05
+              ],
+              "normal_world": [
+                0.0,
+                0.0,
+                1.0
+              ],
+              "separation_m": -9.026316575418136e-05,
+              "normal_force_n": 80.1011552612493
+            }
+          ],
+          "swing_lift_weight": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "wheel_tread_clearance_m": [
+            -0.04118743525905175,
+            -0.0023894837741738895,
+            0.0012656880064075837,
+            0.05155048134280754
+          ],
+          "min_knee_envelope_m": 0.15940294799963595,
+          "calf_geom_distances_m": [
+            -9.026316575418136e-05,
+            0.04385836607409979,
+            0.04756437596704073,
+            0.09697520655753604
+          ]
+        },
+        "seed": 8305,
+        "lifts": [
+          1,
+          1,
+          0,
+          1
+        ],
+        "signed_progress": -0.007065372878244401,
+        "fixed_exit_s": 0.0,
+        "fixed_entry_s": 0.0,
+        "travel_m": 0.2307342232198161,
+        "forward_progress_m": 0.15320771804299232,
+        "signed_elevation_m": 0.0,
+        "motion_base_height_m": 0.3636519899078872,
+        "nonwheel_frames": 1,
+        "min_distal_calf_surface_m": [
+          -0.016292514794378238,
+          0.021691083441477715,
+          0.011115255248579342,
+          0.015951675454565883
+        ],
+        "distal_calf_warning_s": [
+          2.1399999999999846,
+          null,
+          2.2087499999999953,
+          null
+        ],
+        "min_calf_hull_vertex_gap_m": [
+          -9.026274173634663e-05,
+          0.03690522658636547,
+          0.03094973596925843,
+          0.03673065920566945
+        ],
+        "calf_hull_warning_s": [
+          2.224999999999998,
+          null,
+          null,
+          null
+        ],
+        "min_calf_geom_distance_m": [
+          -9.026316575418136e-05,
+          0.03690522778967813,
+          0.030949740069690257,
+          0.036730663828909146
+        ],
+        "calf_geom_warning_s": [
+          2.224999999999998,
+          null,
+          null,
+          null
+        ],
+        "min_knee_surface_m": 0.10669089284075553,
+        "max_effort_fraction_of_guard": 0.8651757019245998
+      }
+    ]
+  },
+  "down": {
+    "passed": 0,
+    "total": 4,
+    "rows": [
+      {
+        "passed": false,
+        "failure": "joint_angle",
+        "failure_time_s": 3.3925,
+        "failure_joints": [
+          {
+            "name": "FL_hip",
+            "angle_rad": 0.7078024778839676,
+            "target_rad": 0.3484782075881958,
+            "lower_rad": -0.7065,
+            "upper_rad": 0.7065,
+            "velocity_rad_s": 2.085155256285708,
+            "actuator_effort_nm": -21.44141957541202,
+            "effort_limit_nm": 54.0
+          }
+        ],
+        "failure_up_body": [
+          -0.4207985762796969,
+          -0.08007669519007192,
+          0.9036129044499182
+        ],
+        "failure_detail": {
+          "wheel_vertical_load_n": [
+            199.19684309070203,
+            142.79135864534538,
+            0.0,
+            0.0
+          ],
+          "simultaneous_nonwheel_contact": false
+        },
+        "seed": 8302,
+        "lifts": [
+          1,
+          1,
+          0,
+          0
+        ],
+        "signed_progress": -0.02228957762540578,
+        "fixed_exit_s": 0.0,
+        "fixed_entry_s": 0.0,
+        "travel_m": 0.2369802108375601,
+        "forward_progress_m": 0.20382215262921033,
+        "signed_elevation_m": 0.0,
+        "motion_base_height_m": 0.3683063396433085,
+        "nonwheel_frames": 0,
+        "min_distal_calf_surface_m": [
+          -0.02025379649888634,
+          0.01965993235362451,
+          0.01870752991879987,
+          0.006847742905519372
+        ],
+        "distal_calf_warning_s": [
+          2.0999999999999783,
+          null,
+          null,
+          0.00125
+        ],
+        "min_calf_hull_vertex_gap_m": [
+          0.0036190656409931243,
+          0.0330942478628698,
+          0.0376624142473051,
+          0.025680447652970395
+        ],
+        "calf_hull_warning_s": [
+          2.570000000000052,
+          null,
+          null,
+          null
+        ],
+        "min_calf_geom_distance_m": [
+          -0.19854317151940595,
+          0.03309424851041169,
+          0.037662634936223766,
+          0.02568045283049944
+        ],
+        "calf_geom_warning_s": [
+          2.570000000000052,
+          null,
+          null,
+          null
+        ],
+        "min_knee_surface_m": 0.1186635025106193,
+        "max_effort_fraction_of_guard": 0.7390567074178175
+      },
+      {
+        "passed": false,
+        "failure": "joint_angle",
+        "failure_time_s": 2.62,
+        "failure_joints": [
+          {
+            "name": "FR_hip",
+            "angle_rad": 0.7066165421652619,
+            "target_rad": 0.2906234194191193,
+            "lower_rad": -0.7065,
+            "upper_rad": 0.7065,
+            "velocity_rad_s": 0.3997196815539275,
+            "actuator_effort_nm": -23.204904292714396,
+            "effort_limit_nm": 54.0
+          }
+        ],
+        "failure_up_body": [
+          -0.07661967191906008,
+          0.18292990758736075,
+          0.9801357430402666
+        ],
+        "failure_detail": {
+          "wheel_vertical_load_n": [
+            0.0,
+            156.17888522205055,
+            0.0,
+            79.61116818597691
+          ],
+          "simultaneous_nonwheel_contact": false
+        },
+        "seed": 8303,
+        "lifts": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "signed_progress": 0.03863245721895735,
+        "fixed_exit_s": 0.0,
+        "fixed_entry_s": 1.1400000000000001,
+        "travel_m": 0.21601142366213533,
+        "forward_progress_m": -0.007534282110587043,
+        "signed_elevation_m": 0.0,
+        "motion_base_height_m": 0.3656577205085339,
+        "nonwheel_frames": 0,
+        "min_distal_calf_surface_m": [
+          -0.005926381740634923,
+          0.026576063452860288,
+          0.008992678675659727,
+          0.010854921717421917
+        ],
+        "distal_calf_warning_s": [
+          0.00125,
+          null,
+          0.00125,
+          0.00125
+        ],
+        "min_calf_hull_vertex_gap_m": [
+          0.01632978601158347,
+          0.04354352191690791,
+          0.027649722062725812,
+          0.029517485722155234
+        ],
+        "calf_hull_warning_s": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "min_calf_geom_distance_m": [
+          0.01633001530522446,
+          0.04354357199999149,
+          0.0276497837471463,
+          0.02951749086756479
+        ],
+        "calf_geom_warning_s": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "min_knee_surface_m": 0.12937208794004007,
+        "max_effort_fraction_of_guard": 0.4297204498650814
+      },
+      {
+        "passed": false,
+        "failure": "nonwheel_contact",
+        "failure_time_s": 4.93375,
+        "failure_joints": [],
+        "failure_up_body": [
+          -0.20652414115297535,
+          0.27375937963761177,
+          0.9393633914420201
+        ],
+        "failure_detail": {
+          "links": [
+            "FL_calf"
+          ],
+          "contacts": [
+            {
+              "link": "FL_calf",
+              "robot_geom": "",
+              "point_link_m": [
+                -0.0025485301716326935,
+                -0.032047441806155555,
+                -0.2441883462700957
+              ],
+              "terrain": "stair_5",
+              "point_world_m": [
+                2.4025846437041043,
+                -0.4229889199140422,
+                0.1999910033259012
+              ],
+              "normal_world": [
+                0.0,
+                0.0,
+                1.0
+              ],
+              "separation_m": -1.6291762241577024e-05,
+              "normal_force_n": 95.99319523739757
+            }
+          ],
+          "swing_lift_weight": [
+            0.0,
+            0.0,
+            0.0,
+            0.8153848052024841
+          ],
+          "wheel_tread_clearance_m": [
+            -0.041150267660843814,
+            -0.0015600961309731598,
+            0.006197684371776396,
+            -0.007498297018239425
+          ],
+          "min_knee_envelope_m": 0.16485710244295476,
+          "calf_geom_distances_m": [
+            -0.15159360436626748,
+            0.04475358331795945,
+            0.05094176238224837,
+            0.037997966314168304
+          ]
+        },
+        "seed": 8304,
+        "lifts": [
+          1,
+          1,
+          0,
+          1
+        ],
+        "signed_progress": -0.038741569282696404,
+        "fixed_exit_s": 0.0,
+        "fixed_entry_s": 0.0,
+        "travel_m": 0.3734064539692951,
+        "forward_progress_m": 0.36514616482695095,
+        "signed_elevation_m": 0.0,
+        "motion_base_height_m": 0.3597010321078178,
+        "nonwheel_frames": 1,
+        "min_distal_calf_surface_m": [
+          -0.016630630322118284,
+          0.019766465379659398,
+          0.009899451553375016,
+          0.01959720962791181
+        ],
+        "distal_calf_warning_s": [
+          2.0874999999999764,
+          null,
+          0.00125,
+          null
+        ],
+        "min_calf_hull_vertex_gap_m": [
+          -1.629472260400444e-05,
+          0.03537909557246213,
+          0.030398141073993773,
+          0.03522624634958679
+        ],
+        "calf_hull_warning_s": [
+          2.1987499999999938,
+          null,
+          null,
+          null
+        ],
+        "min_calf_geom_distance_m": [
+          -0.224149052285091,
+          0.035379455727026166,
+          0.030398173839787435,
+          0.03522655787854212
+        ],
+        "calf_geom_warning_s": [
+          2.1987499999999938,
+          null,
+          null,
+          null
+        ],
+        "min_knee_surface_m": 0.13025640942800282,
+        "max_effort_fraction_of_guard": 0.7368434489225835
+      },
+      {
+        "passed": false,
+        "failure": "joint_angle",
+        "failure_time_s": 3.3775,
+        "failure_joints": [
+          {
+            "name": "FL_hip",
+            "angle_rad": 0.7094155752941608,
+            "target_rad": 0.3544333076477051,
+            "lower_rad": -0.7065,
+            "upper_rad": 0.7065,
+            "velocity_rad_s": 2.435425471025926,
+            "actuator_effort_nm": -23.37540269593425,
+            "effort_limit_nm": 54.0
+          }
+        ],
+        "failure_up_body": [
+          -0.4167655868411585,
+          -0.06932540064168588,
+          0.9063666115048677
+        ],
+        "failure_detail": {
+          "wheel_vertical_load_n": [
+            170.93341849714702,
+            128.23657557223896,
+            0.0,
+            0.0
+          ],
+          "simultaneous_nonwheel_contact": false
+        },
+        "seed": 8305,
+        "lifts": [
+          1,
+          1,
+          0,
+          0
+        ],
+        "signed_progress": -0.025002472919457962,
+        "fixed_exit_s": 0.0,
+        "fixed_entry_s": 0.0,
+        "travel_m": 0.3218124865960643,
+        "forward_progress_m": 0.15020096494181345,
+        "signed_elevation_m": 0.0,
+        "motion_base_height_m": 0.35331976765921264,
+        "nonwheel_frames": 0,
+        "min_distal_calf_surface_m": [
+          -0.014542101898491755,
+          0.018378829688069864,
+          0.012862668022177393,
+          0.01565385097399169
+        ],
+        "distal_calf_warning_s": [
+          2.142499999999985,
+          null,
+          2.2049999999999947,
+          null
+        ],
+        "min_calf_hull_vertex_gap_m": [
+          0.004304010585011009,
+          0.03408021370682757,
+          0.033558175056348394,
+          0.03648050567349137
+        ],
+        "calf_hull_warning_s": [
+          2.2237499999999977,
+          null,
+          null,
+          null
+        ],
+        "min_calf_geom_distance_m": [
+          0.004304029065611059,
+          0.03408028720972266,
+          0.03355821953881656,
+          0.03648057233428485
+        ],
+        "calf_geom_warning_s": [
+          2.2237499999999977,
+          null,
+          null,
+          null
+        ],
+        "min_knee_surface_m": 0.10708896890251379,
+        "max_effort_fraction_of_guard": 1.0
+      }
+    ]
+  }
+}
