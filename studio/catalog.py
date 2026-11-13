@@ -131,6 +131,11 @@ class Catalog:
                     models.append({'id':key,'name':path.name,'group':path.parent.name,'path':self.relative(path),'bytes':path.stat().st_size})
         report_paths=list(self.root.glob('*.md'))+list((self.root/'docs').rglob('*.md'))+list((self.root/'skills').rglob('*.md'))+list((self.root/'go2_nav/paw_contact').glob('*.md'))
         if (self.root/'studio/README.md').exists():report_paths.append(self.root/'studio/README.md')
+        as2w_training = self.root / 'training/as2w-backup/as2w-current'
+        for filename in ('AGENTS.md', 'AS2-W-training-delivery-checklist-v3.md'):
+            manual = as2w_training / filename
+            if manual.is_file():
+                report_paths.append(manual)
         from .documents import aliases
         doc_aliases=aliases(self.root)
         for path in sorted(report_paths):

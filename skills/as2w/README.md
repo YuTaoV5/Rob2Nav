@@ -1,5 +1,10 @@
 # AS2-W skills
 
+## 训练与交付手册
+
+- [AS2-W 训练守则](../../training/as2w-backup/as2w-current/AGENTS.md)
+- [AS2-W 训练到部署交付清单 v3](../../training/as2w-backup/as2w-current/AS2-W-training-delivery-checklist-v3.md)
+
 | Skill | Training recipe | Scope |
 |---|---|---|
 | Rolling | [formal.sh](rolling/recipes/formal.sh) | Straight rolling, turning, braking and fixed stand |
