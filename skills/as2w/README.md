@@ -4,6 +4,7 @@
 
 - [AS2-W 训练守则](../../training/as2w-backup/as2w-current/AGENTS.md)
 - [AS2-W 训练到部署交付清单 v3](../../training/as2w-backup/as2w-current/AS2-W-training-delivery-checklist-v3.md)
+- [AS2-W 后双轮直立训练与部署手册](rear-two-wheel/README.md)
 
 | Skill | Training recipe | Scope |
 |---|---|---|
