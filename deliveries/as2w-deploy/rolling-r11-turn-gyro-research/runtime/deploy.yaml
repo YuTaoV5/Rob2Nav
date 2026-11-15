@@ -103,6 +103,14 @@ fallback:
   to_stock_controller: "run the acceptance/probe scripts with --yaw-kp 0 (and --ff-gain 0); that is the unmodified controller"
   to_previous_skill: "stop publishing wheel velocity targets and hand control back per the fixed-stand sequence"
 
+link_loss_policy:            # MEASURED, must be implemented in the deployment wrapper
+  action_on_loss: zero_command     # NOT hold-last-command
+  evidence: "3 s outage: zeroing travels 0.023 m vs 0.638 m when holding the last command (27.3x)"
+  detection_delay_ms: 300          # measured cost is about 0.02 m of extra travel per 100 ms
+  detection_delay_evidence: "evidence/LOSS_DETECT_DELAY.md: 0/100/300 ms -> 0.023/0.048/0.086 m"
+  burst_loss_note: "IID frame loss at 5 and 15 percent kept 6/11 with no verdict changes, but BURST loss of 10 or 30 consecutive held frames drops to 5/11, so sustained loss must degrade (slow down or stop) rather than hold indefinitely. Burst loss is a SEPARATE test case from IID loss and must not be covered by the IID result."
+  burst_loss_evidence: "evidence/FRAME_DROP.md and evidence/BURST_LOSS.md"
+
 hardware_slots:              # MUST be filled from the current firmware documentation on site
   FL_hip: not_measured
   FR_hip: not_measured
@@ -132,5 +140,5 @@ known_limits_of_this_version:
   payload: "unloaded only; +6 kg measured and NOT passed (6/11 -> 4/11)"
   steering: "arc_right passes; arc_left and all four pure-turn cases fail"
   braking: "passes unloaded at 0.25 m/s (stop distance 0.05-0.07 m)"
-  dual_simulator: "NO candidate passes both MuJoCo and Isaac Lab"
+  dual_simulator: "NO candidate passes both MuJoCo and Isaac Lab; the cases that DO pass on both ends are hold, straight fwd/bwd, arc_right and both brakes (6 with gyro-1, 5 with the base wrapper); arc_left passes on MuJoCo only - see evidence/DUAL_SIM_QUADRANT.md"
   site_acceptance: "R3 and R4 not_run - they need a site authorisation"
