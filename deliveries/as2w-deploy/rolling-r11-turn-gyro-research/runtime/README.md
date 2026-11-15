@@ -12,6 +12,7 @@
 | `r11_c8_verify.py` | 用 `policy.onnx` 重放捕获的 obs，报告最大误差、最差维度与首次分歧帧 |
 | `r11_c5_handover.py` | stand → ramp → hold → ramp → stand 五阶段，报告逐阶段姿态/支撑/终止与退出漂移 |
 | `r11_c5_commloss.py` | 通讯失效对照：冻结最后指令 vs 判定失联即归零，报告失联期间行进距离与恢复时间 |
+| `r11_speed_envelope.py` | 0.25 / 0.60 / 1.00 m/s 逐档实测跟踪、支撑、终止与刹停距离 |
 
 ## gyro-1 包装（版本 gyro-1）
 
