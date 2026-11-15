@@ -64,7 +64,7 @@ python runtime/r11_acceptance_ff.py --usd <as2w.usda> --urdf <as2w.urdf> --out /
 | C2 模型接口 | **pass**（见下） |
 | C3 观测合同 | **pass**（`evidence/C3_OBSERVATION_CONTRACT.md`） |
 | C4 输出链路 | partial（`evidence/C4_OUTPUT_CHAIN.md`；无实机 DDS 映射） |
-| C5 入口与退出 | **not_run**（fixed stand 中转未实现） |
+| C5 入口与退出 | partial（`evidence/C5_HANDOVER.md`；仿真内已验证，未测策略切换/急停） |
 | C6 仿真与资产 | partial（`evidence/C6_ASSETS.md`；未逐个记录 STL 哈希） |
 | C7 逐例证据 | **pass**（`evidence/isaac/`、`evidence/mujoco/`） |
 | C8 最小回放 | **pass**（600 帧真实 rollout，5.96e-07） |

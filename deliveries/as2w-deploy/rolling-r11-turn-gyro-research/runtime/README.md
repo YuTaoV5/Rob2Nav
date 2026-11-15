@@ -10,6 +10,7 @@
 | `export_policy_onnx.py` | 从 checkpoint 的 `actor_state_dict` 导出 `policy.onnx` 并做 ORT 一致性校验 |
 | `r11_c8_dump.py` | 捕获真实 rollout 的逐帧 obs / 原始输出 / 最终轮目标 / 实测 dq / 下一帧 obs |
 | `r11_c8_verify.py` | 用 `policy.onnx` 重放捕获的 obs，报告最大误差、最差维度与首次分歧帧 |
+| `r11_c5_handover.py` | stand → ramp → hold → ramp → stand 五阶段，报告逐阶段姿态/支撑/终止与退出漂移 |
 
 ## gyro-1 包装（版本 gyro-1）
 
