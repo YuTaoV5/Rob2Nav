@@ -135,6 +135,12 @@ def main() -> int:
                     help="bounded gyro yaw feedback, Nm per (rad/s) of (cmd - measured) yaw rate")
     ap.add_argument("--payload-kg", type=float, default=0.0,
                     help="fixed payload added to the base link (goal section 4: 0 / +6 kg tiers)")
+    ap.add_argument("--drop-rate", type=float, default=0.0,
+                    help="per-policy-step probability that the action frame is LOST, in which case "
+                         "the last valid action is held (goal section 2: whole-frame loss + "
+                         "last-valid-frame hold)")
+    ap.add_argument("--drop-seed", type=int, default=1234,
+                    help="RNG seed for the frame-drop pattern so a run is reproducible")
     ap.add_argument("--action-delay-steps", type=int, default=0,
                     help="communication latency in POLICY steps: the robot applies the action "
                          "issued N steps ago (goal section 4 latency tier)")
@@ -239,13 +245,31 @@ def main() -> int:
             _delay = int(getattr(args, "action_delay_steps", 0))
             _hist = deque(maxlen=max(1, _delay + 1))
 
+            import random as _random
+            _drop = float(getattr(args, "drop_rate", 0.0))
+            _rng = _random.Random(int(getattr(args, "drop_seed", 1234)))
+            _last_valid = {"a": None, "drops": 0, "steps": 0}
+
             def delayed_step(a):
-                """Apply a[-(_delay+1)] instead of a; with _delay 0 this is a no-op."""
+                """Apply a[-(_delay+1)] instead of a; with _delay 0 this is a no-op.
+
+                With --drop-rate > 0 a frame is lost with that probability and the robot keeps
+                executing the last VALID action (last-valid-frame hold), which is the failure
+                mode the training guide asks to model.  The policy always sees the real
+                resulting observation.
+                """
+                _last_valid["steps"] += 1
+                applied = a
+                if _drop > 0.0 and _last_valid["a"] is not None and _rng.random() < _drop:
+                    applied = _last_valid["a"]
+                    _last_valid["drops"] += 1
+                else:
+                    _last_valid["a"] = a.clone()
                 if _delay <= 0:
-                    return wrapped.step(a)
-                _hist.append(a.clone())
+                    return wrapped.step(applied)
+                _hist.append(applied.clone())
                 if len(_hist) <= _delay:
-                    return wrapped.step(a)          # still filling the pipeline
+                    return wrapped.step(applied)    # still filling the pipeline
                 return wrapped.step(_hist[0])
 
             def settle(seed):
@@ -368,6 +392,8 @@ def main() -> int:
             report = {"payload": payload_info,
                       "action_delay_steps": int(getattr(args, "action_delay_steps", 0)),
                       "action_delay_ms": int(getattr(args, "action_delay_steps", 0)) * 20,
+                      "drop_rate": float(getattr(args, "drop_rate", 0.0)),
+                      "drop_seed": int(getattr(args, "drop_seed", 1234)),
                       "action_delay_note": "the plant executes the action issued N policy steps ago; the policy sees the real resulting observation",
                       "arm": {"ff_gain_nm_per_rad_s": float(args.ff_gain),
                               "axis": "LEFT-vs-RIGHT differential (s = -1,+1,-1,+1), driven by the COMMANDED wz",
@@ -430,6 +456,8 @@ def main() -> int:
                         "ff_abs_max": float(max(j["ff_abs_max"] for j in js)),
                         "cap_hits": int(max(j["cap_hits"] for j in js)),
                     }
+                entry["frames_dropped"] = int(_last_valid["drops"])
+                entry["frames_total"] = int(_last_valid["steps"])
                 entry["pass_total"] = sum(1 for c in entry["cases"].values() if c["pass_all"])
                 report["candidates"].append(entry)
                 print("  ==> %s ff=%.1f: %d/%d pass"

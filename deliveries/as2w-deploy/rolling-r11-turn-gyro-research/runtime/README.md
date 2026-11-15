@@ -2,7 +2,7 @@
 
 | 文件 | 用途 |
 | --- | --- |
-| `r11_acceptance_ff.py` | Isaac 11 用例验收，**含 gyro-1 包装**（`--ff-gain`/`--ff-cap`/`--yaw-kp`/`--leg-kp-scale`/`--payload-kg`/`--action-delay-steps`） |
+| `r11_acceptance_ff.py` | Isaac 11 用例验收，**含 gyro-1 包装**（`--ff-gain`/`--ff-cap`/`--yaw-kp`/`--leg-kp-scale`/`--payload-kg`/`--action-delay-steps`/`--drop-rate`） |
 | `r11_acceptance_v2.py` | 同一矩阵的**未改包装**基线（对照用） |
 | `r11_mj_matrix_v2.py` | MuJoCo 11 用例矩阵（多站态） |
 | `r11_isaac_exec_probe.py` | 逐轮逐帧执行链探针（目标/实测/力矩/触顶/载荷） |
