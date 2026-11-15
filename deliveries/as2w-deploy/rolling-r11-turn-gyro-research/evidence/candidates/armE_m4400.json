@@ -1,0 +1,220 @@
+{
+ "payload": {
+  "requested_kg": 0.0,
+  "applied": false,
+  "method": "startup mass event on base_link, operation=add",
+  "base_body_name": "base_link",
+  "base_mass_after_kg": 10.579999923706055,
+  "total_mass_after_kg": 26.0,
+  "readback_ok": true
+ },
+ "action_delay_steps": 0,
+ "action_delay_ms": 0,
+ "drop_rate": 0.0,
+ "drop_burst": 1,
+ "drop_seed": 1234,
+ "action_delay_note": "the plant executes the action issued N policy steps ago; the policy sees the real resulting observation",
+ "arm": {
+  "ff_gain_nm_per_rad_s": 0.0,
+  "axis": "LEFT-vs-RIGHT differential (s = -1,+1,-1,+1), driven by the COMMANDED wz",
+  "drive": "wz_cmd (exactly 0 in hold and every straight case)",
+  "ff_cap_nm": 4.0,
+  "yaw_kp": 60.0,
+  "yaw_feedback": "bounded, state-free (no integrator): K*(wz_cmd - wz_meas)",
+  "common_mode_effect": "none by construction",
+  "wheel_limit_nm": 13.5,
+  "legs_touched": false,
+  "leg_kp_scale": 1.0,
+  "state_free": true
+ },
+ "seeds": [
+  7393,
+  311
+ ],
+ "candidates": [
+  {
+   "label": "armE_m4400",
+   "cases": {
+    "hold": {
+     "verdicts": [
+      "PASS",
+      "PASS"
+     ],
+     "pass_all": true,
+     "support_min": 1.0,
+     "upright_min": 0.9970695972442627,
+     "term_any": 0,
+     "yaw_track_mean": null,
+     "vx_track_mean": null,
+     "exec_mean": 0.4748983802669756,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 146
+    },
+    "turn_left_0.05": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "pass_all": false,
+     "support_min": 1.0,
+     "upright_min": 0.9966738820075989,
+     "term_any": 0,
+     "yaw_track_mean": 0.2192143677326385,
+     "vx_track_mean": null,
+     "exec_mean": 0.5193821600595423,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 154
+    },
+    "turn_right_0.05": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "pass_all": false,
+     "support_min": 1.0,
+     "upright_min": 0.9975005388259888,
+     "term_any": 0,
+     "yaw_track_mean": 0.17388732491720776,
+     "vx_track_mean": null,
+     "exec_mean": 0.5998806912812245,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 162
+    },
+    "turn_left_0.10": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "pass_all": false,
+     "support_min": 1.0,
+     "upright_min": 0.9966435432434082,
+     "term_any": 0,
+     "yaw_track_mean": 0.12903174630676706,
+     "vx_track_mean": null,
+     "exec_mean": 0.2521002293905129,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 172
+    },
+    "turn_right_0.10": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "pass_all": false,
+     "support_min": 1.0,
+     "upright_min": 0.9970813989639282,
+     "term_any": 0,
+     "yaw_track_mean": 0.07388807242386974,
+     "vx_track_mean": null,
+     "exec_mean": 0.2500987403993111,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 181
+    },
+    "straight_fwd_0.25": {
+     "verdicts": [
+      "PASS",
+      "PASS"
+     ],
+     "pass_all": true,
+     "support_min": 1.0,
+     "upright_min": 0.9958489537239075,
+     "term_any": 0,
+     "yaw_track_mean": null,
+     "vx_track_mean": 0.8651379295190176,
+     "exec_mean": 0.936484619229879,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 206
+    },
+    "straight_bwd_0.25": {
+     "verdicts": [
+      "PASS",
+      "PASS"
+     ],
+     "pass_all": true,
+     "support_min": 1.0,
+     "upright_min": 0.997398853302002,
+     "term_any": 0,
+     "yaw_track_mean": null,
+     "vx_track_mean": 0.8462071893612544,
+     "exec_mean": 0.9964658762544674,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 223
+    },
+    "arc_left_0.25": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "pass_all": false,
+     "support_min": 1.0,
+     "upright_min": 0.9964202046394348,
+     "term_any": 0,
+     "yaw_track_mean": 0.3057325491060813,
+     "vx_track_mean": 0.7908454595009486,
+     "exec_mean": 0.8322138423639825,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 271
+    },
+    "arc_right_0.25": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "pass_all": false,
+     "support_min": 1.0,
+     "upright_min": 0.9960846900939941,
+     "term_any": 0,
+     "yaw_track_mean": -0.020655942002000924,
+     "vx_track_mean": 0.8565912830829621,
+     "exec_mean": 0.8947285847766703,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 287
+    },
+    "brake_fwd_0.25": {
+     "verdicts": [
+      "PASS",
+      "PASS"
+     ],
+     "pass_all": true,
+     "support_min": 1.0,
+     "upright_min": 0.9924044609069824,
+     "term_any": 0,
+     "yaw_track_mean": null,
+     "vx_track_mean": 0.0068947983222703135,
+     "exec_mean": 0.9490576676961706,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 332
+    },
+    "brake_bwd_0.25": {
+     "verdicts": [
+      "PASS",
+      "PASS"
+     ],
+     "pass_all": true,
+     "support_min": 1.0,
+     "upright_min": 0.9960914254188538,
+     "term_any": 0,
+     "yaw_track_mean": null,
+     "vx_track_mean": -0.029555938991640385,
+     "exec_mean": 0.5266857979661215,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 373
+    }
+   },
+   "frames_dropped": 0,
+   "frames_total": 14800,
+   "pass_total": 5
+  }
+ ]
+}
