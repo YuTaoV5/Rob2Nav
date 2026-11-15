@@ -84,6 +84,10 @@ def main() -> int:
     ap.add_argument("--ckpt", type=Path, required=True)
     ap.add_argument("--seed", type=int, default=7393)
     ap.add_argument("--vx", type=float, default=0.25)
+    ap.add_argument("--detect-ms", type=int, default=0,
+                    help="link-loss detection delay: hold the last command for this long before "
+                         "declaring the link dead and zeroing (GOAL_STATUS recorded this as "
+                         "not_measured, so it is measured here)")
     ap.add_argument("--num-envs", type=int, default=1)
     ap.add_argument("--iterations", type=int, default=1)
     add_launcher_args(ap)
@@ -143,15 +147,20 @@ def main() -> int:
                     step_once()
                 vx_at_loss = float(robot.data.root_lin_vel_b.torch[0, 0])
 
-                # link lost: the two candidate policies differ only here
-                if mode == "zero":
-                    cmd(0.0)
-                # hold_last leaves the command at its last value
+                # Link lost.  A real stack needs a detection delay before it declares the link
+                # dead, so --detect-ms holds the last command for that long and only then applies
+                # the variant's handling.  --detect-ms 0 reproduces the earlier immediate test.
+                n_detect = int(round(float(args.detect_ms) / 1000.0 / DT))
+                n_loss = int(LOSS_S / DT)
 
                 lost = []
-                for _ in range(int(LOSS_S / DT)):
+                for k in range(n_loss):
                     if mode == "hold_last":
                         cmd(args.vx)
+                    elif k < n_detect:
+                        cmd(args.vx)      # still within the detection window: last command held
+                    else:
+                        cmd(0.0)
                     lost.append(step_once())
 
                 rec = []
@@ -163,7 +172,7 @@ def main() -> int:
                 below = np.where(vxs < STOP_EPS)[0]
                 t_stop = (float(below[0]) * DT) if below.size else None
                 return {
-                    "mode": mode,
+                    "mode": mode, "detect_ms": int(args.detect_ms),
                     "vx_at_loss": vx_at_loss,
                     "loss_speed_mean": float(np.mean([abs(r["vx"]) for r in lost])),
                     "loss_distance_m": float(sum(abs(r["vx"]) for r in lost) * DT),
@@ -179,6 +188,7 @@ def main() -> int:
             rep = {"checkpoint": str(args.ckpt), "seed": args.seed,
                    "command_vx": args.vx, "note": "simulation only; not hardware evidence",
                    "sequence": {"drive_s": DRIVE_S, "loss_s": LOSS_S, "recover_s": RECOVER_S},
+                   "detect_ms": int(args.detect_ms),
                    "variants": [variant("hold_last"), variant("zero")]}
             (args.out / "c5_commloss.json").write_text(json.dumps(rep, indent=1, default=str))
             print()
