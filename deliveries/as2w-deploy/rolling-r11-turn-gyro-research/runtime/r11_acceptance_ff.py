@@ -135,6 +135,9 @@ def main() -> int:
                     help="bounded gyro yaw feedback, Nm per (rad/s) of (cmd - measured) yaw rate")
     ap.add_argument("--payload-kg", type=float, default=0.0,
                     help="fixed payload added to the base link (goal section 4: 0 / +6 kg tiers)")
+    ap.add_argument("--action-delay-steps", type=int, default=0,
+                    help="communication latency in POLICY steps: the robot applies the action "
+                         "issued N steps ago (goal section 4 latency tier)")
     ap.add_argument("--num-envs", type=int, default=1)
     ap.add_argument("--iterations", type=int, default=1)
     add_launcher_args(ap)
@@ -232,15 +235,29 @@ def main() -> int:
             ppo = handle_dep(ppo, check_v())
             runner = create_runner(wrapped, ppo, log_dir=None)
 
+            from collections import deque
+            _delay = int(getattr(args, "action_delay_steps", 0))
+            _hist = deque(maxlen=max(1, _delay + 1))
+
+            def delayed_step(a):
+                """Apply a[-(_delay+1)] instead of a; with _delay 0 this is a no-op."""
+                if _delay <= 0:
+                    return wrapped.step(a)
+                _hist.append(a.clone())
+                if len(_hist) <= _delay:
+                    return wrapped.step(a)          # still filling the pipeline
+                return wrapped.step(_hist[0])
+
             def settle(seed):
                 env.seed(seed); env.reset()
+                _hist.clear()
                 cmdterm.vel_command_b[:] = 0.0
                 st["calls"] = 0
                 obs = wrapped.get_observations()
                 for _ in range(int(SETTLE_S / DT)):
                     with torch.inference_mode():
                         a = policy(obs)
-                    obs, _rew, _don, _info = wrapped.step(a)
+                    obs, _rew, _don, _info = delayed_step(a)
                 return obs
 
             def run_case(obs, cmd_fn, seconds):
@@ -257,7 +274,7 @@ def main() -> int:
                         [c], dtype=torch.float32, device=env.device)
                     with torch.inference_mode():
                         a = policy(obs)
-                    obs, _rew, _don, _info = wrapped.step(a)
+                    obs, _rew, _don, _info = delayed_step(a)
                     # termination must actually be read: the earlier version inspected a
                     # list with isinstance(_, tuple) and therefore never set this flag,
                     # which could have scored a fallen episode as PASS.
@@ -349,6 +366,9 @@ def main() -> int:
                      ("brake_bwd_0.25", 10.0, brake_fn(-STRAIGHT_TIER), True)]
 
             report = {"payload": payload_info,
+                      "action_delay_steps": int(getattr(args, "action_delay_steps", 0)),
+                      "action_delay_ms": int(getattr(args, "action_delay_steps", 0)) * 20,
+                      "action_delay_note": "the plant executes the action issued N policy steps ago; the policy sees the real resulting observation",
                       "arm": {"ff_gain_nm_per_rad_s": float(args.ff_gain),
                               "axis": "LEFT-vs-RIGHT differential (s = -1,+1,-1,+1), driven by the COMMANDED wz",
                               "drive": "wz_cmd (exactly 0 in hold and every straight case)",
