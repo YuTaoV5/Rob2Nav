@@ -1,0 +1,90 @@
+{
+ "capture": "/root/gpufree-data/as2w-runs/as2w-rolling-goal/results/eval/c8-capture-20261116-060017/c8_capture_arc_right_0.25.json",
+ "onnx": "/root/gpufree-data/Rob2Nav/deliveries/as2w-deploy/rolling-r11-turn-gyro-research/weights/policy.onnx",
+ "case": "arc_right_0.25",
+ "n_frames": 600,
+ "obs_dim": 65,
+ "action_dim": 16,
+ "tolerance": 1e-05,
+ "replay": {
+  "max_abs_err": 5.960464477539062e-07,
+  "mean_abs_err": 7.10995919916968e-08,
+  "worst_frame": 459,
+  "worst_output_index": 11,
+  "worst_axis_by_max_err": 11,
+  "first_divergence_frame": null,
+  "first_divergence_t_s": null,
+  "frames_over_tolerance": 0,
+  "pass": true
+ },
+ "per_output_index": {
+  "0": {
+   "max_abs_err": 2.384185791015625e-07,
+   "mean_abs_err": 5.6003532478143825e-08
+  },
+  "1": {
+   "max_abs_err": 2.2351741790771484e-07,
+   "mean_abs_err": 4.5262275705226784e-08
+  },
+  "2": {
+   "max_abs_err": 4.172325134277344e-07,
+   "mean_abs_err": 8.098781023591073e-08
+  },
+  "3": {
+   "max_abs_err": 5.066394805908203e-07,
+   "mean_abs_err": 1.0793407767550889e-07
+  },
+  "4": {
+   "max_abs_err": 4.172325134277344e-07,
+   "mean_abs_err": 9.890025154390969e-08
+  },
+  "5": {
+   "max_abs_err": 4.76837158203125e-07,
+   "mean_abs_err": 1.0368724900899906e-07
+  },
+  "6": {
+   "max_abs_err": 2.980232238769531e-07,
+   "mean_abs_err": 7.68154890806727e-08
+  },
+  "7": {
+   "max_abs_err": 2.980232238769531e-07,
+   "mean_abs_err": 6.117547712847227e-08
+  },
+  "8": {
+   "max_abs_err": 3.5762786865234375e-07,
+   "mean_abs_err": 8.218611213806071e-08
+  },
+  "9": {
+   "max_abs_err": 2.384185791015625e-07,
+   "mean_abs_err": 6.025346266369525e-08
+  },
+  "10": {
+   "max_abs_err": 3.5762786865234375e-07,
+   "mean_abs_err": 8.013099517256705e-08
+  },
+  "11": {
+   "max_abs_err": 5.960464477539062e-07,
+   "mean_abs_err": 1.0733803179618917e-07
+  },
+  "12": {
+   "max_abs_err": 1.4901161193847656e-07,
+   "mean_abs_err": 3.605460108246916e-08
+  },
+  "13": {
+   "max_abs_err": 1.9371509552001953e-07,
+   "mean_abs_err": 4.468485670372502e-08
+  },
+  "14": {
+   "max_abs_err": 2.980232238769531e-07,
+   "mean_abs_err": 5.5713268665158466e-08
+  },
+  "15": {
+   "max_abs_err": 2.2351741790771484e-07,
+   "mean_abs_err": 4.046596657758528e-08
+  }
+ },
+ "target_to_torque_chain": {
+  "law": "tau_i = kd*(wheel_target_i - wheel_dq_measured_i), kd = 6.0",
+  "owner": "deployment wrapper / actuator; verified here only as arithmetic"
+ }
+}

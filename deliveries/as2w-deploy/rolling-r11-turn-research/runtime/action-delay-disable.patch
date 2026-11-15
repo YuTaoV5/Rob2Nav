@@ -1,0 +1,33 @@
+diff --git a/training/as2w-backup/as2w-current/code/as2w_isaac_robust_env.py b/training/as2w-backup/as2w-current/code/as2w_isaac_robust_env.py
+index d0d5ea6..175853f 100644
+--- a/training/as2w-backup/as2w-current/code/as2w_isaac_robust_env.py
++++ b/training/as2w-backup/as2w-current/code/as2w_isaac_robust_env.py
+@@ -49,7 +49,17 @@ class DelayedTarget:
+     def reset(self, env_ids=None):
+         super().reset(env_ids)
+         ids = slice(None) if env_ids is None else env_ids
+-        self._lag[ids] = torch.randint(5, self._lag[ids].shape, device=self._lag.device)
++        # Action-delay DR is DISABLED by default.  `delayed()` is called from
++        # apply_actions(), which runs once per PHYSICS substep (decimation times
++        # per policy step); a depth-5 ring written 4x per policy step aliases, so
++        # the nominal "0..4 policy steps" delay does not mean what it looks like.
++        # Re-enable only after fixing and verifying the index semantics.
++        max_lag = int(getattr(self.cfg, "as2w_action_delay_max_steps", 0))
++        if max_lag > 0:
++            self._lag[ids] = torch.randint(max_lag + 1, self._lag[ids].shape,
++                                           device=self._lag.device)
++        else:
++            self._lag[ids] = 0
+         initial = self._initial_target(ids)
+         self._history[:, ids] = initial
+ 
+@@ -201,6 +211,9 @@ def robust_config(args, physics):
+     if args.profile in DELAY:
+         cfg.actions.joint_pos.class_type = DelayedPosition
+         cfg.actions.wheel_vel.class_type = DelayedVelocity
++        # Action-delay DR off by default; recorded in the run contract.
++        for _term in (cfg.actions.joint_pos, cfg.actions.wheel_vel):
++            _term.as2w_action_delay_max_steps = 0
+     if args.profile in {"friction", "combined", "expanded"}:
+         cfg.events.wheel_friction = EventTermCfg(
+             func=mdp.randomize_rigid_body_material, mode="startup", params={

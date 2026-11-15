@@ -1,0 +1,60 @@
+{
+  "schema": "as2w-delivery-manifest/v3",
+  "package": "rolling-r11-turn-research",
+  "status": "research",
+  "deployable": false,
+  "date": "2026-11-16",
+  "repo_commit": "abde5f49330a467db800e7cdcfe6e991c88b4c9b",
+  "selected_candidate": {
+    "name": "model_3998 (r11 line)",
+    "sha256": "92c44107bc16e4783e8b8cacc6c1d012f3f86e6700860a6a85badedbe86dfd66",
+    "init_chain": "trained 0->1999 then resumed 799->3998"
+  },
+  "wrappers": {
+    "r11-train-v1-fixdelay": {
+      "action_delay_dr": "disabled",
+      "wheel_kp": 0.0, "wheel_kd": 6.0, "wheel_effort_limit_nm": 13.5,
+      "leg_kp": 55.0, "leg_kd": 2.0, "leg_scale": 0.35, "wheel_scale": 16.0,
+      "action_clip": 6.0, "obs_dim": 65, "action_dim": 16, "policy_period_ms": 20
+    }
+  },
+  "C1_version_provenance": "pass",
+  "C2_model_interface": "partial - ONNX export and parity NOT RUN",
+  "C3_observation_contract": "pass",
+  "C4_output_chain": "pass",
+  "C5_entry_exit": "partial - fixed stand handover NOT RUN",
+  "C6_sim_assets": "pass",
+  "C7_per_case_evidence": "pass",
+  "C8_minimal_replay": "partial - ONNX Runtime comparison NOT RUN",
+  "R0_receive": "pass_simulation",
+  "R1_offline_align": "pass",
+  "R2_sim2sim": "fail",
+  "R3_arm64_readonly": "not_run",
+  "R4_real_robot": "not_run",
+  "verified_envelope": {
+    "hold_10s": "pass_both_sims",
+    "straight_fwd_m_s": 0.25,
+    "straight_bwd_m_s": 0.25,
+    "brake_release_m_s": 0.25,
+    "turn_rad_s": null,
+    "arc_rad_s": null,
+    "fixed_load_kg": null
+  },
+  "blocking_defects": [
+    "pure turn tracking 0.08-0.43 (gate 0.70) on both simulators",
+    "arc_right has essentially no yaw (0.01 Isaac / -0.04 MuJoCo)",
+    "turn +-0.10 in MuJoCo reaches yaw band only by collapsing support to 0.49-0.79",
+    "brake_forward fell in one MuJoCo stand state (27 non-wheel contacts)"
+  ],
+  "not_run": [
+    "ONNX export / ONNX Runtime parity",
+    "fixed stand hand-over and weight switching",
+    "link-loss recovery",
+    "0.6 and 1.0 m/s tiers",
+    "fixed load 0/+6 kg",
+    "latency / friction / push randomisation",
+    "leg-wheel joint design",
+    "R3 ARM64/CPRO read-only preflight",
+    "R4 real-robot closed loop (needs field authorisation)"
+  ]
+}

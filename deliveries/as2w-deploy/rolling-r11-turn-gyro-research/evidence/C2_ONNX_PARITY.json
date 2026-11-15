@@ -1,0 +1,36 @@
+{
+ "checkpoint": "/root/gpufree-data/as2w-runs/r11_fanziqi_lab/yaw-arms/armE-support-20261116-034514/r11-final.pt",
+ "checkpoint_sha256": "4bdf4d26b076d7c717e9c151946dd42f8b3cf9dbbf592c5d6aac1ed5f6615866",
+ "onnx_sha256": "680e0c720750fdaf3a3403232151a9e0301d1646fd45c95449dbdf74f7d315e7",
+ "opset": 17,
+ "onnx_size_bytes": 175066,
+ "input": {
+  "name": "obs",
+  "shape": [
+   "batch",
+   65
+  ],
+  "dtype": "float32"
+ },
+ "output": {
+  "name": "action",
+  "shape": [
+   "batch",
+   16
+  ],
+  "dtype": "float32"
+ },
+ "control_period_s": 0.02,
+ "architecture": "MLP 65-128-128-128-16, ELU hidden, deterministic mean (std_param excluded)",
+ "internal_state": null,
+ "tolerance_max_abs": 1e-05,
+ "comparison": {
+  "n_samples": 4096,
+  "max_abs_err": 1.430511474609375e-06,
+  "mean_abs_err": 1.0051548571254898e-07,
+  "torch_abs_mean": 1.118776559829712,
+  "onnx_abs_mean": 1.118776559829712,
+  "max_abs_err_rel": 1.335051812025773e-07,
+  "pass": true
+ }
+}

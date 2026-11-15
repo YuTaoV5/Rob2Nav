@@ -1,0 +1,1395 @@
+{
+  "scope": "flat rolling simulation training",
+  "initial_checkpoint": "/root/gpufree-data/as2w-runs/r11_fanziqi_lab/resume-20261115-204347-8722/model_1999.pt",
+  "save_interval": 100,
+  "num_envs": 4096,
+  "iterations": 2000,
+  "seed": 311,
+  "policy_step_s": 0.02,
+  "physics_step_s": 0.005,
+  "joint_order": [
+    "FL_hip",
+    "FR_hip",
+    "RL_hip",
+    "RR_hip",
+    "FL_thigh",
+    "FR_thigh",
+    "RL_thigh",
+    "RR_thigh",
+    "FL_calf",
+    "FR_calf",
+    "RL_calf",
+    "RR_calf",
+    "FL_foot",
+    "FR_foot",
+    "RL_foot",
+    "RR_foot"
+  ],
+  "action_clip": 6.0,
+  "safety": {
+    "angle_rad": {
+      "FL_hip": [
+        -0.7065,
+        0.7065
+      ],
+      "FR_hip": [
+        -0.7065,
+        0.7065
+      ],
+      "RL_hip": [
+        -0.7065,
+        0.7065
+      ],
+      "RR_hip": [
+        -0.7065,
+        0.7065
+      ],
+      "FL_thigh": [
+        -1.72,
+        3.2228000000000003
+      ],
+      "FR_thigh": [
+        -1.72,
+        3.2228000000000003
+      ],
+      "RL_thigh": [
+        -1.09,
+        3.851000000000001
+      ],
+      "RR_thigh": [
+        -1.09,
+        3.851000000000001
+      ],
+      "FL_calf": [
+        -2.65093,
+        -0.89197
+      ],
+      "FR_calf": [
+        -2.65093,
+        -0.89197
+      ],
+      "RL_calf": [
+        -2.65093,
+        -0.89197
+      ],
+      "RR_calf": [
+        -2.65093,
+        -0.89197
+      ]
+    },
+    "effort_nm": {
+      "FL_hip": 54.0,
+      "FR_hip": 54.0,
+      "RL_hip": 54.0,
+      "RR_hip": 54.0,
+      "FL_thigh": 54.0,
+      "FR_thigh": 54.0,
+      "RL_thigh": 54.0,
+      "RR_thigh": 54.0,
+      "FL_calf": 81.0,
+      "FR_calf": 81.0,
+      "RL_calf": 81.0,
+      "RR_calf": 81.0,
+      "FL_foot": 13.5,
+      "FR_foot": 13.5,
+      "RL_foot": 13.5,
+      "RR_foot": 13.5
+    },
+    "wheel_rad_s": {
+      "FL_foot": 98.47,
+      "FR_foot": 98.47,
+      "RL_foot": 98.47,
+      "RR_foot": 98.47
+    },
+    "fraction": 0.9,
+    "source": "simulation_urdf_not_hardware_calibration",
+    "min_knee_surface_m": 0.015
+  },
+  "command_mix": {
+    "hold": 0.2,
+    "straight": 0.15,
+    "spin": 0.4,
+    "arc": 0.25
+  },
+  "source_sha256": {
+    "/root/gpufree-data/as2w-runs/r11_fanziqi_lab/turn-fix.xM3K4M/train_r11.py": "27d6f9644de6fdc4741e60a4f764346759e44767bb11bcd68432ee64c549ee9a",
+    "/root/gpufree-data/Rob2Nav/training/as2w-backup/dependencies/unitree_ros_as2w/robots/as2w_description/as2w.urdf": "696aec2c0915ec1e06bcc91a63104d8234c51c0eb94331fa5496bf426c51e926",
+    "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/runs/r280-isaac-flat-preflight/kit3-as2w.usd/as2w/as2w.usda": "0c5786834c5deda135d3195062033dfe8312c9abf7daad689070925e89d3a55c"
+  },
+  "environment": {
+    "class_type": "isaaclab.envs.manager_based_rl_env:ManagerBasedRLEnv",
+    "sim": {
+      "device": "cuda:0",
+      "dt": 0.005,
+      "gravity": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "physics_prim_path": "/physicsScene",
+      "physics_material": {
+        "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_rigid_body_material",
+        "static_friction": 1.0,
+        "dynamic_friction": 1.0,
+        "restitution": 0.0,
+        "density": null,
+        "compliant_contact_stiffness": null,
+        "compliant_contact_damping": null,
+        "compliant_contact_acceleration_spring": null,
+        "friction_combine_mode": "multiply",
+        "restitution_combine_mode": "multiply",
+        "damping_combine_mode": null,
+        "_usd_applied_schema": "PhysxMaterialAPI",
+        "_usd_field_exceptions": {},
+        "_usd_namespace": "physxMaterial"
+      },
+      "use_fabric": true,
+      "render_interval": 4,
+      "enable_scene_query_support": false,
+      "use_newton_actuators": false,
+      "physics": {
+        "class_type": "isaaclab_physx.physics.physx_manager:PhysxManager",
+        "deterministic": false,
+        "solver_type": 1,
+        "solve_articulation_contact_last": false,
+        "min_position_iteration_count": 1,
+        "max_position_iteration_count": 255,
+        "min_velocity_iteration_count": 0,
+        "max_velocity_iteration_count": 255,
+        "enable_scene_query_support": false,
+        "enable_ccd": false,
+        "enable_stabilization": false,
+        "enable_external_forces_every_iteration": true,
+        "enable_enhanced_determinism": false,
+        "bounce_threshold_velocity": 0.5,
+        "friction_offset_threshold": 0.04,
+        "friction_correlation_distance": 0.025,
+        "gpu_max_rigid_contact_count": 8388608,
+        "gpu_max_rigid_patch_count": 163840,
+        "gpu_found_lost_pairs_capacity": 2097152,
+        "gpu_found_lost_aggregate_pairs_capacity": 33554432,
+        "gpu_total_aggregate_pairs_capacity": 2097152,
+        "gpu_collision_stack_size": 67108864,
+        "gpu_heap_capacity": 67108864,
+        "gpu_temp_buffer_capacity": 16777216,
+        "gpu_max_num_partitions": 8,
+        "gpu_max_soft_body_contacts": 1048576,
+        "gpu_max_particle_contacts": 1048576,
+        "launcher_type": "isaaclab_physx.app:KitLauncher"
+      },
+      "create_stage_in_memory": false,
+      "logging_level": "WARNING",
+      "save_logs_to_file": true,
+      "log_dir": null,
+      "visualizer_cfgs": [],
+      "default_visualizer_cfg": null
+    },
+    "ui_window_class_type": "isaaclab.envs.ui.manager_based_rl_env_window:ManagerBasedRLEnvWindow",
+    "seed": 311,
+    "decimation": 4,
+    "scene": {
+      "class_type": "isaaclab.scene.interactive_scene:InteractiveScene",
+      "num_envs": 4096,
+      "env_spacing": 2.5,
+      "lazy_sensor_update": true,
+      "replicate_physics": true,
+      "filter_collisions": true,
+      "clone_in_fabric": false,
+      "clone_cfg": {
+        "clone_strategy": "isaaclab.cloner.cloner_strategies:sequential",
+        "clone_combinations": [],
+        "clone_template": "/World/envs/env_{}",
+        "replicate_physics": true
+      },
+      "terrain": {
+        "class_type": "isaaclab.terrains.terrain_importer:TerrainImporter",
+        "collision_group": -1,
+        "prim_path": "/World/ground",
+        "num_envs": 4096,
+        "terrain_type": "plane",
+        "terrain_generator": null,
+        "usd_path": null,
+        "env_spacing": 2.5,
+        "use_terrain_origins": true,
+        "visual_material": null,
+        "physics_material": {
+          "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_rigid_body_material",
+          "static_friction": 1.0,
+          "dynamic_friction": 1.0,
+          "restitution": 0.0,
+          "density": null,
+          "compliant_contact_stiffness": null,
+          "compliant_contact_damping": null,
+          "compliant_contact_acceleration_spring": null,
+          "friction_combine_mode": "multiply",
+          "restitution_combine_mode": "multiply",
+          "damping_combine_mode": null,
+          "_usd_applied_schema": "PhysxMaterialAPI",
+          "_usd_field_exceptions": {},
+          "_usd_namespace": "physxMaterial"
+        },
+        "max_init_terrain_level": 5,
+        "debug_vis": false
+      },
+      "robot": {
+        "class_type": "isaaclab.assets.articulation.articulation:Articulation",
+        "cloning_contexts": null,
+        "prim_path": "/World/envs/env_[^/]+/Robot",
+        "spawn": {
+          "func": "isaaclab.sim.spawners.from_files.from_files:spawn_from_usd",
+          "visible": true,
+          "semantic_tags": null,
+          "copy_from_source": true,
+          "spawn_path": "/World/envs/env_0/Robot",
+          "mass_props": null,
+          "deformable_props": null,
+          "volume_deformable_props": null,
+          "surface_deformable_props": null,
+          "mass_props_create_if_missing": false,
+          "rigid_props": null,
+          "collision_props": null,
+          "activate_contact_sensors": true,
+          "scale": null,
+          "articulation_props": null,
+          "articulation_props_create_if_missing": false,
+          "fix_root_link": null,
+          "fixed_tendons_props": null,
+          "spatial_tendons_props": null,
+          "joint_drive_props": null,
+          "joint_drive_props_create_if_missing": false,
+          "ensure_drives_exist": false,
+          "visual_material_path": "material",
+          "visual_material": null,
+          "visual_material_bindings": {},
+          "physics_material_path": "material",
+          "physics_material": null,
+          "usd_path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/runs/r280-isaac-flat-preflight/kit3-as2w.usd/as2w/as2w.usda",
+          "variants": {
+            "Physics": "physx"
+          },
+          "make_uninstanceable": false
+        },
+        "init_state": {
+          "pos": [
+            0.0,
+            0.0,
+            0.37
+          ],
+          "rot": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "lin_vel": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "ang_vel": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "joint_pos": {
+            ".*_hip": 0.0,
+            ".*_thigh": 0.8,
+            ".*_calf": -1.6,
+            ".*_foot": 0.0
+          },
+          "joint_vel": {
+            ".*": 0.0
+          }
+        },
+        "collision_group": 0,
+        "debug_vis": false,
+        "disable_shape_checks": null,
+        "articulation_root_prim_path": null,
+        "soft_joint_pos_limit_factor": 1.0,
+        "joint_ordering": null,
+        "body_ordering": null,
+        "actuators": {
+          "hip": {
+            "class_type": "isaaclab.actuators.actuator_pd:ImplicitActuator",
+            "joint_names_expr": [
+              "FL_hip",
+              "FR_hip",
+              "RL_hip",
+              "RR_hip"
+            ],
+            "actuator_effort_limit": null,
+            "actuator_velocity_limit": null,
+            "joint_effort_limit": null,
+            "joint_velocity_limit": null,
+            "effort_limit_sim": {
+              "FL_hip": 54.0,
+              "FR_hip": 54.0,
+              "RL_hip": 54.0,
+              "RR_hip": 54.0
+            },
+            "velocity_limit_sim": {
+              "FL_hip": 25.0,
+              "FR_hip": 25.0,
+              "RL_hip": 25.0,
+              "RR_hip": 25.0
+            },
+            "stiffness": 55.0,
+            "damping": 2.0,
+            "armature": null,
+            "friction": null,
+            "dynamic_friction": null,
+            "viscous_friction": null,
+            "effort_limit": null,
+            "velocity_limit": null
+          },
+          "thigh": {
+            "class_type": "isaaclab.actuators.actuator_pd:ImplicitActuator",
+            "joint_names_expr": [
+              "FL_thigh",
+              "FR_thigh",
+              "RL_thigh",
+              "RR_thigh"
+            ],
+            "actuator_effort_limit": null,
+            "actuator_velocity_limit": null,
+            "joint_effort_limit": null,
+            "joint_velocity_limit": null,
+            "effort_limit_sim": {
+              "FL_thigh": 54.0,
+              "FR_thigh": 54.0,
+              "RL_thigh": 54.0,
+              "RR_thigh": 54.0
+            },
+            "velocity_limit_sim": {
+              "FL_thigh": 25.0,
+              "FR_thigh": 25.0,
+              "RL_thigh": 25.0,
+              "RR_thigh": 25.0
+            },
+            "stiffness": 55.0,
+            "damping": 2.0,
+            "armature": null,
+            "friction": null,
+            "dynamic_friction": null,
+            "viscous_friction": null,
+            "effort_limit": null,
+            "velocity_limit": null
+          },
+          "calf": {
+            "class_type": "isaaclab.actuators.actuator_pd:ImplicitActuator",
+            "joint_names_expr": [
+              "FL_calf",
+              "FR_calf",
+              "RL_calf",
+              "RR_calf"
+            ],
+            "actuator_effort_limit": null,
+            "actuator_velocity_limit": null,
+            "joint_effort_limit": null,
+            "joint_velocity_limit": null,
+            "effort_limit_sim": {
+              "FL_calf": 81.0,
+              "FR_calf": 81.0,
+              "RL_calf": 81.0,
+              "RR_calf": 81.0
+            },
+            "velocity_limit_sim": {
+              "FL_calf": 16.67,
+              "FR_calf": 16.67,
+              "RL_calf": 16.67,
+              "RR_calf": 16.67
+            },
+            "stiffness": 55.0,
+            "damping": 2.0,
+            "armature": null,
+            "friction": null,
+            "dynamic_friction": null,
+            "viscous_friction": null,
+            "effort_limit": null,
+            "velocity_limit": null
+          },
+          "foot": {
+            "class_type": "isaaclab.actuators.actuator_pd:ImplicitActuator",
+            "joint_names_expr": [
+              "FL_foot",
+              "FR_foot",
+              "RL_foot",
+              "RR_foot"
+            ],
+            "actuator_effort_limit": null,
+            "actuator_velocity_limit": null,
+            "joint_effort_limit": null,
+            "joint_velocity_limit": null,
+            "effort_limit_sim": {
+              "FL_foot": 13.5,
+              "FR_foot": 13.5,
+              "RL_foot": 13.5,
+              "RR_foot": 13.5
+            },
+            "velocity_limit_sim": {
+              "FL_foot": 98.47,
+              "FR_foot": 98.47,
+              "RL_foot": 98.47,
+              "RR_foot": 98.47
+            },
+            "stiffness": 0.0,
+            "damping": 6.0,
+            "armature": null,
+            "friction": null,
+            "dynamic_friction": null,
+            "viscous_friction": null,
+            "effort_limit": null,
+            "velocity_limit": null
+          }
+        },
+        "actuator_value_resolution_debug_print": false
+      },
+      "height_scanner": null,
+      "contact_forces": {
+        "class_type": "isaaclab.sensors.contact_sensor.contact_sensor:ContactSensor",
+        "cloning_contexts": [],
+        "prim_path": "/World/envs/env_[^/]+/Robot/Geometry/.*",
+        "update_period": 0.005,
+        "debug_vis": false,
+        "track_pose": false,
+        "track_contact_points": false,
+        "track_friction_forces": false,
+        "max_contact_data_count_per_prim": null,
+        "track_air_time": true,
+        "force_threshold": null,
+        "history_length": 3,
+        "filter_prim_paths_expr": [],
+        "sensor_shape_prim_expr": [],
+        "filter_shape_prim_expr": [],
+        "visualizer_cfg": {
+          "prim_path": "/Visuals/ContactSensor",
+          "markers": {
+            "contact": {
+              "func": "isaaclab.sim.spawners.shapes.shapes:spawn_sphere",
+              "visible": true,
+              "semantic_tags": null,
+              "copy_from_source": true,
+              "spawn_path": null,
+              "mass_props": null,
+              "mass_props_create_if_missing": false,
+              "rigid_props": null,
+              "collision_props": null,
+              "activate_contact_sensors": false,
+              "visual_material_path": "material",
+              "visual_material": {
+                "func": "isaaclab.sim.spawners.materials.visual_materials:spawn_preview_surface",
+                "visible": true,
+                "semantic_tags": null,
+                "copy_from_source": true,
+                "spawn_path": null,
+                "diffuse_color": [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                "emissive_color": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "opacity": 1.0
+              },
+              "physics_material_path": "material",
+              "physics_material": null,
+              "radius": 0.02
+            },
+            "no_contact": {
+              "func": "isaaclab.sim.spawners.shapes.shapes:spawn_sphere",
+              "visible": false,
+              "semantic_tags": null,
+              "copy_from_source": true,
+              "spawn_path": null,
+              "mass_props": null,
+              "mass_props_create_if_missing": false,
+              "rigid_props": null,
+              "collision_props": null,
+              "activate_contact_sensors": false,
+              "visual_material_path": "material",
+              "visual_material": {
+                "func": "isaaclab.sim.spawners.materials.visual_materials:spawn_preview_surface",
+                "visible": true,
+                "semantic_tags": null,
+                "copy_from_source": true,
+                "spawn_path": null,
+                "diffuse_color": [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                "emissive_color": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "opacity": 1.0
+              },
+              "physics_material_path": "material",
+              "physics_material": null,
+              "radius": 0.02
+            }
+          },
+          "class_type": "isaaclab.markers.visualization_markers:VisualizationMarkers"
+        },
+        "normal_force_visualizer_cfg": {
+          "prim_path": "/Visuals/ContactSensor",
+          "markers": {
+            "arrow": {
+              "func": "isaaclab.sim.spawners.from_files.from_files:spawn_from_usd",
+              "visible": true,
+              "semantic_tags": null,
+              "copy_from_source": true,
+              "spawn_path": null,
+              "mass_props": null,
+              "deformable_props": null,
+              "volume_deformable_props": null,
+              "surface_deformable_props": null,
+              "mass_props_create_if_missing": false,
+              "rigid_props": null,
+              "collision_props": null,
+              "activate_contact_sensors": false,
+              "scale": [
+                0.04,
+                0.04,
+                0.2
+              ],
+              "articulation_props": null,
+              "articulation_props_create_if_missing": false,
+              "fix_root_link": null,
+              "fixed_tendons_props": null,
+              "spatial_tendons_props": null,
+              "joint_drive_props": null,
+              "joint_drive_props_create_if_missing": false,
+              "ensure_drives_exist": false,
+              "visual_material_path": "material",
+              "visual_material": {
+                "func": "isaaclab.sim.spawners.materials.visual_materials:spawn_preview_surface",
+                "visible": true,
+                "semantic_tags": null,
+                "copy_from_source": true,
+                "spawn_path": null,
+                "diffuse_color": [
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "emissive_color": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "opacity": 1.0
+              },
+              "visual_material_bindings": {},
+              "physics_material_path": "material",
+              "physics_material": null,
+              "usd_path": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.2/Isaac/Props/UIElements/arrow_x.usd",
+              "variants": null,
+              "make_uninstanceable": false
+            }
+          },
+          "class_type": "isaaclab.markers.visualization_markers:VisualizationMarkers"
+        },
+        "friction_force_visualizer_cfg": {
+          "prim_path": "/Visuals/ContactSensor",
+          "markers": {
+            "arrow": {
+              "func": "isaaclab.sim.spawners.from_files.from_files:spawn_from_usd",
+              "visible": true,
+              "semantic_tags": null,
+              "copy_from_source": true,
+              "spawn_path": null,
+              "mass_props": null,
+              "deformable_props": null,
+              "volume_deformable_props": null,
+              "surface_deformable_props": null,
+              "mass_props_create_if_missing": false,
+              "rigid_props": null,
+              "collision_props": null,
+              "activate_contact_sensors": false,
+              "scale": [
+                0.04,
+                0.04,
+                0.2
+              ],
+              "articulation_props": null,
+              "articulation_props_create_if_missing": false,
+              "fix_root_link": null,
+              "fixed_tendons_props": null,
+              "spatial_tendons_props": null,
+              "joint_drive_props": null,
+              "joint_drive_props_create_if_missing": false,
+              "ensure_drives_exist": false,
+              "visual_material_path": "material",
+              "visual_material": {
+                "func": "isaaclab.sim.spawners.materials.visual_materials:spawn_preview_surface",
+                "visible": true,
+                "semantic_tags": null,
+                "copy_from_source": true,
+                "spawn_path": null,
+                "diffuse_color": [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                "emissive_color": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "opacity": 1.0
+              },
+              "visual_material_bindings": {},
+              "physics_material_path": "material",
+              "physics_material": null,
+              "usd_path": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.2/Isaac/Props/UIElements/arrow_x.usd",
+              "variants": null,
+              "make_uninstanceable": false
+            }
+          },
+          "class_type": "isaaclab.markers.visualization_markers:VisualizationMarkers"
+        },
+        "force_visualization_scale": 0.01
+      },
+      "sky_light": null
+    },
+    "recorders": {
+      "dataset_file_handler_class_type": "isaaclab.utils.datasets.hdf5_dataset_file_handler:HDF5DatasetFileHandler",
+      "dataset_export_dir_path": "/tmp/isaaclab/logs",
+      "dataset_filename": "dataset",
+      "dataset_export_mode": 1,
+      "export_in_record_pre_reset": true,
+      "export_in_close": false,
+      "dataset_compression": true
+    },
+    "observations": {
+      "policy": {
+        "concatenate_terms": true,
+        "concatenate_dim": -1,
+        "enable_corruption": false,
+        "history_length": null,
+        "flatten_history_dim": true,
+        "history_order": "term",
+        "state": {
+          "func": "as2w_isaac_robust_env:robust_observation",
+          "params": {},
+          "modifiers": null,
+          "noise": null,
+          "clip": null,
+          "scale": null,
+          "delay_min_lag": 0,
+          "delay_max_lag": 0,
+          "delay_hold_prob": 1.0,
+          "history_length": 0,
+          "flatten_history_dim": true
+        }
+      }
+    },
+    "actions": {
+      "joint_pos": {
+        "class_type": "as2w_isaac_robust_env:DelayedPosition",
+        "asset_name": "robot",
+        "debug_vis": false,
+        "clip": {
+          "FL_hip": [
+            -0.7065,
+            0.7065
+          ],
+          "FR_hip": [
+            -0.7065,
+            0.7065
+          ],
+          "RL_hip": [
+            -0.7065,
+            0.7065
+          ],
+          "RR_hip": [
+            -0.7065,
+            0.7065
+          ],
+          "FL_thigh": [
+            -1.72,
+            3.2228000000000003
+          ],
+          "FR_thigh": [
+            -1.72,
+            3.2228000000000003
+          ],
+          "RL_thigh": [
+            -1.09,
+            3.851000000000001
+          ],
+          "RR_thigh": [
+            -1.09,
+            3.851000000000001
+          ],
+          "FL_calf": [
+            -2.65093,
+            -0.89197
+          ],
+          "FR_calf": [
+            -2.65093,
+            -0.89197
+          ],
+          "RL_calf": [
+            -2.65093,
+            -0.89197
+          ],
+          "RR_calf": [
+            -2.65093,
+            -0.89197
+          ]
+        },
+        "joint_names": [
+          "FL_hip",
+          "FR_hip",
+          "RL_hip",
+          "RR_hip",
+          "FL_thigh",
+          "FR_thigh",
+          "RL_thigh",
+          "RR_thigh",
+          "FL_calf",
+          "FR_calf",
+          "RL_calf",
+          "RR_calf"
+        ],
+        "scale": 0.35,
+        "offset": 0.0,
+        "preserve_order": true,
+        "use_default_offset": true,
+        "as2w_action_delay_max_steps": 0
+      },
+      "wheel_vel": {
+        "class_type": "as2w_isaac_robust_env:DelayedVelocity",
+        "asset_name": "robot",
+        "debug_vis": false,
+        "clip": {
+          "FL_foot": [
+            -98.47,
+            98.47
+          ],
+          "FR_foot": [
+            -98.47,
+            98.47
+          ],
+          "RL_foot": [
+            -98.47,
+            98.47
+          ],
+          "RR_foot": [
+            -98.47,
+            98.47
+          ]
+        },
+        "joint_names": [
+          "FL_foot",
+          "FR_foot",
+          "RL_foot",
+          "RR_foot"
+        ],
+        "scale": 16.0,
+        "offset": 0.0,
+        "preserve_order": true,
+        "use_default_offset": false,
+        "as2w_action_delay_max_steps": 0
+      }
+    },
+    "events": {
+      "physics_material": null,
+      "add_base_mass": null,
+      "base_com": null,
+      "base_external_force_torque": null,
+      "reset_base": {
+        "func": "isaaclab.envs.mdp.events:reset_root_state_uniform",
+        "params": {
+          "pose_range": {
+            "z": [
+              -0.02,
+              0.02
+            ],
+            "roll": [
+              -0.052,
+              0.052
+            ],
+            "pitch": [
+              -0.052,
+              0.052
+            ]
+          },
+          "velocity_range": {}
+        },
+        "mode": "reset",
+        "interval_range_s": null,
+        "is_global_time": false,
+        "resample_interval_on_reset": true,
+        "min_step_count_between_reset": 0
+      },
+      "reset_robot_joints": {
+        "func": "as2w_isaac_robust_env:reset_joints",
+        "params": {
+          "position_range": [
+            -0.06,
+            0.06
+          ],
+          "velocity_range": [
+            0.0,
+            0.0
+          ]
+        },
+        "mode": "reset",
+        "interval_range_s": null,
+        "is_global_time": false,
+        "resample_interval_on_reset": true,
+        "min_step_count_between_reset": 0
+      },
+      "push_robot": null
+    },
+    "rerender_on_reset": false,
+    "num_rerenders_on_reset": 0,
+    "wait_for_textures": true,
+    "xr": null,
+    "teleop_devices": {
+      "devices": {}
+    },
+    "isaac_teleop": null,
+    "export_io_descriptors": false,
+    "log_dir": null,
+    "video_recorders": [],
+    "viewer": {
+      "eye": [
+        7.5,
+        7.5,
+        7.5
+      ],
+      "lookat": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cam_prim_path": "/OmniverseKit_Persp",
+      "resolution": [
+        1280,
+        720
+      ],
+      "origin_type": "world",
+      "env_index": 0,
+      "asset_name": null,
+      "body_name": null
+    },
+    "is_finite_horizon": false,
+    "compute_final_obs": false,
+    "episode_length_s": 32.0,
+    "rewards": {
+      "track_lin_vel_xy_exp": {
+        "func": "isaaclab.envs.mdp.rewards:track_lin_vel_xy_exp",
+        "params": {
+          "command_name": "base_velocity",
+          "std": 0.07
+        },
+        "weight": 1.5
+      },
+      "track_ang_vel_z_exp": {
+        "func": "isaaclab.envs.mdp.rewards:track_ang_vel_z_exp",
+        "params": {
+          "command_name": "base_velocity",
+          "std": 0.08
+        },
+        "weight": 1.5
+      },
+      "lin_vel_z_l2": {
+        "func": "isaaclab.envs.mdp.rewards:lin_vel_z_l2",
+        "params": {},
+        "weight": -2.0
+      },
+      "ang_vel_xy_l2": {
+        "func": "isaaclab.envs.mdp.rewards:ang_vel_xy_l2",
+        "params": {},
+        "weight": -0.05
+      },
+      "dof_torques_l2": {
+        "func": "isaaclab.envs.mdp.rewards:joint_torques_l2",
+        "params": {},
+        "weight": -0.0002
+      },
+      "dof_acc_l2": {
+        "func": "isaaclab.envs.mdp.rewards:joint_acc_l2",
+        "params": {},
+        "weight": -2.5e-07
+      },
+      "action_rate_l2": {
+        "func": "isaaclab.envs.mdp.rewards:action_rate_l2",
+        "params": {},
+        "weight": -0.005
+      },
+      "feet_air_time": null,
+      "undesired_contacts": {
+        "func": "isaaclab.envs.mdp.rewards:undesired_contacts",
+        "params": {
+          "sensor_cfg": {
+            "name": "contact_forces",
+            "joint_names": null,
+            "joint_ids": "slice(None, None, None)",
+            "fixed_tendon_names": null,
+            "fixed_tendon_ids": "slice(None, None, None)",
+            "body_names": "^(?!.*_foot$).*",
+            "body_ids": "slice(None, None, None)",
+            "object_collection_names": null,
+            "object_collection_ids": "slice(None, None, None)",
+            "preserve_order": false
+          },
+          "threshold": 4.0
+        },
+        "weight": -1.0
+      },
+      "flat_orientation_l2": {
+        "func": "isaaclab.envs.mdp.rewards:flat_orientation_l2",
+        "params": {},
+        "weight": -2.5
+      },
+      "dof_pos_limits": {
+        "func": "isaaclab.envs.mdp.rewards:joint_pos_limits",
+        "params": {},
+        "weight": 0.0
+      },
+      "base_height_l2": {
+        "func": "isaaclab.envs.mdp.rewards:base_height_l2",
+        "params": {
+          "target_height": 0.37,
+          "sensor_cfg": null
+        },
+        "weight": -3.0
+      },
+      "rear_posture": {
+        "func": "as2w_isaac_flat_env_all:rear_error",
+        "params": {},
+        "weight": -0.8
+      },
+      "zero_motion": {
+        "func": "as2w_isaac_flat_env_all:zero_motion",
+        "params": {
+          "focused": true
+        },
+        "weight": -0.4
+      },
+      "signed_tracking": {
+        "func": "as2w_isaac_flat_env_all:signed_tracking",
+        "params": {},
+        "weight": 0.5
+      },
+      "rolling_wheel_support": {
+        "func": "as2w_isaac_speed_range:wheel_support_error",
+        "params": {},
+        "weight": -0.65
+      },
+      "rolling_knee_margin": {
+        "func": "as2w_training_safety:rolling_knee_margin_cost",
+        "params": {
+          "margin_m": 0.1
+        },
+        "weight": -3.0
+      }
+    },
+    "terminations": {
+      "time_out": {
+        "func": "isaaclab.envs.mdp.terminations:time_out",
+        "params": {},
+        "time_out": true
+      },
+      "base_contact": {
+        "func": "isaaclab.envs.mdp.terminations:illegal_contact",
+        "params": {
+          "sensor_cfg": {
+            "name": "contact_forces",
+            "joint_names": null,
+            "joint_ids": "slice(None, None, None)",
+            "fixed_tendon_names": null,
+            "fixed_tendon_ids": "slice(None, None, None)",
+            "body_names": "base_link",
+            "body_ids": "slice(None, None, None)",
+            "object_collection_names": null,
+            "object_collection_ids": "slice(None, None, None)",
+            "preserve_order": false
+          },
+          "threshold": 1.0
+        },
+        "time_out": false
+      },
+      "as2w_angle_violation": {
+        "func": "as2w_training_safety:angle_violation",
+        "params": {},
+        "time_out": false
+      },
+      "as2w_stance_violation": {
+        "func": "__main__:_sv_counted",
+        "params": {},
+        "time_out": false
+      },
+      "as2w_nonwheel_contact": {
+        "func": "isaaclab.envs.mdp.terminations:illegal_contact",
+        "params": {
+          "sensor_cfg": {
+            "name": "contact_forces",
+            "joint_names": null,
+            "joint_ids": "slice(None, None, None)",
+            "fixed_tendon_names": null,
+            "fixed_tendon_ids": "slice(None, None, None)",
+            "body_names": "^(?!.*_foot$).*",
+            "body_ids": "slice(None, None, None)",
+            "object_collection_names": null,
+            "object_collection_ids": "slice(None, None, None)",
+            "preserve_order": false
+          },
+          "threshold": 4.0
+        },
+        "time_out": false
+      },
+      "as2w_knee_surface": {
+        "func": "as2w_training_safety:knee_surface_violation",
+        "params": {},
+        "time_out": false
+      }
+    },
+    "curriculum": {
+      "terrain_levels": null
+    },
+    "commands": {
+      "base_velocity": {
+        "class_type": "__main__:RollingCommands",
+        "resampling_time_range": [
+          10.0,
+          10.0
+        ],
+        "debug_vis": false,
+        "cmd_kind": null,
+        "element_names": null,
+        "asset_name": "robot",
+        "heading_command": false,
+        "heading_control_stiffness": 0.5,
+        "rel_standing_envs": 0.02,
+        "rel_heading_envs": 0.0,
+        "ranges": {
+          "lin_vel_x": [
+            -0.25,
+            0.25
+          ],
+          "lin_vel_y": [
+            0.0,
+            0.0
+          ],
+          "ang_vel_z": [
+            -0.15,
+            0.15
+          ],
+          "heading": null
+        },
+        "vel_xy_success_threshold": 0.5,
+        "vel_yaw_success_threshold": 0.4,
+        "marker_pos_offset": [
+          0.0,
+          0.0,
+          0.5
+        ],
+        "goal_vel_visualizer_cfg": {
+          "prim_path": "/Visuals/Command/velocity_goal",
+          "markers": {
+            "arrow": {
+              "func": "isaaclab.sim.spawners.from_files.from_files:spawn_from_usd",
+              "visible": true,
+              "semantic_tags": null,
+              "copy_from_source": true,
+              "spawn_path": null,
+              "mass_props": null,
+              "deformable_props": null,
+              "volume_deformable_props": null,
+              "surface_deformable_props": null,
+              "mass_props_create_if_missing": false,
+              "rigid_props": null,
+              "collision_props": null,
+              "activate_contact_sensors": false,
+              "scale": [
+                0.5,
+                0.5,
+                0.5
+              ],
+              "articulation_props": null,
+              "articulation_props_create_if_missing": false,
+              "fix_root_link": null,
+              "fixed_tendons_props": null,
+              "spatial_tendons_props": null,
+              "joint_drive_props": null,
+              "joint_drive_props_create_if_missing": false,
+              "ensure_drives_exist": false,
+              "visual_material_path": "material",
+              "visual_material": {
+                "func": "isaaclab.sim.spawners.materials.visual_materials:spawn_preview_surface",
+                "visible": true,
+                "semantic_tags": null,
+                "copy_from_source": true,
+                "spawn_path": null,
+                "diffuse_color": [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                "emissive_color": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "opacity": 1.0
+              },
+              "visual_material_bindings": {},
+              "physics_material_path": "material",
+              "physics_material": null,
+              "usd_path": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.2/Isaac/Props/UIElements/arrow_x.usd",
+              "variants": null,
+              "make_uninstanceable": false
+            }
+          },
+          "class_type": "isaaclab.markers.visualization_markers:VisualizationMarkers"
+        },
+        "current_vel_visualizer_cfg": {
+          "prim_path": "/Visuals/Command/velocity_current",
+          "markers": {
+            "arrow": {
+              "func": "isaaclab.sim.spawners.from_files.from_files:spawn_from_usd",
+              "visible": true,
+              "semantic_tags": null,
+              "copy_from_source": true,
+              "spawn_path": null,
+              "mass_props": null,
+              "deformable_props": null,
+              "volume_deformable_props": null,
+              "surface_deformable_props": null,
+              "mass_props_create_if_missing": false,
+              "rigid_props": null,
+              "collision_props": null,
+              "activate_contact_sensors": false,
+              "scale": [
+                0.5,
+                0.5,
+                0.5
+              ],
+              "articulation_props": null,
+              "articulation_props_create_if_missing": false,
+              "fix_root_link": null,
+              "fixed_tendons_props": null,
+              "spatial_tendons_props": null,
+              "joint_drive_props": null,
+              "joint_drive_props_create_if_missing": false,
+              "ensure_drives_exist": false,
+              "visual_material_path": "material",
+              "visual_material": {
+                "func": "isaaclab.sim.spawners.materials.visual_materials:spawn_preview_surface",
+                "visible": true,
+                "semantic_tags": null,
+                "copy_from_source": true,
+                "spawn_path": null,
+                "diffuse_color": [
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "emissive_color": [
+                  0.0,
+                  0.0,
+                  0.0
+                ],
+                "roughness": 0.5,
+                "metallic": 0.0,
+                "opacity": 1.0
+              },
+              "visual_material_bindings": {},
+              "physics_material_path": "material",
+              "physics_material": null,
+              "usd_path": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.2/Isaac/Props/UIElements/arrow_x.usd",
+              "variants": null,
+              "make_uninstanceable": false
+            }
+          },
+          "class_type": "isaaclab.markers.visualization_markers:VisualizationMarkers"
+        },
+        "as2w_stage": "all"
+      }
+    },
+    "as2w_zero_memory": true,
+    "robust_profile": "pose-delay",
+    "as2w_safety": {
+      "angle_rad": {
+        "FL_hip": [
+          -0.7065,
+          0.7065
+        ],
+        "FR_hip": [
+          -0.7065,
+          0.7065
+        ],
+        "RL_hip": [
+          -0.7065,
+          0.7065
+        ],
+        "RR_hip": [
+          -0.7065,
+          0.7065
+        ],
+        "FL_thigh": [
+          -1.72,
+          3.2228000000000003
+        ],
+        "FR_thigh": [
+          -1.72,
+          3.2228000000000003
+        ],
+        "RL_thigh": [
+          -1.09,
+          3.851000000000001
+        ],
+        "RR_thigh": [
+          -1.09,
+          3.851000000000001
+        ],
+        "FL_calf": [
+          -2.65093,
+          -0.89197
+        ],
+        "FR_calf": [
+          -2.65093,
+          -0.89197
+        ],
+        "RL_calf": [
+          -2.65093,
+          -0.89197
+        ],
+        "RR_calf": [
+          -2.65093,
+          -0.89197
+        ]
+      },
+      "effort_nm": {
+        "FL_hip": 54.0,
+        "FR_hip": 54.0,
+        "RL_hip": 54.0,
+        "RR_hip": 54.0,
+        "FL_thigh": 54.0,
+        "FR_thigh": 54.0,
+        "RL_thigh": 54.0,
+        "RR_thigh": 54.0,
+        "FL_calf": 81.0,
+        "FR_calf": 81.0,
+        "RL_calf": 81.0,
+        "RR_calf": 81.0,
+        "FL_foot": 13.5,
+        "FR_foot": 13.5,
+        "RL_foot": 13.5,
+        "RR_foot": 13.5
+      },
+      "wheel_rad_s": {
+        "FL_foot": 98.47,
+        "FR_foot": 98.47,
+        "RL_foot": 98.47,
+        "RR_foot": 98.47
+      },
+      "fraction": 0.9,
+      "source": "simulation_urdf_not_hardware_calibration",
+      "min_knee_surface_m": 0.015
+    },
+    "as2w_floor_guard": true,
+    "as2w_min_knee_clearance_m": 0.045
+  },
+  "ppo": {
+    "seed": 311,
+    "device": "cuda:0",
+    "num_steps_per_env": 24,
+    "init_at_random_ep_len": true,
+    "max_iterations": 2000,
+    "empirical_normalization": {},
+    "obs_groups": {
+      "actor": [
+        "policy"
+      ],
+      "critic": [
+        "policy"
+      ]
+    },
+    "clip_actions": null,
+    "check_for_nan": true,
+    "save_interval": 100,
+    "experiment_name": "unitree_go2_flat",
+    "run_name": "",
+    "logger": "tensorboard",
+    "neptune_project": "isaaclab",
+    "wandb_project": "isaaclab",
+    "resume": false,
+    "load_run": ".*",
+    "load_checkpoint": "model_.*.pt",
+    "class_name": "OnPolicyRunner",
+    "actor": {
+      "class_name": "MLPModel",
+      "hidden_dims": [
+        128,
+        128,
+        128
+      ],
+      "activation": "elu",
+      "obs_normalization": false,
+      "distribution_cfg": {
+        "class_name": "GaussianDistribution",
+        "init_std": 0.25,
+        "std_type": "scalar",
+        "std_range": [
+          1e-06,
+          1000000.0
+        ]
+      }
+    },
+    "critic": {
+      "class_name": "MLPModel",
+      "hidden_dims": [
+        128,
+        128,
+        128
+      ],
+      "activation": "elu",
+      "obs_normalization": false,
+      "distribution_cfg": null
+    },
+    "algorithm": {
+      "class_name": "PPO",
+      "num_learning_epochs": 5,
+      "num_mini_batches": 4,
+      "learning_rate": 0.0003,
+      "schedule": "adaptive",
+      "gamma": 0.99,
+      "lam": 0.95,
+      "entropy_coef": 0.01,
+      "desired_kl": 0.01,
+      "max_grad_norm": 1.0,
+      "optimizer": "adam",
+      "value_loss_coef": 1.0,
+      "use_clipped_value_loss": true,
+      "clip_param": 0.2,
+      "normalize_advantage_per_mini_batch": false,
+      "share_cnn_encoders": false,
+      "use_mixed_precision": false,
+      "rnd_cfg": null,
+      "symmetry_cfg": null
+    },
+    "torch_compile_mode": null,
+    "policy": {}
+  }
+}

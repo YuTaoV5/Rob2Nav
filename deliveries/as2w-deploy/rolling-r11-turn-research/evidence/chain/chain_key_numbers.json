@@ -1,0 +1,101 @@
+{
+  "schema": "as2w-chain-bias/key-numbers/v1",
+  "date": "2026-11-16",
+  "scope": "read-only diagnostic, Isaac Lab/PhysX, zero command, no training, no reward/threshold/friction/differential change",
+  "model": {"checkpoint": "model_1999.pt", "iteration": 1999, "sha256_prefix": "f54751faddc211b4"},
+  "run_dir": "/root/gpufree-data/as2w-runs/as2w-rolling-goal/results/chain/main-20261116-011159",
+  "protocol": {
+    "init_states": 5, "repeats": 3, "runs_main": 15,
+    "reset_protocol": "env.seed(seed)+env.reset()+fixed settle (no snapshot forks)",
+    "zero_command": true,
+    "buffer_lag_main": 2, "observation_lag_main": 1,
+    "repeat_sd_tail3s": 0.0,
+    "note": "same-init-state repeats are bit-identical; the earlier 2.067/3.480 rad/s irreproducibility came from snapshot-restore, not physics noise"
+  },
+  "zero_command_bias_tail3s": {
+    "definition": "ddq_lr = dq_FR+dq_RR-dq_FL-dq_RL (rad/s), tail 3 s mean of actor raw wheel action x16",
+    "per_initial_state": [
+      {"settle_s": 4.0, "seed": 42, "ddq_lr": -0.1926, "base_z": 0.2981},
+      {"settle_s": 2.0, "seed": 7393, "ddq_lr": 0.4887, "base_z": 0.3152},
+      {"settle_s": 3.5, "seed": 7393, "ddq_lr": 0.5443, "base_z": 0.3132},
+      {"settle_s": 5.0, "seed": 7393, "ddq_lr": 0.5299, "base_z": 0.3123},
+      {"settle_s": 3.0, "seed": 20261116, "ddq_lr": 0.2696, "base_z": 0.3888}
+    ],
+    "mean": 0.3280, "sd_over_states": 0.3114, "min": -0.1926, "max": 0.5443,
+    "signs_positive_negative": [4, 1],
+    "abs_mean_over_geom": 0.796, "abs_max_over_geom": 1.070,
+    "geom_differential_wz_0p10": 0.5088,
+    "measured_ddq_lr_mean": -0.0381,
+    "yaw_body_mean_rad_s": "~0 (per-init 1e-4..2e-3)",
+    "vx_body_mean_m_s": "~0 (|vx|<=0.034)"
+  },
+  "diagonal_component": {
+    "definition": "ddq_diag = dq_FL+dq_RR-dq_FR-dq_RL",
+    "abs_diag_tail3s_mean_over_states": 1.043,
+    "abs_lr_tail3s_mean_over_states": 0.405,
+    "diag_over_lr": 2.57,
+    "note": "the zero-command wheel bias is dominated by the diagonal (trot-pair) pattern: FL and RR positive (+0.25/+0.63), FR and RL negative (-0.3/-0.4); the left/right differential is the residual"
+  },
+  "layer_attribution": {
+    "raw_actor": 0.3280, "after_clip": 0.3280, "processed_target": 0.3280,
+    "delayed_final_target": 0.3280, "measured": -0.0381,
+    "clip_delta_absmax": 0.0,
+    "processed_minus_scale_clip_absmax_alpha1": 0.0,
+    "processed_equals_alpha_times_scale_clip_absmax": 2.93e-8,
+    "true_substep_delay_model_absmax": 0.0,
+    "documented_0to4_control_step_delay_model_absmax": 0.460,
+    "verdict": "bias originates at the actor raw output; wrapper is a pure x16 gain (clip never triggers, no offset); the delay layer is identity on the same frame under its true substep semantics"
+  },
+  "prior_snapshot_protocol_reproduction": [
+    {"settle_s": 2.0, "now_early1s": 0.6043, "prior_snapshot_value": 0.6039, "reproduced": true},
+    {"settle_s": 3.5, "now_early1s": 0.5881, "prior_snapshot_value": -2.7821, "reproduced": false},
+    {"settle_s": 5.0, "now_early1s": 0.3094, "prior_snapshot_value": -0.5636, "reproduced": false}
+  ],
+  "delay_semantics": {
+    "apply_actions_calls_per_control_step": 4,
+    "decimation": 4, "physics_dt_s": 0.005, "control_dt_s": 0.02,
+    "true_semantics": "for buffer lag L, the first L physics substeps of control step k receive processed[k-1], the rest receive processed[k]; final (4th substep) target = processed[k] for L<4 and processed[k-1] for L=4",
+    "effective_final_delay": "0 control steps for buffer lag 0..3; 1 control step (20 ms) for lag 4",
+    "sweep_true_model_err": {"0": 0.0, "2": 0.0, "4": 0.0},
+    "sweep_documented_model_err": {"0": 0.0, "2": 0.256, "4": 0.243},
+    "bias_insensitive_to_delay": {"lag0": 0.5307, "lag2": 0.5219, "lag4": 0.5357},
+    "structural_note": "the nominal 0..4 control-step (0..80 ms) action delay does not exist in this build; needs a code fix by the code owner (not changed here)"
+  },
+  "replay": {
+    "runs": 21, "segment": "steady [settle+1s, min(settle+6s,end)], never frame 0",
+    "actor_reinference_max_abs_err": 3.58e-7,
+    "clip_max_abs_err": 0.0,
+    "processed_max_abs_err": 0.0,
+    "delayed_final_wheel_max_abs_err": 0.0,
+    "delayed_final_leg_max_abs_err": 0.0,
+    "next_frame_history_max_abs_err": 0.0,
+    "wheel_delta_obs_max_abs_err": 0.0,
+    "sensor_obs_chain_max_abs_err": 1.05e-5,
+    "first_divergence": "only in the (wrong) documented 0..4-control-step delay model, segment frame 0 (delta 0.193 rad/s); all true-semantics stages have no divergence",
+    "execution_gap_target_to_measured": {"target_mean": 0.4666, "measured_mean": 0.0122, "corr": 0.903}
+  },
+  "actor_input_ablation": {
+    "full": 0.4666,
+    "zero_wheel_delta_obs_60_64": -3.2547,
+    "zero_gravity_6_9": 2.4273,
+    "zero_cmd_channel_0_3": -0.8624,
+    "zero_prev_action_42_58": -0.7963,
+    "zero_joint_q_10_26": 0.9354,
+    "zero_zero_flag_64": 0.4471,
+    "zero_joint_dq_26_42": 0.4566,
+    "zero_ang_vel_3_6": 0.4489,
+    "note": "largest single-channel driver is the zero-memory wheel-angle-delta observation obs[60:64]; the bias is a closed-loop product of the actor on zero-command observations, not a constant offset"
+  },
+  "first_violations_deep_trace": {
+    "run": "repro_s3.5", "frames": 575, "pterm_lag": 3, "wterm_lag": 0, "obs_lag": 1,
+    "action_clip": null, "ddq_target_over_geom_first_frame": 14,
+    "wheel_torque_sat_first_frame": 6, "wheel_speed_limit": null,
+    "wheel_delta_obs_sat": null, "nonwheel_contact_4N": null, "leg_travel_95pct": null,
+    "first_overall_frame": 6
+  },
+  "posture_context": {
+    "tail_base_z_range_m": [0.298, 0.389],
+    "wheel_load_mean_N": [66, 70], "wheel_load_min_N": 23,
+    "frame_corr_ddq_raw_vs": {"base_z": -0.006, "gravity_x": 0.239, "gravity_y": 0.056, "load_imbalance": -0.093, "wheel_delta_obs_dd": -0.296}
+  }
+}
