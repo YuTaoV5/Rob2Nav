@@ -12,6 +12,7 @@
 | Rolling | [formal.sh](rolling/recipes/formal.sh) | Straight rolling, turning, braking and fixed stand |
 | Rolling, filtered low speed | [filtered.sh](rolling/recipes/filtered.sh) | Opt-in 0.20 m/s controller and reward smoke test |
 | Rolling, turn-biased continuation | [turn-2000fix.sh](rolling/recipes/turn-2000fix.sh) | 2000 extra iterations from model_1999 with spin sampling 25%->40%; action-delay DR disabled; research status |
+| Rolling, support-weighted continuation | [armE-support2.sh](rolling/recipes/armE-support2.sh) | 600 iterations from model_3998 with rolling_wheel_support -0.65 -> -2.0; MuJoCo 7/11 endpoint; Isaac 5/11; research status |
 | Stepping | [formal.sh](stepping/recipes/formal.sh) | Omnidirectional stepping and stairs |
 | Recovery | [formal.sh](recovery/recipes/formal.sh) | Rising from prone and side tilt |
 
