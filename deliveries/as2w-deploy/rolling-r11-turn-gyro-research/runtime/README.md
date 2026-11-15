@@ -11,6 +11,7 @@
 | `r11_c8_dump.py` | 捕获真实 rollout 的逐帧 obs / 原始输出 / 最终轮目标 / 实测 dq / 下一帧 obs |
 | `r11_c8_verify.py` | 用 `policy.onnx` 重放捕获的 obs，报告最大误差、最差维度与首次分歧帧 |
 | `r11_c5_handover.py` | stand → ramp → hold → ramp → stand 五阶段，报告逐阶段姿态/支撑/终止与退出漂移 |
+| `r11_c5_commloss.py` | 通讯失效对照：冻结最后指令 vs 判定失联即归零，报告失联期间行进距离与恢复时间 |
 
 ## gyro-1 包装（版本 gyro-1）
 
