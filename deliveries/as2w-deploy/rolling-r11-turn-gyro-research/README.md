@@ -6,6 +6,8 @@
 SHA256：`4bdf4d26b076d7c7`…（完整值见 `weights/SHA256`）
 包装版本：**gyro-1**（本轮新增，见 `runtime/README.md`）
 
+**汇总报告见 [FINAL_REPORT.md](FINAL_REPORT.md)** —— 实际通过的速度/转向/刹停/载荷范围与尚缺的现场证据。
+
 ## 能力声明（按实际通过的包络填写）
 
 同一权重 `armE_support2p0_final.pt` 在两端的实测结果：
