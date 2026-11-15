@@ -139,6 +139,9 @@ def main() -> int:
                     help="per-policy-step probability that the action frame is LOST, in which case "
                          "the last valid action is held (goal section 2: whole-frame loss + "
                          "last-valid-frame hold)")
+    ap.add_argument("--drop-burst", type=int, default=1,
+                    help="when a drop occurs, hold the last valid action for this many consecutive "
+                         "policy steps (goal section 2 burst loss; default 1 = IID)")
     ap.add_argument("--drop-seed", type=int, default=1234,
                     help="RNG seed for the frame-drop pattern so a run is reproducible")
     ap.add_argument("--action-delay-steps", type=int, default=0,
@@ -248,7 +251,8 @@ def main() -> int:
             import random as _random
             _drop = float(getattr(args, "drop_rate", 0.0))
             _rng = _random.Random(int(getattr(args, "drop_seed", 1234)))
-            _last_valid = {"a": None, "drops": 0, "steps": 0}
+            _burst = max(1, int(getattr(args, "drop_burst", 1)))
+            _last_valid = {"a": None, "drops": 0, "steps": 0, "remaining": 0}
 
             def delayed_step(a):
                 """Apply a[-(_delay+1)] instead of a; with _delay 0 this is a no-op.
@@ -260,8 +264,16 @@ def main() -> int:
                 """
                 _last_valid["steps"] += 1
                 applied = a
-                if _drop > 0.0 and _last_valid["a"] is not None and _rng.random() < _drop:
+                # A burst begins with probability _drop and then holds for _burst consecutive
+                # steps.  With _burst == 1 this is exactly the IID drop tested earlier, so the
+                # burstiness is the only variable that changes.
+                if _last_valid["remaining"] > 0 and _last_valid["a"] is not None:
                     applied = _last_valid["a"]
+                    _last_valid["remaining"] -= 1
+                    _last_valid["drops"] += 1
+                elif _drop > 0.0 and _last_valid["a"] is not None and _rng.random() < _drop:
+                    applied = _last_valid["a"]
+                    _last_valid["remaining"] = _burst - 1
                     _last_valid["drops"] += 1
                 else:
                     _last_valid["a"] = a.clone()
@@ -393,6 +405,7 @@ def main() -> int:
                       "action_delay_steps": int(getattr(args, "action_delay_steps", 0)),
                       "action_delay_ms": int(getattr(args, "action_delay_steps", 0)) * 20,
                       "drop_rate": float(getattr(args, "drop_rate", 0.0)),
+                      "drop_burst": int(getattr(args, "drop_burst", 1)),
                       "drop_seed": int(getattr(args, "drop_seed", 1234)),
                       "action_delay_note": "the plant executes the action issued N policy steps ago; the policy sees the real resulting observation",
                       "arm": {"ff_gain_nm_per_rad_s": float(args.ff_gain),
