@@ -96,6 +96,17 @@ def build(args, physics):
     cfg.rewards.rolling_knee_margin = RewardTermCfg(
         func=rolling_knee_margin_cost, weight=-3., params={"margin_m": .10})
     apply_safety(cfg, args.urdf, perturb=False, surface_guard=True)
+    # Goal section 4 fixed-load tier.  Done as a startup mass event on the base link instead
+    # of mutating the PhysX view after spawn: the event API is supported and applies before
+    # the first step, and the readback below records the realised mass rather than assuming it.
+    _pay = float(getattr(args, "payload_kg", 0.0))
+    if abs(_pay) > 1e-9:
+        from isaaclab.managers import EventTermCfg as _EvCfg, SceneEntityCfg
+        import isaaclab.envs.mdp as _mdp
+        cfg.events.as2w_payload = _EvCfg(
+            func=_mdp.randomize_rigid_body_mass, mode="startup",
+            params={"asset_cfg": SceneEntityCfg("robot", body_names="base_link"),
+                    "mass_distribution_params": (_pay, _pay), "operation": "add"})
     env = RobustEnvironment(cfg)
     return (env, RslRlVecEnvWrapper, UnitreeGo2FlatPPORunnerCfg,
             check_rsl_rl_version, create_rsl_rl_runner, handle_deprecated_rsl_rl_cfg)
@@ -122,6 +133,8 @@ def main() -> int:
                     help="scale leg (hip/thigh/calf) position stiffness; 1.0 = contract")
     ap.add_argument("--yaw-kp", type=float, default=0.0,
                     help="bounded gyro yaw feedback, Nm per (rad/s) of (cmd - measured) yaw rate")
+    ap.add_argument("--payload-kg", type=float, default=0.0,
+                    help="fixed payload added to the base link (goal section 4: 0 / +6 kg tiers)")
     ap.add_argument("--num-envs", type=int, default=1)
     ap.add_argument("--iterations", type=int, default=1)
     add_launcher_args(ap)
@@ -141,6 +154,22 @@ def main() -> int:
         try:
             wrapped = Wrapper(env, clip_actions=ACTION_CLIP)
             robot = env.scene["robot"]
+            payload_info = {"requested_kg": float(args.payload_kg), "applied": bool(abs(float(args.payload_kg)) > 1e-9),
+                            "method": "startup mass event on base_link, operation=add"}
+            try:
+                masses = np.asarray(robot.root_physx_view.get_masses()).astype(np.float64).reshape(-1)
+                body_names = list(robot.body_names)
+                base_i = body_names.index("base_link") if "base_link" in body_names else 0
+                payload_info.update({
+                    "base_body_name": body_names[base_i],
+                    "base_mass_after_kg": float(masses[base_i]),
+                    "total_mass_after_kg": float(masses.sum()),
+                    "readback_ok": True,
+                })
+            except Exception as exc:                      # readback must never break the run
+                payload_info["readback_ok"] = False
+                payload_info["readback_error"] = "%s: %s" % (type(exc).__name__, exc)
+            print("AS2W_PAYLOAD %s" % json.dumps(payload_info), flush=True)
             wj = env.as2w_joint_ids[12:]
             cmdterm = env.command_manager.get_term("base_velocity")
             wterm = env.action_manager.get_term("wheel_vel")
@@ -319,7 +348,8 @@ def main() -> int:
                      ("brake_fwd_0.25", 10.0, brake_fn(+STRAIGHT_TIER), True),
                      ("brake_bwd_0.25", 10.0, brake_fn(-STRAIGHT_TIER), True)]
 
-            report = {"arm": {"ff_gain_nm_per_rad_s": float(args.ff_gain),
+            report = {"payload": payload_info,
+                      "arm": {"ff_gain_nm_per_rad_s": float(args.ff_gain),
                               "axis": "LEFT-vs-RIGHT differential (s = -1,+1,-1,+1), driven by the COMMANDED wz",
                               "drive": "wz_cmd (exactly 0 in hold and every straight case)",
                               "ff_cap_nm": float(args.ff_cap),
