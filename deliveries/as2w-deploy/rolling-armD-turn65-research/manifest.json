@@ -1,0 +1,189 @@
+{
+  "package": "rolling-armD-turn65-research",
+  "date": "2026-11-17",
+  "skill": "AS2-W four-wheel rolling (independent skill; stepping/stairs/stand-up excluded)",
+  "status": "research",
+  "deployable": false,
+  "owner": "AS2-W rolling agent",
+  "summary": "best Isaac candidate so far: seed 7393 scores 7/11 and BOTH arcs pass (the control fails arc_left), but all four pure turns fail on both simulators, so there is still no accepted weight",
+  "weights": {
+    "selected_checkpoint": {
+      "path": "weights/armD_turn65_final.pt",
+      "sha256": "de61de58fd68efc356efbd48a0b9683153361fc87b6fb32c7b9c83584cbd6926",
+      "bytes": 1042859,
+      "origin": "armD-turn65-1k run, r11-final.pt, iteration 5596"
+    },
+    "deployment_model": {
+      "path": "weights/policy.onnx",
+      "sha256": "680e0c720750fdaf3a3403232151a9e0301d1646fd45c95449dbdf74f7d315e7",
+      "bytes": 175066,
+      "opset": 17,
+      "format": "single file (dynamo=False)",
+      "note": "this ONNX is the CONTROL weight's export, kept for interface verification; it does NOT correspond to the selected armD checkpoint",
+      "armD_onnx_export": "not_run - exporting armD requires the export script plus the armD checkpoint; the export path itself is verified byte-exact"
+    },
+    "control_reference": {
+      "path": "weights/armE_control_reference.pt",
+      "sha256": "4bdf4d26b076d7c717e9c151946dd42f8b3cf9dbbf592c5d6aac1ed5f6615866",
+      "init_sha256": "4bdf4d26b076d7c717e9c151946dd42f8b3cf9dbbf592c5d6aac1ed5f6615866"
+    },
+    "armD_10k_line": {
+      "run": "armD-10k (operator-authorised 10000-round diagnostic continuation)",
+      "checkpoints": [
+        "model_6600.pt sha e6d44e0493f4b6e6"
+      ],
+      "not_selected": true,
+      "reason": "the 6600 checkpoint scores 6/11 with arc_right collapsing to 0.17, below the 1k checkpoint"
+    }
+  },
+  "interfaces": {
+    "obs": {
+      "name": "obs",
+      "shape": [
+        1,
+        65
+      ],
+      "dtype": "float32",
+      "control_period_s": 0.02
+    },
+    "action": {
+      "name": "action",
+      "shape": [
+        1,
+        16
+      ],
+      "dtype": "float32",
+      "layout": "12 leg axes (position, scale 0.35, offset DEF) then 4 wheel axes (velocity, scale 16)"
+    },
+    "action_clip": 6.0,
+    "wrapper": {
+      "name": "gyro-1",
+      "yaw_kp": 60,
+      "ff_cap": 4,
+      "ff_gain": 0,
+      "kd": 6,
+      "axis_vector_S": [
+        -1,
+        1,
+        -1,
+        1
+      ],
+      "in_training_loop": true,
+      "posture_bias": "off (experimental switch only)"
+    }
+  },
+  "source_provenance": {
+    "train_source": {
+      "path": "training/train_armE_support2p0.py",
+      "sha256": "a61b0bb57d41b32471efec16385bfddc33c358bd57aa47d262c7fce19ad1978a",
+      "git": "5e3b18c9285258757ceac378b4663e4d6201d771"
+    },
+    "curriculum_source": {
+      "path": "training/as2w_ab_curriculum.py",
+      "sha256": "f969e454a1b4096eee2a52ddcb89fa1d6c63c977bdf6cfca10e3d1bdbfd51347",
+      "git": "2f3ba3f9798328fb57b90b50c9696aef2ae1f049"
+    },
+    "launch_recipe": {
+      "path": "training/ab-gyro-loop.sh",
+      "sha256": "4f8ec7875fa36fb439188df94c2d0e63645e72ed96120ac7aad9df7b4ad94ae5"
+    },
+    "resolved_config": {
+      "path": "training/resolved_config_armD.txt"
+    },
+    "mjcf": {
+      "path": "runtime/r11_mjcf_excl.xml",
+      "sha256": "56bfa3ffa4cb2dcf4b6ba51bfd3145cd0a724096bb47251f3a53480d1c5e665b",
+      "portability": "relative meshdir; loads from a clean git clone"
+    },
+    "urdf": {
+      "path": "training/as2w-backup/dependencies/unitree_ros_as2w/robots/as2w_description/as2w.urdf",
+      "sha256": "696aec2c0915ec1e06bcc91a63104d8234c51c0eb94331fa5496bf426c51e926"
+    },
+    "usd": {
+      "path": "training/as2w-backup/as2w-current/runs/r280-isaac-flat-preflight/kit3-as2w.usd/as2w/as2w.usda"
+    },
+    "meshes": {
+      "path": "training/as2w-backup/as2w-current/assets/r237-train-root/official-model/robots/as2w_description/meshes",
+      "count": 18,
+      "tracked_in_repo": true
+    }
+  },
+  "environment": {
+    "torch": "2.11.0+cu130",
+    "onnx": "1.22.0",
+    "onnxruntime": "1.32.0",
+    "opset": 17,
+    "isaac_sim": "6.2.0-rc.14 (kit python3.12)",
+    "mujoco": "3.2.3 (via /root/gpufree-data/mujoco-venv)",
+    "python": "3.12"
+  },
+  "results": {
+    "isaac_seed_7393": {
+      "denominator": 11,
+      "passed": 7,
+      "per_case": {
+        "hold": "PASS",
+        "straight_fwd_0.25": "PASS 0.87",
+        "straight_bwd_0.25": "PASS 0.85",
+        "arc_left_0.25": "PASS 0.83",
+        "arc_right_0.25": "PASS 0.76",
+        "brake_fwd_0.25": "PASS",
+        "brake_bwd_0.25": "PASS",
+        "turn_left_0.05": "FAIL 0.02",
+        "turn_right_0.05": "FAIL 0.08",
+        "turn_left_0.10": "FAIL 0.35",
+        "turn_right_0.10": "FAIL 0.02"
+      }
+    },
+    "isaac_seed_311": {
+      "denominator": 11,
+      "passed": 6
+    },
+    "isaac_two_seed_min": {
+      "denominator": 11,
+      "passed": 6
+    },
+    "mujoco_selected_weight": {
+      "status": "not_run",
+      "note": "the MuJoCo matrix exists for the CONTROL weight (7/11) but not for armD"
+    },
+    "hardware": {
+      "status": "not_run",
+      "note": "R3/R4 require site authorisation"
+    }
+  },
+  "C1_C8": {
+    "C1_provenance": "pass",
+    "C2_model_interface": "pass",
+    "C3_observation_contract": "pass",
+    "C4_output_to_control": "partial - the action chain is delivered, but the acceptance script's tau_max/ff_max read 0 on every case, so the torque-headroom item is not_measured",
+    "C5_entry_exit": "pass",
+    "C6_simulation_assets": "pass",
+    "C7_evidence": "pass",
+    "C8_minimal_replay": "pass"
+  },
+  "R0_R4": {
+    "R0_receive": "pass",
+    "R1_offline_alignment": "pass",
+    "R2_sim2sim": "partial",
+    "R3_cpro_readonly": "not_run",
+    "R4_bounded_hardware": "not_run"
+  },
+  "caveats": [
+    "the shipped policy.onnx belongs to the CONTROL weight, not to the selected armD checkpoint - the armD ONNX export was not run",
+    "no accepted weight exists: all four pure turns fail on both simulators",
+    "the two simulators fail pure turns in OPPOSITE directions (Isaac undershoots 0.10-0.31, MuJoCo overshoots 1.41-1.56); the mechanism is not yet located",
+    "the Isaac implicit-drive saturation rate is not_measured - applied_torque is a limit-clipped telemetry estimate, not the solver's drive force",
+    "the long-turn dwell was never implemented: AS2W_AB_TURN_DWELL_* are printed but never read, so armB/armC/armD are mixture-only experiments",
+    "single-leg lift is geometrically infeasible in the current stance: IK reaches 0.25-1.73 mm of a 10 mm target and the measured wheel height goes negative",
+    "the posture bias was rejected: MuJoCo improved but Isaac zero-command drift worsened 65-350x",
+    "R2 is partial: the MuJoCo formal matrix for the selected weight is not_run",
+    "no hardware evidence of any kind"
+  ],
+  "reproduce": {
+    "mujoco_matrix": "python runtime/r11_mj_matrix_v2.py --xml runtime/r11_mjcf_excl.xml --ckpt weights/armD_turn65_final.pt --out out/",
+    "isaac_matrix": "/isaac-sim/python.sh runtime/r11_acceptance_ff.py --usd <as2w.usda> --urdf <as2w.urdf> --out out/ --checkpoints \"armD=weights/armD_turn65_final.pt\" --seeds 7393,311",
+    "video": "MUJOCO_GL=egl python runtime/r11_demo_video.py --xml runtime/r11_mjcf_excl.xml --ckpt weights/armD_turn65_final.pt --out videos/ --width 640 --height 480"
+  },
+  "related_docs": "see README.md section 9; also skills/as2w/ENGINEERING_LESSONS.md in the repository"
+}

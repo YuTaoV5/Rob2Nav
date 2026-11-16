@@ -1,0 +1,129 @@
+{
+ "checkpoint": "/root/gpufree-data/as2w-runs/r11_fanziqi_lab/yaw-arms/armE-support-20261116-034514/r11-final.pt",
+ "seed": 7393,
+ "command": {
+  "vx": 0.25,
+  "wz": 0.0
+ },
+ "sequence": [
+  {
+   "stage": "stand_in",
+   "seconds": 5.0
+  },
+  {
+   "stage": "ramp_up",
+   "seconds": 2.0
+  },
+  {
+   "stage": "hold",
+   "seconds": 8.0
+  },
+  {
+   "stage": "ramp_down",
+   "seconds": 2.0
+  },
+  {
+   "stage": "stand_out",
+   "seconds": 5.0
+  }
+ ],
+ "note": "simulation only; not hardware evidence",
+ "phases": {
+  "stand_in": {
+   "seconds": 5.0,
+   "upright_min": 0.9993069171905518,
+   "support_frac": 1.0,
+   "terminations": 0,
+   "vx_tail_mean": 0.0059581233162316494,
+   "wz_tail_mean": -0.0007274538803418788,
+   "leg_q_err_absmax": 0.1773253083229065,
+   "leg_dq_absmax": 0.10835610330104828,
+   "wheel_dq_absmax": 0.224227637052536
+  },
+  "ramp_up": {
+   "seconds": 2.0,
+   "upright_min": 0.9984667301177979,
+   "support_frac": 1.0,
+   "terminations": 0,
+   "vx_tail_mean": 0.1080426907306537,
+   "wz_tail_mean": -0.006505089705460705,
+   "leg_q_err_absmax": 0.2207140326499939,
+   "leg_dq_absmax": 0.8416598439216614,
+   "wheel_dq_absmax": 3.0662763118743896
+  },
+  "hold": {
+   "seconds": 8.0,
+   "upright_min": 0.9971310496330261,
+   "support_frac": 1.0,
+   "terminations": 0,
+   "vx_tail_mean": 0.21221627245346705,
+   "wz_tail_mean": -0.00034052138682454824,
+   "leg_q_err_absmax": 0.3012165427207947,
+   "leg_dq_absmax": 0.9083784222602844,
+   "wheel_dq_absmax": 4.293377876281738
+  },
+  "ramp_down": {
+   "seconds": 2.0,
+   "upright_min": 0.996882975101471,
+   "support_frac": 1.0,
+   "terminations": 0,
+   "vx_tail_mean": 0.10995959901250899,
+   "wz_tail_mean": -0.012922624097554944,
+   "leg_q_err_absmax": 0.29485172033309937,
+   "leg_dq_absmax": 0.9722647666931152,
+   "wheel_dq_absmax": 3.257784128189087
+  },
+  "stand_out": {
+   "seconds": 5.0,
+   "upright_min": 0.9965139627456665,
+   "support_frac": 1.0,
+   "terminations": 0,
+   "vx_tail_mean": -0.00015046458327560685,
+   "wz_tail_mean": -7.07064820259499e-05,
+   "leg_q_err_absmax": 0.2398795485496521,
+   "leg_dq_absmax": 1.0570900440216064,
+   "wheel_dq_absmax": 2.0564160346984863
+  }
+ },
+ "takeover_first_frame": {
+  "first_frame_wheel_dq": [
+   1.6762632131576538,
+   2.2080068588256836,
+   2.676100015640259,
+   2.2212979793548584
+  ],
+  "first_frame_leg_dq": [
+   -0.024937286972999573,
+   -0.02408749982714653,
+   -0.001150072319433093,
+   -0.018248721957206726,
+   0.33143967390060425,
+   0.16292008757591248,
+   0.22294621169567108,
+   0.1907268613576889,
+   -0.29150164127349854,
+   -0.07580264657735825,
+   -0.4513433575630188,
+   -0.2532138526439667
+  ],
+  "first_frame_leg_q_err": [
+   -0.05978011339902878,
+   -0.0275836531072855,
+   -0.0076979524455964565,
+   0.10549741238355637,
+   0.15280681848526,
+   0.18603068590164185,
+   0.22448188066482544,
+   0.14528250694274902,
+   -0.11312079429626465,
+   -0.007286190986633301,
+   0.1542503833770752,
+   -0.02955913543701172
+  ]
+ },
+ "final_stand": {
+  "drift_vx_abs": 0.00015046458327560685,
+  "drift_wz_abs": 7.07064820259499e-05,
+  "displacement_m": 2.1800332069396973
+ }
+}

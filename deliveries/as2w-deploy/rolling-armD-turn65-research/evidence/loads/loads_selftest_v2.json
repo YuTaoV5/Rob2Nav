@@ -1,0 +1,62 @@
+{
+ "A_standing": {
+  "loads_N": [
+   65.73,
+   62.42,
+   58.03,
+   71.3
+  ],
+  "sum_N": 257.5,
+  "expected_weight_N": 255.1
+ },
+ "B_lifted": {
+  "loads_N": [
+   63.27,
+   47.74,
+   43.73,
+   101.33
+  ]
+ },
+ "C_per_leg_raised": {
+  "FL": {
+   "loads_N": [
+    50.04,
+    40.55,
+    72.64,
+    91.97
+   ]
+  },
+  "FR": {
+   "loads_N": [
+    37.62,
+    52.77,
+    85.11,
+    79.15
+   ]
+  },
+  "RL": {
+   "loads_N": [
+    44.93,
+    65.21,
+    76.8,
+    68.52
+   ]
+  },
+  "RR": {
+   "loads_N": [
+    61.32,
+    47.3,
+    64.67,
+    80.81
+   ]
+  }
+ },
+ "verdict": "FAIL",
+ "reasons": [
+  "lifted: wheels still report load ([63.27, 47.74, 43.73, 101.33])",
+  "raise FL: that wheel still reads 50.04",
+  "raise FR: that wheel still reads 52.77",
+  "raise RL: that wheel still reads 76.80",
+  "raise RR: that wheel still reads 80.81"
+ ]
+}

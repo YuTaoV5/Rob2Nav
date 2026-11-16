@@ -1,0 +1,149 @@
+# AS2-W rolling skill - deployment contract (version gyro-1)
+# Package: deliveries/as2w-deploy/rolling-r11-turn-gyro-research
+#
+# STATUS: research.  deployable: false at the time of writing, because the hardware fields
+# below are not_measured and the acceptance matrix has no dual-simulator pass.
+# `runtime/preflight.py` REFUSES to arm a hardware loop while any required field is
+# not_measured - that refusal is deliberate and must not be bypassed.
+
+version: gyro-1
+# The ACTION wrapper contract is unchanged since gyro-1: same 16-axis mapping, scales, limits,
+# PD gains and 90% protections.  The evaluation tooling has since gained observation-distortion
+# switches and a dual-basis report, which are EVAL-ONLY and do not alter the deployed contract,
+# so they are versioned separately rather than bumping the action wrapper.
+eval_version: eval-3
+date: 2026-11-16
+skill: as2w-rolling
+status: research
+deployable: false
+
+policy:
+  file: weights/policy.onnx
+  checkpoint: weights/armE_support2p0_final.pt
+  checkpoint_sha256: 4bdf4d26b076d7c7  # full value in weights/SHA256
+  onnx_opset: 17
+  onnx_size_bytes: 175066
+  input:
+    name: obs
+    shape: [batch, 65]
+    dtype: float32
+  output:
+    name: action
+    shape: [batch, 16]
+    dtype: float32
+  semantics: deterministic mean of the actor MLP (the sampling std is not exported)
+  internal_state: none
+  control_period_s: 0.02
+
+observation:
+  dim: 65
+  layout_doc: evidence/C3_OBSERVATION_CONTRACT.md
+  segments:
+    - "0:3 cmd_offset (command minus (0.4,0,0), body frame)"
+    - "3:6 root_ang_vel_b rad/s"
+    - "6:9 projected_gravity_b"
+    - "9 const_0p4"
+    - "10:26 q_minus_default, wheel axes wrapped to minus-2pi..2pi"
+    - "26:42 dq rad/s"
+    - "42:58 previous_action"
+    - "58 clock_sin"
+    - "59 clock_cos"
+    - "60:64 zero_cmd_wheel_drift times zero-command flag"
+    - "64 zero_command_flag"
+  filter: none
+  timestamp_or_age: not_measured   # must be specified before any hardware loop
+
+action:
+  clip: 6.0
+  leg:
+    indices: "0:12"
+    scale: 0.35
+    kp: 55
+    kd: 2
+  wheel:
+    indices: "12:16"
+    scale: 16.0
+    kp: 0
+    kd: 6
+    unit: rad/s
+  joint_order:
+    - FL_hip
+    - FR_hip
+    - RL_hip
+    - RR_hip
+    - FL_thigh
+    - FR_thigh
+    - RL_thigh
+    - RR_thigh
+    - FL_calf
+    - FR_calf
+    - RL_calf
+    - RR_calf
+    - FL_foot
+    - FR_foot
+    - RL_foot
+    - RR_foot
+
+torque_limits_nm:            # 90% of the verified hardware limit, includes PD + feedforward
+  hip: 54.0
+  thigh: 54.0
+  calf: 81.0
+  wheel: 13.5
+
+gyro_feedback:               # the ONLY wrapper change in this package
+  enabled_by_default: true
+  formula: "tau_ff = S * clamp(yaw_kp*(wz_cmd - wz_meas), +-ff_cap_nm)"
+  axis_vector_S: [-1.0, 1.0, -1.0, 1.0]   # FL, FR, RL, RR -> left-vs-right differential
+  yaw_kp_nm_per_rad_s: 60.0
+  ff_cap_nm: 4.0
+  state_free: true           # no integrator, no filter, so the 4 sub-steps per policy step cannot compound
+  affects: wheels_only
+
+leg_pose_policy:
+  scheme: wheel_only        # this package does NOT adopt leg-wheel co-design
+  legs_unchanged_from_contract: true
+  note: "Goal authorises leg-wheel co-design, but if used it requires BOTH the wheel-only and the leg-wheel configurations to be delivered. The leg experiments here (stiffness scaling 0.85 / 0.70 / 0.30) were REFUTED and are not carried into this package, so only the wheel-only configuration exists and only one set of weights is needed. The standard stance remains the entry, exit and fallback pose."
+fallback:
+  to_standard_leg_pose: "no action required - no leg-pose strategy is loaded"
+  to_stock_controller: "run the acceptance/probe scripts with --yaw-kp 0 (and --ff-gain 0); that is the unmodified controller"
+  to_previous_skill: "stop publishing wheel velocity targets and hand control back per the fixed-stand sequence"
+
+link_loss_policy:            # MEASURED, must be implemented in the deployment wrapper
+  action_on_loss: zero_command     # NOT hold-last-command
+  evidence: "3 s outage: zeroing travels 0.023 m vs 0.638 m when holding the last command (27.3x)"
+  detection_delay_ms: 300          # measured cost is about 0.02 m of extra travel per 100 ms
+  detection_delay_evidence: "evidence/LOSS_DETECT_DELAY.md: 0/100/300 ms -> 0.023/0.048/0.086 m"
+  burst_loss_note: "IID frame loss at 5 and 15 percent kept 6/11 with no verdict changes, but BURST loss of 10 or 30 consecutive held frames drops to 5/11, so sustained loss must degrade (slow down or stop) rather than hold indefinitely. Burst loss is a SEPARATE test case from IID loss and must not be covered by the IID result."
+  burst_loss_evidence: "evidence/FRAME_DROP.md and evidence/BURST_LOSS.md"
+
+hardware_slots:              # MUST be filled from the current firmware documentation on site
+  FL_hip: not_measured
+  FR_hip: not_measured
+  RL_hip: not_measured
+  RR_hip: not_measured
+  FL_thigh: not_measured
+  FR_thigh: not_measured
+  RL_thigh: not_measured
+  RR_thigh: not_measured
+  FL_calf: not_measured
+  FR_calf: not_measured
+  RL_calf: not_measured
+  RR_calf: not_measured
+  FL_foot: not_measured
+  FR_foot: not_measured
+  RL_foot: not_measured
+  RR_foot: not_measured
+  directions: not_measured
+  zero_offsets: not_measured
+  firmware_version: not_measured
+
+# The R4000 slot map recorded elsewhere in this project belongs to a DIFFERENT training line
+# and a different control contract; it must not be copied into this file.
+
+known_limits_of_this_version:
+  speed: "0.25 m/s only; 0.60 and 1.00 measured and NOT passed"
+  payload: "unloaded only; +6 kg measured and NOT passed (6/11 -> 4/11)"
+  steering: "arc_right passes; arc_left and all four pure-turn cases fail"
+  braking: "passes unloaded at 0.25 m/s (stop distance 0.05-0.07 m)"
+  dual_simulator: "NO candidate passes both MuJoCo and Isaac Lab; the cases that DO pass on both ends are hold, straight fwd/bwd, arc_right and both brakes (6 with gyro-1, 5 with the base wrapper); arc_left passes on MuJoCo only - see evidence/DUAL_SIM_QUADRANT.md"
+  site_acceptance: "R3 and R4 not_run - they need a site authorisation"

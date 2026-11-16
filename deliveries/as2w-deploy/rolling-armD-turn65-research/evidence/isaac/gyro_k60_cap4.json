@@ -1,0 +1,203 @@
+{
+ "arm": {
+  "ff_gain_nm_per_rad_s": 0.0,
+  "axis": "LEFT-vs-RIGHT differential (s = -1,+1,-1,+1), driven by the COMMANDED wz",
+  "drive": "wz_cmd (exactly 0 in hold and every straight case)",
+  "ff_cap_nm": 4.0,
+  "yaw_kp": 60.0,
+  "yaw_feedback": "bounded, state-free (no integrator): K*(wz_cmd - wz_meas)",
+  "common_mode_effect": "none by construction",
+  "wheel_limit_nm": 13.5,
+  "legs_touched": false,
+  "leg_kp_scale": 1.0,
+  "state_free": true
+ },
+ "seeds": [
+  7393,
+  311
+ ],
+ "candidates": [
+  {
+   "label": "armE_final",
+   "cases": {
+    "hold": {
+     "verdicts": [
+      "PASS",
+      "PASS"
+     ],
+     "pass_all": true,
+     "support_min": 1.0,
+     "upright_min": 0.997459888458252,
+     "term_any": 0,
+     "yaw_track_mean": null,
+     "vx_track_mean": null,
+     "exec_mean": 0.3926218910726928,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 173
+    },
+    "turn_left_0.05": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "pass_all": false,
+     "support_min": 1.0,
+     "upright_min": 0.9960617423057556,
+     "term_any": 0,
+     "yaw_track_mean": 0.3057463652929679,
+     "vx_track_mean": null,
+     "exec_mean": 0.6826749413836732,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 181
+    },
+    "turn_right_0.05": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "pass_all": false,
+     "support_min": 1.0,
+     "upright_min": 0.9972248673439026,
+     "term_any": 0,
+     "yaw_track_mean": 0.1808775591023732,
+     "vx_track_mean": null,
+     "exec_mean": 0.45415034028168616,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 188
+    },
+    "turn_left_0.10": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "pass_all": false,
+     "support_min": 1.0,
+     "upright_min": 0.9954684972763062,
+     "term_any": 0,
+     "yaw_track_mean": 0.20787844262473903,
+     "vx_track_mean": null,
+     "exec_mean": 0.3968161120176451,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 210
+    },
+    "turn_right_0.10": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "pass_all": false,
+     "support_min": 1.0,
+     "upright_min": 0.995603621006012,
+     "term_any": 0,
+     "yaw_track_mean": 0.15623068186493277,
+     "vx_track_mean": null,
+     "exec_mean": 0.3031851760915579,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 220
+    },
+    "straight_fwd_0.25": {
+     "verdicts": [
+      "PASS",
+      "PASS"
+     ],
+     "pass_all": true,
+     "support_min": 1.0,
+     "upright_min": 0.9957994818687439,
+     "term_any": 0,
+     "yaw_track_mean": null,
+     "vx_track_mean": 0.8314723406235377,
+     "exec_mean": 0.9291866404505433,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 261
+    },
+    "straight_bwd_0.25": {
+     "verdicts": [
+      "PASS",
+      "PASS"
+     ],
+     "pass_all": true,
+     "support_min": 1.0,
+     "upright_min": 0.996833324432373,
+     "term_any": 0,
+     "yaw_track_mean": null,
+     "vx_track_mean": 0.8950455558300019,
+     "exec_mean": 0.955968388249916,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 280
+    },
+    "arc_left_0.25": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "pass_all": false,
+     "support_min": 1.0,
+     "upright_min": 0.9968586564064026,
+     "term_any": 0,
+     "yaw_track_mean": 0.5277988391326895,
+     "vx_track_mean": 0.8375853449106216,
+     "exec_mean": 0.8641441627880762,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 305
+    },
+    "arc_right_0.25": {
+     "verdicts": [
+      "PASS",
+      "PASS"
+     ],
+     "pass_all": true,
+     "support_min": 0.9533333333333334,
+     "upright_min": 0.9720842838287354,
+     "term_any": 0,
+     "yaw_track_mean": 0.8281427962084611,
+     "vx_track_mean": 0.8968234584728877,
+     "exec_mean": 0.9462371900138333,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 393
+    },
+    "brake_fwd_0.25": {
+     "verdicts": [
+      "PASS",
+      "PASS"
+     ],
+     "pass_all": true,
+     "support_min": 1.0,
+     "upright_min": 0.9941881895065308,
+     "term_any": 0,
+     "yaw_track_mean": null,
+     "vx_track_mean": -0.010707879292410022,
+     "exec_mean": 0.5400097950457368,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 436
+    },
+    "brake_bwd_0.25": {
+     "verdicts": [
+      "PASS",
+      "PASS"
+     ],
+     "pass_all": true,
+     "support_min": 1.0,
+     "upright_min": 0.9967467188835144,
+     "term_any": 0,
+     "yaw_track_mean": null,
+     "vx_track_mean": 0.031183545272797347,
+     "exec_mean": 0.5067305212118423,
+     "tau_abs_max": 13.5,
+     "ff_abs_max": 4.0,
+     "cap_hits": 456
+    }
+   },
+   "pass_total": 6
+  }
+ ]
+}

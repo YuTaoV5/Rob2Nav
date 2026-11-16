@@ -1,0 +1,76 @@
+{
+ "checkpoint": "/root/gpufree-data/as2w-runs/as2w-rolling-goal/results/train/ab-B-longturn-20261116-102312/r11-final.pt",
+ "command": {
+  "vx": 0.0,
+  "wz": 0.05
+ },
+ "load_threshold_n": 20.0,
+ "frames": 600,
+ "dt": 0.02,
+ "first_unload_frame": 294,
+ "first_unload_time_s": 5.88,
+ "first_unload_wheels": [
+  "RL"
+ ],
+ "unload_fraction": 0.12333333333333334,
+ "per_wheel_min_load_N": {
+  "FL": 26.053469888997775,
+  "FR": 25.400615225628524,
+  "RL": 0.0,
+  "RR": 32.68075658448558
+ },
+ "per_wheel_unload_frames": {
+  "FL": 0,
+  "FR": 0,
+  "RL": 74,
+  "RR": 0
+ },
+ "yaw_tail": 0.09868208720565437,
+ "ddq_tail": 0.9649262400658218,
+ "degradation": {
+  "baseline_frames": 219,
+  "first_unload_frame": 294,
+  "first_exceed_frame_per_quantity": {
+   "wheel_load_spread": 243,
+   "leg_joint_error": 0,
+   "measured_differential": null,
+   "yaw_rate": 3,
+   "roll": 0,
+   "pitch": 0,
+   "knee_height_min": 0
+  },
+  "ranked_earliest_first": [
+   {
+    "quantity": "leg_joint_error",
+    "frame": 0,
+    "time_s": 0.0
+   },
+   {
+    "quantity": "roll",
+    "frame": 0,
+    "time_s": 0.0
+   },
+   {
+    "quantity": "pitch",
+    "frame": 0,
+    "time_s": 0.0
+   },
+   {
+    "quantity": "knee_height_min",
+    "frame": 0,
+    "time_s": 0.0
+   },
+   {
+    "quantity": "yaw_rate",
+    "frame": 3,
+    "time_s": 0.06
+   },
+   {
+    "quantity": "wheel_load_spread",
+    "frame": 243,
+    "time_s": 4.86
+   }
+  ],
+  "note": "frame is relative to the START OF THE SPIN command; compare orderings, not absolute values"
+ }
+}

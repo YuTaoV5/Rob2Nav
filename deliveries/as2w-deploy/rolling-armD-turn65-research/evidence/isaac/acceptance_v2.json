@@ -1,0 +1,301 @@
+{
+ "frozen_gates": {
+  "hold_vx": 0.02,
+  "hold_wz": 0.02,
+  "yaw_track": [
+   0.7,
+   1.3
+  ],
+  "vx_track": [
+   0.7,
+   1.3
+  ],
+  "support": 0.95,
+  "upright": 0.85,
+  "brake_vx": 0.02,
+  "tail_s": 3.0,
+  "load_n": 5.0,
+  "settle_s": 2.0,
+  "brake_hold_s": 5.0,
+  "turn_tiers": [
+   0.05,
+   0.1
+  ],
+  "straight_tier": 0.25,
+  "arc_tier": [
+   0.25,
+   0.05
+  ],
+  "frozen": true
+ },
+ "protocol": "env.seed()+env.reset()+fixed settle per repeat; mean/min/max across seeds; NO snapshot forks (Isaac/PhysX fork non-reproducible)",
+ "seeds": [
+  7393,
+  311
+ ],
+ "cases": [
+  "hold",
+  "turn_left_0.05",
+  "turn_right_0.05",
+  "turn_left_0.10",
+  "turn_right_0.10",
+  "straight_fwd_0.25",
+  "straight_bwd_0.25",
+  "arc_left_0.25",
+  "arc_right_0.25",
+  "brake_fwd_0.25",
+  "brake_bwd_0.25"
+ ],
+ "candidates": [
+  {
+   "label": "armE_final",
+   "iteration": 4597,
+   "zero_command_ddq_bias": {
+    "mean": 0.3608622131993373,
+    "values": [
+     0.7247215894858042,
+     -0.0029971630871295928
+    ]
+   },
+   "cases": {
+    "hold": {
+     "verdicts": [
+      "PASS",
+      "PASS"
+     ],
+     "reasons": [
+      "ok",
+      "ok"
+     ],
+     "pass_count": 2,
+     "support_min": 1.0,
+     "upright_min": 0.9985502362251282,
+     "term_any": 0,
+     "vx_tail_mean": -0.0005674372030383286,
+     "wz_tail_mean": -0.0019982739657280037,
+     "yaw_track_mean": null,
+     "vx_track_mean": null,
+     "brake_stop_dist_m": null,
+     "app_ddq_tail": 0.3608622131993373,
+     "meas_ddq_tail": 0.01680881366696364
+    },
+    "turn_left_0.05": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "reasons": [
+      "yaw_track",
+      "yaw_track"
+     ],
+     "pass_count": 0,
+     "support_min": 1.0,
+     "upright_min": 0.9979144930839539,
+     "term_any": 0,
+     "vx_tail_mean": -9.134969743778734e-05,
+     "wz_tail_mean": 8.682421243368782e-05,
+     "yaw_track_mean": 0.0017364842486737564,
+     "vx_track_mean": null,
+     "brake_stop_dist_m": null,
+     "app_ddq_tail": 0.5451152057945728,
+     "meas_ddq_tail": -0.02627751899184659
+    },
+    "turn_right_0.05": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "reasons": [
+      "yaw_track",
+      "yaw_track"
+     ],
+     "pass_count": 0,
+     "support_min": 1.0,
+     "upright_min": 0.9964888691902161,
+     "term_any": 0,
+     "vx_tail_mean": -0.000930351303735127,
+     "wz_tail_mean": -0.005020682273752755,
+     "yaw_track_mean": 0.10041364547505509,
+     "vx_track_mean": null,
+     "brake_stop_dist_m": null,
+     "app_ddq_tail": -0.6975409012287855,
+     "meas_ddq_tail": -0.08365537008736283
+    },
+    "turn_left_0.10": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "reasons": [
+      "yaw_track",
+      "yaw_track"
+     ],
+     "pass_count": 0,
+     "support_min": 1.0,
+     "upright_min": 0.9978623390197754,
+     "term_any": 0,
+     "vx_tail_mean": 0.0002462789724086179,
+     "wz_tail_mean": 0.0032637381378784387,
+     "yaw_track_mean": 0.032637381378784386,
+     "vx_track_mean": null,
+     "brake_stop_dist_m": null,
+     "app_ddq_tail": 0.9770038529237111,
+     "meas_ddq_tail": -0.0025909869722090663
+    },
+    "turn_right_0.10": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "reasons": [
+      "yaw_track",
+      "yaw_track"
+     ],
+     "pass_count": 0,
+     "support_min": 1.0,
+     "upright_min": 0.9950628876686096,
+     "term_any": 0,
+     "vx_tail_mean": -0.0010784575508538787,
+     "wz_tail_mean": -0.012395619603679128,
+     "yaw_track_mean": 0.12395619603679128,
+     "vx_track_mean": null,
+     "brake_stop_dist_m": null,
+     "app_ddq_tail": -0.7399625040094058,
+     "meas_ddq_tail": -0.1631143522216007
+    },
+    "straight_fwd_0.25": {
+     "verdicts": [
+      "PASS",
+      "PASS"
+     ],
+     "reasons": [
+      "ok",
+      "ok"
+     ],
+     "pass_count": 2,
+     "support_min": 0.98,
+     "upright_min": 0.9902697801589966,
+     "term_any": 0,
+     "vx_tail_mean": 0.20770345434546472,
+     "wz_tail_mean": -0.02781415097299032,
+     "yaw_track_mean": null,
+     "vx_track_mean": 0.8308138173818589,
+     "brake_stop_dist_m": null,
+     "app_ddq_tail": 0.005740389823913575,
+     "meas_ddq_tail": -0.24106201867262522
+    },
+    "straight_bwd_0.25": {
+     "verdicts": [
+      "PASS",
+      "PASS"
+     ],
+     "reasons": [
+      "ok",
+      "ok"
+     ],
+     "pass_count": 2,
+     "support_min": 1.0,
+     "upright_min": 0.9972993731498718,
+     "term_any": 0,
+     "vx_tail_mean": -0.22613724316159883,
+     "wz_tail_mean": -0.005712897930061444,
+     "yaw_track_mean": null,
+     "vx_track_mean": 0.9045489726463953,
+     "brake_stop_dist_m": null,
+     "app_ddq_tail": -0.18266011039415997,
+     "meas_ddq_tail": -0.20344056685765585
+    },
+    "arc_left_0.25": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "reasons": [
+      "yaw_or_vx_track",
+      "yaw_or_vx_track"
+     ],
+     "pass_count": 0,
+     "support_min": 1.0,
+     "upright_min": 0.9972493648529053,
+     "term_any": 0,
+     "vx_tail_mean": 0.21345346868038179,
+     "wz_tail_mean": 0.03142671881204782,
+     "yaw_track_mean": 0.6285343762409563,
+     "vx_track_mean": 0.8538138747215271,
+     "brake_stop_dist_m": null,
+     "app_ddq_tail": 0.9801621413230897,
+     "meas_ddq_tail": 0.49779282093048094
+    },
+    "arc_right_0.25": {
+     "verdicts": [
+      "FAIL",
+      "FAIL"
+     ],
+     "reasons": [
+      "yaw_or_vx_track",
+      "yaw_or_vx_track"
+     ],
+     "pass_count": 0,
+     "support_min": 0.96,
+     "upright_min": 0.980310320854187,
+     "term_any": 0,
+     "vx_tail_mean": 0.22838939070701597,
+     "wz_tail_mean": -1.0875512768203366e-05,
+     "yaw_track_mean": 0.00021751025536409507,
+     "vx_track_mean": 0.9135575628280639,
+     "brake_stop_dist_m": null,
+     "app_ddq_tail": -0.14435065666834512,
+     "meas_ddq_tail": -0.009251659711201989
+    },
+    "brake_fwd_0.25": {
+     "verdicts": [
+      "PASS",
+      "PASS"
+     ],
+     "reasons": [
+      "ok",
+      "ok"
+     ],
+     "pass_count": 2,
+     "support_min": 1.0,
+     "upright_min": 0.9951903820037842,
+     "term_any": 0,
+     "vx_tail_mean": -0.0024502613981348988,
+     "wz_tail_mean": -0.0030939951979962643,
+     "yaw_track_mean": null,
+     "vx_track_mean": -0.009801045592539595,
+     "brake_stop_dist_m": 0.045546980471717693,
+     "app_ddq_tail": 0.13772469316919644,
+     "meas_ddq_tail": 0.03542938042820121
+    },
+    "brake_bwd_0.25": {
+     "verdicts": [
+      "PASS",
+      "PASS"
+     ],
+     "reasons": [
+      "ok",
+      "ok"
+     ],
+     "pass_count": 2,
+     "support_min": 1.0,
+     "upright_min": 0.9972993731498718,
+     "term_any": 0,
+     "vx_tail_mean": -0.0016431139438645914,
+     "wz_tail_mean": -0.00022854357787764458,
+     "yaw_track_mean": null,
+     "vx_track_mean": 0.0065724557754583655,
+     "brake_stop_dist_m": 0.037566206869960296,
+     "app_ddq_tail": 0.03277527491251628,
+     "meas_ddq_tail": 0.01915269742991465
+    }
+   }
+  }
+ ],
+ "summary": {
+  "armE_final": {
+   "pass_total": 5,
+   "n_cases": 11
+  }
+ }
+}

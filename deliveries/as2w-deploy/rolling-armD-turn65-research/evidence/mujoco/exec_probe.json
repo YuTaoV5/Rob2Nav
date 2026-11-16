@@ -1,0 +1,193 @@
+{
+ "checkpoint": "/root/gpufree-data/as2w-runs/r11_fanziqi_lab/yaw-arms/armE-support-20261116-034514/r11-final.pt",
+ "seed": 7393,
+ "wheel_kd": 6.0,
+ "wheel_limit_nm": 13.5,
+ "contract": "same as r11_acceptance_v2",
+ "cases": {
+  "turn_right_0.05": {
+   "cmd": [
+    0.0,
+    0.0,
+    -0.05
+   ],
+   "per_wheel": {
+    "FL": {
+     "target_abs_mean": 0.49158233404159546,
+     "actual_abs_mean": 0.06441469490528107,
+     "signed_err_mean": 0.4909539818763733,
+     "torque_abs_mean": 2.94572377204895,
+     "torque_abs_max": 4.472043991088867,
+     "torque_cap_frac": 0.0
+    },
+    "FR": {
+     "target_abs_mean": 0.13967719674110413,
+     "actual_abs_mean": 0.10321244597434998,
+     "signed_err_mean": -0.08273062855005264,
+     "torque_abs_mean": 0.513141930103302,
+     "torque_abs_max": 1.0359045267105103,
+     "torque_cap_frac": 0.0
+    },
+    "RL": {
+     "target_abs_mean": 0.1668451726436615,
+     "actual_abs_mean": 0.11254183202981949,
+     "signed_err_mean": 0.08845045417547226,
+     "torque_abs_mean": 0.6720136404037476,
+     "torque_abs_max": 1.0798426866531372,
+     "torque_cap_frac": 0.0
+    },
+    "RR": {
+     "target_abs_mean": 0.3244139552116394,
+     "actual_abs_mean": 0.24128198623657227,
+     "signed_err_mean": -0.2040446549654007,
+     "torque_abs_mean": 1.2242679595947266,
+     "torque_abs_max": 1.8219677209854126,
+     "torque_cap_frac": 0.0
+    }
+   },
+   "ddq_target_mean": -0.9941380984087785,
+   "ddq_actual_mean": -0.12795839804690332,
+   "ddq_exec": 0.2540815007907366,
+   "torque_cap_frac_any": 0.0,
+   "upright_min": 0.9964888691902161
+  },
+  "turn_left_0.05": {
+   "cmd": [
+    0.0,
+    0.0,
+    0.05
+   ],
+   "per_wheel": {
+    "FL": {
+     "target_abs_mean": 0.27130261063575745,
+     "actual_abs_mean": 0.04297173023223877,
+     "signed_err_mean": -0.220414400100708,
+     "torque_abs_mean": 1.5389506816864014,
+     "torque_abs_max": 3.507023811340332,
+     "torque_cap_frac": 0.0
+    },
+    "FR": {
+     "target_abs_mean": 0.21428990364074707,
+     "actual_abs_mean": 0.03544361889362335,
+     "signed_err_mean": 0.24153630435466766,
+     "torque_abs_mean": 1.4492180347442627,
+     "torque_abs_max": 2.5293760299682617,
+     "torque_cap_frac": 0.0
+    },
+    "RL": {
+     "target_abs_mean": 0.09844254702329636,
+     "actual_abs_mean": 0.059930458664894104,
+     "signed_err_mean": 0.08984215557575226,
+     "torque_abs_mean": 0.5690680742263794,
+     "torque_abs_max": 1.3502354621887207,
+     "torque_cap_frac": 0.0
+    },
+    "RR": {
+     "target_abs_mean": 0.17993658781051636,
+     "actual_abs_mean": 0.04118043929338455,
+     "signed_err_mean": 0.03317796438932419,
+     "torque_abs_mean": 0.9109894037246704,
+     "torque_abs_max": 1.6362504959106445,
+     "torque_cap_frac": 0.0
+    }
+   },
+   "ddq_target_mean": 0.3701101620992025,
+   "ddq_actual_mean": -0.03517637214623392,
+   "ddq_exec": 0.12207741767386214,
+   "torque_cap_frac_any": 0.0,
+   "upright_min": 0.9972895383834839
+  },
+  "arc_left_0.25": {
+   "cmd": [
+    0.25,
+    0.0,
+    0.05
+   ],
+   "per_wheel": {
+    "FL": {
+     "target_abs_mean": 2.6267096996307373,
+     "actual_abs_mean": 2.686382532119751,
+     "signed_err_mean": -0.059672761708498,
+     "torque_abs_mean": 1.4711405038833618,
+     "torque_abs_max": 5.871809959411621,
+     "torque_cap_frac": 0.0
+    },
+    "FR": {
+     "target_abs_mean": 3.375171661376953,
+     "actual_abs_mean": 3.0413992404937744,
+     "signed_err_mean": 0.3337726294994354,
+     "torque_abs_mean": 2.0026357173919678,
+     "torque_abs_max": 4.693735599517822,
+     "torque_cap_frac": 0.0
+    },
+    "RL": {
+     "target_abs_mean": 2.473360300064087,
+     "actual_abs_mean": 2.500594139099121,
+     "signed_err_mean": -0.027233911678195,
+     "torque_abs_mean": 0.6569692492485046,
+     "torque_abs_max": 3.789212465286255,
+     "torque_cap_frac": 0.0
+    },
+    "RR": {
+     "target_abs_mean": 2.8837878704071045,
+     "actual_abs_mean": 2.7890186309814453,
+     "signed_err_mean": 0.0947691947221756,
+     "torque_abs_mean": 0.9026843309402466,
+     "torque_abs_max": 12.682147979736328,
+     "torque_cap_frac": 0.0
+    }
+   },
+   "ddq_target_mean": 1.1588896004358928,
+   "ddq_actual_mean": 0.6434410691261292,
+   "ddq_exec": 0.6713524233282884,
+   "torque_cap_frac_any": 0.0,
+   "upright_min": 0.9972493648529053
+  },
+  "arc_right_0.25": {
+   "cmd": [
+    0.25,
+    0.0,
+    -0.05
+   ],
+   "per_wheel": {
+    "FL": {
+     "target_abs_mean": 3.2236621379852295,
+     "actual_abs_mean": 2.9270803928375244,
+     "signed_err_mean": 0.29658207297325134,
+     "torque_abs_mean": 1.9315677881240845,
+     "torque_abs_max": 7.279143333435059,
+     "torque_cap_frac": 0.0
+    },
+    "FR": {
+     "target_abs_mean": 2.9380884170532227,
+     "actual_abs_mean": 2.7922468185424805,
+     "signed_err_mean": 0.14584164321422577,
+     "torque_abs_mean": 1.8216650485992432,
+     "torque_abs_max": 12.926095962524414,
+     "torque_cap_frac": 0.0
+    },
+    "RL": {
+     "target_abs_mean": 2.6152517795562744,
+     "actual_abs_mean": 2.7026400566101074,
+     "signed_err_mean": -0.08738822489976883,
+     "torque_abs_mean": 0.9573044776916504,
+     "torque_abs_max": 24.30454444885254,
+     "torque_cap_frac": 0.006666666666666667
+    },
+    "RR": {
+     "target_abs_mean": 2.7021842002868652,
+     "actual_abs_mean": 2.7508883476257324,
+     "signed_err_mean": -0.04870414733886719,
+     "torque_abs_mean": 0.6118589043617249,
+     "torque_abs_max": 7.521353244781494,
+     "torque_cap_frac": 0.0
+    }
+   },
+   "ddq_target_mean": -0.19864160060882569,
+   "ddq_actual_mean": -0.08658523877461752,
+   "ddq_exec": 1.401688666258173,
+   "torque_cap_frac_any": 0.0016666666666666668,
+   "upright_min": 0.9809877872467041
+  }
+ }
+}
