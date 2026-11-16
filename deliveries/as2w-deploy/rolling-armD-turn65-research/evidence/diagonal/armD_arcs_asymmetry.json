@@ -1,0 +1,116 @@
+{
+ "window_s": 3.0,
+ "per_case": {
+  "arc_left": {
+   "commanded_wheel_target_rad_s": [
+    -0.0968,
+    -0.126,
+    0.1125,
+    0.0292
+   ],
+   "measured_wheel_speed_rad_s": [
+    -0.0119,
+    0.0081,
+    0.0032,
+    0.0104
+   ],
+   "mean_wheel_load_N": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "commanded_differential_FL_RR_minus_FR_RL": -0.0542,
+   "measured_differential_FL_RR_minus_FR_RL": -0.0127,
+   "commanded_diagonal_magnitude": 0.1142,
+   "measured_diagonal_magnitude": 0.0716,
+   "diag_to_lr_ratio_commanded": 2.108,
+   "diag_to_lr_ratio_measured": 5.641,
+   "yaw_rate_mean": -0.0008,
+   "yaw_rate_tail_mean": -0.0005,
+   "exec_ratio_measured_over_commanded": [
+    0.123,
+    -0.064,
+    0.028,
+    0.358
+   ]
+  },
+  "arc_right": {
+   "commanded_wheel_target_rad_s": [
+    -0.1364,
+    -0.0846,
+    0.1384,
+    -0.0836
+   ],
+   "measured_wheel_speed_rad_s": [
+    -0.0119,
+    0.012,
+    0.0005,
+    0.0155
+   ],
+   "mean_wheel_load_N": [
+    null,
+    null,
+    null,
+    null
+   ],
+   "commanded_differential_FL_RR_minus_FR_RL": -0.2738,
+   "measured_differential_FL_RR_minus_FR_RL": -0.0088,
+   "commanded_diagonal_magnitude": 0.1701,
+   "measured_diagonal_magnitude": 0.0775,
+   "diag_to_lr_ratio_commanded": 0.621,
+   "diag_to_lr_ratio_measured": 8.817,
+   "yaw_rate_mean": -0.0007,
+   "yaw_rate_tail_mean": -0.0004,
+   "exec_ratio_measured_over_commanded": [
+    0.087,
+    -0.141,
+    0.003,
+    -0.186
+   ]
+  }
+ },
+ "verdicts": {
+  "commanded_differential_is_asymmetric": {
+   "left": -0.0542,
+   "right": -0.2738,
+   "ratio_right_over_left": 5.052,
+   "finding": "POLICY"
+  },
+  "measured_differential_is_asymmetric": {
+   "left": -0.0127,
+   "right": -0.0088,
+   "ratio_right_over_left": 0.693
+  },
+  "diagonal_check": {
+   "commanded_diag_over_lr_left": 2.108,
+   "commanded_diag_over_lr_right": 0.621,
+   "measured_diag_over_lr_left": 5.641,
+   "measured_diag_over_lr_right": 8.817,
+   "operator_reference": 2.57,
+   "note": "the ratio is only meaningful when the differential is non-trivial"
+  },
+  "yaw_follows_differential": {
+   "left_yaw": -0.0005,
+   "right_yaw": -0.0004,
+   "left_measured_diff": -0.0127,
+   "right_measured_diff": -0.0088,
+   "left_yaw_per_measured_diff": 0.0394,
+   "right_yaw_per_measured_diff": 0.0455
+  },
+  "per_wheel_execution": {
+   "left": {
+    "FL": 0.123,
+    "FR": -0.064,
+    "RL": 0.028,
+    "RR": 0.358
+   },
+   "right": {
+    "FL": 0.087,
+    "FR": -0.141,
+    "RL": 0.003,
+    "RR": -0.186
+   }
+  }
+ }
+}
