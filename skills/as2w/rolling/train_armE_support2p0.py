@@ -24,7 +24,79 @@ def train(args, physics):
     from as2w_training_safety import apply_safety, rolling_knee_margin_cost
 
     class RollingCommands(TakeoverCommands):
+        """Command sampler.
+
+        Default path is the unchanged armE mixture (hold 20 / straight 15 / pure turn 40 / arc 25).
+        With AS2W_AB_CURRICULUM=1 the operator's B-group mixture takes over:
+
+            35% pure turn   vx=0, vy=0, wz=+-0.05 / +-0.10
+            25% arc         vx=+0.25 with the frozen yaw steps
+            15% straight    low-speed continuous change plus +-0.25, vy=0
+            15% brake       drive at +-0.25 then release to zero inside the same episode
+            10% hold        zero command
+
+        This lives HERE rather than in robust_config because the training entry sets
+        cmd.class_type = RollingCommands AFTER robust_config returns, which overwrote an earlier
+        attempt wired one layer down - see evidence/AB_ARM_B_ABORTED.md.  The startup line is printed
+        from this class so it cannot be false-positive from a class that never runs.
+        """
+
+        def __init__(self, cfg, env):
+            super().__init__(cfg, env)
+            self._ab_on = os.environ.get("AS2W_AB_CURRICULUM", "0") == "1"
+            if self._ab_on:
+                f = [float(os.environ.get("AS2W_AB_TURN_FRACTION", 0.35)),
+                     float(os.environ.get("AS2W_AB_ARC_FRACTION", 0.25)),
+                     float(os.environ.get("AS2W_AB_STRAIGHT_FRACTION", 0.15)),
+                     float(os.environ.get("AS2W_AB_BRAKE_FRACTION", 0.15)),
+                     float(os.environ.get("AS2W_AB_HOLD_FRACTION", 0.10))]
+                tot = sum(f)
+                self._ab_frac = torch.tensor([x / tot for x in f], dtype=torch.float32, device=self.device)
+                self._ab_brake = torch.zeros(self.num_envs, dtype=torch.bool, device=self.device)
+                self._ab_release_at = torch.zeros(self.num_envs, dtype=torch.long, device=self.device)
+                self._ab_count = torch.zeros(5, dtype=torch.long, device=self.device)
+                print("AS2W_AB_CURRICULUM ON  class=RollingCommands  fractions=%s  brake_release=3-6 s"
+                      % [round(float(v), 3) for v in self._ab_frac], flush=True)
+            else:
+                print("AS2W_AB_CURRICULUM OFF (armE sampling unchanged)", flush=True)
+
+        def _resample_ab(self, env_ids):
+            n = self.targets[env_ids].shape[0]
+            cat = torch.multinomial(self._ab_frac, n, replacement=True)
+            cmd = torch.zeros(n, 3, device=self.device)
+            u = torch.rand(n, device=self.device)
+            sign = torch.where(torch.rand(n, device=self.device) < 0.5, -1.0, 1.0)
+            # 0 pure turn: |wz| in {0.05, 0.10}
+            m = cat == 0
+            mag = torch.where(torch.rand(n, device=self.device) < 0.5, 0.05, 0.10)
+            cmd[m, 2] = (sign * mag)[m]
+            # 1 arc: vx=+0.25 with the frozen yaw step
+            m = cat == 1
+            cmd[m, 0] = 0.25
+            cmd[m, 2] = (sign * 0.05)[m]
+            # 2 straight: continuous in [-0.25, +0.25], vy=0
+            m = cat == 2
+            cmd[m, 0] = (torch.rand(n, device=self.device) * 0.50 - 0.25)[m]
+            # 3 brake: drive at +-0.25 now, released to zero later inside this episode
+            m = cat == 3
+            cmd[m, 0] = (torch.where(u < 0.5, 1.0, -1.0) * 0.25)[m]
+            # 4 hold stays zero
+            self.targets[env_ids] = cmd
+            brk = torch.zeros(self.num_envs, dtype=torch.bool, device=self.device)
+            rel = torch.zeros(self.num_envs, dtype=torch.long, device=self.device)
+            ep = self._env.episode_length_buf
+            lo = int(3.0 / self._env.step_dt)
+            hi = int(6.0 / self._env.step_dt)
+            brk[env_ids] = m
+            rel[env_ids] = ep[env_ids] + torch.randint(lo, hi + 1, (n,), device=self.device)
+            self._ab_brake.copy_(brk)
+            self._ab_release_at.copy_(rel)
+            for c in range(5):
+                self._ab_count[c] += int((cat == c).sum())
+
         def _resample_command(self, env_ids):
+            if getattr(self, "_ab_on", False):
+                return self._resample_ab(env_ids)
             draw = torch.rand((self.targets[env_ids].shape[0], 5), device=self.device)
             mode = torch.bucketize(draw[:, 0].contiguous(), draw.new_tensor((.20, .35, .75)))
             vx = (MIN_CMD + (VX_CAP - MIN_CMD) * draw[:, 1]) * torch.where(draw[:, 2] < .5, -1., 1.)
@@ -32,6 +104,16 @@ def train(args, physics):
             self.targets[env_ids, 0] = vx * ((mode == 1) | (mode == 3))
             self.targets[env_ids, 1] = 0.
             self.targets[env_ids, 2] = yaw * (mode >= 2)
+
+        def _update_command(self):
+            # brake cases: once the scheduled release step is reached the target is zeroed, so the
+            # episode contains decelerate -> stop and the existing lerp produces the ramp
+            if getattr(self, "_ab_on", False) and bool(self._ab_brake.any()):
+                due = self._ab_brake & (self._env.episode_length_buf >= self._ab_release_at)
+                if bool(due.any()):
+                    self.targets[due] = 0.0
+                    self._ab_brake &= ~due
+            return super()._update_command()
 
     cfg = robust_config(SimpleNamespace(
         **vars(args), profile="pose-delay", direction_focus=True,

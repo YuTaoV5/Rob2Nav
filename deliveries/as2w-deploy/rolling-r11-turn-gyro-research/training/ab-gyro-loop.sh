@@ -34,6 +34,8 @@ printf '%s  %s\n' e739dd1f9cd45ee1c280f49ffef1bde6db38719f0ad34e3b56d6f8b7bdd3b2
   "$BASE/code/as2w_isaac_flat_env_all.py" | sha256sum -c -
 printf '%s  %s\n' 8532a884c808b462dea70c8f48368bb768864b33cd0dc6177338e299570e0c9c \
   "$BASE/code/as2w_gyro_wheel_action.py" | sha256sum -c -
+printf '%s  %s\n' a61b0bb57d41b32471efec16385bfddc33c358bd57aa47d262c7fce19ad1978a \
+  "$TRAIN" | sha256sum -c -
 printf '%s  %s\n' f969e454a1b4096eee2a52ddcb89fa1d6c63c977bdf6cfca10e3d1bdbfd51347 \
   "$BASE/code/as2w_ab_curriculum.py" | sha256sum -c -
 
