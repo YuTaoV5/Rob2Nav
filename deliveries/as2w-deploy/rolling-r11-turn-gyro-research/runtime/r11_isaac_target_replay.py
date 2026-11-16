@@ -103,7 +103,7 @@ def main() -> int:
             cmdterm = env.command_manager.get_term("base_velocity")
             names = list(robot.joint_names)
             widx = [names.index(n) for n in WHEELS]
-            calfd = [names.index(n.replace("_foot", "_calf")) for n in WHEELS]
+            wheeld = [names.index(n) for n in WHEELS]   # WHEEL BODIES, not calf joints
             print("WHEEL_JOINTS %s" % json.dumps([names[i] for i in widx]), flush=True)
 
             ppo = PPOCfg(); ppo.seed, ppo.device = args.seed, args.device
@@ -143,7 +143,7 @@ def main() -> int:
                     mea.append(robot.data.joint_vel.torch[0][widx].detach().cpu().numpy().copy())
                     yaw.append(float(robot.data.root_ang_vel_b.torch[0, 2]))
                     up.append(float(-robot.data.projected_gravity_b.torch[0][2]))
-                    cf = env.scene["contact_forces"].data.net_forces_w.torch[0][calfd]
+                    cf = env.scene["contact_forces"].data.net_forces_w.torch[0][wheeld]
                     sup.append(bool((torch.linalg.norm(cf, dim=1) > LOAD_N).all()))
                     term += int(bool(_d[0]))
                 mea = np.array(mea)

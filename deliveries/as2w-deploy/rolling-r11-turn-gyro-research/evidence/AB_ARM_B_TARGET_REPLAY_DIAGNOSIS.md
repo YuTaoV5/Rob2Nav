@@ -47,3 +47,26 @@
 ## 7. 边界
 
 1. **单种子、单站态**；`turn_right_0.10` 有终止，不计入2. 偏航与交付比为原始输出，占位可信；**支撑列作废**3. 未做左右镜像回放（goal 要求），只做了非镜像
+## 8. 缺陷已修（本轮）
+
+`runtime/r11_isaac_target_replay.py` 的支撑索引已从**小腿关节**改为**轮体**：
+
+```diff
+- calfd = [names.index(n.replace("_foot", "_calf")) for n in WHEELS]
++ wheeld = [names.index(n) for n in WHEELS]   # WHEEL BODIES, not calf joints
+- net_forces_w.torch[0][calfd]
++ net_forces_w.torch[0][wheeld]
+```
+
+- 修正后 `ast` 校验通过，`calfd` 残留 **0** 处
+- **但修正后的回放尚未重跑** —— 因此本文件第 2 节的**支撑列仍然作废**，不能因为「代码修了」就引用旧数据
+- 重跑后应得到接近 1.0 的支撑值（机器人在回放中 up_min 0.99、三个用例零终止）
+
+### 这个缺陷的教训
+
+同一类缺陷（**支撑按小腿关节而非轮体索引**）在本项目已出现**三次**：
+1. `r11_isaac_target_replay.py`（本次，修了但未重跑）
+2. `r11_isaac_fixedlegs_turn.py`（已修，`support_tail` 曾恒为 0.000）
+3. MuJoCo 侧曾把 `support` 键名当成 `support_tail` 读取，导致假矛盾
+
+**→ 凡「支撑」相关数字，必须同时核对：索引对象是轮体、键名正确、且数值在站立时为正。三条缺一即判无效。**
