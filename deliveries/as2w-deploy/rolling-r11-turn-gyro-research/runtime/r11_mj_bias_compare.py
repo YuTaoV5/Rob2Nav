@@ -210,6 +210,7 @@ def main() -> int:
         xy = st["xy"]
         drift = float(np.max([np.hypot(p[0] - st["x0"], p[1] - st["y0"]) for p in xy])) if xy else 0.0
         return {"bias_absmax": float(np.abs(bias).max()) if bias is not None else 0.0,
+                "bias_vector_rad": ([] if bias is None else [round(float(x), 6) for x in bias]),
                 "q_err_max": float(q_err.max()),
                 "worst_axis": JOINTS[worst_i],
                 "per_axis_q_err": {JOINTS[i]: round(float(q_err[i]), 4) for i in range(12)},
@@ -228,6 +229,9 @@ def main() -> int:
 
     n = int(a.hold_s / STEP_DT)
     rep = {"checkpoint": str(a.ckpt), "command": {"vx": a.vx, "wz": a.wz},
+           "calibration_protocol": {"method": "iterated 2*DEF - q_eq", "rounds": a.bias_rounds,
+                                     "hold_per_round_s": 1.0, "residual_avg_window_s": 0.5,
+                                     "gain": 1.0, "leg_action_scale": LEG_SCALE},
            "line_rad": LINE_RAD,
            "line_status": "SIMULATION SCREENING LINE only - the formal tolerance waits for the Isaac same-protocol result",
            "arms": {}}
