@@ -50,6 +50,7 @@ CLIP = 6.0
 DT, SUBSTEPS = 0.000625, 32
 STEP_DT = DT * SUBSTEPS
 LIMIT = {"hip": 54.0, "thigh": 54.0, "calf": 81.0, "foot": 13.5}
+_TRACE = []
 LIM = np.array([LIMIT[n.split("_")[1]] for n in JOINTS])
 LOAD_N = 5.0
 LOAD_Z_N = 2.0
@@ -91,6 +92,24 @@ def main() -> int:
     ap.add_argument("--ckpt", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--base-z", type=float, default=0.381395)
+    # Per-frame trace dump for the "which wheel unloads and when" diagnosis.  Deliberately
+    # implemented INSIDE this script rather than in a second one: an earlier standalone probe
+    # duplicated the observation assembly, got the joint ordering wrong, and produced a robot
+    # lying on one wheel.  Reusing this code path keeps the dynamics identical to the matrix.
+    ap.add_argument("--dump-trace", type=Path, default=None,
+                    help="if set, write a per-frame trace JSON (loads, wheel targets, measured dq, yaw)")
+    # gyro-1 wrapper, replicated EXACTLY as in the Isaac side so the two simulators can be
+    # compared under the same packaging:
+    #   err   = wz_cmd - wz_meas          (body-frame yaw rate, read ONCE per policy step)
+    #   mag   = clip(yaw_kp * err, +-ff_cap)
+    #   tau_i = kd*(target_i - v_i) + S_i*mag       S = (-1,+1,-1,+1) for FL,FR,RL,RR
+    #   the SUM is then clipped at +-13.5 Nm, same as the Isaac actuator clamp
+    ap.add_argument("--yaw-kp", type=float, default=0.0,
+                    help="gyro-1 yaw feedback gain, Nm per rad/s of yaw-rate error; 0 = base wrapper")
+    ap.add_argument("--ff-cap", type=float, default=4.0,
+                    help="gyro-1 feedforward cap, Nm (applied before the +-13.5 Nm total clamp)")
+    ap.add_argument("--ff-gain", type=float, default=0.0,
+                    help="gyro-1 open-loop term, Nm per rad/s of commanded wz (0 = closed-loop only)")
     ap.add_argument("--states", default=",".join(str(s) for s in SETTLE_STATES))
     ap.add_argument("--label", default="mujoco")
     args = ap.parse_args()
@@ -114,6 +133,10 @@ def main() -> int:
                 for i, n in enumerate(WN_BODY)}
     kp = np.r_[np.full(12, LEG_KP), np.full(4, 0.0)]
     kd = np.r_[np.full(12, LEG_KD), np.full(4, WHEEL_KD)]
+    # gyro-1 state: matches the Isaac implementation (state-free, one wz sample per 20 ms)
+    S_WHEEL = np.array([-1.0, 1.0, -1.0, 1.0])      # FL, FR, RL, RR -> left-vs-right differential
+    GYRO = {"kp": float(args.yaw_kp), "cap": float(args.ff_cap),
+            "ffg": float(args.ff_gain), "wz_cmd": 0.0, "on": bool(args.yaw_kp != 0.0 or args.ff_gain != 0.0)}
     nonwheel_bodies = [i for i in range(m.nbody) if i != 0]
 
     ck = torch.load(str(args.ckpt), map_location="cpu", weights_only=False)
@@ -149,10 +172,20 @@ def main() -> int:
 
     def step_ctrl(a):
         tgt = np.r_[a[:12] * LEG_SCALE + DEF[:12], a[12:] * WHEEL_SCALE]
+        ff = np.zeros(4)
+        if GYRO["on"]:
+            # Read the body-frame yaw rate ONCE per policy step (free-joint qvel[3:6] is in the
+            # body frame), exactly like the Isaac wrapper which samples root_ang_vel_b once per
+            # policy step.  The resulting torque is held for all 32 sub-steps.
+            wz_meas = float(d.qvel[5])
+            mag = (GYRO["ffg"] * GYRO["wz_cmd"]
+                   + GYRO["kp"] * (GYRO["wz_cmd"] - wz_meas))
+            mag = float(np.clip(mag, -GYRO["cap"], GYRO["cap"]))
+            ff = S_WHEEL * mag
         for _ in range(SUBSTEPS):
             q = d.qpos[qadr]; v = d.qvel[vadr]
             tau = np.r_[kp[:12] * (tgt[:12] - q[:12]) - kd[:12] * v[:12],
-                        kd[12:] * (tgt[12:] - v[12:])]
+                        kd[12:] * (tgt[12:] - v[12:]) + ff]
             d.ctrl[aid] = np.clip(tau, -LIM, LIM)
             mujoco.mj_step(m, d)
         return tgt
@@ -183,6 +216,7 @@ def main() -> int:
 
     def settle(settle_s):
         reset_pose(args.base_z)
+        GYRO["wz_cmd"] = 0.0
         prev = np.zeros(16); zr = [None]; ep = 0
         for _ in range(int(settle_s / STEP_DT)):
             o = obs_of([0, 0, 0], prev, ep, zr)
@@ -200,6 +234,7 @@ def main() -> int:
         term = 0; nonwheel_hits = 0
         for k in range(n):
             c = cmd_fn(k * STEP_DT)
+            GYRO["wz_cmd"] = float(c[2])
             o = obs_of(c, prev, ep, zr)
             with torch.no_grad():
                 raw = act(torch.tensor([o], dtype=torch.float32))[0].numpy()
@@ -221,6 +256,17 @@ def main() -> int:
             if up < 0.85 or nw:
                 term = 1
         R["term"] = term; R["nonwheel_hits"] = nonwheel_hits; R["base_z"] = bz
+        if args.dump_trace is not None:
+            _TRACE.append({
+                "case": None,          # labelled by the writer below
+                "settle_s": settle_s,
+                "cmd": [float(x) for x in cmd_fn(0.0)],
+                "step_dt": STEP_DT,
+                "loads_N": [[float(v) for v in row] for row in R["load"]],
+                "wheel_applied": [[float(v) for v in row] for row in R["app"]],
+                "wheel_meas": [[float(v) for v in row] for row in R["meas"]],
+                "yaw_rate": [float(v) for v in R["yaw"]],
+            })
         return R
 
     def judge(R, cmd, brake=False, brake_at=0.0):
@@ -297,6 +343,12 @@ def main() -> int:
     report = {"simulator": "mujoco", "version": mujoco.__version__,
               "checkpoint": str(args.ckpt),
               "contract": {"timestep": DT, "substeps": SUBSTEPS, "step_dt": STEP_DT,
+                           "wrapper": {"yaw_kp": float(args.yaw_kp), "ff_cap": float(args.ff_cap),
+                                       "ff_gain": float(args.ff_gain),
+                                       "S_vector": [float(v) for v in S_WHEEL],
+                                       "wz_sample": "body-frame qvel[5], once per 20 ms policy step",
+                                       "torque_clamp_nm": float(LIMIT["foot"]),
+                                       "note": "ff is added to the kd law and the SUM is clamped at +-13.5 Nm, same as the Isaac actuator"},
                            "wheel_kd": WHEEL_KD, "wheel_limit": LIMIT["foot"],
                            "leg_kp": LEG_KP, "leg_kd": LEG_KD,
                            "leg_scale": LEG_SCALE, "wheel_scale": WHEEL_SCALE,
@@ -344,6 +396,20 @@ def main() -> int:
     print("  ==> %d/%d cases pass on all states" % (npass, len(report["cases"])),
           flush=True)
     (args.out / "mujoco_matrix_v2.json").write_text(json.dumps(report, indent=1, default=str))
+    if args.dump_trace is not None and _TRACE:
+        # Label the traces in the order the cases and their states were run: out["cases"] is an
+        # ordered dict and each entry has one row per settle state.
+        idx = 0
+        for name, rows in report["cases"].items():
+            for _row in rows:
+                if idx >= len(_TRACE):
+                    break
+                _TRACE[idx]["case"] = name
+                idx += 1
+        args.dump_trace.write_text(json.dumps({"checkpoint": str(args.ckpt),
+                                               "n_traces": len(_TRACE),
+                                               "traces": _TRACE}, indent=1, default=str))
+        print("TRACE_DUMPED", len(_TRACE), flush=True)
     print()
     print("MJ_MATRIX_V2_DONE", flush=True)
     return 0
