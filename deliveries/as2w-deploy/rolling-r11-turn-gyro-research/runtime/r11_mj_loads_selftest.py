@@ -64,6 +64,9 @@ def main() -> int:
             out.append(tot)
         return [round(float(x), 2) for x in out]
 
+    def diag(tag):
+        print("    [diag %s] z=%.4f ncon=%d loads=%s" % (tag, float(d.qpos[2]), int(d.ncon), loads()))
+
     def settle(n=400):
         for _ in range(n):
             q = d.qpos[qadr]; v = d.qvel[vadr]
@@ -82,10 +85,13 @@ def main() -> int:
         if lift_leg is not None:
             i = LEGS.index(lift_leg)
             for k, jt in enumerate(("hip", "thigh", "calf")):
-                tgt[i * 3 + k] = DEF[i * 3 + k] + LEG_GAIN[jt][i]
+                idx = k * 4 + i          # contract layout is part-major: hip FL,FR,RL,RR then thigh, then calf
+                tgt[idx] = DEF[idx] + LEG_GAIN[jt][i]
         d.qpos[qadr] = tgt
         mujoco.mj_forward(m, d)
+        diag("after reset")
         settle()
+        diag("after settle")
 
     results = {}
     fresh()
