@@ -421,6 +421,10 @@ def check_wrapper_readback(cfg, results):
     if not path.is_file():
         results.append(bad("wrapper_readback", "missing %s" % path))
         return
+    # Importing the wrapper for the read-back must not leave bytecode inside the frozen R4000 run snapshot:
+    # an earlier version did, which showed up as one modified file in a snapshot that must stay untouched.
+    prev_bytecode = sys.dont_write_bytecode
+    sys.dont_write_bytecode = True
     try:
         sys.path.insert(0, str(snap))
         spec = importlib.util.spec_from_file_location("r4_fixed_exit", path)
@@ -428,9 +432,12 @@ def check_wrapper_readback(cfg, results):
         spec.loader.exec_module(mod)
         fn = mod.rolling_fixed_exit
     except Exception as exc:
+        sys.dont_write_bytecode = prev_bytecode
         results.append(skip("wrapper_readback", "snapshot wrapper not importable standalone: %s: %s"
                             % (type(exc).__name__, exc)))
         return
+    finally:
+        sys.dont_write_bytecode = prev_bytecode
 
     c = cfg["contract"]
     r, scale = c["wheel_radius_m"], c["wheel_action_scale_rad_s"]
