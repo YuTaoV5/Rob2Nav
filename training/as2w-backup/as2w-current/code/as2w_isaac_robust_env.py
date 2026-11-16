@@ -1,3 +1,4 @@
+import os
 """Independent R284 sliding dynamics and takeover experiments."""
 import torch
 from isaaclab.envs import mdp
@@ -49,7 +50,17 @@ class DelayedTarget:
     def reset(self, env_ids=None):
         super().reset(env_ids)
         ids = slice(None) if env_ids is None else env_ids
-        self._lag[ids] = torch.randint(5, self._lag[ids].shape, device=self._lag.device)
+        # Action-delay DR is DISABLED by default.  `delayed()` is called from
+        # apply_actions(), which runs once per PHYSICS substep (decimation times
+        # per policy step); a depth-5 ring written 4x per policy step aliases, so
+        # the nominal "0..4 policy steps" delay does not mean what it looks like.
+        # Re-enable only after fixing and verifying the index semantics.
+        max_lag = int(getattr(self.cfg, "as2w_action_delay_max_steps", 0))
+        if max_lag > 0:
+            self._lag[ids] = torch.randint(max_lag + 1, self._lag[ids].shape,
+                                           device=self._lag.device)
+        else:
+            self._lag[ids] = 0
         initial = self._initial_target(ids)
         self._history[:, ids] = initial
 
@@ -91,6 +102,54 @@ class DelayedVelocity(DelayedTarget, JointVelocityAction):
 
     def apply_actions(self):
         self._asset.set_joint_velocity_target_index(target=self.delayed(), joint_ids=self._joint_ids)
+
+
+class DelayedGyroVelocity(DelayedVelocity):
+    """DelayedVelocity with the gyro-1 yaw feedback folded into the velocity set-point.
+
+    gyro-1 previously existed only in the evaluation wrapper, so policies were trained WITHOUT it and
+    evaluated WITH it - a control-contract inconsistency.  This puts the same law inside the training
+    loop.  The evaluation wrapper computes
+
+        ff = S * clip(yaw_kp*(wz_cmd - wz_meas), +-ff_cap)      S = (-1,+1,-1,+1) FL,FR,RL,RR
+        sp = target + ff / KD                                   KD = 6
+
+    and this class applies exactly that offset, so training and evaluation share one closed loop.
+    Gains come from AS2W_GYRO_KP / AS2W_GYRO_CAP / AS2W_GYRO_FF_GAIN and default to zero, which
+    reproduces the previous behaviour byte for byte.  State-free, so being called once per physics
+    sub-step instead of once per policy step cannot compound.
+    """
+
+    _AS2W_S = (-1.0, 1.0, -1.0, 1.0)
+
+    def __init__(self, cfg, env):
+        super().__init__(cfg, env)
+        self._as2w_kp = float(os.environ.get("AS2W_GYRO_KP", 0.0))
+        self._as2w_cap = float(os.environ.get("AS2W_GYRO_CAP", 4.0))
+        self._as2w_gain = float(os.environ.get("AS2W_GYRO_FF_GAIN", 0.0))
+        self._as2w_kd = 6.0
+        self._as2w_on = bool(self._as2w_kp != 0.0 or self._as2w_gain != 0.0)
+        self._as2w_s = torch.tensor(self._AS2W_S, dtype=torch.float32,
+                                    device=self.device).unsqueeze(0)
+        print("AS2W_GYRO_TRAIN_LOOP %s  yaw_kp=%.1f ff_cap=%.2f ff_gain=%.1f kd=%.1f"
+              % ("ON" if self._as2w_on else "OFF", self._as2w_kp, self._as2w_cap,
+                 self._as2w_gain, self._as2w_kd), flush=True)
+
+    def apply_actions(self):
+        tgt = self.delayed()
+        if not self._as2w_on or tgt.shape[-1] != 4:
+            self._asset.set_joint_velocity_target_index(target=tgt, joint_ids=self._joint_ids)
+            return
+        wz_meas = self._asset.data.root_ang_vel_b.torch[:, 2]
+        try:
+            wz_cmd = self._env.command_manager.get_command("base_velocity")[:, 2]
+        except Exception:
+            wz_cmd = torch.zeros_like(wz_meas)
+        raw = self._as2w_gain * wz_cmd + self._as2w_kp * (wz_cmd - wz_meas)
+        mag = torch.clamp(raw, -self._as2w_cap, self._as2w_cap)
+        ff = self._as2w_s.to(tgt.dtype) * mag.unsqueeze(-1)
+        self._asset.set_joint_velocity_target_index(target=tgt + ff / self._as2w_kd,
+                                                    joint_ids=self._joint_ids)
 
 
 class RobustEnvironment(FlatEnvironment):
@@ -192,6 +251,14 @@ def robust_config(args, physics):
     cfg.robust_profile = args.profile
     if args.profile != "baseline":
         cfg.commands.base_velocity.class_type = TakeoverCommands
+        # B-group curriculum: sampling and dwell only (operator A/B plan).  Off unless
+        # AS2W_AB_CURRICULUM=1 so the A arm keeps the exact armE sampling.
+        if os.environ.get("AS2W_AB_CURRICULUM", "0") == "1":
+            from as2w_ab_curriculum import CurriculumFlatCommands
+            cfg.commands.base_velocity.class_type = CurriculumFlatCommands
+            lo = float(os.environ.get("AS2W_AB_TURN_DWELL_MIN_S", "8"))
+            hi = float(os.environ.get("AS2W_AB_TURN_DWELL_MAX_S", "12"))
+            cfg.commands.base_velocity.resampling_time_range = (lo, hi)
         cfg.observations.policy.state.func = robust_observation
     if args.profile in POSE:
         cfg.events.reset_robot_joints.func = reset_joints
@@ -200,7 +267,10 @@ def robust_config(args, physics):
         }
     if args.profile in DELAY:
         cfg.actions.joint_pos.class_type = DelayedPosition
-        cfg.actions.wheel_vel.class_type = DelayedVelocity
+        cfg.actions.wheel_vel.class_type = DelayedGyroVelocity
+        # Action-delay DR off by default; recorded in the run contract.
+        for _term in (cfg.actions.joint_pos, cfg.actions.wheel_vel):
+            _term.as2w_action_delay_max_steps = 0
     if args.profile in {"friction", "combined", "expanded"}:
         cfg.events.wheel_friction = EventTermCfg(
             func=mdp.randomize_rigid_body_material, mode="startup", params={

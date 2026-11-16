@@ -1,4 +1,5 @@
 """AS2-W flat task and fresh PPO training, imported after Kit starts."""
+import os
 import json
 import xml.etree.ElementTree as ET
 
