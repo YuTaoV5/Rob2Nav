@@ -4,10 +4,16 @@
   "status": {
     "research": true,
     "deployable": false,
-    "phase": "ready_to_launch",
-    "training_started": false,
-    "training_authorised": false,
-    "note": "this phase delivers scripts, configs and offline checks only; nothing is launched without --run"
+    "phase": "stage2_running",
+    "training_started": true,
+    "training_authorised": true,
+    "note": "this phase delivers scripts, configs and offline checks only; nothing is launched without --run",
+    "authorisation": {
+      "by": "operator",
+      "wording": "为啥还不启动",
+      "received_at": "2026-11-17T01:13:25+08:00",
+      "interpretation": "the operator's question is taken as the explicit start instruction that stage 1 was waiting for"
+    }
   },
   "start": {
     "checkpoint": "/root/gpufree-data/Rob2Nav/deliveries/as2w-deploy/rolling-4000-stage020-research/weights/model_3999.pt",

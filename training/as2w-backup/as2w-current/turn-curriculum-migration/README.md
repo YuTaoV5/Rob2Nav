@@ -1,7 +1,15 @@
-# armD 转向课程 → R4000 续训迁移（本阶段：待启动）
+# armD 转向课程 → R4000 续训迁移
 
-- **状态**：`research / deployable: false`，`phase: ready_to_launch`，`training_started: false`
-- **本阶段做了什么**：锁定两条证据链、交付 A/B 配置与启动脚本、交付离线自检与 dry-run。**未启动任何训练、续训或实机作业。**
+> **阶段二已启动（2026-11-17 01:12 操作员指令「为啥还不启动」）**。阶段一交付物保持原样，演练与自检仍可独立复跑。
+>
+> - 授权记录写在 `configs/ab_curriculum.json` → `status.authorisation`（含原话与时间）；`training_authorised=true`、`phase=stage2_running`
+> - 顺序：R4000 起点原评测入口 → A → B（`set -e` 链，A 成功才跑 B）
+> - 实测：**16000 env 显存 19,977 MiB / 46,068 MiB**、利用率 91%，无 OOM；**2.00 iteration/min**，每臂约 **24.9 小时**，两臂约 50 小时
+> - 运行期状态与 manifest 在 `work/AB-run/`（`work/` 不入库），`STATUS.md` 每次恢复先核真实进程与产物
+> - **起点基线（自身评测入口，seed 7393，24 env）**：0.20 m/s 前进 track 9/12、track_brake_hold 5/12、平均 0.174 m/s；倒车 10/12、9/12、0.171 m/s；**左转、右转、左弧、右弧均 0/6 通过**（左转 +0.068 rad/s，右转 −0.049，左弧 +0.042，右弧 +0.046），终止 3/24
+> - 仍保持 `research / deployable: false`，不做实机
+
+- **状态**：`research / deployable: false`，`phase: stage2_running`，`training_started: true`
 - **入口**：`scripts/dry_run.py`（默认 dry-run，只有显式 `--run` 才训练，且需先过自检与授权位）
 
 ## 1. 交付物（绝对路径）

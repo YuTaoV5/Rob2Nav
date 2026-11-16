@@ -1,0 +1,126 @@
+{
+ "source": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/turn-curriculum-migration/work/eval_r4000_start/job.log",
+ "checkpoint": "deliveries/as2w-deploy/rolling-4000-stage020-research/weights/model_3999.pt",
+ "entry": "runs/rolling/filtered-4000-env4096-stage020.ovvRL3/source/train_as2w_isaac_robust.py --evaluate",
+ "seed": 7393,
+ "num_envs": 24,
+ "speed_cap_m_s": 0.2,
+ "turns": {
+  "turn_left": {
+   "passed": 0,
+   "total": 6,
+   "stable": 5,
+   "wrong_direction": 0,
+   "mean_yaw_rad_s": 0.06808614730834961,
+   "mean_vx_m_s": -0.026811808347702026
+  },
+  "turn_right": {
+   "passed": 0,
+   "total": 6,
+   "stable": 5,
+   "wrong_direction": 0,
+   "mean_yaw_rad_s": -0.04865514487028122,
+   "mean_vx_m_s": -0.00891517661511898
+  },
+  "arc_left": {
+   "passed": 0,
+   "total": 6,
+   "stable": 6,
+   "wrong_direction": 0,
+   "mean_yaw_rad_s": 0.04147027060389519,
+   "mean_vx_m_s": 0.012137476354837418
+  },
+  "arc_right": {
+   "passed": 0,
+   "total": 6,
+   "stable": 4,
+   "wrong_direction": 0,
+   "mean_yaw_rad_s": -0.04641135782003403,
+   "mean_vx_m_s": 0.008006512187421322
+  }
+ },
+ "terminated_rows": {
+  "turn_left": 0,
+  "turn_right": 1,
+  "arc_left": 0,
+  "arc_right": 2
+ },
+ "wheel_delivery": {
+  "turn_left": [
+   [
+    0.0,
+    -0.1616,
+    -1.3379,
+    -0.3516
+   ],
+   [
+    0.0,
+    0.1103,
+    -1.2907,
+    -0.523
+   ]
+  ],
+  "turn_right": [
+   [
+    0.0,
+    -0.0053,
+    1.5703,
+    0.5257
+   ],
+   [
+    0.0,
+    0.0765,
+    1.638,
+    0.444
+   ]
+  ],
+  "arc_left": [
+   [
+    0.5814,
+    0.4071,
+    -1.0864,
+    -0.355
+   ],
+   [
+    0.5814,
+    0.5234,
+    -1.313,
+    -0.6075
+   ]
+  ],
+  "arc_right": [
+   [
+    0.5836,
+    0.3933,
+    1.345,
+    0.4406
+   ],
+   [
+    0.5814,
+    0.3107,
+    1.2044,
+    0.3593
+   ]
+  ]
+ },
+ "speed": {
+  "forward": {
+   "track": 9,
+   "stable": 9,
+   "track_and_brake": 9,
+   "hold": 5,
+   "track_brake_hold": 5,
+   "total": 12,
+   "mean_along_m_s": 0.1735577123860518
+  },
+  "back": {
+   "track": 10,
+   "stable": 10,
+   "track_and_brake": 10,
+   "hold": 9,
+   "track_brake_hold": 9,
+   "total": 12,
+   "mean_along_m_s": 0.1713958295683066
+  }
+ }
+}
