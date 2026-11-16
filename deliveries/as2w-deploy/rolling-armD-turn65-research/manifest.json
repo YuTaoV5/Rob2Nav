@@ -5,7 +5,7 @@
   "status": "research",
   "deployable": false,
   "owner": "AS2-W rolling agent",
-  "summary": "best Isaac candidate so far: seed 7393 scores 7/11 and BOTH arcs pass (the control fails arc_left), but all four pure turns fail on both simulators, so there is still no accepted weight",
+  "summary": "armD@1k research: Isaac OFF 7/11 and 6/11; ON 8/11 and 6/11; MuJoCo ON single state 6/11",
   "weights": {
     "selected_checkpoint": {
       "path": "weights/armD_turn65_final.pt",
@@ -33,7 +33,7 @@
         "model_6600.pt sha e6d44e0493f4b6e6"
       ],
       "not_selected": true,
-      "reason": "the 6600 checkpoint scores 6/11 with arc_right collapsing to 0.17, below the 1k checkpoint"
+      "reason": "OFF right arc regression and left arc improvement; ON paired ranking pending"
     }
   },
   "interfaces": {
@@ -185,5 +185,6 @@
     "isaac_matrix": "/isaac-sim/python.sh runtime/r11_acceptance_ff.py --usd <as2w.usda> --urdf <as2w.urdf> --out out/ --checkpoints \"armD=weights/armD_turn65_final.pt\" --seeds 7393,311",
     "video": "MUJOCO_GL=egl python runtime/r11_demo_video.py --xml runtime/r11_mjcf_excl.xml --ckpt weights/armD_turn65_final.pt --out videos/ --width 640 --height 480"
   },
-  "related_docs": "see README.md section 9; also skills/as2w/ENGINEERING_LESSONS.md in the repository"
+  "related_docs": "see README.md section 9; also skills/as2w/ENGINEERING_LESSONS.md in the repository",
+  "acceptance_audit": "evidence/ARM_D_ACCEPTANCE_AUDIT.md"
 }

@@ -131,6 +131,10 @@ def main() -> int:
                     help="hard cap on the feedforward torque itself, Nm")
     ap.add_argument("--leg-kp-scale", type=float, default=1.0,
                     help="scale leg (hip/thigh/calf) position stiffness; 1.0 = contract")
+    ap.add_argument("--allow-no-gyro", action="store_true",
+                    help="permit yaw_kp=0 and ff_gain=0. Without this flag a zero gyro gain is refused, "
+                         "because yaw_kp defaults to 0 and a missing --yaw-kp would otherwise silently run "
+                         "the UNMODIFIED baseline while reporting itself as gyro-1")
     ap.add_argument("--yaw-kp", type=float, default=0.0,
                     help="bounded gyro yaw feedback, Nm per (rad/s) of (cmd - measured) yaw rate")
     ap.add_argument("--payload-kg", type=float, default=0.0,
@@ -159,6 +163,18 @@ def main() -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     args.physics = "isaacsim_physx"
     cks = []
+    if float(getattr(args, "yaw_kp", 0.0)) <= 0.0 and float(getattr(args, "ff_gain", 0.0)) <= 0.0 \
+            and not bool(getattr(args, "allow_no_gyro", False)):
+        raise SystemExit(
+            "AS2W_GYRO_GUARD: refusing to run with yaw_kp=%r and ff_gain=%r.\n"
+            "  The gyro feed-forward would be UNMODIFIED baseline: the early-return branch fires, tau and ff\n"
+            "  are never computed and both print as 0, which is exactly what silently happened before.\n"
+            "  Pass --yaw-kp 60 --ff-cap 4 to actually evaluate gyro-1, or --allow-no-gyro if the baseline\n"
+            "  is genuinely what you want." % (getattr(args, "yaw_kp", None), getattr(args, "ff_gain", None)))
+    print("AS2W_GYRO_GUARD OK yaw_kp=%.2f ff_cap=%.2f ff_gain=%.2f"
+          % (float(getattr(args, "yaw_kp", 0.0)), float(getattr(args, "ff_cap", 0.0)),
+             float(getattr(args, "ff_gain", 0.0))), flush=True)
+
     for spec in args.checkpoints.split(","):
         lab, _, p = spec.partition("=")
         cks.append((lab, Path(p)))

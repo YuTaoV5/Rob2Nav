@@ -1,5 +1,7 @@
 # armD@1k 的 MuJoCo 正式矩阵（操作员第 4 项）：**6/11**，且**转向同时是安全问题而非仅跟踪问题**
 
+> **复核更正**。单站态安全失败保留，跨端归因待对齐执行路径。见 [armD 验收复核](ARM_D_ACCEPTANCE_AUDIT.md)。
+
 同一权重 `armD_turn65_final.pt`（sha `de61de58…`）、同包装（gyro-1, kp=60, cap=4）、冻结 11 项，MJCF 用包内 `runtime/r11_mjcf_excl.xml`，稳定 3 s。
 
 ## 1. 逐例结果

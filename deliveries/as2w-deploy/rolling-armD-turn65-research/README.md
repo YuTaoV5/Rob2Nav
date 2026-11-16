@@ -5,7 +5,7 @@
 
 ## 1. 一句话结论
 
-`armD` 是目前**最好的 Isaac 候选**：种子 7393 **7/11**，且**左右弧同时通过**（对照组 arc_left 是 FAIL）。但**四项纯转在两端都不达标**，因此**尚无验收通过权重**，本包不构成部署授权。
+armD@1k 保留为研究候选，暂无正式验收通过权重。
 
 ## 2. 能力与输入输出
 
@@ -24,28 +24,13 @@
 
 | 场景 | 分母 | 结果 |
 | --- | --- | --- |
-| Isaac Lab，种子 7393 | 11 用例 | **7/11 PASS** |
-| Isaac Lab，种子 311 | 11 用例 | **6/11 PASS** |
-| Isaac Lab，两种子 min 口径 | 11 | **6/11** |
-| MuJoCo 矩阵（对照权重） | 11 | 7/11（armD 未跑 MuJoCo 正式矩阵） |
-| 实机 | — | **not_run**（R3/R4 需现场授权） |
+| Isaac armD@1k，补偿 OFF | 各 11 项 | 7/11、6/11 |
+| Isaac armD@1k，补偿 ON | 各 11 项 | 8/11、6/11 |
+| Isaac 6600，补偿 OFF | 各 11 项 | 6/11、5/11，右弧退化、左弧改善 |
+| MuJoCo armD@1k，补偿 ON | 11 项，单站态 | 6/11，三项纯转支撑失败 |
+| 实机 | — | not_run |
 
-### 逐例（种子 7393，armD@1k）
-
-| 用例 | 结果 | 关键量 |
-| --- | --- | --- |
-| hold | PASS | sup 1.000, |vx| 0.0005 |
-| straight_fwd 0.25 | PASS | 跟踪 0.87 |
-| straight_bwd 0.25 | PASS | 跟踪 0.85 |
-| **arc_left 0.25** | **PASS** | 偏航跟踪 **0.83**（对照 FAIL 0.50） |
-| **arc_right 0.25** | **PASS** | 偏航跟踪 **0.76** |
-| brake_fwd / brake_bwd | PASS | — |
-| turn_left_0.05 | FAIL | 偏航跟踪 0.02（门槛 ≥0.70） |
-| turn_right_0.05 | FAIL | 0.08 |
-| turn_left_0.10 | FAIL | 0.35 |
-| turn_right_0.10 | FAIL | 0.02 |
-
-**失败范围：纯原地转（±0.05 / ±0.10 rad/s）四项均不达标。**
+详见 [armD 验收复核](evidence/ARM_D_ACCEPTANCE_AUDIT.md)。
 
 ## 4. 目录
 
@@ -65,30 +50,30 @@ rolling-armD-turn65-research/
 | 项 | 状态 | 证据 |
 | --- | --- | --- |
 | **C1 版本溯源** | ✅ pass | 权重 sha `de61de58fd68efc3`；初始化 checkpoint `4bdf4d26…`（sha `4bdf4d26b076d7c717e9c151946dd42f8b3cf9dbbf592c5d6aac1ed5f6615866`）；run 目录 `training/resolved_config_armD.txt`；启动命令 `training/launch_armD.sh`；训练源码 sha 见 `manifest.json` |
-| **C2 模型接口** | ✅ pass | obs 1×65 → action 1×16，opset 17，导出脚本 `runtime/export_policy_onnx.py`；**导出经干净检出实跑，字节级复现** sha `680e0c72…`；同输入差值 max_abs_err **1.43e-06** |
+| **C2 模型接口** | **partial** | 现有 ONNX 属于 armE，对应 armD 的导出待核验。 |
 | **C3 观测合同** | ✅ pass | `evidence/C3_OBSERVATION_CONTRACT.md`（逐维索引/单位/坐标系/缩放/裁剪/滤波/复位） |
-| **C4 输出到控制目标** | ⚠️ partial | 包装源码在 `runtime/`；**但验收脚本的 `tau_max`/`ff_max` 遥测读数恒为 0，力矩余量项标 `not_measured`**（见 `evidence/EVAL3_BIAS_SWITCH.md` 与本包 `manifest.json` 的 caveats） |
+| **C4 输出到控制目标** | **partial** | ON 有软件补偿和限幅记录，Isaac 求解器施力未测。 |
 | **C5 入口/退出** | ✅ pass | 零指令驻停、四轮着地回站、固定杆位切换；姿态偏置为**实验开关、默认关闭** |
 | **C6 训练仿真与资产** | ✅ pass | MJCF `runtime/r11_mjcf_excl.xml`（**已入库、相对 meshdir、从干净克隆可加载**）；URDF/USD/STL 均在 `training/as2w-backup/`；见 `evidence/MUJOCO_ASSETS_UPLOADED.md` |
-| **C7 已有验证证据** | ✅ pass | 逐例结果在 `evidence/isaac/`、`evidence/mujoco/`；失败样例、首次失败帧、诊断链齐全；**armD 未跑 MuJoCo 正式矩阵，标 `not_run`** |
-| **C8 最小回放** | ✅ pass | `evidence/replay/`；C8 逐帧对齐 max_abs_err **5.96e-07** |
+| **C7 已有验证证据** | **partial** | 分包装 Isaac 矩阵与 MuJoCo 单站态矩阵已记录，双端配对待补。 |
+| **C8 最小回放** | **partial** | 现有证据属于 armE 对照，armD 同输入对齐待补。 |
 
 ## 6. R0–R4 状态
 
 | 项 | 状态 | 说明 |
 | --- | --- | --- |
 | **R0 收包** | ✅ pass | C1–C8 齐备，SHA 一致，权重溯源正确 |
-| **R1 离线对齐** | ✅ pass | checkpoint↔ONNX 1.43e-06；C8 回放 5.96e-07 |
-| **R2 sim2sim** | ⚠️ **partial** | MuJoCo 侧对**对照权重**有完整矩阵（7/11）；**armD 权重的 MuJoCo 正式矩阵未跑**（`not_run`） |
+| **R1 离线对齐** | **partial** | armE 已核验，armD 待核验。 |
+| **R2 sim2sim** | **partial** | armD@1k MuJoCo 已跑 6/11，双端执行路径及留出配对待补。 |
 | **R3 CPRO 只读** | ❌ **not_run** | 需现场设备与授权；影子回放脚本在 `runtime/` |
 | **R4 有界实机** | ❌ **not_run** | 需现场人员逐档授权；本包**不构成**实机部署授权 |
 
 ## 7. 已知失败与未验证范围（如实声明）
 
-1. **四项纯转不达标**（0.02–0.35 vs 门槛 0.70）；两端一致，无一端通过
-2. **两端对纯转的失效方向相反**：Isaac 欠跟踪，MuJoCo 超调（1.41–1.56）—— 机理尚未定位
-3. **右向不对称加深**：armD@6.6k 时 arc_left 0.93 / arc_right 0.17
-4. **力矩余量未测**：`tau_max`/`ff_max` 遥测读数恒 0；Isaac 隐式驱动的实际饱和率标 **`not_measured`**
+1. Isaac ON 的种子 7393 通过右原地转 0.10 rad/s，311 未过；左转该档在 7393 跟踪接近零。
+2. MuJoCo 三项纯转支撑失败。
+3. 6600 右弧退化只在 OFF 下确认，ON 排名待测。
+4. Isaac 隐式求解器实际施力仍为 not_measured。
 5. **长转 dwell 从未实现**：`AS2W_AB_TURN_DWELL_*` 只被打印未被读取；armB/armC 的「长转」实为**仅配比变化**
 6. **单腿抬升在现有站姿下几何不可行**：IK 只能到 0.25–1.73 mm（目标 10 mm），实测为负；正常退出沿用四轮着地回站
 7. **姿态偏置已被否决**：MuJoCo 改善但 Isaac 零指令漂移恶化 65–350 倍（0.7 mm → 22–30 cm）
@@ -99,12 +84,12 @@ rolling-armD-turn65-research/
 ```bash
 # MuJoCo 矩阵（需 MJCF 与 mesh 目录）
 python runtime/r11_mj_matrix_v2.py --xml runtime/r11_mjcf_excl.xml \
-  --ckpt weights/armD_turn65_final.pt --out out/
+  --ckpt weights/armD_turn65_final.pt --out out/ --yaw-kp 60 --ff-cap 4
 
 # Isaac 验收矩阵（两种子）
 /isaac-sim/python.sh runtime/r11_acceptance_ff.py \
   --usd <as2w.usda> --urdf <as2w.urdf> --out out/ \
-  --checkpoints "armD=weights/armD_turn65_final.pt" --seeds 7393,311
+  --checkpoints "armD=weights/armD_turn65_final.pt" --seeds 7393,311 --yaw-kp 60 --ff-cap 4 --ff-gain 0
 
 # 视频
 MUJOCO_GL=egl python runtime/r11_demo_video.py --xml runtime/r11_mjcf_excl.xml \

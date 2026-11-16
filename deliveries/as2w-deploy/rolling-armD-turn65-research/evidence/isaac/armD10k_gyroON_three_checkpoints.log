@@ -1,0 +1,257 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1794821605.826590  987038 descriptor_database.cc:633] File already exists in database: grpc/health/v1/health.proto
+W0000 00:00:1794821605.826643  987038 message.cc:301] Protobuf GeneratedMessageFactory: File is already registered: grpc/health/v1/health.proto
+Warning: Possible version incompatibility. Attempting to load carb::ujitso::IFactory with version v0.3 against v0.2.
+[ISAACLAB] KitLauncher initialization complete
+Warp 1.17.0 initialized:
+   CUDA Toolkit 12.9, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA L40" (44 GiB, sm_89, mempool enabled)
+   Kernel cache:
+     /root/.cache/warp/1.17.0
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 7393
+	Physics step-size     : 0.005
+	Rendering step-size   : 0.02
+	Environment step-size : 0.02
+[INFO]: Loading local copy of remote asset 'https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.2/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/default_ground_plane.usda' from '/tmp/https/omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.2/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/default_ground_plane.usda'.
+[INFO]: Loading local copy of remote asset 'https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.2/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/Materials/Textures/default_ground_plane_albedo.png' from '/tmp/https/omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.2/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/Materials/Textures/default_ground_plane_albedo.png'.
+[INFO]: Loading local copy of remote asset 'https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.2/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/Materials/Textures/default_ground_plane_roughness.png' from '/tmp/https/omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.2/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/Materials/Textures/default_ground_plane_roughness.png'.
+[INFO]: Registered backend 'physx' for factory Articulation.
+[INFO]: Setting variant selection 'physx' for variant set 'Physics' on prim '/World/envs/env_0/Robot'.
+[INFO]: Registered backend 'physx' for factory ContactSensor.
+[INFO]: Physics scene prim path: /physicsScene
+[INFO]: Time taken for scene creation Last: 6.391245 s, Mean: 6.391245 s, Std: 0.000000 s, N: 1
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 1
+	Environment spacing   : 2.5
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : ['/World/ground']
+	Replicate physics     : True
+[INFO]: Simulation parameters for joints in /World/envs/env_[^/]+/Robot:
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|                                               Simulation Joint Information (Prim path: /World/envs/env_[^/]+/Robot)                                               |
++-------+----------+-----------+---------+----------+-----------------+------------------+------------------+---------------------+-----------------+---------------+
+| Index | Name     | Stiffness | Damping | Armature | Static Friction | Dynamic Friction | Viscous Friction |   Position Limits   | Velocity Limits | Effort Limits |
++-------+----------+-----------+---------+----------+-----------------+------------------+------------------+---------------------+-----------------+---------------+
+|   0   | FL_hip   |   55.000  |  2.000  |  0.000   |      0.000      |      0.000       |      0.000       |   [-0.785, 0.785]   |      25.000     |     54.000    |
+|   1   | FR_hip   |   55.000  |  2.000  |  0.000   |      0.000      |      0.000       |      0.000       |   [-0.785, 0.785]   |      25.000     |     54.000    |
+|   2   | RL_hip   |   55.000  |  2.000  |  0.000   |      0.000      |      0.000       |      0.000       |   [-0.785, 0.785]   |      25.000     |     54.000    |
+|   3   | RR_hip   |   55.000  |  2.000  |  0.000   |      0.000      |      0.000       |      0.000       |   [-0.785, 0.785]   |      25.000     |     54.000    |
+|   4   | FL_thigh |   55.000  |  2.000  |  0.000   |      0.000      |      0.000       |      0.000       |   [-2.000, 3.492]   |      25.000     |     54.000    |
+|   5   | FR_thigh |   55.000  |  2.000  |  0.000   |      0.000      |      0.000       |      0.000       |   [-2.000, 3.492]   |      25.000     |     54.000    |
+|   6   | RL_thigh |   55.000  |  2.000  |  0.000   |      0.000      |      0.000       |      0.000       |   [-1.300, 4.190]   |      25.000     |     54.000    |
+|   7   | RR_thigh |   55.000  |  2.000  |  0.000   |      0.000      |      0.000       |      0.000       |   [-1.300, 4.190]   |      25.000     |     54.000    |
+|   8   | FL_calf  |   55.000  |  2.000  |  0.000   |      0.000      |      0.000       |      0.000       |   [-2.768, -0.813]  |      16.670     |     81.000    |
+|   9   | FR_calf  |   55.000  |  2.000  |  0.000   |      0.000      |      0.000       |      0.000       |   [-2.768, -0.813]  |      16.670     |     81.000    |
+|   10  | RL_calf  |   55.000  |  2.000  |  0.000   |      0.000      |      0.000       |      0.000       |   [-2.768, -0.813]  |      16.670     |     81.000    |
+|   11  | RR_calf  |   55.000  |  2.000  |  0.000   |      0.000      |      0.000       |      0.000       |   [-2.768, -0.813]  |      16.670     |     81.000    |
+|   12  | FL_foot  |   0.000   |  6.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-3.4e+38, 3.4e+38] |      98.470     |     13.500    |
+|   13  | FR_foot  |   0.000   |  6.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-3.4e+38, 3.4e+38] |      98.470     |     13.500    |
+|   14  | RL_foot  |   0.000   |  6.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-3.4e+38, 3.4e+38] |      98.470     |     13.500    |
+|   15  | RR_foot  |   0.000   |  6.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-3.4e+38, 3.4e+38] |      98.470     |     13.500    |
++-------+----------+-----------+---------+----------+-----------------+------------------+------------------+---------------------+-----------------+---------------+
+[INFO]: Time taken for simulation start Last: 0.819140 s, Mean: 0.819140 s, Std: 0.000000 s, N: 1
+[INFO] Command Manager:  <CommandManager> contains 1 active terms.
++--------------------------------------+
+|         Active Command Terms         |
++-------+---------------+--------------+
+| Index | Name          |     Type     |
++-------+---------------+--------------+
+|   0   | base_velocity | EvalCommands |
++-------+---------------+--------------+
+
+[INFO] Event Manager:  <EventManager> contains 1 active terms.
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++--------+----------------------------+
+| Index  | Name                       |
++--------+----------------------------+
+|   0    | reset_base                 |
+|   1    | reset_robot_joints         |
++--------+----------------------------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++-----------------------+
+| Active Recorder Terms |
++------------+----------+
+|   Index    | Name     |
++------------+----------+
++------------+----------+
+
+[INFO]: Resolved joint names for the action term DelayedPosition: ['FL_hip', 'FR_hip', 'RL_hip', 'RR_hip', 'FL_thigh', 'FR_thigh', 'RL_thigh', 'RR_thigh', 'FL_calf', 'FR_calf', 'RL_calf', 'RR_calf'] [tensor([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11], device='cuda:0',
+       dtype=torch.int32)]
+[INFO]: Resolved joint names for the action term DelayedGyroVelocity: ['FL_foot', 'FR_foot', 'RL_foot', 'RR_foot'] [tensor([12, 13, 14, 15], device='cuda:0', dtype=torch.int32)]
+AS2W_GYRO_TRAIN_LOOP OFF  yaw_kp=0.0 ff_cap=4.00 ff_gain=0.0 kd=6.0
+/root/gpufree-data/Rob2Nav/deliveries/as2w-deploy/rolling-armD-turn65-research/runtime/r11_acceptance_ff.py:175: DeprecationWarning: The `root_physx_view` property will be deprecated in a future release. Please use `root_view` instead.
+  masses = np.asarray(robot.root_physx_view.get_masses()).astype(np.float64).reshape(-1)
+[INFO] Action Manager:  <ActionManager> contains 2 active terms.
++---------------------------------+
+| Active Action Terms (shape: 16) |
++-------+-----------+-------------+
+| Index | Name      |   Dimension |
++-------+-----------+-------------+
+|   0   | joint_pos |          12 |
+|   1   | wheel_vel |           4 |
++-------+-----------+-------------+
+
+[INFO] Observation Manager: <ObservationManager> contains 1 groups.
++------------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (65,)) |
++-------------------+-------------------+--------------------+
+|       Index       | Name              |       Shape        |
++-------------------+-------------------+--------------------+
+|         0         | state             |       (65,)        |
++-------------------+-------------------+--------------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 6 active terms.
++------------------------------------------+
+|         Active Termination Terms         |
++-------+-----------------------+----------+
+| Index | Name                  | Time Out |
++-------+-----------------------+----------+
+|   0   | time_out              |   True   |
+|   1   | base_contact          |  False   |
+|   2   | as2w_angle_violation  |  False   |
+|   3   | as2w_stance_violation |  False   |
+|   4   | as2w_nonwheel_contact |  False   |
+|   5   | as2w_knee_surface     |  False   |
++-------+-----------------------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 16 active terms.
++------------------------------------------+
+|           Active Reward Terms            |
++-------+-----------------------+----------+
+| Index | Name                  |   Weight |
++-------+-----------------------+----------+
+|   0   | track_lin_vel_xy_exp  |      1.5 |
+|   1   | track_ang_vel_z_exp   |      1.5 |
+|   2   | lin_vel_z_l2          |     -2.0 |
+|   3   | ang_vel_xy_l2         |    -0.05 |
+|   4   | dof_torques_l2        |  -0.0002 |
+|   5   | dof_acc_l2            | -2.5e-07 |
+|   6   | action_rate_l2        |   -0.005 |
+|   7   | undesired_contacts    |     -1.0 |
+|   8   | flat_orientation_l2   |     -2.5 |
+|   9   | dof_pos_limits        |      0.0 |
+|   10  | base_height_l2        |     -3.0 |
+|   11  | rear_posture          |     -0.8 |
+|   12  | zero_motion           |     -0.4 |
+|   13  | signed_tracking       |      0.5 |
+|   14  | rolling_wheel_support |    -0.65 |
+|   15  | rolling_knee_margin   |     -3.0 |
++-------+-----------------------+----------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 0 active terms.
++-------------------------+
+| Active Curriculum Terms |
++-------------+-----------+
+|    Index    | Name      |
++-------------+-----------+
++-------------+-----------+
+
+[INFO]: Completed setting up the environment...
+AS2W_PAYLOAD {"requested_kg": 0.0, "applied": false, "method": "startup mass event on base_link, operation=add", "base_body_name": "base_link", "base_mass_after_kg": 10.579999923706055, "total_mass_after_kg": 26.0, "readback_ok": true}
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 actor :  ['policy']
+	 critic :  ['policy']
+--------------------------------------------------------------------------------
+Actor Model: MLPModel(
+  (obs_normalizer): Identity()
+  (distribution): GaussianDistribution()
+  (mlp): MLP(
+    (0): Linear(in_features=65, out_features=128, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=128, out_features=128, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=128, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=16, bias=True)
+  )
+)
+Critic Model: MLPModel(
+  (obs_normalizer): Identity()
+  (mlp): MLP(
+    (0): Linear(in_features=65, out_features=128, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=128, out_features=128, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=128, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=1, bias=True)
+  )
+)
+
+########## armD10k_6600 ff=0.0 ##########
+/root/gpufree-data/Rob2Nav/deliveries/as2w-deploy/rolling-armD-turn65-research/runtime/r11_acceptance_ff.py:240: DeprecationWarning: Articulation.set_joint_velocity_target_index is deprecated. Use articulation.actuators.target_command.set_velocity_index instead.
+  robot.set_joint_velocity_target_index(target=sp,
+AS2W_GUARD_GEOMETRY {'width': [[0.2957513630390167, 0.29907548427581787]], 'rear_thigh': [[1.0113155841827393, 0.7351551651954651]], 'knee_clearance': [[0.23458155989646912, 0.25003814697265625, 0.2658904194831848, 0.21361398696899414]], 'crossed': 0, 'rear_overextended': 0, 'low_knee': 0}
+  seed 7393
+    hold               PASS  sup=1.000 up=0.997 vx=+0.0027 wz=+0.0016 trk=-/- exec=0.523 tau_max=13.50 ff_max=1.03 caps=8 term=0
+    turn_left_0.05     FAIL  sup=1.000 up=0.996 vx=-0.0000 wz=+0.0044 trk=-/+0.09 exec=0.363 tau_max=13.50 ff_max=4.00 caps=17 term=0
+    turn_right_0.05    FAIL  sup=1.000 up=0.983 vx=-0.0010 wz=-0.0306 trk=-/+0.61 exec=0.710 tau_max=13.50 ff_max=4.00 caps=27 term=0
+    turn_left_0.10     FAIL  sup=1.000 up=0.998 vx=-0.0117 wz=+0.0423 trk=-/+0.42 exec=0.398 tau_max=13.50 ff_max=4.00 caps=36 term=0
+    turn_right_0.10    FAIL  sup=1.000 up=0.979 vx=-0.0041 wz=-0.0636 trk=-/+0.64 exec=0.703 tau_max=13.50 ff_max=4.00 caps=48 term=0
+    straight_fwd_0.25  PASS  sup=1.000 up=0.979 vx=+0.2147 wz=-0.0123 trk=+0.86/- exec=0.992 tau_max=13.50 ff_max=4.00 caps=100 term=0
+    straight_bwd_0.25  PASS  sup=1.000 up=0.996 vx=-0.2108 wz=+0.0162 trk=+0.84/- exec=0.934 tau_max=13.50 ff_max=4.00 caps=126 term=0
+    arc_left_0.25      PASS  sup=0.993 up=0.992 vx=+0.2113 wz=+0.0490 trk=+0.85/+0.98 exec=0.800 tau_max=13.50 ff_max=4.00 caps=170 term=0
+    arc_right_0.25     FAIL  sup=1.000 up=0.976 vx=+0.2214 wz=-0.0219 trk=+0.89/+0.44 exec=0.923 tau_max=13.50 ff_max=4.00 caps=198 term=0
+    brake_fwd_0.25     PASS  sup=1.000 up=0.982 vx=-0.0076 wz=-0.0011 trk=-0.03/- exec=0.608 tau_max=13.50 ff_max=4.00 caps=215 term=0
+    brake_bwd_0.25     PASS  sup=1.000 up=0.995 vx=+0.0026 wz=-0.0001 trk=-0.01/- exec=0.575 tau_max=13.50 ff_max=4.00 caps=288 term=0
+  seed 311
+    hold               PASS  sup=1.000 up=0.999 vx=+0.0002 wz=-0.0014 trk=-/- exec=0.877 tau_max=13.50 ff_max=4.00 caps=295 term=0
+    turn_left_0.05     FAIL  sup=1.000 up=0.995 vx=-0.0029 wz=+0.0124 trk=-/+0.25 exec=0.684 tau_max=13.50 ff_max=4.00 caps=310 term=0
+    turn_right_0.05    FAIL  sup=1.000 up=0.983 vx=+0.0066 wz=-0.0003 trk=-/+0.01 exec=0.560 tau_max=13.50 ff_max=4.00 caps=319 term=0
+    turn_left_0.10     FAIL  sup=1.000 up=0.994 vx=-0.0061 wz=+0.0369 trk=-/+0.37 exec=0.455 tau_max=13.50 ff_max=4.00 caps=329 term=0
+    turn_right_0.10    FAIL  sup=1.000 up=0.981 vx=+0.0125 wz=-0.0493 trk=-/+0.49 exec=0.903 tau_max=13.50 ff_max=4.00 caps=372 term=1
+    straight_fwd_0.25  PASS  sup=1.000 up=0.978 vx=+0.2144 wz=-0.0091 trk=+0.86/- exec=0.945 tau_max=13.50 ff_max=4.00 caps=420 term=0
+    straight_bwd_0.25  PASS  sup=1.000 up=0.997 vx=-0.2177 wz=-0.0050 trk=+0.87/- exec=0.980 tau_max=13.50 ff_max=4.00 caps=451 term=0
+    arc_left_0.25      PASS  sup=0.993 up=0.989 vx=+0.2124 wz=+0.0388 trk=+0.85/+0.78 exec=0.855 tau_max=13.50 ff_max=4.00 caps=507 term=0
+    arc_right_0.25     FAIL  sup=1.000 up=0.975 vx=+0.2195 wz=-0.0199 trk=+0.88/+0.40 exec=0.888 tau_max=13.50 ff_max=4.00 caps=555 term=0
+    brake_fwd_0.25     PASS  sup=1.000 up=0.980 vx=+0.0002 wz=-0.0009 trk=+0.00/- exec=0.497 tau_max=13.50 ff_max=4.00 caps=606 term=0
+    brake_bwd_0.25     PASS  sup=1.000 up=0.999 vx=+0.0001 wz=-0.0002 trk=-0.00/- exec=0.538 tau_max=13.50 ff_max=4.00 caps=645 term=0
+  ==> armD10k_6600 ff=0.0: 6/11 pass
+
+########## armD10k_8600 ff=0.0 ##########
+  seed 7393
+    hold               PASS  sup=1.000 up=0.998 vx=+0.0014 wz=-0.0012 trk=-/- exec=0.631 tau_max=13.50 ff_max=4.00 caps=654 term=0
+    turn_left_0.05     FAIL  sup=1.000 up=0.994 vx=-0.0004 wz=+0.0136 trk=-/+0.27 exec=0.590 tau_max=13.50 ff_max=4.00 caps=664 term=0
+    turn_right_0.05    FAIL  sup=0.860 up=0.964 vx=-0.0252 wz=-0.0300 trk=-/+0.60 exec=0.872 tau_max=13.50 ff_max=4.00 caps=731 term=1
+    turn_left_0.10     PASS  sup=0.980 up=0.987 vx=+0.0006 wz=+0.0907 trk=-/+0.91 exec=0.833 tau_max=13.50 ff_max=4.00 caps=790 term=0
+    turn_right_0.10    FAIL  sup=1.000 up=0.967 vx=-0.0030 wz=-0.0696 trk=-/+0.70 exec=0.699 tau_max=13.50 ff_max=4.00 caps=862 term=1
+    straight_fwd_0.25  PASS  sup=1.000 up=0.968 vx=+0.2141 wz=-0.0031 trk=+0.86/- exec=0.932 tau_max=13.50 ff_max=4.00 caps=907 term=0
+    straight_bwd_0.25  PASS  sup=1.000 up=0.989 vx=-0.2105 wz=+0.0042 trk=+0.84/- exec=1.032 tau_max=13.50 ff_max=4.00 caps=953 term=0
+    arc_left_0.25      PASS  sup=1.000 up=0.983 vx=+0.2184 wz=+0.0435 trk=+0.87/+0.87 exec=0.825 tau_max=13.50 ff_max=4.00 caps=999 term=0
+    arc_right_0.25     FAIL  sup=0.867 up=0.955 vx=+0.0524 wz=-0.0483 trk=+0.21/+0.97 exec=0.885 tau_max=13.50 ff_max=4.00 caps=1192 term=1
+    brake_fwd_0.25     PASS  sup=1.000 up=0.972 vx=+0.0016 wz=-0.0102 trk=+0.01/- exec=0.650 tau_max=13.50 ff_max=4.00 caps=1230 term=0
+    brake_bwd_0.25     PASS  sup=1.000 up=0.988 vx=-0.0017 wz=+0.0004 trk=+0.01/- exec=0.565 tau_max=13.50 ff_max=4.00 caps=1294 term=0
+  seed 311
+    hold               PASS  sup=1.000 up=1.000 vx=-0.0002 wz=-0.0004 trk=-/- exec=0.444 tau_max=13.50 ff_max=4.00 caps=1311 term=0
+    turn_left_0.05     FAIL  sup=1.000 up=0.989 vx=-0.0032 wz=+0.0116 trk=-/+0.23 exec=0.590 tau_max=13.50 ff_max=4.00 caps=1319 term=0
+    turn_right_0.05    FAIL  sup=1.000 up=0.960 vx=-0.0007 wz=-0.0331 trk=-/+0.66 exec=0.792 tau_max=13.50 ff_max=4.00 caps=1349 term=0
+    turn_left_0.10     FAIL  sup=0.853 up=0.986 vx=+0.0227 wz=+0.0625 trk=-/+0.63 exec=0.957 tau_max=13.50 ff_max=4.00 caps=1449 term=0
+    turn_right_0.10    PASS  sup=1.000 up=0.971 vx=+0.0031 wz=-0.0744 trk=-/+0.74 exec=0.783 tau_max=13.50 ff_max=4.00 caps=1497 term=0
+    straight_fwd_0.25  FAIL  sup=1.000 up=0.970 vx=+0.2097 wz=-0.0021 trk=+0.84/- exec=0.995 tau_max=13.50 ff_max=4.00 caps=1583 term=1
+    straight_bwd_0.25  PASS  sup=1.000 up=0.989 vx=-0.2144 wz=+0.0072 trk=+0.86/- exec=0.910 tau_max=13.50 ff_max=4.00 caps=1602 term=0
+    arc_left_0.25      PASS  sup=1.000 up=0.982 vx=+0.2182 wz=+0.0463 trk=+0.87/+0.93 exec=0.876 tau_max=13.50 ff_max=4.00 caps=1684 term=0
+    arc_right_0.25     FAIL  sup=0.993 up=0.949 vx=+0.2149 wz=-0.0493 trk=+0.86/+0.99 exec=1.041 tau_max=13.50 ff_max=4.00 caps=1823 term=1
+    brake_fwd_0.25     PASS  sup=1.000 up=0.969 vx=+0.0010 wz=+0.0008 trk=+0.00/- exec=0.767 tau_max=13.50 ff_max=4.00 caps=1905 term=0
+    brake_bwd_0.25     PASS  sup=1.000 up=0.989 vx=+0.0021 wz=+0.0013 trk=-0.01/- exec=0.611 tau_max=13.50 ff_max=4.00 caps=1937 term=0
+  ==> armD10k_8600 ff=0.0: 5/11 pass
+
+########## armD10k_10600 ff=0.0 ##########
+  seed 7393
+    hold               PASS  sup=1.000 up=1.000 vx=-0.0002 wz=-0.0004 trk=-/- exec=0.279 tau_max=13.50 ff_max=4.00 caps=1944 term=0
+    turn_left_0.05     FAIL  sup=1.000 up=0.995 vx=+0.0003 wz=+0.0005 trk=-/+0.01 exec=0.184 tau_max=13.50 ff_max=4.00 caps=1952 term=0
+    turn_right_0.05    FAIL  sup=1.000 up=0.986 vx=+0.0016 wz=-0.0183 trk=-/+0.37 exec=0.516 tau_max=13.50 ff_max=4.00 caps=1962 term=0
+    turn_left_0.10     FAIL  sup=1.000 up=0.992 vx=+0.0128 wz=+0.0199 trk=-/+0.20 exec=0.338 tau_max=13.50 ff_max=4.00 caps=1979 term=0
+    turn_right_0.10    PASS  sup=1.000 up=0.988 vx=+0.0043 wz=-0.0724 trk=-/+0.72 exec=0.729 tau_max=13.50 ff_max=4.00 caps=1990 term=0
+    straight_fwd_0.25  PASS  sup=0.993 up=0.994 vx=+0.2151 wz=-0.0062 trk=+0.86/- exec=1.026 tau_max=13.50 ff_max=4.00 caps=2045 term=0
+    straight_bwd_0.25  PASS  sup=0.993 up=0.989 vx=-0.2230 wz=-0.0047 trk=+0.89/- exec=0.882 tau_max=13.50 ff_max=4.00 caps=2081 term=0
+    arc_left_0.25      FAIL  sup=1.000 up=0.998 vx=+0.2107 wz=+0.0317 trk=+0.84/+0.63 exec=0.938 tau_max=13.50 ff_max=4.00 caps=2107 term=0
+    arc_right_0.25     FAIL  sup=1.000 up=0.995 vx=+0.2146 wz=-0.0219 trk=+0.86/+0.44 exec=0.938 tau_max=13.50 ff_max=4.00 caps=2152 term=0
+    brake_fwd_0.25     PASS  sup=1.000 up=0.989 vx=-0.0007 wz=-0.0002 trk=-0.00/- exec=0.319 tau_max=13.50 ff_max=4.00 caps=2180 term=0
+    brake_bwd_0.25     PASS  sup=1.000 up=0.990 vx=+0.0010 wz=-0.0011 trk=-0.00/- exec=0.127 tau_max=13.50 ff_max=4.00 caps=2237 term=0
