@@ -1,0 +1,81 @@
+{
+ "checkpoint": "/root/gpufree-data/as2w-runs/as2w-rolling-goal/results/train/ab-A-equalbudget-20261116-095239/r11-final.pt",
+ "command": {
+  "vx": 0.0,
+  "wz": 0.05
+ },
+ "load_threshold_n": 20.0,
+ "frames": 600,
+ "dt": 0.02,
+ "first_unload_frame": 235,
+ "first_unload_time_s": 4.7,
+ "first_unload_wheels": [
+  "RL"
+ ],
+ "unload_fraction": 0.14833333333333334,
+ "per_wheel_min_load_N": {
+  "FL": 37.658810860284646,
+  "FR": 23.81635653437734,
+  "RL": 0.0,
+  "RR": 45.884281401195956
+ },
+ "per_wheel_unload_frames": {
+  "FL": 0,
+  "FR": 0,
+  "RL": 89,
+  "RR": 0
+ },
+ "yaw_tail": 0.06540274670861282,
+ "ddq_tail": 0.8338123622180951,
+ "degradation": {
+  "baseline_frames": 160,
+  "first_unload_frame": 235,
+  "first_exceed_frame_per_quantity": {
+   "wheel_load_spread": 199,
+   "leg_joint_error": 0,
+   "measured_differential": 0,
+   "yaw_rate": 11,
+   "roll": 3,
+   "pitch": 33,
+   "knee_height_min": 0
+  },
+  "ranked_earliest_first": [
+   {
+    "quantity": "leg_joint_error",
+    "frame": 0,
+    "time_s": 0.0
+   },
+   {
+    "quantity": "measured_differential",
+    "frame": 0,
+    "time_s": 0.0
+   },
+   {
+    "quantity": "knee_height_min",
+    "frame": 0,
+    "time_s": 0.0
+   },
+   {
+    "quantity": "roll",
+    "frame": 3,
+    "time_s": 0.06
+   },
+   {
+    "quantity": "yaw_rate",
+    "frame": 11,
+    "time_s": 0.22
+   },
+   {
+    "quantity": "pitch",
+    "frame": 33,
+    "time_s": 0.66
+   },
+   {
+    "quantity": "wheel_load_spread",
+    "frame": 199,
+    "time_s": 3.98
+   }
+  ],
+  "note": "frame is relative to the START OF THE SPIN command; compare orderings, not absolute values"
+ }
+}
