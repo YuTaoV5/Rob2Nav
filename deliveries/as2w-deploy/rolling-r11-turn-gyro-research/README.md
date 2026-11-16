@@ -73,7 +73,7 @@ python runtime/r11_acceptance_ff.py --usd <as2w.usda> --urdf <as2w.urdf> --out /
 | C3 观测合同 | **pass**（`evidence/C3_OBSERVATION_CONTRACT.md`） |
 | C4 输出链路 | partial（`evidence/C4_OUTPUT_CHAIN.md`；无实机 DDS 映射） |
 | C5 入口与退出 | partial（`evidence/C5_HANDOVER.md`；仿真内已验证，未测策略切换/急停） |
-| C6 仿真与资产 | partial（`evidence/C6_ASSETS.md`；未逐个记录 STL 哈希） |
+| C6 仿真与资产 | **pass**（`evidence/C6_ASSETS.md`；USD 展开引用层 9 个已逐个哈希见 `evidence/C6_USD_LAYERS.md`；URDF 引用的 36 个网格已逐个哈希见 `evidence/C6_MESH_HASHES.md`；训练复跑入口 recipe 已 pin 并通过校验。运行期 physics variant 的实际选中未验证，不影响资产锁定） |
 | C7 逐例证据 | **pass**（`evidence/isaac/`、`evidence/mujoco/`） |
 | C8 最小回放 | **pass**（600 帧真实 rollout，5.96e-07） |
 | R0 | pass；R1 partial；R2 partial（无候选双端同时通过） |
