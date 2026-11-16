@@ -1,30 +1,12 @@
-#!/usr/bin/env python3
 """DEPRECATED - DO NOT USE ITS NUMBERS.
 
 This probe computed the wheel demand ONCE per 20 ms control sample and held it across all 32 substeps.
-That is not how the main evaluators work (they recompute inside the substep loop), and it produces a
+That is not how the main evaluators work (they recompute inside the substep loop), and it produced a
 spurious 49x overshoot that was mistaken for a MuJoCo-vs-Isaac implementation difference.  The correct
-comparison is in r11_mj_substep_ab.py, which shows that holding the demand reproduces 24.5 rad/s while
+comparison is r11_mj_substep_ab.py, which shows that holding the demand reproduces 24.5 rad/s while
 recomputing per substep converges to exactly 0.5000 - i.e. the two simulators AGREE on the unloaded wheel.
 
 Kept only as the record of the defect.
-"""
-"""Wheel-loop isolation: fixed base, wheels in the air, no policy, no gyro, no delay.
-
-Operator step 1.  Both simulators get the identical treatment so the only thing under test is the wheel
-velocity loop itself:
-
-    * the robot is lifted clear of the ground and the base is pinned (no falling, no contact)
-    * all 12 leg joints are held at one fixed pose
-    * NO actor, NO gyro compensation, NO action delay, NO action ramp, NO command gate
-    * each wheel is given the same target sequence: 0 -> +0.5 -> 0 -> -0.5 rad/s, held long enough to settle
-
-Recorded per sample, for each wheel: the final target, the measured velocity, and the torque actually
-applied BEFORE and AFTER the effort limit, so a difference can be attributed to the loop rather than to
-the limiter.  Also recorded: the physics step, the number of physics sub-steps per control sample, and the
-control period - the three quantities the operator asked to align.
-
-MuJoCo version.  The Isaac twin is r11_isaac_wheel_loop.py with the same schema and the same sequence.
 """
 from __future__ import annotations
 
