@@ -1,74 +1,65 @@
-# 上传状态：**已授权、已审查、待凭据**
+# 上传授权：**临时 SSH deploy key 已生成，等待您授权**
 
-操作员已明确授权上传。本文件记录**上传前审查结果**、**具体阻塞**与**一键执行方式**。
+操作员要求生成可授权的临时凭证。本文件记录授权步骤与授权后的一键推送方式。
 
-## 1. 当前状态
+## 1. 需要您做的事（两步，约 1 分钟）
+
+### 第 1 步：打开这个链接
+
+**https://github.com/YuTaoV5/Rob2Nav/settings/keys/new**
+
+（仓库级 deploy key，权限最小，只影响这一个仓库；若该入口不可用，用账户级：https://github.com/settings/ssh/new ）
+
+### 第 2 步：粘贴下面这一整行公钥
+
+```
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPxPXV2FTNk9Phhcu1CaniEYSCyHpezH3OXda9wdUR/1 rob2nav-upload-20261116-110651
+```
+
+- **Title**：随意，建议 `rob2nav-upload-20261116`- **Key**：粘贴上面那一行- **✅ 必须勾选 `Allow write access`**（否则只能读、不能 push）- 然后点 `Add key`
+
+公钥指纹（用于核对，防止粘错）：`SHA256:zUBJ7OT74Y7VCucCZLIU9GWjJAIrx23K1/RjQs25RLc`
+
+> 私钥在服务器 `/root/.ssh/rob2nav_upload_ed25519`，**不会显示、不会进仓库、不会被提交**。> 该 key 只配给 `github.com`，且 `IdentitiesOnly yes`，不影响其它用途。
+
+## 2. 授权后我会执行（一条命令）
+
+```bash
+bash /root/push_after_auth.sh
+```
+
+该脚本会：SSH 授权自测 → 核对快进合法性（**远端已前进则拒绝，不强推**）→ `git push ghssh HEAD:main` → 回读远端 main 与本地 HEAD 比对。
+
+## 3. 备选方案：PAT（个人访问令牌）
+
+若不希望加 SSH key，也可以给一个 **fine-grained PAT**（只需 `Contents: Read and write` 权限、仅限 `YuTaoV5/Rob2Nav`）：
+
+1. 打开 **https://github.com/settings/personal-access-tokens/new**2. Repository access 选 `Only select repositories` → `YuTaoV5/Rob2Nav`3. Permissions → Repository permissions → **Contents: Read and write**4. 生成后执行：
+
+```bash
+GH_TOKEN=<你的token> bash /root/push_rob2nav.sh
+```
+
+该脚本**不落盘** token（仅注入本次 URL）。
+
+## 4. 当前待推送内容（未变）
 
 | 项 | 值 |
 | --- | --- |
-| 本地 HEAD | `86fe5500e561dbf9d8a15fdfc97416b3f92edd65` |
-| 领先远端 | **72 个提交** |
-| 落后远端 | **0**（快进合法，无需 rebase） |
-| 远端 main | `abde5f4`（与本地 `origin/main` 一致） |
-| 出站内容 | **239 文件 / 6.02 MB** |
-| 最大出站文件 | 1.94 MB（C8 回放 JSON），**远低于 GitHub 100 MB 单文件限** |
-| 是否需要 LFS | **不需要** |
+| 提交数 | **76** |
+| 远端 main | `abde5f4`（与本地 `origin/main` 一致 → 快进合法） |
+| 出站体积 | 239 文件 / 6.02 MB |
+| 包校验 | 194/194 OK |
+| 安全审查 | 已通过（无密钥/无原始采集/无缓存） |
 
-## 2. 🔴 唯一阻塞：主机无推送凭据
-
-已实际尝试推送，失败于认证：
-
-```
-fatal: could not read Username for 'https://v6.gh-proxy.org': terminal prompts disabled
-```
-
-主机上没有：`credential.helper`、`~/.git-credentials`、`GITHUB_TOKEN`、`GH_TOKEN`、`gh` CLI、SSH 密钥。
-**→ 这是环境限制，不是仓库问题；我不能代为创建凭据，也不会把凭据写进仓库或脚本。**
-
-## 3. 上传前审查（全部通过）
+## 5. 授权前自测结果（已确认通路可用）
 
 | 检查 | 结果 |
 | --- | --- |
-| 出站 diff 含密钥/凭据 | ✅ 未发现（扫描 PAT/AKIA/私钥/password/api_key/token 模式） |
-| 压缩包/日志/原始采集 | ✅ 无 |
-| `__pycache__` / `.pyc` / `.bak` | ✅ 无 |
-| whitespace 错误 | ⚠️ 1 处，在**旧包** `rolling-r11-turn-research/runtime/action-delay-disable.patch:23`（历史遗留，非本次新增） |
-| 包清单校验 | ✅ **189/189 OK** |
-| 权重文件 | 2 个 `.pt` + 1 个 `.onnx`，均属两个交付包自身，**非重复副本** |
+| github.com HTTPS | **200** |
+| github.com SSH (22) | **可达** |
+| `ssh -T git@github.com`（授权前） | `Permission denied (publickey)` —— **符合预期，只差授权** |
 
-## 4. 一键执行方式（三选一）
+## 6. 备选：bundle（无需任何服务器凭据）
 
-**方式 A —— 提供 token（推荐，脚本不会落盘）**
-
-```bash
-GH_TOKEN=ghp_xxxxxxxx bash /root/push_rob2nav.sh
-```
-
-脚本会：核对快进合法性（落后即**拒绝**而不是强推）→ 把 token 仅注入**本次** url → `git push` → 回读远端 main 校验。
-
-**方式 B —— 交互式输入**
-
-```bash
-bash /root/push_rob2nav.sh      # git 会提示用户名与 token
-```
-
-**方式 C —— 从我方机器直接推**（无需服务器凭据）
-
-```bash
-git clone https://github.com/YuTaoV5/Rob2Nav.git && cd Rob2Nav
-git remote add srv <服务器路径或 rsync 拉取>
-git fetch srv main && git push origin srv/main:main
-```
-或在授权后由我出具 `git bundle`，由有凭据的一端 `git fetch` 后推送。
-
-## 5. 推送后的校验清单（脚本已自动做前两项）
-
-1. `git push` 返回 0
-2. 回读 `git rev-parse origin/main` 等于本地 HEAD
-3. 网页确认入口可达：`skills/as2w/README.md`、`deliveries/as2w-deploy/rolling-r11-turn-gyro-research/README.md`
-4. 网页确认权重可取：`weights/policy.onnx`（175,066 B）、`weights/armE_support2p0_final.pt`（1,042,859 B）
-5. 网页确认 `SHA256SUMS` 与本地一致（189 条）
-
-## 6. 如实声明
-
-- **本轮未能完成上传** —— 缺凭据，不是被拒绝也不是审查未过- 我不会把任何 token 写入仓库、提交历史或服务器脚本- 一旦提供凭据，执行 `/root/push_rob2nav.sh` 即可完成；全部审查已就绪
+已有 `Rob2Nav-upload-20261116.bundle`（2.98 MB，含全部提交，基线 = 远端 main）。在任意有凭据的机器上 `git fetch <bundle> main:upload && git push origin upload:main` 即可。
