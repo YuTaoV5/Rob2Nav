@@ -103,7 +103,15 @@ def main() -> int:
             cmdterm = env.command_manager.get_term("base_velocity")
             names = list(robot.joint_names)
             widx = [names.index(n) for n in WHEELS]
-            wheeld = [names.index(n) for n in WHEELS]   # WHEEL BODIES, not calf joints
+            # net_forces_w is ordered by the CONTACT SENSOR's own body list.  `names` holds JOINT names,
+            # so indexing it with body names silently read the wrong rows.  Resolve against the
+            # sensor body list and print it once so the index space is auditable.
+            _sens = env.scene["contact_forces"]
+            _sbody = list(getattr(_sens, "body_names", []) or [])
+            if not _sbody:
+                _sbody = list(robot.body_names)
+            wheeld = [_sbody.index(n) for n in WHEELS]
+            print("AS2W_SUPPORT_INDEX sensor_bodies=%d wheel_idx=%s" % (len(_sbody), wheeld), flush=True)
             print("WHEEL_JOINTS %s" % json.dumps([names[i] for i in widx]), flush=True)
 
             ppo = PPOCfg(); ppo.seed, ppo.device = args.seed, args.device
