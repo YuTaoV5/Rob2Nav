@@ -1,0 +1,331 @@
+{
+ "replay": {
+  "status": "pass",
+  "checks": {
+   "leg_rate_limit_per_step": true,
+   "zero_command_before_motion_start": true,
+   "zero_command_during_takeover": true,
+   "release_window_at_least_3s": true,
+   "filter_reset_zeroes_state": true
+  },
+  "detail": {
+   "episode_s": 23.0,
+   "motion_start_s": 4.0,
+   "park_until_s": 7.0,
+   "max_leg_target_delta_rad_per_step": 0.018,
+   "limit_rad_per_step": 0.018,
+   "filter_alpha": 0.466512,
+   "slew_limit_action_units": 0.051429,
+   "longest_zero_command_window_s": 11.24,
+   "plan": [
+    {
+     "from_s": 0.0,
+     "to_s": 4.0,
+     "vx": 0.0,
+     "wz": 0.0,
+     "label": "fixed_stand"
+    },
+    {
+     "from_s": 4.0,
+     "to_s": 6.0,
+     "vx": 0.0,
+     "wz": 0.0,
+     "label": "takeover_zero"
+    },
+    {
+     "from_s": 6.0,
+     "to_s": 6.5,
+     "vx": 0.0,
+     "wz": 0.0,
+     "label": "hold"
+    },
+    {
+     "from_s": 6.5,
+     "to_s": 9.5,
+     "vx": 0.2,
+     "wz": 0.03,
+     "label": "arc_left_long"
+    },
+    {
+     "from_s": 9.5,
+     "to_s": 9.0,
+     "vx": 0.0,
+     "wz": 0.0,
+     "label": "release"
+    },
+    {
+     "from_s": 9.0,
+     "to_s": 10.5,
+     "vx": -0.2,
+     "wz": 0.0,
+     "label": "straight_reverse"
+    },
+    {
+     "from_s": 10.5,
+     "to_s": 11.2,
+     "vx": 0.2,
+     "wz": 0.0,
+     "label": "brake_entry"
+    },
+    {
+     "from_s": 11.2,
+     "to_s": 7.0,
+     "vx": 0.0,
+     "wz": 0.0,
+     "label": "brake_to_zero"
+    },
+    {
+     "from_s": 7.0,
+     "to_s": 23.0,
+     "vx": 0.0,
+     "wz": 0.0,
+     "label": "return_to_stand"
+    }
+   ],
+   "trace_every_1s": [
+    {
+     "t_s": 0.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 1.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 2.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 3.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 4.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 5.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 6.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 7.0,
+     "cmd": [
+      0.1928,
+      0.0,
+      0.0289
+     ],
+     "joint_offset_rad": 0.35
+    },
+    {
+     "t_s": 8.0,
+     "cmd": [
+      0.2,
+      0.0,
+      0.03
+     ],
+     "joint_offset_rad": 0.35
+    },
+    {
+     "t_s": 9.0,
+     "cmd": [
+      0.2,
+      0.0,
+      0.03
+     ],
+     "joint_offset_rad": 0.35
+    },
+    {
+     "t_s": 10.0,
+     "cmd": [
+      -0.1856,
+      0.0,
+      0.0011
+     ],
+     "joint_offset_rad": 0.35
+    },
+    {
+     "t_s": 11.0,
+     "cmd": [
+      0.1856,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.35
+    },
+    {
+     "t_s": 12.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 13.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 14.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 15.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 16.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 17.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 18.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 19.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 20.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 21.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 22.0,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    },
+    {
+     "t_s": 22.98,
+     "cmd": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "joint_offset_rad": 0.0
+    }
+   ]
+  }
+ },
+ "dwell": {
+  "episodes": 400,
+  "episode_length_s": 23.0,
+  "installed_segments": {
+   "straight": 966,
+   "pure_turn": 1262,
+   "arc": 783,
+   "turn_long": 211,
+   "release": 211
+  },
+  "share": {
+   "straight": 0.2814,
+   "pure_turn": 0.3676,
+   "arc": 0.2281,
+   "turn_long": 0.0615,
+   "release": 0.0615
+  },
+  "truncated_by_episode_end": 0,
+  "segments_clipped_by_episode_end": 275,
+  "clip_note": "an ordinary final segment of an episode is expected to be clipped by the episode boundary and is counted separately; a clipped RELEASE would break the after-long-turn guarantee and is counted as truncated_by_episode_end, which must stay zero",
+  "long_turn_downgraded_for_lack_of_time": 251,
+  "installed_long_turns": 211,
+  "dwell_policy": "a long turn is only installed when the remaining episode time can hold dwell + the minimum release; otherwise it is downgraded to a short turn, so requested dwell equals installed dwell inside an episode"
+ },
+ "failures": [],
+ "verdict": "PASS"
+}

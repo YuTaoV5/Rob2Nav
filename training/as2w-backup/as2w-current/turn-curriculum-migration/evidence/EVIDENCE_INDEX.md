@@ -55,8 +55,10 @@
 
 | 结论 | 证据 |
 | --- | --- |
-| `4096 × 24 = 98,304` 转移/迭代；400 迭代 = 39,321,600 环境步 = R4000 的 10% | `checks[env_step_budget]`；`evidence/dry_run_A.json` `budget` |
-| PPO 5 epochs × 4 minibatches、批量 24,576（从已安装 runner 配置**读取**） | `evidence/dry_run_*.json` → `budget.ppo_*`、`ppo_cfg_verified=true` |
+| `16000 × 128 = 2,048,000` 转移/迭代；3000 迭代 = **6,144,000,000** 环境步 = R4000 的 **15.625 倍** | `checks[env_step_budget]`；`evidence/dry_run_A.json` `budget` |
+| `num_steps_per_env=128` 可追溯到入口强制值（R4000 入口默认 24，两臂一致覆盖） | `checks[num_steps_traceable]`、`checks[install_path_wiring]` |
+| 离线状态序列回放：0.018000 rad/步、滤波复位、运动前/接管窗零命令、松杆零截断 | `evidence/replay.json`、`checks[replay_state_sequence]`、`checks[dwell_request_vs_installed]` |
+| PPO 5 epochs × 4 minibatches、批量 **512,000**（2,048,000/4，来自已安装 runner 配置） | `evidence/dry_run_*.json` → `budget.ppo_*`、`ppo_cfg_verified=true` |
 | A/B 结构占比相同，仅混合分支内容不同 | `checks[ab_structure_shared]` |
 | 未授权时拒跑；本阶段 `training_started=false` | `checks[phase_guard]`；`dry_run.py --run` 退出码 5 |
 | 两组完整启动命令与 PYTHONPATH | `evidence/dry_run_A.json`、`evidence/dry_run_B.json` → `launch_command`、`pythonpath`、`env` |
@@ -66,7 +68,8 @@
 ```bash
 cd /root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/turn-curriculum-migration
 PY="env -u PYTHONPATH -u LD_LIBRARY_PATH -u VIRTUAL_ENV -u PYTHONHOME /root/gpufree-data/mujoco-venv/bin/python"
-$PY scripts/selfcheck.py                 # 写 evidence/selfcheck.json，必须 SELFCHECK_PASS
+$PY scripts/replay_contract.py           # 写 evidence/replay.json，必须 REPLAY_PASS
+$PY scripts/selfcheck.py                 # 写 evidence/selfcheck.json，必须 SELFCHECK_PASS（含回放）
 $PY scripts/dry_run.py --arm A           # 写 evidence/dry_run_A.json
 $PY scripts/dry_run.py --arm B           # 写 evidence/dry_run_B.json
 ```

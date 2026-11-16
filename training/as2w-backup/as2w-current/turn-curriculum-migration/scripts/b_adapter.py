@@ -73,8 +73,12 @@ def make_b_class(base_cls):
             mixed = (self.kind[ids] >= MIXED_LO) & (self.kind[ids] < MIXED_HI)
             if not bool(mixed.any()):
                 return
-            for i in ids[mixed].tolist():
-                seg = self._ts.draw_segment(bool(self._pending_release[i].item()))
+            ep_s = float(getattr(self._env.cfg, "episode_length_s", 23.0))
+            remaining = ep_s - self._env.episode_length_buf[ids[mixed]].float() * self._env.step_dt
+            rem_list = remaining.tolist()
+            for pos, i in enumerate(ids[mixed].tolist()):
+                seg = self._ts.draw_segment(bool(self._pending_release[i].item()),
+                                            remaining_s=rem_list[pos])
                 self.targets[i, 0] = float(seg["vx"])
                 self.targets[i, 1] = 0.0
                 self.targets[i, 2] = float(seg["wz"])

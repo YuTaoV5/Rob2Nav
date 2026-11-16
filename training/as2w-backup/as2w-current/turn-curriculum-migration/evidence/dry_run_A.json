@@ -65,14 +65,14 @@
   "wrapper_leg_prescale_rad_per_unit": 0.18
  },
  "budget": {
-  "num_envs": 4096,
-  "num_steps_per_env": 24,
-  "iterations": 400,
-  "transitions_per_iteration": 98304,
-  "total_env_steps": 39321600,
+  "num_envs": 16000,
+  "num_steps_per_env": 128,
+  "iterations": 3000,
+  "transitions_per_iteration": 2048000,
+  "total_env_steps": 6144000000,
   "ppo_epochs": 5,
   "ppo_minibatches": 4,
-  "ppo_minibatch_size": 24576,
+  "ppo_minibatch_size": 512000,
   "ppo_cfg_verified": true
  },
  "curriculum": {
@@ -163,7 +163,7 @@
  },
  "launch_command": [
   "/isaac-sim/python.sh",
-  "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/runs/rolling/filtered-4000-env4096-stage020.ovvRL3/source/train_as2w_isaac_robust.py",
+  "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/turn-curriculum-migration/scripts/train_ab_entry.py",
   "--viz",
   "none",
   "--device",
@@ -194,9 +194,9 @@
   "--urdf",
   "/root/gpufree-data/Rob2Nav/training/as2w-backup/dependencies/unitree_ros_as2w/robots/as2w_description/as2w.urdf",
   "--num-envs",
-  "4096",
+  "16000",
   "--iterations",
-  "400",
+  "3000",
   "--out",
   "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/turn-curriculum-migration/work/A_nominal_r4000_curriculum",
   "--checkpoint",
@@ -207,9 +207,14 @@
   "5e-05"
  ],
  "pythonpath": [
+  "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/turn-curriculum-migration/scripts",
   "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/runs/rolling/filtered-4000-env4096-stage020.ovvRL3/source"
  ],
- "env": {},
+ "env": {
+  "AS2W_R4000_SNAPSHOT": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/runs/rolling/filtered-4000-env4096-stage020.ovvRL3/source",
+  "AS2W_AB_ARM": "A",
+  "AS2W_AB_NUM_STEPS": "128"
+ },
  "out_dir": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/turn-curriculum-migration/work/A_nominal_r4000_curriculum",
  "selfcheck": "passed"
 }

@@ -119,7 +119,7 @@ class TurnSchedule:
         raise ValueError("unknown category %r" % (category,))
 
     # ---- segment -----------------------------------------------------------------
-    def draw_segment(self, pending_release: bool = False) -> dict:
+    def draw_segment(self, pending_release: bool = False, remaining_s: float | None = None) -> dict:
         """Draw one segment.
 
         ``pending_release`` is the caller's per-environment state: True means the previous segment was a
@@ -127,19 +127,42 @@ class TurnSchedule:
         the adapter needs, including the dwell the environment should actually use.
         """
         if pending_release:
+            dwell = _u(self.rng, *self.p["release_s"])
+            ready = remaining_s is None or dwell <= remaining_s
+            if not ready:
+                dwelling = max(remaining_s, 0.02)
+            else:
+                dwelling = dwell
             return {
                 "category": "release",
                 "is_release": True,
                 "is_turn_long": False,
                 "vx": 0.0,
                 "wz": 0.0,
-                "dwell_s": _u(self.rng, *self.p["release_s"]),
+                "dwell_s": dwelling,
+                "requested_dwell_s": dwell,
+                "truncated_by_episode_end": not ready,
+                "clipped_at_episode_end": False,
+                "downgraded_from": None,
                 "next_pending_release": False,
             }
         category = self.draw_category()
         vx, wz = self.draw_command(category)
         is_long = category == "turn_long"
         dwell = _u(self.rng, *self.p["turn_long_dwell_s"]) if is_long else _u(self.rng, *DWELL_SHORT_S)
+        downgraded_from = None
+        # A sustained turn that cannot also fit its release inside the remaining episode time would be
+        # silently truncated, so it is downgraded to a short turn instead.  This keeps requested dwell
+        # equal to installed dwell and is reported, not hidden.
+        if is_long and remaining_s is not None and dwell + self.p["release_s"][1] > remaining_s:
+            downgraded_from = "turn_long"
+            category, is_long = "pure_turn", False
+            vx, wz = 0.0, _sign(self.rng) * _u(self.rng, WZ_FLOOR_RAD_S, WZ_CAP_RAD_S)
+            dwell = min(_u(self.rng, *DWELL_SHORT_S), max(0.02, remaining_s))
+        clipped = False
+        if remaining_s is not None and dwell > remaining_s:
+            clipped = True
+            dwell = max(0.02, remaining_s)
         return {
             "category": category,
             "is_release": False,
@@ -147,6 +170,10 @@ class TurnSchedule:
             "vx": vx,
             "wz": wz,
             "dwell_s": dwell,
+            "requested_dwell_s": dwell,
+            "truncated_by_episode_end": False,
+            "clipped_at_episode_end": clipped,
+            "downgraded_from": downgraded_from,
             "next_pending_release": is_long,
         }
 

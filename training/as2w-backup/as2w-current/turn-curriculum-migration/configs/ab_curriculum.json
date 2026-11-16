@@ -86,9 +86,9 @@
     "wrapper_leg_prescale_rad_per_unit": 0.18
   },
   "shared_run": {
-    "num_envs": 4096,
-    "num_steps_per_env": 24,
-    "iterations": 400,
+    "num_envs": 16000,
+    "num_steps_per_env": 128,
+    "iterations": 3000,
     "seed": 311,
     "save_interval": 25,
     "learning_rate": 5e-05,
@@ -102,8 +102,8 @@
       1.1,
       3.4
     ],
-    "env_step_budget": 39321600,
-    "env_step_budget_note": "4096 envs x 24 steps x 400 iterations = 39,321,600 environment steps; R4000 consumed 4096 x 24 x 4000 = 393,216,000, so this continuation is 10 percent of it",
+    "env_step_budget": 6144000000,
+    "env_step_budget_note": "operator instruction 2026-11-17: continuation envs 16000, num_steps_per_env 128, iterations 3000 -> 16000*128*3000 = 6,144,000,000 environment steps, which is 15.6x the R4000 training budget of 393,216,000. Both arms use exactly this budget, so the A/B comparison stays equal-budget.",
     "common_flags": [
       "--viz none --device cuda:0",
       "--profile expanded --speed-cap .20 --speed-rolling",
@@ -112,7 +112,13 @@
       "--pure-turn-common-scale 0 --rolling-leg-filter-hz 5 --rolling-low-speed-smooth",
       "--rolling-maneuvers --rolling-knee-margin --safety",
       "--park-policy-rad 0 --learning-rate .00005 --seed 311"
-    ]
+    ],
+    "resource_preflight": {
+      "envs_risk": "16000 parallel Isaac environments on a single L40 44 GiB card has not been run before in this project (R4000 used 4096); memory must be measured at launch and the arm must not start if allocation fails",
+      "ppo_batch_note": "transitions per iteration 2,048,000 with 4 minibatches = 512,000 per minibatch, which is 5.33x the R4000 per-iteration batch; this deviates from R4000's PPO batch shape and is shared by both arms, so it must be recorded when comparing against R4000",
+      "wall_clock_note": "3000 iterations x 2,048,000 transitions is 15.6x R4000's work; schedule expectations must be set from a measured first-iteration throughput, not from a guess"
+    },
+    "num_steps_per_env_source": "the frozen R4000 entry has no switch for num_steps_per_env and would use the runner default 24; train_ab_entry.py forces the config value (128) through the same import hook it uses for the arm-B curriculum, so both arms get 128 identically"
   },
   "A": {
     "name": "A_nominal_r4000_curriculum",

@@ -352,10 +352,11 @@ def check_out_of_range_request(cfg, results):
 
 
 def check_install_path(cfg, results):
-    """The B install must not rewrite any R4000 snapshot file."""
+    """The shared entry must patch only the runner step count and (arm B) the curriculum class, and it must
+    not rewrite any R4000 snapshot file."""
     snap = Path(cfg["provenance"]["run_dir"]) / "source"
     adapter = HERE / "b_adapter.py"
-    entry = HERE / "train_b_entry.py"
+    entry = HERE / "train_ab_entry.py"
     if not snap.is_dir() or not adapter.is_file() or not entry.is_file():
         results.append(bad("install_path_files", "missing snapshot %s or adapter %s / entry %s"
                            % (snap, adapter, entry)))
@@ -364,22 +365,36 @@ def check_install_path(cfg, results):
     e_src = entry.read_text(encoding="utf-8")
     tree_a = ast.parse(a_src)
     tree_e = ast.parse(e_src)
-    uses_ts = any(isinstance(n, ast.Attribute) and n.attr in ("draw_segment",)
-                  for n in ast.walk(tree_a))
-    calls_ts_ctor = "TurnSchedule(" in a_src
-    rebinds = ("sr.RollingSpeedCommands = make_b_class(base)" in e_src
-               or "RollingSpeedCommands = make_b_class" in e_src)
-    runs_snapshot = "runpy.run_path(entry" in e_src
-    if not (uses_ts and calls_ts_ctor and rebinds and runs_snapshot):
-        results.append(bad("install_path_wiring",
-                           "adapter uses TurnSchedule=%s, entry rebinds=%s runs snapshot=%s"
-                           % (uses_ts, rebinds, runs_snapshot)))
+
+    uses_ts = any(isinstance(n, ast.Attribute) and n.attr == "draw_segment" for n in ast.walk(tree_a))
+    wires = {
+        "adapter_calls_turnschedule": uses_ts and "TurnSchedule(" in a_src,
+        "entry_installs_import_hook": "builtins.__import__" in e_src and "hooked_import" in e_src,
+        "entry_forces_num_steps": "num_steps_per_env = int(num_steps)" in e_src
+                                  and "AS2W_AB_NUM_STEPS" in e_src,
+        "entry_rebinds_b_curriculum": "make_b_class(base)" in e_src
+                                      and "RollingSpeedCommands = " in e_src,
+        "entry_runs_frozen_entry": "runpy.run_path(entry" in e_src,
+        "entry_arm_switch": "AS2W_AB_ARM" in e_src,
+    }
+    broken = [k for k, v in wires.items() if not v]
+    if broken:
+        results.append(bad("install_path_wiring", "failed: %s" % broken, wiring=wires))
     else:
         results.append(ok("install_path_wiring",
-                          "B entry rebinds only as2w_isaac_speed_range.RollingSpeedCommands and runs the frozen "
-                          "entry with runpy; adapter calls TurnSchedule.draw_segment"))
-    # adapter must not touch the observation function, the action wrapper or the leg filter.  Inspect the
-    # AST so a docstring that merely names them cannot fail the check, and so a real reference cannot hide.
+                          "one shared entry for both arms: import hook (post-simulation), forced "
+                          "num_steps_per_env, B-only curriculum rebinding, frozen entry executed with runpy",
+                          wiring=wires))
+
+    declared_steps = int(cfg["shared_run"]["num_steps_per_env"])
+    if ("AS2W_AB_NUM_STEPS" not in e_src) or str(declared_steps) not in e_src:
+        results.append(bad("num_steps_traceable",
+                           "config declares %d steps but the entry does not carry it" % declared_steps))
+    else:
+        results.append(ok("num_steps_traceable",
+                          "config num_steps_per_env=%d is the value the entry forces into the runner config"
+                          % declared_steps))
+
     forbidden_names = {"robust_observation", "observation", "rolling_fixed_exit", "filter_leg_residual"}
     referenced = set()
     for node in ast.walk(tree_a):
@@ -387,11 +402,8 @@ def check_install_path(cfg, results):
             referenced.add(node.attr)
         elif isinstance(node, ast.Name) and node.id in forbidden_names:
             referenced.add(node.id)
-        elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id in forbidden_names:
-            referenced.add(node.func.id)
-    forbidden = sorted(referenced)
-    if forbidden:
-        results.append(bad("install_path_no_wrapper_touch", "adapter mentions %s" % forbidden))
+    if referenced:
+        results.append(bad("install_path_no_wrapper_touch", "adapter references %s" % sorted(referenced)))
     else:
         results.append(ok("install_path_no_wrapper_touch",
                           "adapter references neither the observation function, the action wrapper nor the leg filter"))
@@ -508,6 +520,39 @@ def check_torque_from_source(cfg, snapshot, results):
                           % (frac, derived), fraction=frac, derived=derived, urdf=str(urdf)))
 
 
+def check_replay(cfg, results):
+    """Replay the state machine and the leg pipeline offline, and report dwell request vs installed."""
+    import replay_contract
+
+    rep = replay_contract.replay(cfg, verbose=False)
+    dw = replay_contract.dwell_report(cfg)
+    if rep["status"] != "pass":
+        results.append(bad("replay_state_sequence",
+                           "failed checks: %s" % [k for k, v in rep["checks"].items() if not v],
+                           replay=rep))
+    else:
+        results.append(ok("replay_state_sequence",
+                          "fixed stand -> takeover -> motion -> release -> brake -> return to stand replayed; "
+                          "max leg target delta %.6f rad/step (limit %.6f)"
+                          % (rep["detail"]["max_leg_target_delta_rad_per_step"],
+                             rep["detail"]["limit_rad_per_step"]), replay=rep))
+    dwell_ok = (dw["truncated_by_episode_end"] == 0 and dw["installed_long_turns"] > 0
+                and dw["long_turn_downgraded_for_lack_of_time"] > 0)
+    if dwell_ok:
+        results.append(ok("dwell_request_vs_installed",
+                          "installed %s; release truncations 0 (%d ordinary segments clipped at episode end); "
+                          "%d long turns downgraded because the remaining episode time could not hold "
+                          "dwell + the maximum release"
+                          % (dw["installed_segments"], dw.get("segments_clipped_by_episode_end", 0),
+                             dw["long_turn_downgraded_for_lack_of_time"]), dwell=dw))
+    else:
+        results.append(bad("dwell_request_vs_installed",
+                           "truncated=%d installed_long=%d downgraded=%d"
+                           % (dw["truncated_by_episode_end"], dw["installed_long_turns"],
+                              dw["long_turn_downgraded_for_lack_of_time"]), dwell=dw))
+    return rep, dw
+
+
 def check_shared_budget(cfg, results):
     s = cfg["shared_run"]
     batch = s["num_envs"] * s["num_steps_per_env"]
@@ -583,6 +628,8 @@ def main() -> int:
     check_install_path(cfg, results)
     check_wrapper_readback(cfg, results)
     check_torque_from_source(cfg, snapshot, results)
+    rep, dwell = check_replay(cfg, results)
+    replay_payload = {"replay": rep, "dwell": dwell}
     check_shared_budget(cfg, results)
 
     payload = {
@@ -593,6 +640,7 @@ def main() -> int:
         "failures": FAILS,
         "skips": SKIPS,
         "extracted_contract": fact,
+        "replay": replay_payload,
         "b_statistics": st,
         "r4000_reference": ref,
         "verdict": "PASS" if not FAILS else "FAIL",

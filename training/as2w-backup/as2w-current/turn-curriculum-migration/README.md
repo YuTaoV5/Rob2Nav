@@ -13,10 +13,12 @@
 | `configs/ab_curriculum.json` | 单一事实源：起点、合同、共享预算、A 课程、B 课程、差异清单、越界请求处理 |
 | `scripts/turn_schedule.py` | B 课程决策核心（纯 Python，可离线运行，被自检直接验证） |
 | `scripts/b_adapter.py` | 环境适配器：把 `TurnSchedule` 的决策映射到每环境张量，不新增采样逻辑 |
-| `scripts/train_b_entry.py` | B 入口：只重绑定 `as2w_isaac_speed_range.RollingSpeedCommands`，再用 runpy 跑**未改动的** R4000 入口 |
-| `scripts/selfcheck.py` | 离线自检（16 项全过才允许启动） |
+| `scripts/train_ab_entry.py` | **两臂共用入口**：import 钩子在仿真启动后强制 `num_steps_per_env`，B 另重绑定 `RollingSpeedCommands`，再用 runpy 跑**未改动的** R4000 入口 |
+| `scripts/selfcheck.py` | 离线自检（18 项全过才允许启动） |
+| `scripts/replay_contract.py` | 离线回放：状态序列、滤波复位、0.018 rad/步、驻留截断归因 |
 | `scripts/dry_run.py` | dry-run 打印 + 受控启动器 |
-| `evidence/selfcheck.json` | 自检结果与从源码抽取的合同事实 |
+| `evidence/selfcheck.json` | 自检结果（18 项）与从源码抽取的合同事实 |
+| `evidence/replay.json` | 离线状态序列回放与驻留请求/实际/截断统计 |
 | `evidence/dry_run_A.json`、`evidence/dry_run_B.json` | 两组 dry-run 记录（含完整启动命令） |
 | `evidence/EVIDENCE_INDEX.md` | 证据索引：每条结论对应哪个文件/行/命令 |
 
@@ -113,7 +115,33 @@ $PY scripts/dry_run.py --arm A --run
 $PY scripts/dry_run.py --arm B --run
 ```
 
-dry-run 输出要点：`4096 × 24 = 98,304` 转移/迭代，400 迭代 = **39,321,600 环境步**（R4000 的 10%）；PPO 5 epochs × 4 minibatches（批量 24,576，从已安装 runner 配置**读取**而非假设）。
+离线状态序列回放：
+
+```bash
+$PY scripts/replay_contract.py     # 写 evidence/replay.json
+```
+
+dry-run 输出要点（按操作员 2026-11-17 指定预算）：`16000 × 128 = 2,048,000` 转移/迭代（128 由 `train_ab_entry.py` 显式强制；R4000 入口本身没有该开关，默认是 24，两臂强制值相同），3000 迭代 = **6,144,000,000 环境步**（R4000 的 **15.625 倍**）；PPO 5 epochs × 4 minibatches（**批量 512,000**，从已安装 runner 配置读取而非假设）。两组完全同预算。
+
+**两点必须提前记录的偏离/风险**（不是缺陷，但会影响与 R4000 的可比性和启动可行性）：
+
+- **PPO 批量形变**：每迭代 2,048,000 转移是 R4000 的 5.33 倍（R4000 为 4096×24=98,304）。两组共享同一批量，所以 A/B 对照仍然干净；但**与 R4000 原基线本身的横向比较要注明批量已变**。
+- **16000 并行环境在单张 L40 44 GiB 上从未跑过**（本项目历史最大 4096）。启动前必须先测显存，分配失败时该臂**不得启动**；3000 迭代的总工作量是 R4000 的 15.625 倍，工期预期要用实测首轮吞吐推算，不能估算。
+
+## 6b. 离线状态序列回放（fixed stand → 接管 → 运动 → 松杆 → Brake → 回站）
+
+`scripts/replay_contract.py`（无仿真器，纯 torch/纯 Python）复刻 R4000 的腿流水线：5 Hz 一阶残差滤波（α=0.4665）→ 限速（`.9*dt/.35` 动作单位，×0.35）→ 关节目标；并按 `TakeoverCommands`（前 100 步零指令）、`as2w_motion_start_s=4`、`park_until_s=7`、命令滤波 lerp 0.12 与死区（0.008 m/s、0.024 rad/s）回放整条状态序列。自检结论：
+
+| 项 | 结果 |
+| --- | --- |
+| 稳态腿目标每步变化 | **0.018000 rad/步**，等于 0.9 rad/s × 0.02 s 的限值（不是"小于"而是正好被限住） |
+| 运动前 / 接管窗口内的非零命令 | 0 帧 |
+| 松杆窗口 | 最长 11.24 s 零指令（脚本序列中的 release+brake+回站区间） |
+| 滤波与限速状态复位 | `reset()` 后 `filtered/slewed/joint_offset` 全为 0，与 `_reset_idx` 一致 |
+
+**驻留请求 vs 实际（23 s 回合，400 回合）**：安装段 `{straight 966, pure_turn 1262, arc 783, turn_long 211, release 211}`；**松杆被回合末尾截断 = 0**；普通末段被回合边界裁剪 275 次（预期行为，单独统计）；因"剩余回合时间装不下 dwell + 最大松杆"而**降级为短转 251 次**。
+
+这里暴露一个必须报告的课程设计张力：**8–12 s 长转 + 3.5 s 松杆与 23 s 回合长度相冲突**，约一半长转抽样会被降级（实际约 0.53 个长转/回合）。本阶段的处理是**宁可降级也不截断**，从而保证"每个安装的长转后必有完整松杆"；若要让长转密度更高，需要**两臂同时**延长回合长度或缩短反应窗口——那是独立的一步，不能在 B 里偷偷改。
 
 ## 8. 训练授权后的评测协议（已写入配置，本阶段不执行）
 
@@ -127,6 +155,8 @@ dry-run 输出要点：`4096 × 24 = 98,304` 转移/迭代，400 迭代 = **39,3
 4. **`--rolling-maneuvers` 的对称增强**（`mirror_flat` + mirror loss 0.15）对 B 的双向弧线是否等价，需在首轮日志确认镜像样本未引入左偏。
 5. **实机 DDS 槽位/符号/零位**仍未映射（沿用既有结论），不影响仿真续训，但阻塞闭环。
 6. **`FRACTION` 抽取**依赖 `as2w_training_safety.py` 的写法；若上游改写法，自检会变 SKIP 而不是假装通过。
+7. **16000 env 显存预检**未做（本阶段禁止 GPU 压测）：启动前必须实测，分配失败则该臂不得启动。
+8. **回合长度 vs 长转驻留**的张力（见 6b）：当前策略是降级而不是截断，长转实际密度约 0.53/回合；若要提高需两臂同时改回合长度，单独验证。
 
 ## 10. 停止条件
 

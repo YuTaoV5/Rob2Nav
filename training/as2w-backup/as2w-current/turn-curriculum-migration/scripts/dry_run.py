@@ -75,17 +75,14 @@ def strip_flags(argv, names):
 
 
 def arm_command(cfg, arm, out_dir):
+    """Both arms go through the same entry, so only the curriculum differs."""
     s = cfg["shared_run"]
     snapshot = str(Path(cfg["provenance"]["run_dir"]) / "source")
     common = strip_flags(shlex.split(" ".join(s["common_flags"])),
-                     {"--seed", "--learning-rate", "--num-envs", "--iterations", "--out",
-                      "--checkpoint", "--usd", "--urdf"})
-    if arm == "A":
-        entry = str(Path(snapshot) / "train_as2w_isaac_robust.py")
-        py_path = [snapshot]
-    else:
-        entry = str(HERE / "train_b_entry.py")
-        py_path = [str(HERE), snapshot]
+                         {"--seed", "--learning-rate", "--num-envs", "--iterations", "--out",
+                          "--checkpoint", "--usd", "--urdf"})
+    entry = str(HERE / "train_ab_entry.py")
+    py_path = [str(HERE), snapshot]
     cmd = [ISAAC, entry] + common + [
         "--usd", USD, "--urdf", URDF,
         "--num-envs", str(s["num_envs"]),
@@ -95,9 +92,12 @@ def arm_command(cfg, arm, out_dir):
         "--seed", str(s["seed"]),
         "--learning-rate", str(s["learning_rate"]),
     ]
-    env = {}
+    env = {
+        "AS2W_R4000_SNAPSHOT": snapshot,
+        "AS2W_AB_ARM": arm,
+        "AS2W_AB_NUM_STEPS": str(int(s["num_steps_per_env"])),
+    }
     if arm == "B":
-        env["AS2W_R4000_SNAPSHOT"] = snapshot
         env["AS2W_TURN_B_SEED"] = str(s["seed"])
     return cmd, py_path, env
 
@@ -197,7 +197,8 @@ def main() -> int:
     # ---- 4. budget --------------------------------------------------------------------------
     s = cfg["shared_run"]
     pb = ppo_batch()
-    steps = pb["num_steps_per_env"] or s["num_steps_per_env"]
+    # the config value is authoritative: train_ab_entry.py forces exactly this into the runner config
+    steps = int(s["num_steps_per_env"])
     batch = s["num_envs"] * steps
     total = batch * s["iterations"]
     print_block("PPO batch and environment-step budget")
@@ -206,6 +207,8 @@ def main() -> int:
     print("  iterations                     %d" % s["iterations"])
     print("  total environment steps        %d  (R4000 used 393,216,000 = %.3f of it)"
           % (total, total / 393216000.0))
+    print("  num_steps_per_env source       config value forced by train_ab_entry.py "
+          "(R4000 runner default is %s, override is identical in both arms)" % pb["num_steps_per_env"])
     print("  PPO cfg source                 %s" % pb["source"])
     print("  PPO cfg verified from source   %s   epochs=%s minibatches=%s"
           % (pb["verified"], pb["num_learning_epochs"], pb["num_mini_batches"]))
