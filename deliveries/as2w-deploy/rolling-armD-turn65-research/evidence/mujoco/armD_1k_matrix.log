@@ -1,0 +1,33 @@
+mujoco 3.12.0  dt=0.000625  substeps=32  step_dt=0.0200
+actor layers: [[128, 65], [128, 128], [128, 128], [16, 128]]
+
+-- stand state settle=3.0s --
+/root/gpufree-data/Rob2Nav/deliveries/as2w-deploy/rolling-armD-turn65-research/runtime/r11_mj_matrix_v2.py:240: UserWarning: Creating a tensor from a list of numpy.ndarrays is extremely slow. Please consider converting the list to a single numpy.ndarray with numpy.array() before converting to a tensor. (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:253.)
+  prev = act(torch.tensor([o], dtype=torch.float32))[0].numpy()
+   hold               PASS            sup=1.000 up=0.999 term=0 nw=0 vx=-0.0005 wz=-0.0035 trk=-/- exec=0.278
+   turn_left_0.05     INVALID_STAGE1  sup=0.747 up=0.994 term=0 nw=0 vx=-0.0032 wz=+0.0682 trk=-/+1.36 exec=0.739
+   turn_right_0.05    FAIL            sup=1.000 up=0.991 term=0 nw=0 vx=-0.0028 wz=-0.0331 trk=-/+0.66 exec=1.987
+   turn_left_0.10     INVALID_STAGE1  sup=0.387 up=0.987 term=1 nw=51 vx=+0.0027 wz=+0.1549 trk=-/+1.55 exec=0.608
+   turn_right_0.10    INVALID_STAGE1  sup=0.447 up=0.994 term=0 nw=0 vx=-0.0531 wz=-0.0754 trk=-/+0.75 exec=0.682
+   straight_fwd_0.25  PASS            sup=1.000 up=0.993 term=0 nw=0 vx=+0.2762 wz=+0.0050 trk=+1.10/- exec=0.992
+   straight_bwd_0.25  PASS            sup=1.000 up=0.998 term=0 nw=0 vx=-0.2690 wz=-0.0010 trk=+1.08/- exec=0.948
+   arc_left_0.25      FAIL            sup=1.000 up=0.995 term=0 nw=0 vx=+0.2518 wz=+0.0314 trk=+1.01/+0.63 exec=1.322
+   arc_right_0.25     PASS            sup=1.000 up=0.990 term=0 nw=0 vx=+0.2353 wz=-0.0547 trk=+0.94/+1.09 exec=0.828
+   brake_fwd_0.25     PASS            sup=1.000 up=0.990 term=0 nw=0 vx=-0.0004 wz=-0.0108 trk=-0.00/- exec=0.165
+   brake_bwd_0.25     PASS            sup=1.000 up=0.998 term=0 nw=0 vx=+0.0062 wz=+0.0011 trk=-0.02/- exec=1.509
+
+=== MuJoCo summary (pass on ALL 1 states) ===
+  hold               PASS   yaw=- vx=-
+  turn_left_0.05     FAIL   yaw=[+1.36,+1.36] vx=-
+  turn_right_0.05    FAIL   yaw=[+0.66,+0.66] vx=-
+  turn_left_0.10     FAIL   yaw=[+1.55,+1.55] vx=-
+  turn_right_0.10    FAIL   yaw=[+0.75,+0.75] vx=-
+  straight_fwd_0.25  PASS   yaw=- vx=[+1.10,+1.10]
+  straight_bwd_0.25  PASS   yaw=- vx=[+1.08,+1.08]
+  arc_left_0.25      FAIL   yaw=[+0.63,+0.63] vx=[+1.01,+1.01]
+  arc_right_0.25     PASS   yaw=[+1.09,+1.09] vx=[+0.94,+0.94]
+  brake_fwd_0.25     PASS   yaw=- vx=[-0.00,-0.00]
+  brake_bwd_0.25     PASS   yaw=- vx=[-0.02,-0.02]
+  ==> 6/11 cases pass on all states
+
+MJ_MATRIX_V2_DONE

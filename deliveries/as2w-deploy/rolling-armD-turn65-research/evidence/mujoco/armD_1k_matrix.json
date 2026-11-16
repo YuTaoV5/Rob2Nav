@@ -1,0 +1,369 @@
+{
+ "simulator": "mujoco",
+ "version": "3.12.0",
+ "checkpoint": "/root/gpufree-data/Rob2Nav/deliveries/as2w-deploy/rolling-armD-turn65-research/weights/armD_turn65_final.pt",
+ "contract": {
+  "timestep": 0.000625,
+  "substeps": 32,
+  "step_dt": 0.02,
+  "wrapper": {
+   "diff_gain": 0.0,
+   "diff_cap": 0.5,
+   "yaw_kp": 60.0,
+   "ff_cap": 4.0,
+   "ff_gain": 0.0,
+   "S_vector": [
+    -1.0,
+    1.0,
+    -1.0,
+    1.0
+   ],
+   "wz_sample": "body-frame qvel[5], once per 20 ms policy step",
+   "torque_clamp_nm": 13.5,
+   "note": "ff is added to the kd law and the SUM is clamped at +-13.5 Nm, same as the Isaac actuator"
+  },
+  "wheel_kd": 6.0,
+  "wheel_limit": 13.5,
+  "leg_kp": 55.0,
+  "leg_kd": 2.0,
+  "leg_scale": 0.35,
+  "wheel_scale": 16.0,
+  "clip": 6.0,
+  "base_z_init": 0.381395,
+  "mjcf_timestep_overridden": true
+ },
+ "gates": {
+  "hold": [
+   0.02,
+   0.02
+  ],
+  "track_band": [
+   0.7,
+   1.3
+  ],
+  "support": 0.95,
+  "upright": 0.85,
+  "brake_vx": 0.02,
+  "tail_s": 3.0,
+  "load_n": 5.0,
+  "load_z_n": 2.0
+ },
+ "states": [
+  3.0
+ ],
+ "cases": {
+  "hold": [
+   {
+    "cmd": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "settle_base_z": 0.3603181594467305,
+    "vx_tail": -0.0004717583236452011,
+    "wz_tail": -0.00353191576090542,
+    "ddq_target_tail": -0.29126671522855757,
+    "ddq_measured_tail": 0.005713088799647258,
+    "support_tail": 1.0,
+    "support_all": 1.0,
+    "upright_min": 0.9994029603384507,
+    "terminated": 0,
+    "nonwheel_hits": 0,
+    "exec_tail": 0.2775491414651285,
+    "app_ddq_tail": -0.29126671522855757,
+    "meas_ddq_tail": 0.005713088799647258,
+    "unloaded_frac_z2n_tail": 0.0,
+    "unloaded_frac_norm5n_tail": 0.0,
+    "verdict": "PASS",
+    "reason": "ok",
+    "settle_s": 3.0
+   }
+  ],
+  "turn_left_0.05": [
+   {
+    "cmd": [
+     0.0,
+     0.0,
+     0.05
+    ],
+    "settle_base_z": 0.3603181594467305,
+    "vx_tail": -0.003194907227648256,
+    "wz_tail": 0.06817096354728196,
+    "ddq_target_tail": 1.127786132891973,
+    "ddq_measured_tail": 0.4050923407832563,
+    "support_tail": 0.7466666666666667,
+    "support_all": 0.8566666666666667,
+    "upright_min": 0.9942718627725481,
+    "terminated": 0,
+    "nonwheel_hits": 0,
+    "exec_tail": 0.7389048874023608,
+    "app_ddq_tail": 1.127786132891973,
+    "meas_ddq_tail": 0.4050923407832563,
+    "unloaded_frac_z2n_tail": 0.06333333333333334,
+    "unloaded_frac_norm5n_tail": 0.06333333333333334,
+    "yaw_track": 1.363419270945639,
+    "verdict": "INVALID_STAGE1",
+    "reason": "stage1",
+    "settle_s": 3.0
+   }
+  ],
+  "turn_right_0.05": [
+   {
+    "cmd": [
+     0.0,
+     0.0,
+     -0.05
+    ],
+    "settle_base_z": 0.3603181594467305,
+    "vx_tail": -0.0028066132813341646,
+    "wz_tail": -0.033116493593566707,
+    "ddq_target_tail": -0.2643401006857554,
+    "ddq_measured_tail": -0.525537079558484,
+    "support_tail": 1.0,
+    "support_all": 1.0,
+    "upright_min": 0.9910744753479747,
+    "terminated": 0,
+    "nonwheel_hits": 0,
+    "exec_tail": 1.9865372285304235,
+    "app_ddq_tail": -0.2643401006857554,
+    "meas_ddq_tail": -0.525537079558484,
+    "unloaded_frac_z2n_tail": 0.0,
+    "unloaded_frac_norm5n_tail": 0.0,
+    "yaw_track": 0.6623298718713341,
+    "verdict": "FAIL",
+    "reason": "yaw",
+    "settle_s": 3.0
+   }
+  ],
+  "turn_left_0.10": [
+   {
+    "cmd": [
+     0.0,
+     0.0,
+     0.1
+    ],
+    "settle_base_z": 0.3603181594467305,
+    "vx_tail": 0.0027092267975353853,
+    "wz_tail": 0.15486759042530088,
+    "ddq_target_tail": 1.0669154540697734,
+    "ddq_measured_tail": 0.789813229357226,
+    "support_tail": 0.38666666666666666,
+    "support_all": 0.6216666666666667,
+    "upright_min": 0.9871733719390547,
+    "terminated": 1,
+    "nonwheel_hits": 51,
+    "exec_tail": 0.6083162849158407,
+    "app_ddq_tail": 1.0669154540697734,
+    "meas_ddq_tail": 0.789813229357226,
+    "unloaded_frac_z2n_tail": 0.18666666666666668,
+    "unloaded_frac_norm5n_tail": 0.19,
+    "yaw_track": 1.5486759042530087,
+    "verdict": "INVALID_STAGE1",
+    "reason": "stage1",
+    "settle_s": 3.0
+   }
+  ],
+  "turn_right_0.10": [
+   {
+    "cmd": [
+     0.0,
+     0.0,
+     -0.1
+    ],
+    "settle_base_z": 0.3603181594467305,
+    "vx_tail": -0.053140157969754444,
+    "wz_tail": -0.07542618708344644,
+    "ddq_target_tail": -2.326514244576295,
+    "ddq_measured_tail": -2.059283229319474,
+    "support_tail": 0.44666666666666666,
+    "support_all": 0.8416666666666667,
+    "upright_min": 0.994006074770256,
+    "terminated": 0,
+    "nonwheel_hits": 0,
+    "exec_tail": 0.6817020608290271,
+    "app_ddq_tail": -2.326514244576295,
+    "meas_ddq_tail": -2.059283229319474,
+    "unloaded_frac_z2n_tail": 0.165,
+    "unloaded_frac_norm5n_tail": 0.16833333333333333,
+    "yaw_track": 0.7542618708344643,
+    "verdict": "INVALID_STAGE1",
+    "reason": "stage1",
+    "settle_s": 3.0
+   }
+  ],
+  "straight_fwd_0.25": [
+   {
+    "cmd": [
+     0.25,
+     0.0,
+     0.0
+    ],
+    "settle_base_z": 0.3603181594467305,
+    "vx_tail": 0.2762240009373344,
+    "wz_tail": 0.004951403082598554,
+    "ddq_target_tail": 0.4360557699203491,
+    "ddq_measured_tail": 0.16583274683411692,
+    "support_tail": 1.0,
+    "support_all": 0.9983333333333333,
+    "upright_min": 0.9927891321248921,
+    "terminated": 0,
+    "nonwheel_hits": 0,
+    "exec_tail": 0.9916926960918775,
+    "app_ddq_tail": 0.4360557699203491,
+    "meas_ddq_tail": 0.16583274683411692,
+    "unloaded_frac_z2n_tail": 0.0,
+    "unloaded_frac_norm5n_tail": 0.0,
+    "vx_track": 1.1048960037493376,
+    "verdict": "PASS",
+    "reason": "ok",
+    "settle_s": 3.0
+   }
+  ],
+  "straight_bwd_0.25": [
+   {
+    "cmd": [
+     -0.25,
+     0.0,
+     0.0
+    ],
+    "settle_base_z": 0.3603181594467305,
+    "vx_tail": -0.26898867819850897,
+    "wz_tail": -0.0010474774088102723,
+    "ddq_target_tail": -0.09653824965159098,
+    "ddq_measured_tail": -0.05007982336204984,
+    "support_tail": 1.0,
+    "support_all": 0.9966666666666667,
+    "upright_min": 0.998471073544059,
+    "terminated": 0,
+    "nonwheel_hits": 0,
+    "exec_tail": 0.948481053502965,
+    "app_ddq_tail": -0.09653824965159098,
+    "meas_ddq_tail": -0.05007982336204984,
+    "unloaded_frac_z2n_tail": 0.0,
+    "unloaded_frac_norm5n_tail": 0.0,
+    "vx_track": 1.0759547127940359,
+    "verdict": "PASS",
+    "reason": "ok",
+    "settle_s": 3.0
+   }
+  ],
+  "arc_left_0.25": [
+   {
+    "cmd": [
+     0.25,
+     0.0,
+     0.05
+    ],
+    "settle_base_z": 0.3603181594467305,
+    "vx_tail": 0.2517650309837654,
+    "wz_tail": 0.03140452058624541,
+    "ddq_target_tail": 0.1609139815966288,
+    "ddq_measured_tail": 0.527736808826936,
+    "support_tail": 1.0,
+    "support_all": 1.0,
+    "upright_min": 0.9954896579348625,
+    "terminated": 0,
+    "nonwheel_hits": 0,
+    "exec_tail": 1.3220733472717767,
+    "app_ddq_tail": 0.1609139815966288,
+    "meas_ddq_tail": 0.527736808826936,
+    "unloaded_frac_z2n_tail": 0.0,
+    "unloaded_frac_norm5n_tail": 0.0,
+    "yaw_track": 0.6280904117249082,
+    "vx_track": 1.0070601239350616,
+    "verdict": "FAIL",
+    "reason": "yaw_or_vx",
+    "settle_s": 3.0
+   }
+  ],
+  "arc_right_0.25": [
+   {
+    "cmd": [
+     0.25,
+     0.0,
+     -0.05
+    ],
+    "settle_base_z": 0.3603181594467305,
+    "vx_tail": 0.23531779051479665,
+    "wz_tail": -0.054650193247974176,
+    "ddq_target_tail": -1.6586799502869447,
+    "ddq_measured_tail": -0.9336801446376416,
+    "support_tail": 1.0,
+    "support_all": 0.9983333333333333,
+    "upright_min": 0.9903954638543748,
+    "terminated": 0,
+    "nonwheel_hits": 0,
+    "exec_tail": 0.8281885712511715,
+    "app_ddq_tail": -1.6586799502869447,
+    "meas_ddq_tail": -0.9336801446376416,
+    "unloaded_frac_z2n_tail": 0.0,
+    "unloaded_frac_norm5n_tail": 0.0,
+    "yaw_track": 1.0930038649594835,
+    "vx_track": 0.9412711620591866,
+    "verdict": "PASS",
+    "reason": "ok",
+    "settle_s": 3.0
+   }
+  ],
+  "brake_fwd_0.25": [
+   {
+    "cmd": [
+     0.25,
+     0.0,
+     0.0
+    ],
+    "settle_base_z": 0.3603181594467305,
+    "vx_tail": -0.0003922745320059546,
+    "wz_tail": -0.010805049132590765,
+    "ddq_target_tail": -0.7180253044764201,
+    "ddq_measured_tail": -0.09385313387869759,
+    "support_tail": 1.0,
+    "support_all": 0.994,
+    "upright_min": 0.9898558533371443,
+    "terminated": 0,
+    "nonwheel_hits": 0,
+    "exec_tail": 0.1652880214536049,
+    "app_ddq_tail": -0.7180253044764201,
+    "meas_ddq_tail": -0.09385313387869759,
+    "unloaded_frac_z2n_tail": 0.0,
+    "unloaded_frac_norm5n_tail": 0.0,
+    "vx_track": -0.0015690981280238184,
+    "brake_stop_dist_m": 0.025499143765234794,
+    "verdict": "PASS",
+    "reason": "ok",
+    "settle_s": 3.0
+   }
+  ],
+  "brake_bwd_0.25": [
+   {
+    "cmd": [
+     -0.25,
+     0.0,
+     0.0
+    ],
+    "settle_base_z": 0.3603181594467305,
+    "vx_tail": 0.006186037853245607,
+    "wz_tail": 0.001089349281475125,
+    "ddq_target_tail": 0.11136554718017579,
+    "ddq_measured_tail": 0.052173648309954336,
+    "support_tail": 1.0,
+    "support_all": 0.996,
+    "upright_min": 0.9984686436577263,
+    "terminated": 0,
+    "nonwheel_hits": 0,
+    "exec_tail": 1.5089392631206255,
+    "app_ddq_tail": 0.11136554718017579,
+    "meas_ddq_tail": 0.052173648309954336,
+    "unloaded_frac_z2n_tail": 0.0,
+    "unloaded_frac_norm5n_tail": 0.0,
+    "vx_track": -0.02474415141298243,
+    "brake_stop_dist_m": 0.04525329073778067,
+    "verdict": "PASS",
+    "reason": "ok",
+    "settle_s": 3.0
+   }
+  ]
+ },
+ "pass_total": 6,
+ "n_cases": 11
+}
