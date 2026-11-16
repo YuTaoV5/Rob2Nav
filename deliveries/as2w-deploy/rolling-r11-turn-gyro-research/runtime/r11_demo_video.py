@@ -21,6 +21,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+import re
 import numpy as np
 import torch
 import torch.nn as nn
@@ -88,6 +89,18 @@ def make_grid_xml(src, dst):
                   'quat="1.0 0 0.0 0" material="gridmat" />')
     assert old_ground in s, "ground geom not found verbatim"
     s = s.replace(old_ground, new_ground, 1)
+    # The grid XML is written to the OUTPUT directory, so a RELATIVE compiler meshdir would be
+    # resolved against that directory instead of the source XML and the meshes would not be found.
+    # Rewrite meshdir to an absolute path pointing back at the tracked STL directory.
+    m = re.search(r'meshdir="([^"]*)"', s)
+    if m:
+        rel = m.group(1)
+        base = Path(src).resolve().parent
+        abs_mesh = (base / rel).resolve()
+        if not abs_mesh.is_dir():
+            raise SystemExit("meshdir does not resolve: %s" % abs_mesh)
+        s = s.replace('meshdir="%s"' % rel, 'meshdir="%s"' % abs_mesh, 1)
+        print("AS2W_VIDEO_MESHDIR %s" % abs_mesh, flush=True)
     Path(dst).write_text(s)
     return dst
 
