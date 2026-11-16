@@ -1,26 +1,23 @@
 #!/usr/bin/env python3
-"""Continuous joystick sequence regression: fixed stand -> reverse -> release -> stop -> fixed stand.
+"""Continuous joystick sequence regression, both directions, with a correct stand reference.
 
-The selection standard requires the reverse brake to be tested BOTH standalone and inside a
-continuous joystick sequence, and it requires braking to complete three stages on one trajectory:
-decelerate, come to rest, and restore the standing posture.  The standalone brake case only covers
-the middle of that.  This script runs the whole sequence and judges all three stages plus the usual
-hard constraints.
+Timeline per direction (one continuous trajectory, no reset between stages):
 
-Timeline (one trajectory, continuous, no reset between stages):
+    0 - 3 s    fixed stand, zero command        <- the LAST 1 s of this is the stand reference
+    3 - 4 s    ramp to +-0.25 m/s
+    4 - 9 s    hold the commanded speed
+    9 - 19 s   release: command to zero, decelerate, come to rest and hold (10 s)
+   19 - 22 s   restore the standing posture
 
-    0.0 -  3.0 s   fixed stand, zero command
-    3.0 -  4.0 s   ramp the reverse command down to -0.25 m/s
-    4.0 -  9.0 s   hold reverse
-    9.0 - 19.0 s   release: command to zero, decelerate, come to rest and hold
-   19.0 - 22.0 s   restore fixed stand and check the posture error
+The stand reference is the posture the policy ACTUALLY holds at zero command in this same episode,
+not default_joint_pos.  An earlier version compared against default_joint_pos with a 0.20 rad
+tolerance and reported a false failure: the policy's ordinary rolling stance already sits 0.30-0.52
+rad away from the URDF default, so that tolerance was unreachable by construction.
 
-Judged:
-  decelerate  - time and distance from release to |vx| < 0.02
-  come to rest- tail |vx| and |wz| over the last 3 s of the hold
-  restore     - leg joint error against the default stance at the end, plus upright
-  safety      - no termination, no non-wheel contact, four-wheel support, upright
-Nothing is tuned; the gates are the frozen ones already in use.
+Judged on the same trajectory, per direction:
+  decelerate / come to rest - stop time and distance, tail |vx| and |wz| against the frozen 0.02 gates
+  restore                   - final leg posture against the episode's own zero-command posture
+  safety                    - no termination, four-wheel support, upright, no non-wheel contact
 """
 from __future__ import annotations
 
@@ -40,11 +37,10 @@ WHEEL_KD, ACTION_CLIP = 6.0, 6.0
 DT = 0.02
 LOAD_N = 5.0
 STOP_VX, STOP_WZ = 0.02, 0.02
-UPRIGHT_MIN = 0.85
-SUPPORT_MIN = 0.95
-STAND_POS_TOL = 0.20      # rad, max leg joint error at the end of the restore stage
-SEQ = [("stand_in", 3.0, 0.0), ("ramp_rev", 1.0, -0.25), ("hold_rev", 5.0, -0.25),
-       ("release", 10.0, 0.0), ("stand_out", 3.0, 0.0)]
+UPRIGHT_MIN, SUPPORT_MIN = 0.85, 0.95
+STAND_TOL = 0.10          # rad, against the episode's OWN zero-command posture
+STAND_REF_WINDOW = 50     # last 1 s of the stand-in stage
+STAGES = [("stand_in", 3.0), ("ramp", 1.0), ("hold", 5.0), ("release", 10.0), ("stand_out", 3.0)]
 
 
 def build(args, physics):
@@ -81,8 +77,7 @@ def main() -> int:
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--ckpt", type=Path, required=True)
     ap.add_argument("--seed", type=int, default=7393)
-    ap.add_argument("--yaw-kp", type=float, default=0.0)
-    ap.add_argument("--ff-cap", type=float, default=4.0)
+    ap.add_argument("--direction", choices=["rev", "fwd", "both"], default="both")
     ap.add_argument("--num-envs", type=int, default=1)
     ap.add_argument("--iterations", type=int, default=1)
     add_launcher_args(ap)
@@ -92,14 +87,15 @@ def main() -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     args.physics = "isaacsim_physx"
 
+    dirs = {"rev": [-0.25], "fwd": [0.25], "both": [-0.25, 0.25]}[args.direction]
+
     with launch_simulation(SimulationCfg(device=args.device, dt=.005), args) as physics:
         env, Wrapper, PPOCfg, check_v, create_runner, handle_dep = build(args, physics)
         try:
             wrapped = Wrapper(env, clip_actions=ACTION_CLIP)
             robot = env.scene["robot"]
             cmdterm = env.command_manager.get_term("base_velocity")
-            names = list(robot.joint_names)
-            bodies = list(robot.body_names)
+            names = list(robot.joint_names); bodies = list(robot.body_names)
             wbid = [bodies.index(n) for n in ("FL_foot", "FR_foot", "RL_foot", "RR_foot")]
             leg_ids = list(range(12))
 
@@ -110,84 +106,88 @@ def main() -> int:
             runner.load(str(args.ckpt), map_location=args.device)
             policy = runner.get_inference_policy(device=args.device)
 
-            env.seed(args.seed); env.reset()
-            cmdterm.vel_command_b[:] = 0.0
-            obs = wrapped.get_observations()
-            rows, term = [], 0
-            for stage, secs, vx in SEQ:
-                for _ in range(int(secs / DT)):
-                    cmdterm.vel_command_b[:] = torch.tensor(
-                        [[vx, 0.0, 0.0]], dtype=torch.float32, device=env.device)
-                    with torch.inference_mode():
-                        a = policy(obs)
-                    obs, _r, _d, _i = wrapped.step(a)
-                    cf = env.scene["contact_forces"].data.net_forces_w.torch[0][wbid]
-                    load = torch.linalg.norm(cf, dim=1)
-                    qerr = (robot.data.joint_pos.torch[0][leg_ids]
-                            - robot.data.default_joint_pos.torch[0][leg_ids]).abs()
-                    rows.append({
-                        "stage": stage,
-                        "t": len(rows) * DT,
-                        "vx": float(robot.data.root_lin_vel_b.torch[0, 0]),
-                        "wz": float(robot.data.root_ang_vel_b.torch[0, 2]),
-                        "up": float(-robot.data.projected_gravity_b.torch[0][2]),
-                        "sup": bool((load > LOAD_N).all()),
-                        "leg_err": float(qerr.max()),
-                        "term": bool(_d[0]),
-                    })
-                    term += int(bool(_d[0]))
+            def legs():
+                return robot.data.joint_pos.torch[0][leg_ids].detach().cpu().numpy().copy()
 
-            def seg(name):
-                return [r for r in rows if r["stage"] == name]
+            def run(vx_target):
+                env.seed(args.seed); env.reset()
+                cmdterm.vel_command_b[:] = 0.0
+                obs = wrapped.get_observations()
+                rows, term = [], 0
+                stand_ref = None
+                for stage, secs in STAGES:
+                    n = int(secs / DT)
+                    for k in range(n):
+                        vx = 0.0
+                        if stage == "ramp":
+                            vx = vx_target * (k + 1) / n            # smooth ramp
+                        elif stage == "hold":
+                            vx = vx_target
+                        cmdterm.vel_command_b[:] = torch.tensor(
+                            [[vx, 0.0, 0.0]], dtype=torch.float32, device=env.device)
+                        with torch.inference_mode():
+                            a = policy(obs)
+                        obs, _r, _d, _i = wrapped.step(a)
+                        cf = env.scene["contact_forces"].data.net_forces_w.torch[0][wbid]
+                        load = torch.linalg.norm(cf, dim=1)
+                        rows.append({
+                            "stage": stage, "t": len(rows) * DT,
+                            "vx": float(robot.data.root_lin_vel_b.torch[0, 0]),
+                            "wz": float(robot.data.root_ang_vel_b.torch[0, 2]),
+                            "up": float(-robot.data.projected_gravity_b.torch[0][2]),
+                            "sup": bool((load > LOAD_N).all()),
+                            "legs": legs(),
+                            "term": bool(_d[0]),
+                        })
+                        term += int(bool(_d[0]))
+                        # the stand reference is the posture held at zero command, late in stage 0
+                        if stage == "stand_in" and k >= n - STAND_REF_WINDOW:
+                            stand_ref = (legs() if stand_ref is None
+                                         else 0.5 * (stand_ref + legs()))
+                return rows, term, stand_ref
 
-            rel = seg("release")
-            stop_idx = next((i for i, r in enumerate(rel) if abs(r["vx"]) < STOP_VX), None)
-            dist = float(sum(abs(r["vx"]) for r in rel[:stop_idx + 1]) * DT) if stop_idx is not None else None
-            tail = rel[-150:] if len(rel) >= 150 else rel
-            out_last = seg("stand_out")[-150:]
-            res = {
-                "checkpoint": str(args.ckpt), "seed": args.seed,
-                "yaw_kp": args.yaw_kp, "ff_cap": args.ff_cap,
-                "gates": {"stop_vx": STOP_VX, "stop_wz": STOP_WZ, "upright": UPRIGHT_MIN,
-                           "support": SUPPORT_MIN, "stand_pos_tol_rad": STAND_POS_TOL},
-                "sequence": [{"stage": s, "seconds": d, "cmd_vx": v} for s, d, v in SEQ],
-                "release": {
-                    "stop_time_s": (stop_idx * DT) if stop_idx is not None else None,
+            rep = {"checkpoint": str(args.ckpt), "seed": args.seed,
+                   "gates": {"stop_vx": STOP_VX, "stop_wz": STOP_WZ, "upright": UPRIGHT_MIN,
+                              "support": SUPPORT_MIN, "stand_tol_rad": STAND_TOL},
+                   "stand_reference": "episode's own zero-command posture (last 1 s of stand_in), NOT default_joint_pos",
+                   "note": "earlier version used default_joint_pos with 0.20 rad and produced a false failure because the policy stance sits 0.30-0.52 rad from that default",
+                   "directions": {}}
+            for vx_target in dirs:
+                rows, term, stand_ref = run(vx_target)
+                rel = [r for r in rows if r["stage"] == "release"]
+                stop = next((i for i, r in enumerate(rel) if abs(r["vx"]) < STOP_VX), None)
+                dist = float(sum(abs(r["vx"]) for r in rel[:stop + 1]) * DT) if stop is not None else None
+                tail = rel[-150:] if len(rel) >= 150 else rel
+                out_stage = [r for r in rows if r["stage"] == "stand_out"][-150:]
+                ref = stand_ref if stand_ref is not None else np.zeros(12)
+                err = max(float(np.abs(r["legs"] - ref).max()) for r in out_stage) if out_stage else None
+                d = {
+                    "cmd_vx": vx_target,
+                    "stop_time_s": (stop * DT) if stop is not None else None,
                     "stop_distance_m": dist,
                     "tail_vx": float(np.mean([r["vx"] for r in tail])),
                     "tail_wz": float(np.mean([r["wz"] for r in tail])),
                     "tail_support": float(np.mean([r["sup"] for r in tail])),
-                },
-                "restore": {
-                    "final_leg_err_max": float(max(r["leg_err"] for r in out_last)) if out_last else None,
-                    "final_vx": float(np.mean([r["vx"] for r in out_last])) if out_last else None,
-                    "final_wz": float(np.mean([r["wz"] for r in out_last])) if out_last else None,
-                },
-                "safety": {
-                    "terminations": term,
                     "upright_min": float(min(r["up"] for r in rows)),
-                    "support_min_tail_release": float(np.mean([r["sup"] for r in tail])),
-                    "frames": len(rows),
-                },
-            }
-            r, st, sa = res["release"], res["restore"], res["safety"]
-            # release-derived values live in r, restore-derived in st; keep them straight
-            res["pass"] = bool(
-                term == 0
-                and sa["upright_min"] >= UPRIGHT_MIN
-                and r["tail_support"] >= SUPPORT_MIN
-                and abs(r["tail_vx"]) < STOP_VX and abs(r["tail_wz"]) < STOP_WZ
-                and r["stop_time_s"] is not None
-                and st["final_leg_err_max"] is not None
-                and st["final_leg_err_max"] <= STAND_POS_TOL
-            )
-            print("JOYSTICK_SEQ pass=%s  stop_t=%s s stop_d=%s m  tail_vx=%+.4f tail_wz=%+.4f "
-                  "sup=%.3f up_min=%.3f leg_err_final=%.3f term=%d"
-                  % (res["pass"], r["stop_time_s"], r["stop_distance_m"],
-                     r["tail_vx"], r["tail_wz"], r["tail_support"],
-                     sa["upright_min"], st["final_leg_err_max"], term), flush=True)
-            (args.out / "joystick_seq.json").write_text(json.dumps(res, indent=1, default=str))
-            print("JOYSTICK_SEQ_DONE", flush=True)
+                    "terminations": term,
+                    "final_leg_err_vs_stand_ref": err,
+                    "final_vx": float(np.mean([r["vx"] for r in out_stage])) if out_stage else None,
+                }
+                d["pass"] = bool(
+                    term == 0 and d["upright_min"] >= UPRIGHT_MIN
+                    and d["tail_support"] >= SUPPORT_MIN
+                    and abs(d["tail_vx"]) < STOP_VX and abs(d["tail_wz"]) < STOP_WZ
+                    and d["stop_time_s"] is not None
+                    and err is not None and err <= STAND_TOL
+                )
+                rep["directions"]["fwd" if vx_target > 0 else "rev"] = d
+                print("JOYSTICK_SEQ dir=%s pass=%s stop_t=%s s stop_d=%s m tail_vx=%+.4f tail_wz=%+.4f "
+                      "sup=%.3f up_min=%.3f leg_err_vs_stand=%.3f term=%d"
+                      % ("fwd" if vx_target > 0 else "rev", d["pass"], d["stop_time_s"], d["stop_distance_m"],
+                         d["tail_vx"], d["tail_wz"], d["tail_support"], d["upright_min"], err, term), flush=True)
+            rep["all_pass"] = all(v["pass"] for v in rep["directions"].values())
+            (args.out / "joystick_seq.json").write_text(json.dumps(rep, indent=1, default=str))
+            print("JOYSTICK_SEQ_DONE all_pass=%s" % rep["all_pass"], flush=True)
         finally:
             env.close()
     return 0

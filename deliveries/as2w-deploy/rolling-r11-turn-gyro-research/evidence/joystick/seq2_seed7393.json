@@ -1,0 +1,42 @@
+{
+ "checkpoint": "/root/gpufree-data/as2w-runs/r11_fanziqi_lab/yaw-arms/armE-support-20261116-034514/r11-final.pt",
+ "seed": 7393,
+ "gates": {
+  "stop_vx": 0.02,
+  "stop_wz": 0.02,
+  "upright": 0.85,
+  "support": 0.95,
+  "stand_tol_rad": 0.1
+ },
+ "stand_reference": "episode's own zero-command posture (last 1 s of stand_in), NOT default_joint_pos",
+ "note": "earlier version used default_joint_pos with 0.20 rad and produced a false failure because the policy stance sits 0.30-0.52 rad from that default",
+ "directions": {
+  "rev": {
+   "cmd_vx": -0.25,
+   "stop_time_s": 0.1,
+   "stop_distance_m": 0.011280695889145136,
+   "tail_vx": 0.012834531666400532,
+   "tail_wz": 0.000561223105857304,
+   "tail_support": 1.0,
+   "upright_min": 0.9946118593215942,
+   "terminations": 0,
+   "final_leg_err_vs_stand_ref": 0.4163174629211426,
+   "final_vx": 0.005104189034318552,
+   "pass": false
+  },
+  "fwd": {
+   "cmd_vx": 0.25,
+   "stop_time_s": 0.1,
+   "stop_distance_m": 0.00885113824158907,
+   "tail_vx": -0.004141559725394472,
+   "tail_wz": -0.0006411133925333464,
+   "tail_support": 1.0,
+   "upright_min": 0.9949373602867126,
+   "terminations": 0,
+   "final_leg_err_vs_stand_ref": 0.2424783706665039,
+   "final_vx": -0.004148077212982268,
+   "pass": false
+  }
+ },
+ "all_pass": false
+}
