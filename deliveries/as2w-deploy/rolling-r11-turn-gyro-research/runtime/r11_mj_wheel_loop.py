@@ -1,4 +1,14 @@
 #!/usr/bin/env python3
+"""DEPRECATED - DO NOT USE ITS NUMBERS.
+
+This probe computed the wheel demand ONCE per 20 ms control sample and held it across all 32 substeps.
+That is not how the main evaluators work (they recompute inside the substep loop), and it produces a
+spurious 49x overshoot that was mistaken for a MuJoCo-vs-Isaac implementation difference.  The correct
+comparison is in r11_mj_substep_ab.py, which shows that holding the demand reproduces 24.5 rad/s while
+recomputing per substep converges to exactly 0.5000 - i.e. the two simulators AGREE on the unloaded wheel.
+
+Kept only as the record of the defect.
+"""
 """Wheel-loop isolation: fixed base, wheels in the air, no policy, no gyro, no delay.
 
 Operator step 1.  Both simulators get the identical treatment so the only thing under test is the wheel
