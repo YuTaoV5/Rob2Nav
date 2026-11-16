@@ -152,6 +152,7 @@ def main() -> int:
     add_launcher_args(ap)
     ap.add_argument("--obs-freeze", type=int, default=0, help="C5 observation distortion: once every N frames the policy is shown the previous observation instead of the fresh one (stalled sensor stream)")
     ap.add_argument("--obs-stale-steps", type=int, default=0, help="C5 observation distortion: the policy is shown the observation from K policy steps ago while the simulator keeps advancing (delayed or duplicated frame stream)")
+    ap.add_argument("--leg-bias-rad", default="", help="EXPERIMENTAL posture bias: 12 comma-separated joint-space radians added to the leg action target, divided by the 0.35 action scale; empty disables it; not part of the default contract")
     args = ap.parse_args()
     for a in ("usd", "urdf"):
         setattr(args, a, getattr(args, a).resolve(strict=True))
@@ -247,6 +248,12 @@ def main() -> int:
             runner = create_runner(wrapped, ppo, log_dir=None)
 
             from collections import deque
+            _bias12 = None
+            if str(getattr(args, "leg_bias_rad", "")).strip():
+                _v = [float(x) for x in str(args.leg_bias_rad).split(",") if x.strip()]
+                assert len(_v) == 12, "leg_bias_rad needs 12 values"
+                _bias12 = torch.tensor(_v, dtype=torch.float32, device=env.device) / 0.35
+                print("AS2W_LEG_BIAS_ON absmax_rad=%.4f" % max(abs(x) for x in _v), flush=True)
             _delay = int(getattr(args, "action_delay_steps", 0))
             _hist = deque(maxlen=max(1, _delay + 1))
 
@@ -265,6 +272,9 @@ def main() -> int:
                 resulting observation.
                 """
                 _last_valid["steps"] += 1
+                if _bias12 is not None:
+                    a = a.clone()
+                    a[:, :12] = a[:, :12] + _bias12
                 applied = a
                 # A burst begins with probability _drop and then holds for _burst consecutive
                 # steps.  With _burst == 1 this is exactly the IID drop tested earlier, so the
