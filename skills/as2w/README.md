@@ -13,6 +13,7 @@
 | Rolling, filtered low speed | [filtered.sh](rolling/recipes/filtered.sh) | Opt-in 0.20 m/s controller and reward smoke test |
 | Rolling, turn-biased continuation | [turn-2000fix.sh](rolling/recipes/turn-2000fix.sh) | 2000 extra iterations from model_1999 with spin sampling 25%->40%; action-delay DR disabled; research status |
 | Rolling, support-weighted continuation | [armE-support2.sh](rolling/recipes/armE-support2.sh) | 600 iterations from model_3998 with rolling_wheel_support -0.65 -> -2.0; MuJoCo 7/11 endpoint; Isaac 5/11; research status |
+| Rolling, A/B gyro-loop comparison | [ab-gyro-loop.sh](rolling/recipes/ab-gyro-loop.sh) | Two 1000-iteration arms from the same init with gyro in the training loop: `ARM=A` keeps the armE sampling (equal-budget control), `ARM=B` switches to the 35/25/15/15/10 long-turn curriculum via [as2w_ab_curriculum.py](rolling/as2w_ab_curriculum.py). The recipe pins every input by SHA256 and fails on mismatch; **arm B is only really running the curriculum if the startup line `AS2W_AB_CURRICULUM ON` appears** |
 | Stepping | [formal.sh](stepping/recipes/formal.sh) | Omnidirectional stepping and stairs |
 | Recovery | [formal.sh](recovery/recipes/formal.sh) | Rising from prone and side tilt |
 
@@ -69,3 +70,25 @@ four pure-turn cases.
 3. After starting a new arm, verify that the quantity it claims to change is actually non-zero
    (`ff_max > 0`, `caps > 0`, or a different checkpoint sha). Pass counts, printed config values
    and startup logs have each been misleading at least once in this work.
+
+## r11 diagnostic and reporting tools (research, 2026-11-16)
+
+Entry points added while chasing the pure-turn gap. All are CPU-side where possible so they can run while a
+training job holds the GPU; each writes a JSON next to its log.
+
+| Tool | Purpose |
+|---|---|
+| [r11_dual_basis_report.py](r11_dual_basis_report.py) | Report an acceptance `ff_arm.json` under BOTH bases: min (every seed passes - the decision basis) and mean (mean tracking in band with the worst seed still supported). A case that passes mean but fails min is seed scatter and must not be promoted. |
+| [r11_segmented_report.py](r11_segmented_report.py) | Turning report by window - first second, 3-5 s, last 3 s - with signed yaw, actor differential, measured differential, delivery ratio, common-mode wheel speed and four-wheel support. |
+| [r11_joystick_seq.py](r11_joystick_seq.py) | Continuous joystick sequence, fixed stand -> reverse/forward -> release -> stop -> fixed stand, judged on decelerate, come-to-rest and restore separately. |
+| [r11_mj_stand_decay.py](r11_mj_stand_decay.py) | Does the post-turn leg offset decay when the legs are just held at fixed stand, or is it a loaded PD equilibrium? |
+| [r11_mj_bias_comp.py](r11_mj_bias_comp.py) | Constant posture bias (`target = 2*DEF - q_eq`, iterated) to pull the achieved stance back to fixed stand. |
+| [r11_mj_bias_regression.py](r11_mj_bias_regression.py) | The regression the goal demands before any leg-pose change may be adopted: support, rear clearance, torque fraction of the 90% limits, non-wheel contacts, with and without the bias. |
+| [r11_mj_estop.py](r11_mj_estop.py) | Instant e-stop - wheel target to zero in one step with the legs frozen - as distinct from a ramped release. |
+| [r11_mj_step_reset.py](r11_mj_step_reset.py) | Net-zero step cycle as a way to restore standing; measured NOT to work with the current gait (see the delivery evidence). |
+
+Honest status of this line: the posture bias cuts the post-turn standing residual from about 0.20 rad to
+0.06-0.08 rad and passes the MuJoCo hard-protection regression, but the goal requires the same hard-constraint
+basis on the Isaac side, which has not been run. Stepping as a reset does not work. The instant e-stop stops the
+robot cleanly but saturates the wheel torque cap on every stop from speed, because `tau = -6*dq` exceeds the cap
+at any normal speed - that is a pending ruling, not a fixed defect.
