@@ -89,6 +89,16 @@ def main() -> int:
             trace = {"sim": "isaac", "checkpoint": str(args.ckpt), "cmd": [args.vx, 0.0, args.wz],
                      "step_dt": DT, "settle_s": args.settle_s, "settle": [], "turn": []}
 
+            wb_idx = [robot.body_names.index(n) for n in
+                      [f"{L}_foot" for L in ("FL", "FR", "RL", "RR")]]
+
+            def wheel_loads():
+                try:
+                    cf = env.scene["contact_forces"].data.net_forces_w.torch[0][wb_idx]
+                    return [round(float(x), 2) for x in torch.linalg.norm(cf, dim=1)]
+                except Exception:
+                    return None
+
             def record(bucket, o, a):
                 # get_observations() returns a TensorDict keyed by "policy"; o[0] would return the
                 # KEY STRING rather than a tensor, which is what the first run tripped over.
@@ -100,7 +110,8 @@ def main() -> int:
                     "dq": [round(float(x), 6) for x in robot.data.joint_vel.torch[0].detach().cpu().numpy()],
                     "quat": [round(float(x), 6) for x in robot.data.root_quat_w.torch[0].detach().cpu().numpy()],
                     "angvel": [round(float(x), 6) for x in robot.data.root_ang_vel_w.torch[0].detach().cpu().numpy()],
-                    "yaw": round(float(robot.data.root_ang_vel_b.torch[0, 2]), 6)}
+                    "yaw": round(float(robot.data.root_ang_vel_b.torch[0, 2]), 6),
+                    "loads_n": wheel_loads()}
                 bucket.append(trace_row)
 
             env.seed(args.seed); env.reset()

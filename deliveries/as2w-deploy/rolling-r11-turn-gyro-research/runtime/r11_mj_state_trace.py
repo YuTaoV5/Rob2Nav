@@ -88,6 +88,20 @@ def main() -> int:
     aid = np.array([mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_ACTUATOR, n) for n in JOINTS])
     kp = np.r_[np.full(12, KP_LEG), np.full(4, 0.0)]
     kd = np.r_[np.full(12, LEG_KD), np.full(4, WHEEL_KD)]
+    wb = [mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, f"{L}_foot") for L in LEGS]
+
+    def wheel_loads():
+        out = []
+        for b in wb:
+            tot = 0.0
+            for ci in range(d.ncon):
+                c = d.contact[ci]
+                if m.geom_bodyid[c.geom1] == b or m.geom_bodyid[c.geom2] == b:
+                    fv = np.zeros(6); mujoco.mj_contactForce(m, d, ci, fv)
+                    tot += abs(fv[0])
+            out.append(tot)
+        return [round(float(x), 2) for x in out]
+
     ck = torch.load(str(a.ckpt), map_location="cpu", weights_only=False)
     act = build_actor(ck.get("actor_state_dict") or ck.get("model_state_dict"))
     cmd = {"v": np.zeros(3)}
@@ -141,7 +155,8 @@ def main() -> int:
             "dq": [round(float(x), 6) for x in d.qvel[vadr]],
             "quat": [round(float(x), 6) for x in d.qpos[3:7]],
             "angvel": [round(float(x), 6) for x in d.qvel[3:6]],
-            "yaw": round(float(d.qvel[5]), 6)})
+            "yaw": round(float(d.qvel[5]), 6),
+            "loads_n": wheel_loads()})
 
     cmd["v"] = np.zeros(3)
     for _ in range(int(a.settle_s / STEP_DT)):
