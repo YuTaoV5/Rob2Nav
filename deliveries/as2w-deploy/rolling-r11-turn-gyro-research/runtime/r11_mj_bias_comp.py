@@ -79,6 +79,7 @@ def main() -> int:
     ap.add_argument("--turn-s", type=float, default=12.0)
     ap.add_argument("--hold-s", type=float, default=4.0)
     ap.add_argument("--bias-gain", type=float, default=1.0, help="1.0 = full 2*DEF - q_eq compensation")
+    ap.add_argument("--bias-rounds", type=int, default=3, help="number of bias iterations")
     a = ap.parse_args()
     a.out.mkdir(parents=True, exist_ok=True)
 
@@ -163,23 +164,38 @@ def main() -> int:
     dev = acc / max(1, n_acc)
     err_hold = leg_err()
 
-    # bias = minus the loaded deviation; replay from the same state
+    # bias = minus the loaded deviation, then iterate: each round re-measures the residual
+    # under the current bias and adds the remaining deviation on top.
     bias = -a.bias_gain * dev
-    for _ in range(n_hold):
-        step_ctrl(np.zeros(16), leg_bias=bias)
-    err_bias = leg_err()
+    rounds = []
+    for it in range(a.bias_rounds):
+        for _ in range(n_hold):
+            step_ctrl(np.zeros(16), leg_bias=bias)
+        e = leg_err()
+        res = np.mean(d.qpos[qadr][:12] - DEF[:12]) if False else None
+        rounds.append({"round": it + 1, "leg_err_max": e,
+                        "bias_absmax": float(np.abs(bias).max())})
+        # remaining deviation measured over the last 0.5 s of this biased hold
+        acc2, n2 = np.zeros(12), 0
+        for k in range(int(0.5 / STEP_DT)):
+            step_ctrl(np.zeros(16), leg_bias=bias)
+            acc2 += d.qpos[qadr][:12] - DEF[:12]
+            n2 += 1
+        bias = bias - a.bias_gain * (acc2 / max(1, n2))
+    err_bias = rounds[-1]["leg_err_max"] if rounds else leg_err()
 
     rep = {"checkpoint": str(a.ckpt), "wz": a.wz, "bias_gain": a.bias_gain,
            "leg_err_max_rad": {"after_turn": err_turn_end, "hold_plain": err_hold, "hold_biased": err_bias},
            "loaded_deviation_mean": dev.tolist(),
            "bias_applied": bias.tolist(),
+           "rounds": rounds,
            "delta_from_bias": err_bias - err_hold,
            "note": "bias = -mean(q - DEF) over the last 0.5 s of the plain hold, i.e. the full 2*DEF - q_eq compensation at gain 1.0"}
     (a.out / "bias_comp.json").write_text(json.dumps(rep, indent=1))
-    print("wz=%+.2f  turn_end=%.3f  hold_plain=%.3f  hold_biased=%.3f  delta=%+.3f  "
-          "|dev|max=%.3f  |bias|max=%.3f"
-          % (a.wz, err_turn_end, err_hold, err_bias, rep["delta_from_bias"],
-             float(np.abs(dev).max()), float(np.abs(bias).max())))
+    print("wz=%+.2f  turn_end=%.3f  hold_plain=%.3f  hold_biased=%.3f  delta=%+.3f" %
+          (a.wz, err_turn_end, err_hold, err_bias, rep["delta_from_bias"]))
+    for r in rounds:
+        print("    round %d: leg_err_max=%.3f  |bias|max=%.3f" % (r["round"], r["leg_err_max"], r["bias_absmax"]))
     print("BIAS_COMP_DONE")
     return 0
 
