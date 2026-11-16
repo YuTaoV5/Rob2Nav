@@ -7,6 +7,11 @@
 # not_measured - that refusal is deliberate and must not be bypassed.
 
 version: gyro-1
+# The ACTION wrapper contract is unchanged since gyro-1: same 16-axis mapping, scales, limits,
+# PD gains and 90% protections.  The evaluation tooling has since gained observation-distortion
+# switches and a dual-basis report, which are EVAL-ONLY and do not alter the deployed contract,
+# so they are versioned separately rather than bumping the action wrapper.
+eval_version: eval-2
 date: 2026-11-16
 skill: as2w-rolling
 status: research

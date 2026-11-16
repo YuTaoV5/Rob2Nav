@@ -4,7 +4,7 @@
 日期 2026-11-16 · 负责人：服务器 Agent（lead）
 最终权重：`weights/armE_support2p0_final.pt`
 SHA256：`4bdf4d26b076d7c7`…（完整值见 `weights/SHA256`）
-包装版本：**gyro-1**（本轮新增，见 `runtime/README.md`）
+包装版本：**gyro-1**（动作包装契约未变：16 轴映射、尺度、限位、PD 增益、90% 保护均与 gyro-1 相同）。评测工具版本：**eval-2**（新增观测畸变开关 `--obs-freeze` / `--obs-stale-steps` 与双口径报告工具；**评测专用，不改变部署契约**，故与动作包装分开版本化。详见 `evidence/EVAL_TOOLING_CHANGELOG.md`）
 
 **汇总报告见 [FINAL_REPORT.md](FINAL_REPORT.md)** —— 实际通过的速度/转向/刹停/载荷范围与尚缺的现场证据。
 
