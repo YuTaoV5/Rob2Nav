@@ -1,0 +1,14 @@
+{
+ "purpose": "prove the plan refuses to run when the declared curriculum leaves the frozen R4000 envelope",
+ "mutation": "B.curriculum.arc.vx_m_s set to 0.25 (outside the frozen 0.20 m/s stage cap) and marked in_range",
+ "selfcheck_exit_code": 1,
+ "selfcheck_failures": [
+  "b_schedule_matches_config",
+  "b_schedule_invariants",
+  "requested_arc_vx_gate"
+ ],
+ "selfcheck_verdict": "FAIL",
+ "dry_run_arm_B_exit_code": 4,
+ "refused": true,
+ "note": "the same mutation is what the operator's requested 0.25 m/s tier would do if applied without widening the stage cap"
+}

@@ -1,0 +1,328 @@
+{
+ "generated_at_unix": 1794847871,
+ "config": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/turn-curriculum-migration/configs/ab_curriculum.json",
+ "snapshot": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/runs/rolling/filtered-4000-env4096-stage020.ovvRL3/source",
+ "checks": [
+  {
+   "check": "start_checkpoint_identity",
+   "status": "pass",
+   "detail": "sha256 matches the site record, 1042741 bytes, iter=3999, actor (128, 65)->(16, 128), critic (128, 65)",
+   "sha256": "e46954b697ae8c4de2530ebae8f7c520f8f222bdd6a117195ff57bc4d3327769",
+   "bytes": 1042741,
+   "iteration": 3999,
+   "optimizer_state_entries": 17
+  },
+  {
+   "check": "optimizer_policy",
+   "status": "pass",
+   "detail": "optimizer present=True, entries=17, used=False (R4000 entry loads actor+critic only; A and B restore identically)"
+  },
+  {
+   "check": "contract_from_source",
+   "status": "pass",
+   "detail": "16 declared constants match the R4000 run snapshot and run.sh",
+   "extracted": {
+    "action_clip": 6.0,
+    "wrapper_leg_prescale_rad_per_unit": 0.18,
+    "wheel_radius_m": 0.086,
+    "wheel_action_scale_rad_s": 16.0,
+    "leg_target_rate_limit_rad_s": 0.9,
+    "leg_rate_divisor": 0.35,
+    "turn_compensation_gain": 0.66,
+    "turn_compensation_steer_coeff": 0.25,
+    "gyro_correction_gain": 0.8,
+    "gyro_correction_clamp": 10.0,
+    "gyro_engagement_denominator": 0.035,
+    "wheel_actuator_damping_kd": 2.0,
+    "resampling_lo_s": 1.1,
+    "resampling_hi_s": 3.4,
+    "episode_length_s": 23.0,
+    "motion_start_s": 4.0,
+    "park_until_s": 7.0,
+    "speed_cap_m_s": 0.2,
+    "pure_turn_common_scale": 0.0,
+    "leg_filter_hz": 5.0,
+    "filter_alpha_at_5hz": null,
+    "safety_ninety_mentions": [],
+    "num_steps_per_env_source": "isaaclab_tasks go2 rsl_rl_ppo_cfg num_steps_per_env"
+   }
+  },
+  {
+   "check": "rate_limit_units",
+   "status": "pass",
+   "detail": "step_limit=0.051429 action units -> 0.018000 rad/step -> 0.900 rad/s"
+  },
+  {
+   "check": "b_schedule_matches_config",
+   "status": "pass",
+   "detail": "module defaults equal the declared B curriculum"
+  },
+  {
+   "check": "b_schedule_statistics",
+   "status": "pass",
+   "detail": "segments=20000 shares={'arc': 0.222, 'pure_turn': 0.263, 'straight': 0.264, 'turn_long': 0.126, 'release': 0.126} step_shares={'arc': 0.149, 'pure_turn': 0.176, 'straight': 0.178, 'turn_long': 0.374, 'release': 0.122}",
+   "statistics": {
+    "segments": 20000,
+    "category_segment_share": {
+     "arc": 0.2217,
+     "pure_turn": 0.26265,
+     "straight": 0.26375,
+     "turn_long": 0.12595,
+     "release": 0.12595
+    },
+    "category_step_share": {
+     "arc": 0.14894233996375272,
+     "pure_turn": 0.17644731837200456,
+     "straight": 0.17810037366030473,
+     "turn_long": 0.37449891481887543,
+     "release": 0.12201105318506254
+    },
+    "dwell_range": {
+     "arc": [
+      1.1003295875298407,
+      3.3995867787151948
+     ],
+     "pure_turn": [
+      1.100018897227622,
+      3.399678254197275
+     ],
+     "straight": [
+      1.100100108997535,
+      3.3996591730699284
+     ],
+     "turn_long": [
+      8.000517118194427,
+      11.998059558842417
+     ],
+     "release": [
+      3.0002851496846192,
+      3.499709566089542
+     ]
+    },
+    "long_turns": 2519,
+    "releases": 2519,
+    "long_turn_followed_by_release_rate": 1.0,
+    "sign_balance": {
+     "pure_turn": -0.024938130592042643,
+     "turn_long": 0.028979753870583564,
+     "arc": -0.005412719891745603
+    },
+    "envelope_ok": true,
+    "release_has_zero_command": true
+   }
+  },
+  {
+   "check": "b_schedule_invariants",
+   "status": "pass",
+   "detail": "long turns 2519, all followed by release, release zero-filled, dwell in range, L/R balanced {'pure_turn': -0.0082, 'turn_long': 0.0129, 'arc': -0.0146}, envelope respected, arcs bidirectional",
+   "checks": {
+    "long_turn_present": true,
+    "long_turn_dwell_in_range": true,
+    "release_present": true,
+    "every_long_turn_followed_by_release": true,
+    "release_command_is_zero": true,
+    "release_dwell_in_range": true,
+    "short_turns_survive": true,
+    "sign_balance_pure_turn": true,
+    "sign_balance_turn_long": true,
+    "sign_balance_arc": true,
+    "envelope_within_r4000_stage": true,
+    "arcs_bidirectional": true,
+    "arc_vx_in_range": true,
+    "arc_vx_equals_declared": true,
+    "arc_wz_small_set": true
+   },
+   "sign_balance": {
+    "pure_turn": {
+     "n": 18009,
+     "balance": -0.0082
+    },
+    "turn_long": {
+     "n": 9085,
+     "balance": 0.0129
+    },
+    "arc": {
+     "n": 14970,
+     "balance": -0.0146
+    }
+   }
+  },
+  {
+   "check": "a_reference_envelope",
+   "status": "pass",
+   "detail": "R4000 mixed branch: shares={'pure_turn': 0.4, 'arc': 0.149, 'straight': 0.451} wz|max|=0.120 vx in [-0.20, 0.20]",
+   "reference": {
+    "category_segment_share": {
+     "pure_turn": 0.399995,
+     "arc": 0.149435,
+     "straight": 0.45057
+    },
+    "wz_magnitude_range": [
+     0.03500211338550029,
+     0.11999747547203679
+    ],
+    "wz_sign_balance": 0.0018746701126622135,
+    "vx_range": [
+     -0.1999886546183103,
+     0.19999912304600365
+    ],
+    "dwell_s": "U(1.1, 3.4) for every category (global resampling_time_range)"
+   }
+  },
+  {
+   "check": "requested_arc_vx_gate",
+   "status": "pass",
+   "detail": "requested 0.250 m/s exceeds the frozen 0.200 m/s stage cap and is not used; B runs 0.200 m/s and the request is deferred to a separate speed experiment"
+  },
+  {
+   "check": "install_path_wiring",
+   "status": "pass",
+   "detail": "B entry rebinds only as2w_isaac_speed_range.RollingSpeedCommands and runs the frozen entry with runpy; adapter calls TurnSchedule.draw_segment"
+  },
+  {
+   "check": "install_path_no_wrapper_touch",
+   "status": "pass",
+   "detail": "adapter references neither the observation function, the action wrapper nor the leg filter"
+  },
+  {
+   "check": "wrapper_readback",
+   "status": "pass",
+   "detail": "12 numeric properties of the frozen wrapper read back offline (straight targets, .18 motion-gated leg residual, -.66*(1+.25*steering) turn compensation, sign convention, gyro correction both directions, +-6 clip)",
+   "checks": {
+    "straight_wheel_target": true,
+    "straight_all_four_equal": true,
+    "leg_residual_scale_0p18_at_motion_1": true,
+    "leg_residual_motion_gated": true,
+    "turn_compensation_reads_back": true,
+    "positive_yaw_left_backward": true,
+    "positive_yaw_right_forward": true,
+    "gyro_zero_error_matches_no_gyro": true,
+    "gyro_overrotation_reduces_turn": true,
+    "gyro_underrotation_increases_turn": true,
+    "wheel_output_clipped_to_6": true
+   }
+  },
+  {
+   "check": "torque_90pct_derived",
+   "status": "pass",
+   "detail": "FRACTION=0.90 x URDF effort gives {'hip': 54.0, 'thigh': 54.0, 'calf': 81.0, 'wheel': 13.5} Nm, matching the declared 90% ceiling",
+   "fraction": 0.9,
+   "derived": {
+    "hip": 54.0,
+    "thigh": 54.0,
+    "calf": 81.0,
+    "wheel": 13.5
+   },
+   "urdf": "/root/gpufree-data/Rob2Nav/training/as2w-backup/dependencies/unitree_ros_as2w/robots/as2w_description/as2w.urdf"
+  },
+  {
+   "check": "env_step_budget",
+   "status": "pass",
+   "detail": "rollout batch 98304, 400 iterations -> 39321600 env steps (R4000 used 393,216,000, ratio 0.100)"
+  },
+  {
+   "check": "ab_structure_shared",
+   "status": "pass",
+   "detail": "base 40% / mixed 40% / park 20% identical in A and B; only the mixed branch contents differ"
+  },
+  {
+   "check": "phase_guard",
+   "status": "pass",
+   "detail": "status.training_started=false, deployable=false"
+  }
+ ],
+ "failures": [],
+ "skips": [],
+ "extracted_contract": {
+  "action_clip": 6.0,
+  "wrapper_leg_prescale_rad_per_unit": 0.18,
+  "wheel_radius_m": 0.086,
+  "wheel_action_scale_rad_s": 16.0,
+  "leg_target_rate_limit_rad_s": 0.9,
+  "leg_rate_divisor": 0.35,
+  "turn_compensation_gain": 0.66,
+  "turn_compensation_steer_coeff": 0.25,
+  "gyro_correction_gain": 0.8,
+  "gyro_correction_clamp": 10.0,
+  "gyro_engagement_denominator": 0.035,
+  "wheel_actuator_damping_kd": 2.0,
+  "resampling_lo_s": 1.1,
+  "resampling_hi_s": 3.4,
+  "episode_length_s": 23.0,
+  "motion_start_s": 4.0,
+  "park_until_s": 7.0,
+  "speed_cap_m_s": 0.2,
+  "pure_turn_common_scale": 0.0,
+  "leg_filter_hz": 5.0,
+  "filter_alpha_at_5hz": null,
+  "safety_ninety_mentions": [],
+  "num_steps_per_env_source": "isaaclab_tasks go2 rsl_rl_ppo_cfg num_steps_per_env"
+ },
+ "b_statistics": {
+  "segments": 20000,
+  "category_segment_share": {
+   "arc": 0.2217,
+   "pure_turn": 0.26265,
+   "straight": 0.26375,
+   "turn_long": 0.12595,
+   "release": 0.12595
+  },
+  "category_step_share": {
+   "arc": 0.14894233996375272,
+   "pure_turn": 0.17644731837200456,
+   "straight": 0.17810037366030473,
+   "turn_long": 0.37449891481887543,
+   "release": 0.12201105318506254
+  },
+  "dwell_range": {
+   "arc": [
+    1.1003295875298407,
+    3.3995867787151948
+   ],
+   "pure_turn": [
+    1.100018897227622,
+    3.399678254197275
+   ],
+   "straight": [
+    1.100100108997535,
+    3.3996591730699284
+   ],
+   "turn_long": [
+    8.000517118194427,
+    11.998059558842417
+   ],
+   "release": [
+    3.0002851496846192,
+    3.499709566089542
+   ]
+  },
+  "long_turns": 2519,
+  "releases": 2519,
+  "long_turn_followed_by_release_rate": 1.0,
+  "sign_balance": {
+   "pure_turn": -0.024938130592042643,
+   "turn_long": 0.028979753870583564,
+   "arc": -0.005412719891745603
+  },
+  "envelope_ok": true,
+  "release_has_zero_command": true
+ },
+ "r4000_reference": {
+  "category_segment_share": {
+   "pure_turn": 0.399995,
+   "arc": 0.149435,
+   "straight": 0.45057
+  },
+  "wz_magnitude_range": [
+   0.03500211338550029,
+   0.11999747547203679
+  ],
+  "wz_sign_balance": 0.0018746701126622135,
+  "vx_range": [
+   -0.1999886546183103,
+   0.19999912304600365
+  ],
+  "dwell_s": "U(1.1, 3.4) for every category (global resampling_time_range)"
+ },
+ "verdict": "PASS"
+}

@@ -1,0 +1,234 @@
+{
+  "task": "migrate armD turn curriculum onto the R4000 continuation start point",
+  "generated_by": "turn-curriculum-migration/scripts/ (selfcheck.py, dry_run.py)",
+  "status": {
+    "research": true,
+    "deployable": false,
+    "phase": "ready_to_launch",
+    "training_started": false,
+    "training_authorised": false,
+    "note": "this phase delivers scripts, configs and offline checks only; nothing is launched without --run"
+  },
+  "start": {
+    "checkpoint": "/root/gpufree-data/Rob2Nav/deliveries/as2w-deploy/rolling-4000-stage020-research/weights/model_3999.pt",
+    "sha256_expected": "e46954b697ae8c4de2530ebae8f7c520f8f222bdd6a117195ff57bc4d3327769",
+    "bytes_expected": 1042741,
+    "training_iteration": 3999,
+    "actor_obs": 65,
+    "actor_actions": 16,
+    "init_mode": "weights_only_actor_critic",
+    "optimizer_state_present": true,
+    "optimizer_state_used": false,
+    "optimizer_reason": "the governing R4000 entry calls runner.load(..., load_cfg={'actor': True, 'critic': True}) and therefore restores neither the optimizer nor the iteration counter. A and B use the identical weights-only init, so no arm gets an advantage from optimiser state.",
+    "optimizer_state_shape_note": "17 parameter entries under one param group with exp_avg shapes (16,), (128,65), ... which match actor+critic parameter shapes; it is structurally loadable but is deliberately not loaded because the governing entry does not load it and both arms must be restored the same way."
+  },
+  "provenance": {
+    "run_dir": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/runs/rolling/filtered-4000-env4096-stage020.ovvRL3",
+    "run_id": "filtered-4000-env4096-stage020.ovvRL3",
+    "source_snapshot": "runs/rolling/filtered-4000-env4096-stage020.ovvRL3/source",
+    "entry": "source/train_as2w_isaac_robust.py",
+    "launch_script": "runs/rolling/filtered-4000-env4096-stage020.ovvRL3/run.sh",
+    "source_reference_commit": "9dffc8c9055f9df3783af3ed6901da782d950f6f",
+    "armd_run_dir": "/root/gpufree-data/as2w-runs/as2w-rolling-goal/results/train/armD-turn65-1k-20261116-145902",
+    "armd_launch_script": "armD-turn65-1k-20261116-145902/launch.sh",
+    "armd_init_sha256": "4bdf4d26b076d7c717e9c151946dd42f8b3cf9dbbf592c5d6aac1ed5f6615866",
+    "urdf": "/root/gpufree-data/Rob2Nav/training/as2w-backup/dependencies/unitree_ros_as2w/robots/as2w_description/as2w.urdf"
+  },
+  "contract": {
+    "policy_step_s": 0.02,
+    "physics_step_s": 0.005,
+    "decimation": 4,
+    "obs_dim": 65,
+    "action_dim": 16,
+    "action_clip": 6.0,
+    "leg_action_scale_rad": 0.35,
+    "wheel_action_scale_rad_s": 16.0,
+    "wheel_radius_m": 0.086,
+    "leg_target_rate_limit_rad_s": 0.9,
+    "leg_target_rate_limit_rad_per_step": 0.018,
+    "leg_residual_filter_hz": 5.0,
+    "wheel_actuator_damping_kd": 2.0,
+    "torque_limits_nm": {
+      "hip": 54.0,
+      "thigh": 54.0,
+      "calf": 81.0,
+      "wheel": 13.5
+    },
+    "torque_limit_fraction": 0.9,
+    "open_loop_turn_compensation": "-.66*(1+.25*steering)*yaw_drive*side",
+    "env_gyro_correction": ".8*(yaw_cmd-omega_z) clamped +-0.10, engaged at |yaw_cmd|>=0.035",
+    "pure_turn_common_scale": 0.0,
+    "joint_order": [
+      "FL_hip",
+      "FR_hip",
+      "RL_hip",
+      "RR_hip",
+      "FL_thigh",
+      "FR_thigh",
+      "RL_thigh",
+      "RR_thigh",
+      "FL_calf",
+      "FR_calf",
+      "RL_calf",
+      "RR_calf",
+      "FL_foot",
+      "FR_foot",
+      "RL_foot",
+      "RR_foot"
+    ],
+    "wheel_positive_means": "rolling forward for all four wheels",
+    "wheel_order": [
+      "FL_foot",
+      "FR_foot",
+      "RL_foot",
+      "RR_foot"
+    ],
+    "wrapper_leg_prescale_rad_per_unit": 0.18
+  },
+  "shared_run": {
+    "num_envs": 4096,
+    "num_steps_per_env": 24,
+    "iterations": 400,
+    "seed": 311,
+    "save_interval": 25,
+    "learning_rate": 5e-05,
+    "episode_length_s": 23.0,
+    "motion_start_s": 4.0,
+    "park_until_s": 7.0,
+    "speed_cap_m_s": 0.2,
+    "wz_cap_rad_s": 0.12,
+    "vx_floor_m_s": 0.03,
+    "dwell_range_s": [
+      1.1,
+      3.4
+    ],
+    "env_step_budget": 39321600,
+    "env_step_budget_note": "4096 envs x 24 steps x 400 iterations = 39,321,600 environment steps; R4000 consumed 4096 x 24 x 4000 = 393,216,000, so this continuation is 10 percent of it",
+    "common_flags": [
+      "--viz none --device cuda:0",
+      "--profile expanded --speed-cap .20 --speed-rolling",
+      "--rolling-fixed-exit --rolling-stand-compensation --rolling-wheel-hold",
+      "--park-precalibrated --park-continuous-bias --park-straight-bias",
+      "--pure-turn-common-scale 0 --rolling-leg-filter-hz 5 --rolling-low-speed-smooth",
+      "--rolling-maneuvers --rolling-knee-margin --safety",
+      "--park-policy-rad 0 --learning-rate .00005 --seed 311"
+    ]
+  },
+  "A": {
+    "name": "A_nominal_r4000_curriculum",
+    "curriculum": {
+      "sampler": "R4000 RollingSpeedCommands.sample_motion (as2w_isaac_speed_range.py), unmodified",
+      "mixed_branch_share_of_segments": 0.4,
+      "base_branch_share_of_segments": 0.4,
+      "park_branch_share_of_segments": 0.2,
+      "within_mixed": {
+        "pure_turn": 0.4,
+        "arc": 0.15,
+        "straight": 0.45
+      },
+      "pure_turn": {
+        "vx_m_s": 0.0,
+        "wz_rad_s": "sign * U(0.035, 0.120)"
+      },
+      "arc": {
+        "vx_m_s": 0.05,
+        "wz_rad_s": "sign * U(0.035, 0.120)",
+        "directions": "forward only"
+      },
+      "straight": {
+        "vx_m_s": "sign * (0.03 + 0.17*U)",
+        "wz_rad_s": 0.0
+      },
+      "dwell_s": "U(1.1, 3.4) for every category",
+      "release_after_turn": "none (release happens only through the existing brake/park semantics)"
+    },
+    "overlay": "none, snapshot source used byte-identical"
+  },
+  "B": {
+    "name": "B_turn_curriculum_migrated",
+    "curriculum": {
+      "sampler": "turn-curriculum-migration/scripts/turn_schedule.py TurnSchedule, installed by rebinding as2w_isaac_speed_range.RollingSpeedCommands (no snapshot file is rewritten)",
+      "mixed_branch_share_of_segments": 0.4,
+      "base_branch_share_of_segments": 0.4,
+      "park_branch_share_of_segments": 0.2,
+      "within_mixed": {
+        "pure_turn": 0.3,
+        "turn_long": 0.15,
+        "arc": 0.25,
+        "straight": 0.3
+      },
+      "pure_turn": {
+        "vx_m_s": 0.0,
+        "wz_rad_s": "sign * U(0.035, 0.120)",
+        "dwell_s": [
+          1.1,
+          3.4
+        ]
+      },
+      "turn_long": {
+        "vx_m_s": 0.0,
+        "wz_rad_s": "sign * U(0.035, 0.120)",
+        "dwell_s": [
+          8.0,
+          12.0
+        ],
+        "followed_by": "explicit zero-command release segment of U(3.0, 3.5) s"
+      },
+      "arc": {
+        "vx_m_s": 0.2,
+        "wz_rad_s": "sign * choice(0.02, 0.04, 0.06)",
+        "dwell_s": [
+          1.1,
+          3.4
+        ],
+        "directions": "bidirectional 50/50"
+      },
+      "straight": {
+        "vx_m_s": "sign * U(0.03, 0.2)",
+        "wz_rad_s": 0.0,
+        "dwell_s": [
+          1.1,
+          3.4
+        ]
+      },
+      "release_s": [
+        3.0,
+        3.5
+      ]
+    },
+    "requested_arc_vx_m_s": 0.25,
+    "requested_arc_vx_status": "out_of_range",
+    "requested_arc_vx_resolution": "the frozen R4000 stage samples |vx| <= 0.20 m/s (speed_cap 0.20), so a 0.25 m/s arc would widen the speed domain at the same time as changing the turn curriculum, which the first round forbids. B therefore uses vx=0.20 m/s, the maximum in-range value, and keeps 0.25 for a later single-variable speed experiment."
+  },
+  "differences_B_vs_A": [
+    "within the mixed branch the category shares change from pure_turn .40 / arc .15 / straight .45 to pure_turn .30 / turn_long .15 / arc .25 / straight .30",
+    "a new turn_long category gets a dwell of 8-12 s instead of the global 1.1-3.4 s",
+    "every turn_long segment is followed by an explicit zero-command release of 3.0-3.5 s",
+    "arcs become bidirectional (A samples forward only) and their yaw magnitude is drawn from the small set {0.02, 0.04, 0.06} rad/s instead of U(0.035, 0.120)",
+    "arc forward speed moves from 0.05 to 0.20 m/s, still inside the frozen 0.20 m/s stage cap",
+    "no change to: observation, network, action wrapper, control contract, rewards, PPO, init, total env steps, randomisation, held-out seeds, speed cap, yaw cap, perturbation or payload range"
+  ],
+  "evaluation_plan_after_authorisation": {
+    "same_entry": "evaluate R4000 start, A and B with the same frozen matrix entry and the same held-out seeds",
+    "start_evaluated_as_original_checkpoint": "model_3999.pt is evaluated directly; model_0.pt is not used as the start because it may be rewritten by any later run",
+    "windows": [
+      "first 1 s",
+      "3-5 s",
+      "last 3 s"
+    ],
+    "per_direction": [
+      "arc_left",
+      "arc_right",
+      "turn_left",
+      "turn_right"
+    ],
+    "records": [
+      "signed yaw",
+      "measured wheel differential",
+      "four-wheel support",
+      "longest continuous unload"
+    ],
+    "selection": "worst side across held-out seeds, base/hard-protection gates first, then turning",
+    "long_turn_verification": "8-12 s sustained turn events must appear in the real rollout, not only in the sampler"
+  }
+}
