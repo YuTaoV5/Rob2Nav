@@ -27,17 +27,42 @@ LEGS = ("FL", "FR", "RL", "RR")
 JOINTS = [f"{leg}_{p}" for p in ("hip", "thigh", "calf", "foot") for leg in LEGS]
 DEFAULT = {"hip": 0.0, "thigh": 0.8, "calf": -1.6, "foot": 0.0}
 DEF = np.array([DEFAULT[n.split("_")[1]] for n in JOINTS])
-LEG_GAIN = {"hip": np.array([-0.35, 0.35, -0.35, 0.35]),
-            "thigh": np.array([-1.4, -1.4, -1.4, -1.4]),
-            "calf": np.array([1.2, 1.2, 1.2, 1.2])}
+# Small offsets: the earlier +-0.35/1.4/1.2 rad class tipped the robot over, which invalidated the test.
+LEG_GAIN = {"hip": np.array([-0.12, 0.12, -0.12, 0.12]),
+            "thigh": np.array([-0.15, -0.15, -0.15, -0.15]),
+            "calf": np.array([0.15, 0.15, 0.15, 0.15])}
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--xml", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--ckpt", type=Path, required=True,
+                    help="checkpoint for the POLICY that settles the robot - holding DEF rigidly collapses it")
     a = ap.parse_args()
     a.out.mkdir(parents=True, exist_ok=True)
+
+    import torch, torch.nn as nn
+
+    def build_actor(sd):
+        lin = {}
+        for k, v in sd.items():
+            if not k.startswith("mlp."):
+                continue
+            _, idx, param = k.split(".")
+            if param in ("weight", "bias"):
+                lin.setdefault(int(idx), {})[param] = v
+        layers, order = [], sorted(lin)
+        for n, i in enumerate(order):
+            w, b = lin[i]["weight"], lin[i]["bias"]
+            mm = nn.Linear(w.shape[1], w.shape[0]); mm.weight.data = w.clone(); mm.bias.data = b.clone()
+            layers.append(mm)
+            if n != len(order) - 1:
+                layers.append(nn.ELU())
+        return nn.Sequential(*layers).eval()
+
+    ck = torch.load(str(a.ckpt), map_location="cpu", weights_only=False)
+    act = build_actor(ck.get("actor_state_dict") or ck.get("model_state_dict"))
 
     m = mujoco.MjModel.from_xml_path(str(a.xml))
     m.opt.timestep = DT
@@ -67,31 +92,76 @@ def main() -> int:
     def diag(tag):
         print("    [diag %s] z=%.4f ncon=%d loads=%s" % (tag, float(d.qpos[2]), int(d.ncon), loads()))
 
-    def settle(n=400):
-        for _ in range(n):
-            q = d.qpos[qadr]; v = d.qvel[vadr]
-            tau = np.r_[kp[:12] * (tgt[:12] - q[:12]) - kd[:12] * v[:12],
-                        np.zeros(4)]
-            d.ctrl[aid] = np.clip(tau, -100, 100)
-            for _ in range(SUBSTEPS):
-                mujoco.mj_step(m, d)
+    prev = np.zeros(16); zr = [None]; ep = 0
 
-    def fresh(z=0.381395, lift_leg=None):
-        global tgt
+    def obs_of(prev, ep, zero_ref):
+        q = d.qpos[qadr].copy(); dq = d.qvel[vadr].copy()
+        w, x, y, z = d.qpos[3:7]
+        R = np.array([[1-2*(y*y+z*z), 2*(x*y-z*w), 2*(x*z+y*w)],
+                      [2*(x*y+z*w), 1-2*(x*x+z*z), 2*(y*z-x*w)],
+                      [2*(x*z-y*w), 2*(y*z+x*w), 1-2*(x*x+y*y)]])
+        qrel = q - DEF
+        qrel[12:] = (qrel[12:] + 2*np.pi) % (4*np.pi) - 2*np.pi
+        o = np.zeros(65)
+        o[0:3] = np.array([0.0, 0.0, 0.0]) - np.array([0.4, 0.0, 0.0])
+        o[3:6] = R.T @ d.qvel[3:6]
+        o[6:9] = R.T @ np.array([0.0, 0.0, -1.0])
+        o[9] = 0.4
+        o[10:26] = qrel
+        o[26:42] = dq
+        o[42:58] = prev
+        clk = 2*np.pi*ep*0.02/0.62
+        o[58], o[59] = np.sin(clk), np.cos(clk)
+        if zero_ref[0] is None:
+            zero_ref[0] = qrel[12:].copy()
+        dd = (qrel[12:] - zero_ref[0] + 2*np.pi) % (4*np.pi) - 2*np.pi
+        o[60:64] = np.clip(dd/0.20, -3, 3)
+        o[64] = 1.0
+        return o
+
+    def settle(n=150):
+        nonlocal prev, ep
+        for _ in range(n):
+            o = obs_of(prev, ep, zr)
+            with torch.no_grad():
+                prev[:] = np.clip(act(torch.tensor([o], dtype=torch.float32))[0].numpy(), -6, 6)
+            leg_t = prev[:12] * 0.35 + DEF[:12]
+            tgtw = prev[12:] * 16.0
+            for _ in range(SUBSTEPS):
+                q = d.qpos[qadr]; v = d.qvel[vadr]
+                tau = np.r_[kp[:12]*(leg_t - q[:12]) - kd[:12]*v[:12],
+                            6.0*(tgtw - v[12:])]
+                d.ctrl[aid] = np.clip(tau, -100, 100)
+                mujoco.mj_step(m, d)
+            ep += 1
+
+    def fresh(z=0.381395, lift_leg=None, lift_after=True):
+        nonlocal prev, ep
         mujoco.mj_resetData(m, d)
         d.qpos[0:3] = (0.0, 0.0, z)
         d.qpos[3:7] = (1.0, 0, 0, 0)
-        tgt = DEF.copy()
-        if lift_leg is not None:
-            i = LEGS.index(lift_leg)
-            for k, jt in enumerate(("hip", "thigh", "calf")):
-                idx = k * 4 + i          # contract layout is part-major: hip FL,FR,RL,RR then thigh, then calf
-                tgt[idx] = DEF[idx] + LEG_GAIN[jt][i]
-        d.qpos[qadr] = tgt
+        d.qpos[qadr] = DEF
         mujoco.mj_forward(m, d)
+        prev = np.zeros(16); ep = 0; zr[0] = None
         diag("after reset")
         settle()
         diag("after settle")
+        if lift_leg is not None and lift_after:
+            i = LEGS.index(lift_leg)
+            base = d.qpos[qadr][:12].copy()
+            for k, jt in enumerate(("hip", "thigh", "calf")):
+                idx = k * 4 + i      # contract layout is part-major
+                base[idx] = base[idx] + LEG_GAIN[jt][i]
+            # hold this offset for a short while so the load shift is observable
+            for _ in range(120):
+                leg_t = base
+                tgtw = np.zeros(4)
+                for _ in range(SUBSTEPS):
+                    q = d.qpos[qadr]; v = d.qvel[vadr]
+                    tau = np.r_[kp[:12]*(leg_t - q[:12]) - kd[:12]*v[:12], 6.0*(tgtw - v[12:])]
+                    d.ctrl[aid] = np.clip(tau, -100, 100)
+                    mujoco.mj_step(m, d)
+            diag("after lift %s" % lift_leg)
 
     results = {}
     fresh()
