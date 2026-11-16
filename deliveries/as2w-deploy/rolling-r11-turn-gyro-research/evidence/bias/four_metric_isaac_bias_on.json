@@ -1,0 +1,577 @@
+{
+ "checkpoint": "/root/gpufree-data/as2w-runs/as2w-rolling-goal/results/train/ab-A-equalbudget-20261116-095239/r11-final.pt",
+ "seed": 7393,
+ "leg_bias_rad": "-0.2467,0.2419,-0.2033,0.2079,0.0124,0.0170,0.0122,0.0137,0.1396,0.1461,0.1266,0.1310",
+ "bias_active": true,
+ "load_threshold_n": 5.0,
+ "cases": {
+  "arc_left": {
+   "command": {
+    "vx": 0.25,
+    "wz": 0.05
+   },
+   "per_leg": {
+    "FL": {
+     "before_turn": {
+      "q_err_max": 0.0954,
+      "wheel_dpos_fwd_m": 0.0,
+      "wheel_dpos_lat_m": 0.0,
+      "load_N": 67.8
+     },
+     "turn_end": {
+      "q_err_max": 0.0657,
+      "wheel_dpos_fwd_m": -0.0284,
+      "wheel_dpos_lat_m": 0.0532,
+      "load_N": 68.8
+     },
+     "release_end": {
+      "q_err_max": 0.1851,
+      "wheel_dpos_fwd_m": 0.0196,
+      "wheel_dpos_lat_m": 0.1016,
+      "load_N": 72.7
+     },
+     "after_stand": {
+      "q_err_max": 0.0917,
+      "wheel_dpos_fwd_m": -0.0231,
+      "wheel_dpos_lat_m": 0.0043,
+      "load_N": 52.6
+     },
+     "after_restart": {
+      "q_err_max": 0.1472,
+      "wheel_dpos_fwd_m": 0.0567,
+      "wheel_dpos_lat_m": 0.0361,
+      "load_N": 69.7
+     }
+    },
+    "FR": {
+     "before_turn": {
+      "q_err_max": 0.3197,
+      "wheel_dpos_fwd_m": 0.0,
+      "wheel_dpos_lat_m": 0.0,
+      "load_N": 57.6
+     },
+     "turn_end": {
+      "q_err_max": 0.3004,
+      "wheel_dpos_fwd_m": 0.0052,
+      "wheel_dpos_lat_m": 0.0663,
+      "load_N": 57.2
+     },
+     "release_end": {
+      "q_err_max": 0.451,
+      "wheel_dpos_fwd_m": -0.0269,
+      "wheel_dpos_lat_m": 0.1002,
+      "load_N": 48.0
+     },
+     "after_stand": {
+      "q_err_max": 0.0971,
+      "wheel_dpos_fwd_m": 0.0603,
+      "wheel_dpos_lat_m": 0.0281,
+      "load_N": 75.3
+     },
+     "after_restart": {
+      "q_err_max": 0.4582,
+      "wheel_dpos_fwd_m": -0.0408,
+      "wheel_dpos_lat_m": 0.0405,
+      "load_N": 55.8
+     }
+    },
+    "RL": {
+     "before_turn": {
+      "q_err_max": 0.2891,
+      "wheel_dpos_fwd_m": 0.0,
+      "wheel_dpos_lat_m": 0.0,
+      "load_N": 60.0
+     },
+     "turn_end": {
+      "q_err_max": 0.3252,
+      "wheel_dpos_fwd_m": -0.0271,
+      "wheel_dpos_lat_m": 0.0477,
+      "load_N": 55.4
+     },
+     "release_end": {
+      "q_err_max": 0.5329,
+      "wheel_dpos_fwd_m": 0.0012,
+      "wheel_dpos_lat_m": 0.1019,
+      "load_N": 59.2
+     },
+     "after_stand": {
+      "q_err_max": 0.1,
+      "wheel_dpos_fwd_m": 0.0194,
+      "wheel_dpos_lat_m": 0.0468,
+      "load_N": 72.4
+     },
+     "after_restart": {
+      "q_err_max": 0.5389,
+      "wheel_dpos_fwd_m": -0.0224,
+      "wheel_dpos_lat_m": 0.0731,
+      "load_N": 61.5
+     }
+    },
+    "RR": {
+     "before_turn": {
+      "q_err_max": 0.4149,
+      "wheel_dpos_fwd_m": 0.0,
+      "wheel_dpos_lat_m": 0.0,
+      "load_N": 90.6
+     },
+     "turn_end": {
+      "q_err_max": 0.312,
+      "wheel_dpos_fwd_m": 0.0887,
+      "wheel_dpos_lat_m": 0.0604,
+      "load_N": 83.4
+     },
+     "release_end": {
+      "q_err_max": 0.3976,
+      "wheel_dpos_fwd_m": 0.0215,
+      "wheel_dpos_lat_m": 0.1017,
+      "load_N": 93.0
+     },
+     "after_stand": {
+      "q_err_max": 0.1387,
+      "wheel_dpos_fwd_m": 0.0341,
+      "wheel_dpos_lat_m": 0.0549,
+      "load_N": 56.7
+     },
+     "after_restart": {
+      "q_err_max": 0.3208,
+      "wheel_dpos_fwd_m": -0.0064,
+      "wheel_dpos_lat_m": 0.0712,
+      "load_N": 90.4
+     }
+    }
+   },
+   "zero_command_drift_m": 0.2951,
+   "return_to_stand_support": 1.0,
+   "restart_support_frac": 1.0,
+   "restart_yaw_tail": -0.020213305534174046,
+   "turn_support_frac": 0.9766666666666667,
+   "release_support_frac": 0.9966666666666667
+  },
+  "arc_right": {
+   "command": {
+    "vx": 0.25,
+    "wz": -0.05
+   },
+   "per_leg": {
+    "FL": {
+     "before_turn": {
+      "q_err_max": 0.0954,
+      "wheel_dpos_fwd_m": 0.0,
+      "wheel_dpos_lat_m": 0.0,
+      "load_N": 67.8
+     },
+     "turn_end": {
+      "q_err_max": 0.081,
+      "wheel_dpos_fwd_m": -0.0254,
+      "wheel_dpos_lat_m": 0.0454,
+      "load_N": 0.0
+     },
+     "release_end": {
+      "q_err_max": 0.1448,
+      "wheel_dpos_fwd_m": 0.0285,
+      "wheel_dpos_lat_m": 0.0788,
+      "load_N": 72.7
+     },
+     "after_stand": {
+      "q_err_max": 0.2217,
+      "wheel_dpos_fwd_m": 0.009,
+      "wheel_dpos_lat_m": 0.1029,
+      "load_N": 73.7
+     },
+     "after_restart": {
+      "q_err_max": 0.1172,
+      "wheel_dpos_fwd_m": 0.0549,
+      "wheel_dpos_lat_m": 0.0293,
+      "load_N": 67.4
+     }
+    },
+    "FR": {
+     "before_turn": {
+      "q_err_max": 0.3197,
+      "wheel_dpos_fwd_m": 0.0,
+      "wheel_dpos_lat_m": 0.0,
+      "load_N": 57.6
+     },
+     "turn_end": {
+      "q_err_max": 0.1689,
+      "wheel_dpos_fwd_m": 0.0387,
+      "wheel_dpos_lat_m": 0.0562,
+      "load_N": 0.0
+     },
+     "release_end": {
+      "q_err_max": 0.4851,
+      "wheel_dpos_fwd_m": -0.041,
+      "wheel_dpos_lat_m": 0.0821,
+      "load_N": 45.3
+     },
+     "after_stand": {
+      "q_err_max": 0.5531,
+      "wheel_dpos_fwd_m": -0.0581,
+      "wheel_dpos_lat_m": 0.0945,
+      "load_N": 38.5
+     },
+     "after_restart": {
+      "q_err_max": 0.4572,
+      "wheel_dpos_fwd_m": -0.0425,
+      "wheel_dpos_lat_m": 0.0379,
+      "load_N": 52.7
+     }
+    },
+    "RL": {
+     "before_turn": {
+      "q_err_max": 0.2891,
+      "wheel_dpos_fwd_m": 0.0,
+      "wheel_dpos_lat_m": 0.0,
+      "load_N": 60.0
+     },
+     "turn_end": {
+      "q_err_max": 0.2793,
+      "wheel_dpos_fwd_m": 0.0079,
+      "wheel_dpos_lat_m": 0.0502,
+      "load_N": 0.0
+     },
+     "release_end": {
+      "q_err_max": 0.4902,
+      "wheel_dpos_fwd_m": 0.0042,
+      "wheel_dpos_lat_m": 0.0811,
+      "load_N": 56.8
+     },
+     "after_stand": {
+      "q_err_max": 0.5326,
+      "wheel_dpos_fwd_m": 0.0481,
+      "wheel_dpos_lat_m": 0.1098,
+      "load_N": 42.6
+     },
+     "after_restart": {
+      "q_err_max": 0.5124,
+      "wheel_dpos_fwd_m": -0.0201,
+      "wheel_dpos_lat_m": 0.0615,
+      "load_N": 62.7
+     }
+    },
+    "RR": {
+     "before_turn": {
+      "q_err_max": 0.4149,
+      "wheel_dpos_fwd_m": 0.0,
+      "wheel_dpos_lat_m": 0.0,
+      "load_N": 90.6
+     },
+     "turn_end": {
+      "q_err_max": 0.3063,
+      "wheel_dpos_fwd_m": 0.0854,
+      "wheel_dpos_lat_m": 0.0604,
+      "load_N": 0.0
+     },
+     "release_end": {
+      "q_err_max": 0.3561,
+      "wheel_dpos_fwd_m": -0.0003,
+      "wheel_dpos_lat_m": 0.0864,
+      "load_N": 98.5
+     },
+     "after_stand": {
+      "q_err_max": 0.3262,
+      "wheel_dpos_fwd_m": 0.0191,
+      "wheel_dpos_lat_m": 0.1045,
+      "load_N": 102.2
+     },
+     "after_restart": {
+      "q_err_max": 0.3011,
+      "wheel_dpos_fwd_m": -0.0069,
+      "wheel_dpos_lat_m": 0.0618,
+      "load_N": 93.3
+     }
+    }
+   },
+   "zero_command_drift_m": 0.226,
+   "return_to_stand_support": 0.9825,
+   "restart_support_frac": 0.9825,
+   "restart_yaw_tail": -0.021896355224307627,
+   "turn_support_frac": 0.9883333333333333,
+   "release_support_frac": 0.9766666666666667
+  },
+  "spin_left": {
+   "command": {
+    "vx": 0.0,
+    "wz": 0.05
+   },
+   "per_leg": {
+    "FL": {
+     "before_turn": {
+      "q_err_max": 0.0954,
+      "wheel_dpos_fwd_m": 0.0,
+      "wheel_dpos_lat_m": 0.0,
+      "load_N": 67.8
+     },
+     "turn_end": {
+      "q_err_max": 0.0863,
+      "wheel_dpos_fwd_m": -0.0663,
+      "wheel_dpos_lat_m": 0.0625,
+      "load_N": 76.1
+     },
+     "release_end": {
+      "q_err_max": 0.1504,
+      "wheel_dpos_fwd_m": 0.0223,
+      "wheel_dpos_lat_m": 0.0861,
+      "load_N": 73.7
+     },
+     "after_stand": {
+      "q_err_max": 0.3687,
+      "wheel_dpos_fwd_m": -0.0316,
+      "wheel_dpos_lat_m": 0.0752,
+      "load_N": 76.3
+     },
+     "after_restart": {
+      "q_err_max": 0.2119,
+      "wheel_dpos_fwd_m": 0.0748,
+      "wheel_dpos_lat_m": 0.0792,
+      "load_N": 71.1
+     }
+    },
+    "FR": {
+     "before_turn": {
+      "q_err_max": 0.3197,
+      "wheel_dpos_fwd_m": 0.0,
+      "wheel_dpos_lat_m": 0.0,
+      "load_N": 57.6
+     },
+     "turn_end": {
+      "q_err_max": 0.2307,
+      "wheel_dpos_fwd_m": 0.01,
+      "wheel_dpos_lat_m": 0.0759,
+      "load_N": 51.3
+     },
+     "release_end": {
+      "q_err_max": 0.4656,
+      "wheel_dpos_fwd_m": -0.0333,
+      "wheel_dpos_lat_m": 0.0892,
+      "load_N": 52.3
+     },
+     "after_stand": {
+      "q_err_max": 0.6652,
+      "wheel_dpos_fwd_m": -0.1115,
+      "wheel_dpos_lat_m": 0.0486,
+      "load_N": 14.5
+     },
+     "after_restart": {
+      "q_err_max": 0.574,
+      "wheel_dpos_fwd_m": -0.0753,
+      "wheel_dpos_lat_m": 0.0483,
+      "load_N": 53.4
+     }
+    },
+    "RL": {
+     "before_turn": {
+      "q_err_max": 0.2891,
+      "wheel_dpos_fwd_m": 0.0,
+      "wheel_dpos_lat_m": 0.0,
+      "load_N": 60.0
+     },
+     "turn_end": {
+      "q_err_max": 0.1685,
+      "wheel_dpos_fwd_m": -0.0126,
+      "wheel_dpos_lat_m": 0.054,
+      "load_N": 61.9
+     },
+     "release_end": {
+      "q_err_max": 0.5184,
+      "wheel_dpos_fwd_m": 0.005,
+      "wheel_dpos_lat_m": 0.0858,
+      "load_N": 54.4
+     },
+     "after_stand": {
+      "q_err_max": 0.5101,
+      "wheel_dpos_fwd_m": 0.0846,
+      "wheel_dpos_lat_m": 0.1444,
+      "load_N": 32.6
+     },
+     "after_restart": {
+      "q_err_max": 0.5307,
+      "wheel_dpos_fwd_m": -0.0153,
+      "wheel_dpos_lat_m": 0.1048,
+      "load_N": 48.2
+     }
+    },
+    "RR": {
+     "before_turn": {
+      "q_err_max": 0.4149,
+      "wheel_dpos_fwd_m": 0.0,
+      "wheel_dpos_lat_m": 0.0,
+      "load_N": 90.6
+     },
+     "turn_end": {
+      "q_err_max": 0.2105,
+      "wheel_dpos_fwd_m": 0.0839,
+      "wheel_dpos_lat_m": 0.0671,
+      "load_N": 73.1
+     },
+     "release_end": {
+      "q_err_max": 0.3636,
+      "wheel_dpos_fwd_m": 0.0083,
+      "wheel_dpos_lat_m": 0.0898,
+      "load_N": 94.3
+     },
+     "after_stand": {
+      "q_err_max": 0.1776,
+      "wheel_dpos_fwd_m": -0.0524,
+      "wheel_dpos_lat_m": 0.1083,
+      "load_N": 138.8
+     },
+     "after_restart": {
+      "q_err_max": 0.3468,
+      "wheel_dpos_fwd_m": 0.0089,
+      "wheel_dpos_lat_m": 0.0661,
+      "load_N": 91.8
+     }
+    }
+   },
+   "zero_command_drift_m": 0.2454,
+   "return_to_stand_support": 1.0,
+   "restart_support_frac": 1.0,
+   "restart_yaw_tail": -0.010416516219265759,
+   "turn_support_frac": 0.9783333333333334,
+   "release_support_frac": 0.9966666666666667
+  },
+  "spin_right": {
+   "command": {
+    "vx": 0.0,
+    "wz": -0.05
+   },
+   "per_leg": {
+    "FL": {
+     "before_turn": {
+      "q_err_max": 0.0954,
+      "wheel_dpos_fwd_m": 0.0,
+      "wheel_dpos_lat_m": 0.0,
+      "load_N": 67.8
+     },
+     "turn_end": {
+      "q_err_max": 0.0851,
+      "wheel_dpos_fwd_m": -0.0655,
+      "wheel_dpos_lat_m": 0.0624,
+      "load_N": 73.5
+     },
+     "release_end": {
+      "q_err_max": 0.1518,
+      "wheel_dpos_fwd_m": 0.0214,
+      "wheel_dpos_lat_m": 0.0875,
+      "load_N": 74.5
+     },
+     "after_stand": {
+      "q_err_max": 0.3678,
+      "wheel_dpos_fwd_m": -0.0372,
+      "wheel_dpos_lat_m": 0.0752,
+      "load_N": 76.2
+     },
+     "after_restart": {
+      "q_err_max": 0.2324,
+      "wheel_dpos_fwd_m": 0.0725,
+      "wheel_dpos_lat_m": 0.0731,
+      "load_N": 73.2
+     }
+    },
+    "FR": {
+     "before_turn": {
+      "q_err_max": 0.3197,
+      "wheel_dpos_fwd_m": 0.0,
+      "wheel_dpos_lat_m": 0.0,
+      "load_N": 57.6
+     },
+     "turn_end": {
+      "q_err_max": 0.2277,
+      "wheel_dpos_fwd_m": 0.0103,
+      "wheel_dpos_lat_m": 0.0758,
+      "load_N": 54.3
+     },
+     "release_end": {
+      "q_err_max": 0.4615,
+      "wheel_dpos_fwd_m": -0.0322,
+      "wheel_dpos_lat_m": 0.0904,
+      "load_N": 52.7
+     },
+     "after_stand": {
+      "q_err_max": 0.6663,
+      "wheel_dpos_fwd_m": -0.1125,
+      "wheel_dpos_lat_m": 0.0485,
+      "load_N": 16.1
+     },
+     "after_restart": {
+      "q_err_max": 0.5782,
+      "wheel_dpos_fwd_m": -0.0769,
+      "wheel_dpos_lat_m": 0.0385,
+      "load_N": 57.1
+     }
+    },
+    "RL": {
+     "before_turn": {
+      "q_err_max": 0.2891,
+      "wheel_dpos_fwd_m": 0.0,
+      "wheel_dpos_lat_m": 0.0,
+      "load_N": 60.0
+     },
+     "turn_end": {
+      "q_err_max": 0.1689,
+      "wheel_dpos_fwd_m": -0.0131,
+      "wheel_dpos_lat_m": 0.0537,
+      "load_N": 61.5
+     },
+     "release_end": {
+      "q_err_max": 0.5234,
+      "wheel_dpos_fwd_m": 0.0036,
+      "wheel_dpos_lat_m": 0.0868,
+      "load_N": 54.1
+     },
+     "after_stand": {
+      "q_err_max": 0.5208,
+      "wheel_dpos_fwd_m": 0.0883,
+      "wheel_dpos_lat_m": 0.1433,
+      "load_N": 34.0
+     },
+     "after_restart": {
+      "q_err_max": 0.5751,
+      "wheel_dpos_fwd_m": -0.017,
+      "wheel_dpos_lat_m": 0.1107,
+      "load_N": 44.2
+     }
+    },
+    "RR": {
+     "before_turn": {
+      "q_err_max": 0.4149,
+      "wheel_dpos_fwd_m": 0.0,
+      "wheel_dpos_lat_m": 0.0,
+      "load_N": 90.6
+     },
+     "turn_end": {
+      "q_err_max": 0.2087,
+      "wheel_dpos_fwd_m": 0.0836,
+      "wheel_dpos_lat_m": 0.0668,
+      "load_N": 72.3
+     },
+     "release_end": {
+      "q_err_max": 0.3639,
+      "wheel_dpos_fwd_m": 0.0091,
+      "wheel_dpos_lat_m": 0.0906,
+      "load_N": 93.6
+     },
+     "after_stand": {
+      "q_err_max": 0.1625,
+      "wheel_dpos_fwd_m": -0.0553,
+      "wheel_dpos_lat_m": 0.1079,
+      "load_N": 140.4
+     },
+     "after_restart": {
+      "q_err_max": 0.326,
+      "wheel_dpos_fwd_m": 0.0051,
+      "wheel_dpos_lat_m": 0.0657,
+      "load_N": 93.9
+     }
+    }
+   },
+   "zero_command_drift_m": 0.2471,
+   "return_to_stand_support": 1.0,
+   "restart_support_frac": 1.0,
+   "restart_yaw_tail": -0.009787138509564102,
+   "turn_support_frac": 0.9783333333333334,
+   "release_support_frac": 0.9966666666666667
+  }
+ }
+}
