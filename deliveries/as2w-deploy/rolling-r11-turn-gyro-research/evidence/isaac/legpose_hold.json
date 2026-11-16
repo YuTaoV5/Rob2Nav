@@ -1,0 +1,149 @@
+{
+ "checkpoint": "/root/gpufree-data/as2w-runs/r11_fanziqi_lab/yaw-arms/armE-support-20261116-034514/r11-final.pt",
+ "seed": 7393,
+ "hold_s": 10.0,
+ "leg_scale": 0.35,
+ "note": "leg-pose offsets applied as a constant offset on the leg part of the action; target = DEFAULT + offset",
+ "gates": {
+  "hold_vx": 0.02,
+  "hold_wz": 0.02,
+  "upright": 0.85
+ },
+ "arms": [
+  {
+   "spec": {},
+   "applied_joint_indices": [],
+   "applied_offset_rad": [],
+   "n_frames": 500,
+   "vx_tail": -0.0005593038574443199,
+   "vy_tail": -0.0018416287079647494,
+   "wz_tail": -0.0018046691454946995,
+   "vx_absmax_full": 0.012594562023878098,
+   "upright_min": 0.9992498159408569,
+   "displacement_m": 0.03865205496549606,
+   "tau_absmax": 1.662762999534607,
+   "terminations": 0,
+   "arm": "baseline"
+  },
+  {
+   "spec": {
+    "thigh": 0.04,
+    "calf": -0.08
+   },
+   "applied_joint_indices": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   "applied_offset_rad": [
+    0.04,
+    0.04,
+    0.04,
+    0.04,
+    -0.08,
+    -0.08,
+    -0.08,
+    -0.08
+   ],
+   "n_frames": 500,
+   "vx_tail": 0.014534575687721372,
+   "vy_tail": -0.0028337796847335995,
+   "wz_tail": -0.0036787706485483795,
+   "vx_absmax_full": 0.023987503722310066,
+   "upright_min": 0.9982603788375854,
+   "displacement_m": 0.07978685945272446,
+   "tau_absmax": 1.65569007396698,
+   "terminations": 0,
+   "arm": "base_h_up"
+  },
+  {
+   "spec": {
+    "thigh": -0.04,
+    "calf": 0.08
+   },
+   "applied_joint_indices": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   "applied_offset_rad": [
+    -0.04,
+    -0.04,
+    -0.04,
+    -0.04,
+    0.08,
+    0.08,
+    0.08,
+    0.08
+   ],
+   "n_frames": 500,
+   "vx_tail": -0.00013544726054533384,
+   "vy_tail": -2.60257792979246e-05,
+   "wz_tail": 0.00030408707574072953,
+   "vx_absmax_full": 0.01464382465928793,
+   "upright_min": 0.999510645866394,
+   "displacement_m": 0.023687802255153656,
+   "tau_absmax": 2.8506085872650146,
+   "terminations": 0,
+   "arm": "base_h_down"
+  },
+  {
+   "spec": {
+    "thigh_RL": 0.1,
+    "thigh_RR": 0.1
+   },
+   "applied_joint_indices": [
+    6,
+    7
+   ],
+   "applied_offset_rad": [
+    0.1,
+    0.1
+   ],
+   "n_frames": 500,
+   "vx_tail": -0.000780156588977358,
+   "vy_tail": 0.0002455666121992787,
+   "wz_tail": 0.00027983703058756266,
+   "vx_absmax_full": 0.04060741141438484,
+   "upright_min": 0.9979607462882996,
+   "displacement_m": 0.09979323297739029,
+   "tau_absmax": 1.8967256546020508,
+   "terminations": 0,
+   "arm": "rear_rake_fwd"
+  },
+  {
+   "spec": {
+    "thigh_RL": -0.1,
+    "thigh_RR": -0.1
+   },
+   "applied_joint_indices": [
+    6,
+    7
+   ],
+   "applied_offset_rad": [
+    -0.1,
+    -0.1
+   ],
+   "n_frames": 500,
+   "vx_tail": -0.001353621054731775,
+   "vy_tail": -0.002388477851006125,
+   "wz_tail": -0.0015313267961998159,
+   "vx_absmax_full": 0.032818254083395004,
+   "upright_min": 0.9985185861587524,
+   "displacement_m": 0.08166968077421188,
+   "tau_absmax": 2.2964096069335938,
+   "terminations": 0,
+   "arm": "rear_rake_back"
+  }
+ ]
+}
