@@ -1,5 +1,7 @@
 # AS2-W skills
 
+- [工程教训清单（必读）](ENGINEERING_LESSONS.md) —— 本仓库已实际发生过并已修正的 9 类 38 条错误，含提交结论前的 18 项自查表。做仿真、评测、导出或部署前先读。
+
 ## 训练与交付手册
 
 - [AS2-W 训练守则](../../training/as2w-backup/as2w-current/AGENTS.md)
