@@ -83,6 +83,12 @@ def main() -> int:
     # wheels are forced to zero: the policy keeps moving the legs, and the resulting body motion
     # drags the wheels (creep up to 0.35 rad/s).  So the legs must be frozen at the fixed stand as
     # well, otherwise the wheels can never be measured from rest.
+    # Body lock: the two earlier attempts could not establish a rest baseline because the wheel
+    # drive is a KD damper, not a brake, so the robot creeps.  Locking the root pose/velocity back
+    # to its initial value every policy step prevents any translation, which is the only way the
+    # classic "torque from rest, find break-away" experiment becomes meaningful here.
+    ap.add_argument("--lock-body", type=int, default=1,
+                    help="1 = rewrite the root pose and zero its velocity every policy step")
     ap.add_argument("--freeze-legs", type=int, default=1,
                     help="1 = hold the leg action at 0 (fixed stand) during baseline and ramp")
     ap.add_argument("--num-envs", type=int, default=1)
@@ -119,6 +125,24 @@ def main() -> int:
                 t = f.torch if hasattr(torch, "no_grad") and hasattr(f, "torch") else torch.as_tensor(f, device=env.device)
                 return t[0][widx].detach().cpu().numpy().astype(float)
 
+            root_pose0 = robot.data.root_state_w.torch[0, :7].clone()
+            lock_stats = {"steps": 0, "max_pos_err": 0.0}
+
+            def lock_root():
+                """Force the root back to its initial pose and kill its velocity."""
+                if not args.lock_body:
+                    return
+                try:
+                    pose = root_pose0.unsqueeze(0)
+                    robot.write_root_pose_to_sim(pose)
+                    robot.write_root_velocity_to_sim(torch.zeros((1, 6), device=env.device))
+                    cur = robot.data.root_pos_w.torch[0]
+                    err = float(torch.linalg.norm(cur - root_pose0[:3]))
+                    lock_stats["max_pos_err"] = max(lock_stats["max_pos_err"], err)
+                    lock_stats["steps"] += 1
+                except Exception as exc:
+                    lock_stats["error"] = "%s: %s" % (type(exc).__name__, exc)
+
             def step_with(tgt_all, obs):
                 """Advance one policy step with the wheel targets forced to tgt_all.
 
@@ -133,6 +157,7 @@ def main() -> int:
                 for j in range(4):
                     a[0, 12 + j] = float(tgt_all) / WHEEL_SCALE
                 obs, _r, _d, _i = wrapped.step(a)
+                lock_root()
                 dq = robot.data.joint_vel.torch[0][widx].detach().cpu().numpy().copy()
                 tau = measured_tau()
                 return obs, dq, tau, bool(_d[0])
@@ -144,6 +169,7 @@ def main() -> int:
                 with torch.inference_mode():
                     a = policy(obs)
                 obs, _r, _d, _i = wrapped.step(a)
+                lock_root()
 
             # ---- baseline gate -------------------------------------------------
             base = []
@@ -163,6 +189,7 @@ def main() -> int:
                    "baseline_ok": baseline_ok, "step_rad_s": args.step, "dwell_s": args.dwell,
                    "tgt_max_rad_s": args.tgt_max, "onset_dq": args.onset_dq,
                    "wheel_kd": WHEEL_KD, "wheel_tau_cap_nm": WHEEL_TAU_CAP,
+                   "lock_body": int(args.lock_body), "lock_stats": lock_stats,
                    "freeze_legs": int(args.freeze_legs), "steps": [], "per_wheel": {}}
 
             dwell_n = max(1, int(args.dwell / DT))
