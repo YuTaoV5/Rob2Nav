@@ -1,0 +1,262 @@
+{
+ "checkpoint": "/root/gpufree-data/as2w-runs/r11_fanziqi_lab/yaw-arms/armE-support-20261116-034514/r11-final.pt",
+ "seed": 7393,
+ "wheel_tau_cap_nm": 13.5,
+ "wheel_kd": 6.0,
+ "wheel_scale": 16.0,
+ "api": {
+  "getters": [
+   "get_coriolis_and_centrifugal_compensation_forces",
+   "get_dof_actuation_forces",
+   "get_dof_max_forces",
+   "get_dof_projected_joint_forces",
+   "get_gravity_compensation_forces",
+   "get_link_incoming_joint_force"
+  ],
+  "projected_available": true,
+  "incoming_available": true
+ },
+ "note": "reconstruction is KD*(target-actual); 'actual' is the solver-projected DOF force when the API allows",
+ "cases": {
+  "turn_left_0.05": {
+   "n_frames": 600,
+   "actual_source": "measured",
+   "yaw_track_tail": 0.07445096436034267,
+   "per_wheel": {
+    "FL": {
+     "tgt_mean": -0.21315929293632507,
+     "tgt_absmax": 2.616983413696289,
+     "dq_mean": 0.007255110889673233,
+     "recon_mean": -1.322486400604248,
+     "recon_absmax": 4.50360107421875,
+     "recon_cap_frac": 0.0,
+     "track_ratio": -0.034036099910736084,
+     "actual_mean": -0.8549598414221934,
+     "actual_absmax": 4.360654354095459,
+     "actual_cap_frac": 0.0,
+     "actual_over_recon": 0.6742044108508815
+    },
+    "FR": {
+     "tgt_mean": 0.21428990364074707,
+     "tgt_absmax": 0.5775775909423828,
+     "dq_mean": -0.027246439829468727,
+     "recon_mean": 1.4492180347442627,
+     "recon_absmax": 2.5293760299682617,
+     "recon_cap_frac": 0.0,
+     "track_ratio": -0.12714757025241852,
+     "actual_mean": 1.0900393084685007,
+     "actual_absmax": 1.7665770053863525,
+     "actual_cap_frac": 0.0,
+     "actual_over_recon": 0.7521568751805212
+    },
+    "RL": {
+     "tgt_mean": 0.07860253751277924,
+     "tgt_absmax": 2.012606382369995,
+     "dq_mean": -0.011239620856940746,
+     "recon_mean": 0.5390529632568359,
+     "recon_absmax": 2.064878463745117,
+     "recon_cap_frac": 0.0,
+     "track_ratio": -0.14299310743808746,
+     "actual_mean": 0.47957136313120524,
+     "actual_absmax": 0.991649866104126,
+     "actual_cap_frac": 0.0,
+     "actual_over_recon": 0.8427310981786483
+    },
+    "RR": {
+     "tgt_mean": 0.02126351371407509,
+     "tgt_absmax": 3.216867208480835,
+     "dq_mean": -0.011914445087313652,
+     "recon_mean": 0.19906778633594513,
+     "recon_absmax": 2.205443859100342,
+     "recon_cap_frac": 0.0,
+     "track_ratio": -0.5603234171867371,
+     "actual_mean": 0.16412146807958683,
+     "actual_absmax": 2.0318028926849365,
+     "actual_cap_frac": 0.0,
+     "actual_over_recon": 0.7435002186428704
+    }
+   },
+   "cmd_wz": 0.05
+  },
+  "turn_right_0.05": {
+   "n_frames": 600,
+   "actual_source": "measured",
+   "yaw_track_tail": 0.0966637244700299,
+   "per_wheel": {
+    "FL": {
+     "tgt_mean": 0.49158233404159546,
+     "tgt_absmax": 2.4105324745178223,
+     "dq_mean": 0.0006284330156631768,
+     "recon_mean": 2.94572377204895,
+     "recon_absmax": 4.472043991088867,
+     "recon_cap_frac": 0.0,
+     "track_ratio": 0.0012783880811184645,
+     "actual_mean": 2.276491969426473,
+     "actual_absmax": 3.275184154510498,
+     "actual_cap_frac": 0.0,
+     "actual_over_recon": 0.7728124378216966
+    },
+    "FR": {
+     "tgt_mean": -0.11712700873613358,
+     "tgt_absmax": 1.1201752424240112,
+     "dq_mean": -0.034396372735500336,
+     "recon_mean": -0.49638381600379944,
+     "recon_absmax": 2.306885242462158,
+     "recon_cap_frac": 0.0,
+     "track_ratio": 0.2936673164367676,
+     "actual_mean": -0.3431734230245153,
+     "actual_absmax": 1.5152209997177124,
+     "actual_cap_frac": 0.0,
+     "actual_over_recon": 0.7019122714446613
+    },
+    "RL": {
+     "tgt_mean": 0.103721022605896,
+     "tgt_absmax": 1.22995924949646,
+     "dq_mean": 0.015270577743649483,
+     "recon_mean": 0.5307027101516724,
+     "recon_absmax": 1.3619744777679443,
+     "recon_cap_frac": 0.0,
+     "track_ratio": 0.14722740650177002,
+     "actual_mean": 0.4623589676991105,
+     "actual_absmax": 0.9867370128631592,
+     "actual_cap_frac": 0.0,
+     "actual_over_recon": 0.8458206807414443
+    },
+    "RR": {
+     "tgt_mean": -0.28170767426490784,
+     "tgt_absmax": 3.540194034576416,
+     "dq_mean": -0.07766301184892654,
+     "recon_mean": -1.2242679595947266,
+     "recon_absmax": 3.9178004264831543,
+     "recon_cap_frac": 0.0,
+     "track_ratio": 0.2756865322589874,
+     "actual_mean": -0.9517648514111837,
+     "actual_absmax": 1.6425820589065552,
+     "actual_cap_frac": 0.0,
+     "actual_over_recon": 0.7774154701608377
+    }
+   },
+   "cmd_wz": -0.05
+  },
+  "turn_left_0.10": {
+   "n_frames": 600,
+   "actual_source": "measured",
+   "yaw_track_tail": 0.016827436292078345,
+   "per_wheel": {
+    "FL": {
+     "tgt_mean": -0.3627449572086334,
+     "tgt_absmax": 2.8745193481445312,
+     "dq_mean": -0.012632816098630428,
+     "recon_mean": -2.100672960281372,
+     "recon_absmax": 4.315265655517578,
+     "recon_cap_frac": 0.0,
+     "track_ratio": 0.03482561558485031,
+     "actual_mean": -1.5668212175369263,
+     "actual_absmax": 3.064626455307007,
+     "actual_cap_frac": 0.0,
+     "actual_over_recon": 0.7458663233933664
+    },
+    "FR": {
+     "tgt_mean": 0.44171401858329773,
+     "tgt_absmax": 0.7109005451202393,
+     "dq_mean": -0.005961835850030184,
+     "recon_mean": 2.6860551834106445,
+     "recon_absmax": 3.0980944633483887,
+     "recon_cap_frac": 0.0,
+     "track_ratio": -0.013497048988938332,
+     "actual_mean": 2.050567923386892,
+     "actual_absmax": 2.2896728515625,
+     "actual_cap_frac": 0.0,
+     "actual_over_recon": 0.7634124332409148
+    },
+    "RL": {
+     "tgt_mean": -0.26685693860054016,
+     "tgt_absmax": 2.2654995918273926,
+     "dq_mean": 0.007240104489028454,
+     "recon_mean": -1.6445822715759277,
+     "recon_absmax": 2.7177579402923584,
+     "recon_cap_frac": 0.0,
+     "track_ratio": -0.027131034061312675,
+     "actual_mean": -1.1617181094487508,
+     "actual_absmax": 1.2867283821105957,
+     "actual_cap_frac": 0.0,
+     "actual_over_recon": 0.7063909963808193
+    },
+    "RR": {
+     "tgt_mean": 0.07709120213985443,
+     "tgt_absmax": 2.7913663387298584,
+     "dq_mean": -0.004121852573007345,
+     "recon_mean": 0.4872783422470093,
+     "recon_absmax": 2.623373508453369,
+     "recon_cap_frac": 0.0,
+     "track_ratio": -0.05346722528338432,
+     "actual_mean": 0.4035335899978721,
+     "actual_absmax": 1.3514320850372314,
+     "actual_cap_frac": 0.0,
+     "actual_over_recon": 0.784323727313589
+    }
+   },
+   "cmd_wz": 0.1
+  },
+  "turn_right_0.10": {
+   "n_frames": 600,
+   "actual_source": "measured",
+   "yaw_track_tail": 0.21585441920906306,
+   "per_wheel": {
+    "FL": {
+     "tgt_mean": 0.6066238880157471,
+     "tgt_absmax": 2.3817391395568848,
+     "dq_mean": 0.19519278407096863,
+     "recon_mean": 2.4685866832733154,
+     "recon_absmax": 5.183262348175049,
+     "recon_cap_frac": 0.0,
+     "track_ratio": 0.32176902890205383,
+     "actual_mean": 1.852643692974622,
+     "actual_absmax": 3.876006841659546,
+     "actual_cap_frac": 0.0,
+     "actual_over_recon": 0.7463888269430827
+    },
+    "FR": {
+     "tgt_mean": -0.036993417888879776,
+     "tgt_absmax": 1.7206202745437622,
+     "dq_mean": -0.024064797908067703,
+     "recon_mean": -0.07757166773080826,
+     "recon_absmax": 2.0935778617858887,
+     "recon_cap_frac": 0.0,
+     "track_ratio": 0.6505156755447388,
+     "actual_mean": -0.13860163575038315,
+     "actual_absmax": 1.4321852922439575,
+     "actual_cap_frac": 0.0,
+     "actual_over_recon": 0.7829161204801514
+    },
+    "RL": {
+     "tgt_mean": 0.06613338738679886,
+     "tgt_absmax": 0.5661939978599548,
+     "dq_mean": 0.023847859352827072,
+     "recon_mean": 0.2537131607532501,
+     "recon_absmax": 1.5931222438812256,
+     "recon_cap_frac": 0.0,
+     "track_ratio": 0.36060240864753723,
+     "actual_mean": 0.20017061644233763,
+     "actual_absmax": 1.0927377939224243,
+     "actual_cap_frac": 0.0,
+     "actual_over_recon": 0.7196879387651394
+    },
+    "RR": {
+     "tgt_mean": -0.15227985382080078,
+     "tgt_absmax": 3.480039358139038,
+     "dq_mean": -0.08260359615087509,
+     "recon_mean": -0.41805756092071533,
+     "recon_absmax": 2.5069048404693604,
+     "recon_cap_frac": 0.0,
+     "track_ratio": 0.5424460172653198,
+     "actual_mean": -0.2729765858501196,
+     "actual_absmax": 1.8263590335845947,
+     "actual_cap_frac": 0.0,
+     "actual_over_recon": 0.6419266481200785
+    }
+   },
+   "cmd_wz": -0.1
+  }
+ }
+}
