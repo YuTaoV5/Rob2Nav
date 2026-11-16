@@ -1,0 +1,30 @@
+{
+  "checkpoint": "/root/gpufree-data/Rob2Nav/deliveries/as2w-deploy/rolling-armD-turn65-research/weights/armD_turn65_final.pt",
+  "checkpoint_sha256": "de61de58fd68efc356efbd48a0b9683153361fc87b6fb32c7b9c83584cbd6926",
+  "onnx": "/root/gpufree-data/Rob2Nav/deliveries/as2w-deploy/rolling-armD-turn65-research/weights/policy.onnx",
+  "onnx_sha256": "087c91bc4c613271d3b841ac001ab6c169e7f6e62264671c5c2a4e4e23dc9821",
+  "onnx_bytes": 175066,
+  "opset": 17,
+  "input": {
+    "name": "obs",
+    "shape": [
+      1,
+      65
+    ],
+    "dtype": "float32"
+  },
+  "output": {
+    "name": "action",
+    "shape": [
+      1,
+      16
+    ],
+    "dtype": "float32"
+  },
+  "comparison": {
+    "samples": 4096,
+    "max_abs_err": 1.9073486328125e-06,
+    "pass": true
+  },
+  "exporter": "torch.onnx.export(dynamo=False), single self-contained file"
+}

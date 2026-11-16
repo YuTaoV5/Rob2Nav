@@ -1,0 +1,12 @@
+run=armD-turn65-1k
+user_decision=2026-11-16 operator: save armC, stop it, start a fresh group from 4bdf4d26 for 1000 rounds with turning exposure restored to 65 percent
+init_checkpoint=/root/gpufree-data/as2w-runs/r11_fanziqi_lab/yaw-arms/armE-support-20261116-034514/r11-final.pt
+init_sha256=4bdf4d26b076d7c717e9c151946dd42f8b3cf9dbbf592c5d6aac1ed5f6615866
+num_envs=4096
+iterations=1000
+save_interval=200
+mixture: turn=0.40 arc=0.25 hold=0.15 straight=0.10 brake=0.10  (turning total 0.65)
+gyro: kp=60 cap=4 ff_gain=0 (in training loop, as A/B)
+reward: yaw_weight=3.0 yaw_std=0.05 sym_w=0.0 support_w=-2.0
+posture_bias=off ; normal_exit=four-wheel grounded return
+KNOWN_DEFECT: the AS2W_AB_TURN_DWELL_* variables are PRINTED but never used by as2w_ab_curriculum.py - "long turns" were never actually implemented in armB or armC

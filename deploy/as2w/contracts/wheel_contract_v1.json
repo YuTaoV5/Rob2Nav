@@ -1,0 +1,73 @@
+{
+  "$comment": "Versioned wheel contract for AS2-W rolling. Training, Isaac Lab evaluation and MuJoCo evaluation MUST all read the wheel scale, wheel gain, compensation switch and limits from ONE entry here. This exists because the old r11 defaults (scale 16, kd 6, gyro-1) silently leaked into evaluations before.",
+  "contract_version": "wheel-contract-v1",
+  "created": "2026-11-17",
+  "wheel_order": [
+    "FL_foot",
+    "FR_foot",
+    "RL_foot",
+    "RR_foot"
+  ],
+  "wheel_positive_means": "rolling forward for all four wheels",
+  "differential_formula": "(FR + RR - FL - RL) / 2",
+  "diagonal_formula": "(FL + RR - FR - RL) / 2",
+  "torque_budget_nm": 13.5,
+  "torque_budget_note": "90 percent of the verified 15 Nm hardware limit; unified denominator is deploy.yaml torque_limits_nm, ratio must stay <= 1.00",
+  "observation_dim": 65,
+  "action_dim": 16,
+  "control_period_s": 0.02,
+  "contracts": {
+    "fanziqi_direct_v1": {
+      "description": "four independent wheel velocity channels straight from the actor; controller adapted from Fan Ziqi Robot Lab Go2-W; NOT yet validated on AS2-W",
+      "wheel_action_scale": 5.0,
+      "wheel_action_note": "wheel_target = 5.0 * wheel_action",
+      "wheel_kp": 0.0,
+      "wheel_kd": 0.5,
+      "wheel_mode": "velocity",
+      "gyro_enabled": false,
+      "gyro_yaw_kp": 0.0,
+      "gyro_ff_cap_nm": 0.0,
+      "gyro_ff_gain": 0.0,
+      "leg_kp": 55.0,
+      "leg_kd": 2.0,
+      "leg_action_scale": 0.35,
+      "status": "research",
+      "deployable": false
+    },
+    "r11_legacy": {
+      "description": "the r11 rolling wrapper this project has been evaluating so far; kept as the comparison arm",
+      "wheel_action_scale": 16.0,
+      "wheel_action_note": "wheel_target = 16.0 * wheel_action",
+      "wheel_kp": 0.0,
+      "wheel_kd": 6.0,
+      "wheel_mode": "velocity",
+      "gyro_enabled": false,
+      "gyro_enabled_variant": "gyro-1 adds ff = S*clip(yaw_kp*(wz_cmd - wz_meas), +-ff_cap) and dispatches sp = dq + tau/kd",
+      "gyro_yaw_kp": 60.0,
+      "gyro_ff_cap_nm": 4.0,
+      "gyro_ff_gain": 0.0,
+      "gyro_axis_vector_S": [
+        -1,
+        1,
+        -1,
+        1
+      ],
+      "leg_kp": 55.0,
+      "leg_kd": 2.0,
+      "leg_action_scale": 0.35,
+      "status": "research",
+      "deployable": false
+    }
+  },
+  "evaluation_requirements": {
+    "verify_before_running": [
+      "wheel_action_scale",
+      "wheel_kd",
+      "gyro_enabled",
+      "torque_budget_nm"
+    ],
+    "dispatch_verification": "feed a known non-zero action and confirm the wheel velocity target actually dispatched equals scale * action (after clipping)",
+    "torque_reporting": "Isaac implicit-drive effort telemetry is a software clamp estimate and must be labelled estimated; solver actual force is not_measured until a trustworthy readback exists",
+    "probe_rule": "any dispatch probe must preserve the original number of delayed() calls, otherwise it changes the controller it is measuring"
+  }
+}

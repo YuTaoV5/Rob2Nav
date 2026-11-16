@@ -1,0 +1,144 @@
+{
+  "package": "deploy/as2w",
+  "version": "deploy-as2w-v1",
+  "date": "2026-11-17",
+  "skill": "AS2-W four-wheel rolling",
+  "status": "research",
+  "deployable": false,
+  "intended_use": "controlled research first test only (R3 read-only shadow replay). NOT an accepted deployment. Real-hardware closed loop requires per-stage site authorisation.",
+  "weights": {
+    "selected_checkpoint": {
+      "path": "weights/armD_turn65_final.pt",
+      "sha256": "de61de58fd68efc356efbd48a0b9683153361fc87b6fb32c7b9c83584cbd6926",
+      "bytes": 1042859
+    },
+    "deployment_model": {
+      "path": "weights/policy.onnx",
+      "sha256": "087c91bc4c613271d3b841ac001ab6c169e7f6e62264671c5c2a4e4e23dc9821",
+      "bytes": 175066,
+      "opset": 17,
+      "input": "obs 1x65 float32",
+      "output": "action 1x16 float32",
+      "parity": {
+        "samples": 4096,
+        "max_abs_err": 1.907e-06,
+        "pass": true
+      },
+      "note": "exported from the SELECTED checkpoint with dynamo=False, single self-contained file"
+    },
+    "line_init_checkpoint": {
+      "sha256": "4bdf4d26b076d7c717e9c151946dd42f8b3cf9dbbf592c5d6aac1ed5f6615866"
+    }
+  },
+  "interfaces": {
+    "control_period_s": 0.02,
+    "physics_dt_s": 0.005,
+    "decimation": 4,
+    "action_clip": 6.0,
+    "leg": {
+      "indices": "0-11",
+      "order": "FL/FR/RL/RR x hip/thigh/calf/foot",
+      "scale": 0.35,
+      "mode": "position",
+      "kp": 55.0,
+      "kd": 2.0
+    },
+    "wheel": {
+      "indices": "12-15",
+      "order": "FL_foot/FR_foot/RL_foot/RR_foot",
+      "positive": "rolling forward",
+      "scale": 16.0,
+      "mode": "velocity",
+      "kp": 0.0,
+      "kd": 6.0,
+      "torque_budget_nm": 13.5
+    }
+  },
+  "gyro1": {
+    "trained_with": true,
+    "yaw_kp": 60.0,
+    "ff_cap_nm": 4.0,
+    "ff_gain": 0.0,
+    "axis_vector_S": [
+      -1,
+      1,
+      -1,
+      1
+    ],
+    "formula": "ff = S*clip(yaw_kp*(wz_cmd - wz_meas), +-ff_cap); tau = kd*(target-dq) + ff; tau = clip(tau, +-13.5); dispatch = dq + tau/kd",
+    "evaluation_must_pass": "--yaw-kp 60 --ff-cap 4 --ff-gain 0, otherwise AS2W_GYRO_GUARD refuses to run"
+  },
+  "results": {
+    "isaac_gyro_off_two_seed_intersection": "6/11",
+    "isaac_gyro_off_seed7393": "7/11",
+    "isaac_gyro_on_two_seed_intersection": "6/11",
+    "isaac_gyro_on_seed7393": "8/11",
+    "mujoco_formal_matrix": "6/11",
+    "dual_simulator_common_pass": [
+      "hold",
+      "straight_fwd",
+      "straight_bwd",
+      "brake_fwd",
+      "brake_bwd",
+      "arc_right"
+    ],
+    "per_case_seed7393_gyro_on": {
+      "hold": "PASS",
+      "straight_fwd": "PASS 0.87",
+      "straight_bwd": "PASS 0.85",
+      "arc_left": "PASS 0.82",
+      "arc_right": "PASS 0.87",
+      "brake_fwd": "PASS",
+      "brake_bwd": "PASS",
+      "turn_left_0.05": "FAIL 0.15",
+      "turn_right_0.05": "FAIL 0.18",
+      "turn_left_0.10": "FAIL -0.03 (reversed)",
+      "turn_right_0.10": "PASS 0.87 (one seed only)"
+    },
+    "hardware": "not_run"
+  },
+  "C1_C8": {
+    "C1_provenance": "pass",
+    "C2_model_interface": "pass",
+    "C3_observation_contract": "pass",
+    "C4_output_to_control": "partial - chain complete but NO hardware DDS slot mapping",
+    "C5_entry_exit": "pass",
+    "C6_simulation_assets": "pass",
+    "C7_evidence": "pass",
+    "C8_minimal_replay": "pass"
+  },
+  "R0_R4": {
+    "R0_receive": "pass",
+    "R1_offline_alignment": "pass",
+    "R2_sim2sim": "partial",
+    "R3_cpro_readonly": "not_run",
+    "R4_bounded_hardware": "not_run"
+  },
+  "preflight_refusal_conditions": [
+    "any joint whose motor slot, direction or zero offset is unverified",
+    "deploy.yaml inconsistent with contracts/wheel_contract_v1.json",
+    "any SHA256SUMS mismatch",
+    "ONNX hash not equal to the recorded value"
+  ],
+  "deployment_stages": {
+    "S0_static": "no site authorisation",
+    "S1_offline_replay": "no site authorisation",
+    "S2_readonly_shadow": "REQUIRES site authorisation",
+    "S3_suspended": "REQUIRES site authorisation",
+    "S4_bounded_hardware": "REQUIRES per-tier site authorisation"
+  },
+  "known_failures": [
+    "all four pure in-place turns fail on both simulators",
+    "the two simulators fail turns in OPPOSITE directions (Isaac undershoots, MuJoCo overshoots 1.36-1.55)",
+    "left-right asymmetry points in opposite directions across simulators so it is not a fixed policy bias",
+    "single-leg lift is geometrically infeasible (IK 0.25-1.73 mm of a 10 mm target) so exit uses four-wheel grounded return",
+    "posture bias was rejected (Isaac zero-command drift worsened 65-350x)",
+    "Isaac implicit-drive saturation is not_measured",
+    "NO hardware evidence of any kind"
+  ],
+  "reproduce": {
+    "mujoco": "python runtime/r11_mj_matrix_v2.py --xml simulation/r11_mjcf_excl.xml --ckpt weights/armD_turn65_final.pt --out out/ --contract contracts/wheel_contract_v1.json --contract-name r11_legacy --states 3.0",
+    "isaac": "/isaac-sim/python.sh runtime/r11_acceptance_ff.py --usd <as2w.usda> --urdf <as2w.urdf> --out out/ --checkpoints 'armD=weights/armD_turn65_final.pt' --seeds 7393,311 --contract contracts/wheel_contract_v1.json --contract-name r11_legacy --yaw-kp 60 --ff-cap 4 --ff-gain 0",
+    "formula_selftest": "python contracts/as2w_diff_formula_selftest.py  (expects DIFF_FORMULA_SELFTEST_PASS)"
+  }
+}
