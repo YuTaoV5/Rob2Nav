@@ -121,6 +121,13 @@ def train(args, physics):
     cmd = cfg.commands.base_velocity
     cmd.class_type = RollingCommands
     cmd.resampling_time_range = (10., 10.)
+    # Opt-in: the long-dwell curriculum. The DWELL_* variables were historically only printed, and
+    # the real hold came from resampling_time_range=(10,10) above. This switch makes the hold
+    # 8-12 s on a sub-fraction of turn/arc samples and emits START/END/SUMMARY events as proof.
+    if os.environ.get("AS2W_AB_LONG_DWELL_CURRICULUM", "0") == "1":
+        from as2w_long_dwell_curriculum import LongDwellCommands
+        cmd.class_type = LongDwellCommands
+        print("AS2W_LONG_DWELL_CLASS ON  LongDwellCommands", flush=True)
     cmd.ranges.lin_vel_x = (-VX_CAP, VX_CAP)
     cmd.ranges.lin_vel_y = (0., 0.)
     cmd.ranges.ang_vel_z = (-YAW_CAP, YAW_CAP)
