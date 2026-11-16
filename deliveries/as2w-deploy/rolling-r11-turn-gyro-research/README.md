@@ -72,7 +72,7 @@ python runtime/r11_acceptance_ff.py --usd <as2w.usda> --urdf <as2w.urdf> --out /
 | C2 模型接口 | **pass**（见下） |
 | C3 观测合同 | **pass**（`evidence/C3_OBSERVATION_CONTRACT.md`） |
 | C4 输出链路 | partial（`evidence/C4_OUTPUT_CHAIN.md`；无实机 DDS 映射） |
-| C5 入口与退出 | partial（`evidence/C5_HANDOVER.md`；仿真内已验证，未测策略切换/急停） |
+| C5 入口与退出 | **partial（逐项枚举见 `evidence/C5_STATUS_ENUMERATION.md`）**：已测 8 项（松杆减速/停稳/回站 1 项 pass，失联/丢包/时延/交接首帧 7 项有数据但有边界）；未测 5 项（**急停**、**观测冻结/时间戳跳变/重复帧**、自动恢复、跨策略切换、控制权释放）。跨策略切换当前条件不具备（无第二个学习策略），控制权释放需现场 |
 | C6 仿真与资产 | **pass**（`evidence/C6_ASSETS.md`；USD 展开引用层 9 个已逐个哈希见 `evidence/C6_USD_LAYERS.md`；URDF 引用的 36 个网格已逐个哈希见 `evidence/C6_MESH_HASHES.md`；训练复跑入口 recipe 已 pin 并通过校验。运行期 physics variant 的实际选中未验证，不影响资产锁定） |
 | C7 逐例证据 | **pass**（`evidence/isaac/`、`evidence/mujoco/`） |
 | C8 最小回放 | **pass**（600 帧真实 rollout，5.96e-07） |
