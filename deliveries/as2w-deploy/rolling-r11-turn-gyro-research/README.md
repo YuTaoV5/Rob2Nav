@@ -68,7 +68,7 @@ python runtime/r11_acceptance_ff.py --usd <as2w.usda> --urdf <as2w.urdf> --out /
 
 | 项 | 状态 |
 | --- | --- |
-| C1 版本溯源 | partial（`evidence/C1_PROVENANCE.md`；训练期 commit 未固化） |
+| C1 版本溯源 | **pass**（选中/部署/初始化权重哈希、run ID、启动命令、实际解析配置均已记录；训练期环境源码已固化为不可变提交 `6d938eb5`，见 `evidence/C1_SOURCE_SNAPSHOT.md`） |
 | C2 模型接口 | **pass**（见下） |
 | C3 观测合同 | **pass**（`evidence/C3_OBSERVATION_CONTRACT.md`） |
 | C4 输出链路 | partial（`evidence/C4_OUTPUT_CHAIN.md`；无实机 DDS 映射） |
