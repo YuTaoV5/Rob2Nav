@@ -122,8 +122,18 @@ def main() -> int:
                     help="gyro-1 open-loop term, Nm per rad/s of commanded wz (0 = closed-loop only)")
     ap.add_argument("--states", default=",".join(str(s) for s in SETTLE_STATES))
     ap.add_argument("--label", default="mujoco")
+    ap.add_argument("--contract", default="", help="wheel_contract_v1.json path; wheel scale and gain come from the named entry")
+    ap.add_argument("--contract-name", default="", help="entry name inside --contract")
     args = ap.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
+    global WHEEL_KD, WHEEL_SCALE
+    if str(getattr(args, "contract", "")).strip():
+        import json as _json
+        _c = _json.loads(Path(args.contract).read_text(encoding="utf-8"))
+        _want = _c["contracts"][args.contract_name]
+        WHEEL_KD = float(_want["wheel_kd"])
+        WHEEL_SCALE = float(_want["wheel_action_scale"])
+        print("AS2W_MJ_CONTRACT_APPLIED " + _json.dumps({"name": args.contract_name, "wheel_kd": WHEEL_KD, "wheel_scale": WHEEL_SCALE, "gyro_enabled": bool(_want.get("gyro_enabled", False))}), flush=True)
     states = [float(s) for s in args.states.split(",")]
 
     m = mujoco.MjModel.from_xml_path(str(args.xml))

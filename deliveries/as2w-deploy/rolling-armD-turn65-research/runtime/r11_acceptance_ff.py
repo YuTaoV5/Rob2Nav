@@ -40,6 +40,7 @@ from isaaclab.sim import SimulationCfg
 
 VX_CAP, YAW_CAP = .25, .15
 WHEEL_KD, WHEEL_SCALE, ACTION_CLIP = 6.0, 16.0, 6.0
+_CONTRACT_APPLIED = None  # module-level so build() and the dispatch patch can both read it
 WHEEL_LIMIT = 13.5
 DT = 0.02
 SETTLE_S = 2.0
@@ -77,6 +78,12 @@ def build(args, physics):
     cmd.ranges.ang_vel_z = (-YAW_CAP, YAW_CAP)
     cfg.episode_length_s = 32.
     cfg.scene.robot.actuators["foot"].damping = WHEEL_KD
+    # the wheel action scale lives on the ACTION TERM, and robust_config does not carry it
+    cfg.actions.wheel_vel.scale = WHEEL_SCALE
+    if _CONTRACT_APPLIED is not None and not _CONTRACT_APPLIED["gyro_enabled"]:
+        from as2w_isaac_robust_env import DelayedVelocity as _DV
+        cfg.actions.wheel_vel.class_type = _DV
+    print("AS2W_WHEEL_DISPATCH_CFG scale=%.3f kd=%.3f class=%s" % (WHEEL_SCALE, WHEEL_KD, cfg.actions.wheel_vel.class_type.__name__), flush=True)
     # GOAL_STATUS 74.3 hypothesis: the wheel differential delivers ~half of its target
     # (exec 0.49) yet the body barely yaws, so the reaction is being absorbed somewhere
     # other than the ground.  The wheels hang off position-PD-held legs (KP 55,
@@ -135,6 +142,8 @@ def main() -> int:
                     help="permit yaw_kp=0 and ff_gain=0. Without this flag a zero gyro gain is refused, "
                          "because yaw_kp defaults to 0 and a missing --yaw-kp would otherwise silently run "
                          "the UNMODIFIED baseline while reporting itself as gyro-1")
+    ap.add_argument("--contract", default="", help="wheel_contract_v1.json path; sets wheel scale and gain from the named entry")
+    ap.add_argument("--contract-name", default="", help="entry name inside --contract")
     ap.add_argument("--yaw-kp", type=float, default=0.0,
                     help="bounded gyro yaw feedback, Nm per (rad/s) of (cmd - measured) yaw rate")
     ap.add_argument("--payload-kg", type=float, default=0.0,
@@ -174,6 +183,18 @@ def main() -> int:
     print("AS2W_GYRO_GUARD OK yaw_kp=%.2f ff_cap=%.2f ff_gain=%.2f"
           % (float(getattr(args, "yaw_kp", 0.0)), float(getattr(args, "ff_cap", 0.0)),
              float(getattr(args, "ff_gain", 0.0))), flush=True)
+
+    global WHEEL_KD, WHEEL_SCALE, _CONTRACT_APPLIED
+    _CONTRACT_APPLIED = None
+    if str(getattr(args, "contract", "")).strip():
+        import json as _json
+        from pathlib import Path as _Path
+        _c = _json.loads(_Path(args.contract).read_text(encoding="utf-8"))
+        _want = _c["contracts"][args.contract_name]
+        WHEEL_KD = float(_want["wheel_kd"])
+        WHEEL_SCALE = float(_want["wheel_action_scale"])
+        _CONTRACT_APPLIED = {"name": args.contract_name, "wheel_kd": WHEEL_KD, "wheel_scale": WHEEL_SCALE, "gyro_enabled": bool(_want.get("gyro_enabled", False))}
+        print("AS2W_CONTRACT_APPLIED " + _json.dumps(_CONTRACT_APPLIED), flush=True)
 
     for spec in args.checkpoints.split(","):
         lab, _, p = spec.partition("=")
