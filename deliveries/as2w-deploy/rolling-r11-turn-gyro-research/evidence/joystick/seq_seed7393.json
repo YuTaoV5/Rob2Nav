@@ -1,0 +1,59 @@
+{
+ "checkpoint": "/root/gpufree-data/as2w-runs/r11_fanziqi_lab/yaw-arms/armE-support-20261116-034514/r11-final.pt",
+ "seed": 7393,
+ "yaw_kp": 0.0,
+ "ff_cap": 4.0,
+ "gates": {
+  "stop_vx": 0.02,
+  "stop_wz": 0.02,
+  "upright": 0.85,
+  "support": 0.95,
+  "stand_pos_tol_rad": 0.2
+ },
+ "sequence": [
+  {
+   "stage": "stand_in",
+   "seconds": 3.0,
+   "cmd_vx": 0.0
+  },
+  {
+   "stage": "ramp_rev",
+   "seconds": 1.0,
+   "cmd_vx": -0.25
+  },
+  {
+   "stage": "hold_rev",
+   "seconds": 5.0,
+   "cmd_vx": -0.25
+  },
+  {
+   "stage": "release",
+   "seconds": 10.0,
+   "cmd_vx": 0.0
+  },
+  {
+   "stage": "stand_out",
+   "seconds": 3.0,
+   "cmd_vx": 0.0
+  }
+ ],
+ "release": {
+  "stop_time_s": 0.14,
+  "stop_distance_m": 0.011269222581759095,
+  "tail_vx": 0.0022782135618035684,
+  "tail_wz": 0.0002959829343793293,
+  "tail_support": 1.0
+ },
+ "restore": {
+  "final_leg_err_max": 0.4293069839477539,
+  "final_vx": 0.00033489785904142384,
+  "final_wz": -0.00010414121711316208
+ },
+ "safety": {
+  "terminations": 0,
+  "upright_min": 0.9940363764762878,
+  "support_min_tail_release": 1.0,
+  "frames": 1100
+ },
+ "pass": false
+}
