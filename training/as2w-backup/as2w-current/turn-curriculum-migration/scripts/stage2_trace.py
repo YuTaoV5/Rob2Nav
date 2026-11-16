@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """WIP / DO NOT USE FOR ACCEPTANCE -- per-frame trace recorder for the R4000 sanction evaluation.
 
-STATUS (2026-11-17): the import-hook design works (the frozen entry's evaluator is found and patched), but the
-sanctioned evaluator does not step through ``wrapped.step``; it drives the environment through another entry
-point, so the recorder captured **0 frames** in the verified attempt (and one attempt additionally hit a Warp
-CUDA device-side assert). Fixing this needs the evaluator's real stepping call, which has not been located yet.
-Until then the metrics this file exists for - first-second / 3-5 s / last-3 s yaw split, longest continuous
-unload, worst per-axis leg target step, leg and wheel velocity RMS - stay marked as pending, and the headline
-start/A/B comparison uses only ``scripts/stage2_compare.py`` on the sanctioned evaluation JSON. A caller must
-pass --i-understand-this-is-wip or the script refuses to run.
+STATUS (2026-11-17, still WIP): the import-hook design works (the evaluator is found and patched:
+AS2W_TRACE_EVALUATOR_FOUND -> PATCHED), and the evaluator DOES call ``wrapped.step(actor(obs))`` at line 79 of
+eval_as2w_isaac_speed_range.py, so a wrapper on that attribute should see every frame. Two attempts still
+recorded 0 frames. The first failure was a Warp device-side assert caused by wrapping the articulation's
+set_joint_velocity_target setter (that hook has been removed); the second attempt traced_evaluate entered and
+exited early with trace_frames=[] and no AS2W_TRACE console line, so the remaining failure is before the first
+recorded step and has not been isolated yet. Until then the metrics this file exists for - first-second /
+3-5 s / last-3 s yaw split, longest continuous unload, worst per-axis leg target step, leg and wheel velocity
+RMS - stay marked as pending, and the headline start/A/B comparison uses only ``scripts/stage2_compare.py`` on
+the sanctioned evaluation JSON. A caller must pass --i-understand-this-is-wip or the script refuses to run.
 
 Original design note follows.
 
@@ -171,26 +173,12 @@ def main() -> int:
         wheel_joints = [joint_names.index(n) for n in wheel_names]
         leg_joints = [i for i in range(len(joint_names)) if i not in wheel_joints]
         side = torch.tensor([1.0, -1.0, 1.0, -1.0], device=env.device)
-
-        # capture the FINAL dispatched wheel velocity target by wrapping the articulation setter
-        for meth in ("set_joint_velocity_target", "set_joint_velocity_target_index"):
-            if not hasattr(robot, meth):
-                continue
-            original = getattr(robot, meth)
-
-            def make(orig):
-                def hook(*a, **k):
-                    try:
-                        tgt = k.get("target", a[0] if a else None)
-                        if tgt is not None:
-                            t = tgt if hasattr(tgt, "shape") else torch.as_tensor(tgt, device=env.device)
-                            state["dispatched_wheel"] = t[0][wheel_joints].detach().clone()
-                    except Exception as exc:
-                        state["errors"].append("dispatch hook %s: %s" % (meth, exc))
-                    return orig(*a, **k)
-                return hook
-
-            setattr(robot, meth, make(original))
+        # NOTE: wrapping the articulation's target setters breaks the dispatch path (Warp device-side assert
+        # before the first step), so the dispatched target is NOT intercepted here.  Instead the action the
+        # evaluator hands to step is recorded, and the measured differential comes from joint velocities.  The
+        # authoritative dispatched differential is the evaluator's own per-row value, which
+        # scripts/stage2_compare.py already reports.
+        side = torch.tensor([1.0, -1.0, 1.0, -1.0], device=env.device)
 
         prev_leg_target = {"v": None}
         original_step = wrapped.step
@@ -223,8 +211,13 @@ def main() -> int:
                     wm = torch.as_tensor([dq[j] for j in wheel_joints], device=env.device)
                     diff_m = float(((wm * side).sum()) / 2.0)
                     diff_d = None
-                    if state["dispatched_wheel"] is not None:
-                        diff_d = float(((state["dispatched_wheel"] * side).sum()) / 2.0)
+                    try:
+                        aw = torch.as_tensor(actions[0][12:16], device=env.device, dtype=torch.float32)
+                        # the R4000 wheel mapping is vx/(0.086*16) with an open-loop differential term, so the
+                        # action differential times the scale is a lower bound of the dispatched differential
+                        diff_d = float(((aw * side).sum()) / 2.0) * 16.0 * 0.086
+                    except Exception:
+                        diff_d = None
                     state["frames"].append({
                         "t": round(float(env.episode_length_buf[0]) * dt, 4),
                         "reset": bool(env.episode_length_buf[0] <= 2),
