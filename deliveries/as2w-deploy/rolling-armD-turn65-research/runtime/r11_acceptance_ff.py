@@ -80,7 +80,11 @@ def build(args, physics):
     cfg.scene.robot.actuators["foot"].damping = WHEEL_KD
     # the wheel action scale lives on the ACTION TERM, and robust_config does not carry it
     cfg.actions.wheel_vel.scale = WHEEL_SCALE
-    if _CONTRACT_APPLIED is not None and not _CONTRACT_APPLIED["gyro_enabled"]:
+    # Only downgrade to the plain velocity term when the caller did NOT ask for gyro-1.
+    # The contract entry cannot decide this: r11_legacy describes the wheel end, and the gyro
+    # can be on or off on top of it, which is exactly what --yaw-kp selects.
+    if (_CONTRACT_APPLIED is not None and not _CONTRACT_APPLIED["gyro_enabled"]
+            and float(getattr(args, "yaw_kp", 0.0)) <= 0.0):
         from as2w_isaac_robust_env import DelayedVelocity as _DV
         cfg.actions.wheel_vel.class_type = _DV
     print("AS2W_WHEEL_DISPATCH_CFG scale=%.3f kd=%.3f class=%s" % (WHEEL_SCALE, WHEEL_KD, cfg.actions.wheel_vel.class_type.__name__), flush=True)
@@ -381,6 +385,37 @@ def main() -> int:
                     # which could have scored a fallen episode as PASS.
                     if bool(_don[0]):
                         term = 1
+                        if R.get("first_term_k") is None:
+                            R["first_term_k"] = k
+                    # instantaneous gate probes, recorded only the first time each trips
+                    _g = robot.data.projected_gravity_b.torch[0]
+                    _up_now = float(-_g[2])
+                    _cf = env.scene["contact_forces"].data.net_forces_w.torch[0][[13, 14, 15, 16]]
+                    _lw = torch.linalg.norm(_cf, dim=1)
+                    _loaded = int((_lw > 1.0).sum())
+                    # wheel-cannot-follow: the measured differential falls far below the dispatched one,
+                    # sustained. Only judged when the dispatched differential is non-trivial, otherwise
+                    # the ratio is noise (this is the same near-zero-denominator rule as elsewhere).
+                    _w = [float(x) for x in st["applied"][0].detach().cpu().numpy()]
+                    _m = [float(x) for x in robot.data.joint_vel.torch[0, wj].detach().cpu().numpy()]
+                    _cd = (lambda v: (v[1] + v[3] - v[0] - v[2]) / 2.0)(_w)
+                    _md = (lambda v: (v[1] + v[3] - v[0] - v[2]) / 2.0)(_m)
+                    _wf = (abs(_cd) > 0.05) and (abs(_md) < 0.35 * abs(_cd))
+                    R["_wh_run"] = (R.get("_wh_run", 0) + 1) if _wf else 0
+                    if R["_wh_run"] >= 10 and R.get("first_wheel_k") is None and k >= 10:
+                        R["first_wheel_k"] = k
+                        R["first_wheel_detail"] = {"cmd_diff": round(_cd, 4), "meas_diff": round(_md, 4),
+                                                   "ratio": round(abs(_md) / abs(_cd), 3) if abs(_cd) > 1e-9 else None}
+                    R["_sup_run"] = (R.get("_sup_run", 0) + 1) if _loaded < 4 else 0
+                    R["_up_run"] = (R.get("_up_run", 0) + 1) if _up_now < 0.85 else 0
+                    # a single frame is not a failure: the settle transient and inertial spikes trip
+                    # a raw threshold. Require 10 consecutive frames (0.2 s) before recording.
+                    if R["_sup_run"] >= 10 and R.get("first_sup_k") is None and k >= 10:
+                        R["first_sup_k"] = k
+                        R["first_sup_detail"] = {"loaded_wheels": _loaded, "loads_n": [round(float(x), 2) for x in _lw]}
+                    if R["_up_run"] >= 10 and R.get("first_up_k") is None and k >= 10:
+                        R["first_up_k"] = k
+                        R["first_up_detail"] = {"upright": round(_up_now, 4)}
                     R["yaw"].append(float(robot.data.root_ang_vel_b.torch[0, 2]))
                     R["vx"].append(float(robot.data.root_lin_vel_b.torch[0, 0]))
                     R["app"].append(st["applied"][0].detach().cpu().numpy().tolist())
@@ -393,6 +428,24 @@ def main() -> int:
                     g = robot.data.projected_gravity_b.torch[0]
                     R["up"].append(float(-g[2]))
                 R["term"] = term
+                _cands = []
+                for _k, _kind in ((R.get("first_term_k"), "termination"),
+                                  (R.get("first_sup_k"), "wheel_support_lost"),
+                                  (R.get("first_up_k"), "upright_below_gate"),
+                                  (R.get("first_wheel_k"), "wheel_cannot_follow")):
+                    if _k is not None:
+                        _cands.append((int(_k), _kind))
+                if _cands:
+                    _cands.sort()
+                    R["first_fail_k"] = _cands[0][0]
+                    R["first_fail_s"] = round(_cands[0][0] * DT, 2)
+                    R["first_fail_kind"] = _cands[0][1]
+                    R["first_fail_all"] = [{"k": a, "s": round(a * DT, 2), "kind": b} for a, b in _cands]
+                else:
+                    R["first_fail_k"] = None
+                    R["first_fail_s"] = None
+                    R["first_fail_kind"] = None
+                    R["first_fail_all"] = []
                 R["cap_hits"] = st["cap_hits"]
                 R["tau_abs_max"] = st["tau_abs_max"]
                 R["ff_abs_max"] = st["ff_abs_max"]
@@ -418,7 +471,14 @@ def main() -> int:
                        "ddq_meas_tail": float(mea_d[-tail:].mean()),
                        "tau_abs_max": float(R["tau_abs_max"]),
                        "ff_abs_max": float(R["ff_abs_max"]),
-                       "cap_hits": int(R["cap_hits"])}
+                       "cap_hits": int(R["cap_hits"]),
+                       "first_fail_k": R.get("first_fail_k"),
+                       "first_fail_s": R.get("first_fail_s"),
+                       "first_fail_kind": R.get("first_fail_kind"),
+                       "first_fail_wheel_detail": R.get("first_wheel_detail"),
+                       "first_fail_sup_detail": R.get("first_sup_detail"),
+                       "first_fail_up_detail": R.get("first_up_detail"),
+                       "first_fail_all": R.get("first_fail_all", [])}
                 if abs(wz_cmd) > 1e-9:
                     out["yaw_track"] = out["wz_tail"] / wz_cmd
                 if abs(vx_cmd) > 1e-9:
@@ -530,6 +590,12 @@ def main() -> int:
                         "exec_mean": (float(np.mean([j["exec_tail"] for j in js
                                                     if j["exec_tail"]]))
                                       if any(j["exec_tail"] for j in js) else None),
+                        "first_fail_kinds": [j.get("first_fail_kind") for j in js],
+                        "first_fail_wheel": [j.get("first_fail_wheel_detail") for j in js],
+                        "first_fail_times_s": [j.get("first_fail_s") for j in js],
+                        "first_fail_detail": [j.get("first_fail_all") or [] for j in js],
+                        "first_fail_sup": [j.get("first_fail_sup_detail") for j in js],
+                        "first_fail_up": [j.get("first_fail_up_detail") for j in js],
                         "tau_abs_max": float(max(j["tau_abs_max"] for j in js)),
                         "ff_abs_max": float(max(j["ff_abs_max"] for j in js)),
                         "cap_hits": int(max(j["cap_hits"] for j in js)),
