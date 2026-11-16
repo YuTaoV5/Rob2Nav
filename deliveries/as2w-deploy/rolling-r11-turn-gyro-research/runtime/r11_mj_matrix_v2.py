@@ -104,6 +104,16 @@ def main() -> int:
     #   mag   = clip(yaw_kp * err, +-ff_cap)
     #   tau_i = kd*(target_i - v_i) + S_i*mag       S = (-1,+1,-1,+1) for FL,FR,RL,RR
     #   the SUM is then clipped at +-13.5 Nm, same as the Isaac actuator clamp
+    # Bounded differential TARGET boost.  Distinct from both the open-loop torque feedforward and
+    # the gyro feedback: this adds a bounded offset to the wheel VELOCITY TARGET proportional to the
+    # commanded yaw rate, so the kd law keeps driving toward it even when the policy's own
+    # differential decays.  The operator's item 1 asks for exactly this against the right-turn tail
+    # collapse, keeping the actor's leg feedback untouched and changing one variable only.
+    #   target_wheel_i += S_i * clip(diff_gain * wz_cmd, +-diff_cap)
+    ap.add_argument("--diff-gain", type=float, default=0.0,
+                    help="rad/s of wheel target per rad/s of commanded yaw rate (0 = off)")
+    ap.add_argument("--diff-cap", type=float, default=0.5,
+                    help="bound on the added differential magnitude, rad/s")
     ap.add_argument("--yaw-kp", type=float, default=0.0,
                     help="gyro-1 yaw feedback gain, Nm per rad/s of yaw-rate error; 0 = base wrapper")
     ap.add_argument("--ff-cap", type=float, default=4.0,
@@ -136,7 +146,8 @@ def main() -> int:
     # gyro-1 state: matches the Isaac implementation (state-free, one wz sample per 20 ms)
     S_WHEEL = np.array([-1.0, 1.0, -1.0, 1.0])      # FL, FR, RL, RR -> left-vs-right differential
     GYRO = {"kp": float(args.yaw_kp), "cap": float(args.ff_cap),
-            "ffg": float(args.ff_gain), "wz_cmd": 0.0, "on": bool(args.yaw_kp != 0.0 or args.ff_gain != 0.0)}
+            "ffg": float(args.ff_gain), "wz_cmd": 0.0, "on": bool(args.yaw_kp != 0.0 or args.ff_gain != 0.0),
+            "dg": float(args.diff_gain), "dcap": float(args.diff_cap)}
     nonwheel_bodies = [i for i in range(m.nbody) if i != 0]
 
     ck = torch.load(str(args.ckpt), map_location="cpu", weights_only=False)
@@ -172,6 +183,11 @@ def main() -> int:
 
     def step_ctrl(a):
         tgt = np.r_[a[:12] * LEG_SCALE + DEF[:12], a[12:] * WHEEL_SCALE]
+        if GYRO["dg"] != 0.0:
+            # bounded differential added to the TARGET, sign follows the command so it reverses
+            # with wz_cmd; this is what keeps the tail differential from collapsing
+            mag = float(np.clip(GYRO["dg"] * GYRO["wz_cmd"], -GYRO["dcap"], GYRO["dcap"]))
+            tgt[12:] = tgt[12:] + S_WHEEL * mag
         ff = np.zeros(4)
         if GYRO["on"]:
             # Read the body-frame yaw rate ONCE per policy step (free-joint qvel[3:6] is in the
@@ -279,6 +295,8 @@ def main() -> int:
         out = {"cmd": [float(x) for x in cmd], "settle_base_z": R["base_z"],
                "vx_tail": float(vx[-tail:].mean()),
                "wz_tail": float(yaw[-tail:].mean()),
+               "ddq_target_tail": float(np.mean(d4(np.array(R["app"]))[-tail:])),
+               "ddq_measured_tail": float(np.mean(d4(np.array(R["meas"]))[-tail:])),
                "support_tail": float(sup[-tail:].mean()),
                "support_all": float(sup.mean()),
                "upright_min": float(np.min(R["up"])),
@@ -343,7 +361,8 @@ def main() -> int:
     report = {"simulator": "mujoco", "version": mujoco.__version__,
               "checkpoint": str(args.ckpt),
               "contract": {"timestep": DT, "substeps": SUBSTEPS, "step_dt": STEP_DT,
-                           "wrapper": {"yaw_kp": float(args.yaw_kp), "ff_cap": float(args.ff_cap),
+                           "wrapper": {"diff_gain": float(args.diff_gain), "diff_cap": float(args.diff_cap),
+                                       "yaw_kp": float(args.yaw_kp), "ff_cap": float(args.ff_cap),
                                        "ff_gain": float(args.ff_gain),
                                        "S_vector": [float(v) for v in S_WHEEL],
                                        "wz_sample": "body-frame qvel[5], once per 20 ms policy step",
