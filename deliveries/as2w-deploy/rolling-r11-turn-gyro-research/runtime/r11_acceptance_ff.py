@@ -150,6 +150,8 @@ def main() -> int:
     ap.add_argument("--num-envs", type=int, default=1)
     ap.add_argument("--iterations", type=int, default=1)
     add_launcher_args(ap)
+    ap.add_argument("--obs-freeze", type=int, default=0, help="C5 observation distortion: once every N frames the policy is shown the previous observation instead of the fresh one (stalled sensor stream)")
+    ap.add_argument("--obs-stale-steps", type=int, default=0, help="C5 observation distortion: the policy is shown the observation from K policy steps ago while the simulator keeps advancing (delayed or duplicated frame stream)")
     args = ap.parse_args()
     for a in ("usd", "urdf"):
         setattr(args, a, getattr(args, a).resolve(strict=True))
@@ -291,8 +293,23 @@ def main() -> int:
                 st["calls"] = 0
                 obs = wrapped.get_observations()
                 for _ in range(int(SETTLE_S / DT)):
+                    # C5 observation distortion: the SIMULATOR always advances with the true state, but the
+                    # policy may be shown a stale or frozen observation, which is what a stalled, delayed or
+                    # duplicated sensor stream looks like to it.
+                    if args.obs_stale_steps or args.obs_freeze:
+                        _ohist.append(obs)
+                        if args.obs_stale_steps and len(_ohist) > args.obs_stale_steps:
+                            feed = _ohist[-1 - args.obs_stale_steps]
+                        elif args.obs_freeze and _frozen is not None and (k % args.obs_freeze) != 0:
+                            feed = _frozen
+                        else:
+                            feed, _frozen = obs, obs
+                        if len(_ohist) > 64:
+                            _ohist.pop(0)
+                    else:
+                        feed = obs
                     with torch.inference_mode():
-                        a = policy(obs)
+                        a = policy(feed)
                     obs, _rew, _don, _info = delayed_step(a)
                 return obs
 
@@ -302,6 +319,7 @@ def main() -> int:
                 n = int(seconds / DT)
                 R = {k: [] for k in ("yaw", "vx", "load", "app", "meas", "tau", "up")}
                 term = 0
+                _ohist, _frozen = [], None
                 for k in range(n):
                     c = cmd_fn(k * DT)
                     st["wz_cmd"] = float(c[2])
