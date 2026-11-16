@@ -41,13 +41,22 @@ with torch.no_grad():
 onnx_path = os.path.join(OUT, "weights", "policy.onnx")
 torch.onnx.export(net, (x[:1],), onnx_path,
     input_names=["obs"], output_names=["action"], opset_version=17,
-    dynamic_axes={"obs": {0: "batch"}, "action": {0: "batch"}}, do_constant_folding=True)
+    dynamic_axes={"obs": {0: "batch"}, "action": {0: "batch"}}, do_constant_folding=True, dynamo=False)   # dynamo=True (torch's new default) writes external
+    # data (policy.onnx + policy.onnx.data); the legacy exporter reproduces the published
+    # single-file artifact byte for byte
 print("exported:", onnx_path, os.path.getsize(onnx_path), "bytes")
 
 import onnx
 m = onnx.load(onnx_path); onnx.checker.check_model(m)
 
-import numpy as np, onnxruntime as ort
+try:
+    import numpy as np, onnxruntime as ort
+except ModuleNotFoundError as exc:
+    raise SystemExit(
+        "ONNX export succeeded but the parity check needs onnxruntime, which is not installed.\n"
+        "Install it (pip install onnxruntime) and re-run. The exported file is already valid;\n"
+        "only the ONNX-vs-training-model alignment step is blocked.") from exc
+
 sess = ort.InferenceSession(onnx_path, providers=["CPUExecutionProvider"])
 yo = sess.run(["action"], {"obs": x.numpy()})[0]
 err = np.abs(yo - y.numpy())
