@@ -1,0 +1,948 @@
+{
+  "schema_version": "fs-stair-config-v1",
+  "line": "stair-from-scratch",
+  "status": "research",
+  "deployable": false,
+  "scope": {
+    "in_scope": "blind stair from-scratch training on MuJoCo (CPU only): flat approach, step1, step2, continuous 5-step, plus a standalone flat approach/stop evaluation",
+    "out_of_scope": [
+      "vx_hat / rolling speed-estimation head: NOT used on the stair line; that is the rolling line's C arm",
+      "full flat driving (forward/reverse/turn/arc, braking distance, 10 s dwell): owned by the rolling policy",
+      "Isaac Lab cross-simulator acceptance and any real-robot work: not started",
+      "controller overlays (yawhold, speedgate): documented only, not implemented"
+    ],
+    "cpu_only": "MuJoCo + SB3, SubprocVecEnv process workers, device cpu; the GPU is owned by the Isaac line and must stay untouched"
+  },
+  "arch": "zero_history",
+  "arm": "H0",
+  "description": "Arm H0: 360-dim input with historical slots pinned to zero (shape/parameter control for H6).",
+  "seed": 449,
+  "device": "cpu",
+  "n_workers": 4,
+  "total_env_steps": 65536,
+  "control_period_s": 0.02,
+  "physics_substeps_per_step": 16,
+  "torch_threads": 1,
+  "observation": {
+    "single_frame_dim": 60,
+    "history_note": "Arm H0: 360-dim input identical in shape and parameter count to H6, but the five historical slots are pinned to zero and only the newest slot carries the current frame. It separates the shape/parameter-count cost (S -> H0) from the history-information benefit (H0 -> H6).",
+    "components": [
+      {
+        "index": [
+          0,
+          3
+        ],
+        "name": "command_error",
+        "size": 3,
+        "unit": "m/s,rad/s",
+        "source": "command - (0.4, 0, 0); command is constant (0.4,0,0) on every stage"
+      },
+      {
+        "index": [
+          3,
+          6
+        ],
+        "name": "base_ang_vel_world",
+        "size": 3,
+        "unit": "rad/s",
+        "source": "data.qvel[3:6]"
+      },
+      {
+        "index": [
+          6,
+          9
+        ],
+        "name": "projected_gravity",
+        "size": 3,
+        "source": "-data.xmat[base, 6:9]"
+      },
+      {
+        "index": [
+          9,
+          10
+        ],
+        "name": "height_reference",
+        "size": 1,
+        "source": "constant 0.4"
+      },
+      {
+        "index": [
+          10,
+          26
+        ],
+        "name": "joint_pos_minus_default",
+        "size": 16,
+        "unit": "rad",
+        "source": "qpos[qa] - default_joint_pos; wheel angles wrapped to [-2pi, 2pi]"
+      },
+      {
+        "index": [
+          26,
+          42
+        ],
+        "name": "joint_vel",
+        "size": 16,
+        "unit": "rad/s",
+        "source": "qvel[va]"
+      },
+      {
+        "index": [
+          42,
+          58
+        ],
+        "name": "previous_action",
+        "size": 16,
+        "source": "previous raw action"
+      },
+      {
+        "index": [
+          58,
+          60
+        ],
+        "name": "gait_clock",
+        "size": 2,
+        "source": "sin/cos of 2*pi*t/0.62"
+      }
+    ],
+    "source": "train_stair_curriculum.py:143-149 (pinned sha256 a08b8d76...)",
+    "project_convention_not_used": {
+      "file": "training/as2w-backup/as2w-current/code/as2w_history.py",
+      "size": 720,
+      "definition": "60 current + 12 offsets (2,4,...,24 steps) x 55 dims = 720, covering 480 ms by subsampling",
+      "reason": "This experiment uses the consecutive six-frame stack (360 dims, 100 ms). Mixing the 360 and 720 conventions is forbidden; the choice is operator decision OD-2."
+    }
+  },
+  "history": {
+    "mode": "zero_history",
+    "frames": 6,
+    "frame_stride_steps": 1,
+    "span_ms": 100,
+    "order": "oldest_to_newest",
+    "reset_fill": "zeros_except_current",
+    "current_frame_slot": "newest",
+    "policy_steps_per_frame": 1,
+    "definition": "six consecutive policy frames at 20 ms each, oldest first; reset fills every slot with copies of the first frame so no stale frame survives"
+  },
+  "network": {
+    "policy": "MlpPolicy",
+    "activation": "ELU",
+    "pi": [
+      128,
+      128,
+      128
+    ],
+    "vf": [
+      128,
+      128,
+      128
+    ],
+    "log_std_init": 0.0,
+    "log_std_init_note": "from-scratch arms start at std 1.0 for exploration; the pinned fine-tune used log(0.12) because it resumed a competent actor",
+    "init": "SB3 orthogonal default under torch.manual_seed(seed)",
+    "note": "actor width/depth identical across the S/H0/H6 arms; only the input width changes"
+  },
+  "ppo": {
+    "n_steps": 128,
+    "batch_size": 128,
+    "n_epochs": 4,
+    "learning_rate": 0.0003,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip_range": 0.2,
+    "target_kl": null,
+    "target_kl_note": "null on purpose: the prior baseline used the SB3 default; the pinned fine-tune's target_kl=0.015 stops updates at step 0 ('Early stopping at step 0 due to reaching max kl')"
+  },
+  "stages": [
+    {
+      "name": "flat_approach",
+      "levels": 0,
+      "rise_m": null,
+      "tread_m": null,
+      "episode_s": 6.0,
+      "first_riser_x_m": 0.7,
+      "start_back_m": 0.35,
+      "approach_line_m": 0.3,
+      "description": "Flat ground, same robot/contact configuration as the stair stages, no riser. The robot starts 0.35 m behind the nominal start and must reach x = 0.30 m (0.40 m before where the first riser would be) and hold a stable four-wheel stance for 0.5 s. Run this stage standalone before any stair budget.",
+      "known_geometry": {}
+    },
+    {
+      "name": "step1",
+      "levels": 1,
+      "rise_m": 0.06,
+      "tread_m": 0.31,
+      "episode_s": 9.0,
+      "first_riser_x_m": 0.7,
+      "start_back_m": 0.0,
+      "approach_line_m": null,
+      "description": "One 0.06 m step whose top surface is the 2.00 m landing (x 0.70-2.70 m).",
+      "known_geometry": {
+        "levels": 1,
+        "rise_m": 0.06,
+        "x_front_m": 0.7,
+        "x_back_m": 2.7
+      }
+    },
+    {
+      "name": "step2",
+      "levels": 2,
+      "rise_m": 0.06,
+      "tread_m": 0.31,
+      "episode_s": 9.0,
+      "first_riser_x_m": 0.7,
+      "start_back_m": 0.0,
+      "approach_line_m": null,
+      "description": "Two 0.06 m steps, 0.31 m treads, x 0.70-3.01 m.",
+      "known_geometry": {
+        "levels": 2,
+        "rise_m": 0.06,
+        "x_front_m": 0.7,
+        "x_back_m": 3.01
+      }
+    },
+    {
+      "name": "continuous",
+      "levels": 5,
+      "rise_m": 0.06,
+      "tread_m": 0.31,
+      "episode_s": 9.0,
+      "first_riser_x_m": 0.7,
+      "start_back_m": 0.0,
+      "approach_line_m": null,
+      "description": "Five 0.06 m steps, 0.31 m treads, x 0.70-3.94 m. This is the target stage, never the first thing to train.",
+      "known_geometry": {
+        "levels": 5,
+        "rise_m": 0.06,
+        "x_front_m": 0.7,
+        "x_back_m": 3.94
+      }
+    }
+  ],
+  "geometry": {
+    "readback": "every stage builds its model and reads levels / rise / tread / x_range back from the loaded model; the values are asserted against the config derivation and the known geometry (tolerance 1e-6)",
+    "tread_note": "tread is fixed at 0.31 m on every stage so the known geometry can be asserted. The pinned env sampled tread {0.31,0.35,0.39} from the scene seed; that is a deliberate, recorded difference.",
+    "rise_note": "rise is fixed at 0.06 m instead of the pinned 6/8/10 cm rise curriculum."
+  },
+  "curriculum": {
+    "promote_after": 2,
+    "demote_after": 2,
+    "promotion_signal": "top_stable_hold",
+    "min_top_hold_s": 0.5,
+    "min_all4_top_s": 0.26,
+    "degenerate_after": 6,
+    "eligibility": "full start from the bottom AND not manual AND promotion signal satisfied AND no hard protection",
+    "demotion_rule": "hard protection demotes immediately; demote_after consecutive zero-progress from-bottom episodes demote; manual top placement and mid-course resets never feed either counter",
+    "alternatives": [
+      {
+        "signal": "all_wheels_top",
+        "default": false,
+        "note": "all four wheels must have been credited with the top tread at least once; ignores the 0.5 s hold"
+      },
+      {
+        "signal": "longest_all4_top_s",
+        "default": false,
+        "min_all4_top_s": 0.26,
+        "note": "longest simultaneous four-wheel top load >= X s; X in {0.15,0.20,0.26} showed the same discrimination because per-seed values are either 0 or >= 0.26 s"
+      }
+    ],
+    "warning": "The task-defined signal measured 0/6 on 1-, 2- and 5-step terrain for all three arms and four-wheel top load peaks at 0.26 s < 0.50 s, so this ladder will not promote past stage 0 unless the operator changes the signal. This is deliberate: the default is not loosened here."
+  },
+  "thresholds": {
+    "train_termination": {
+      "source": "train_stair_curriculum.py:207",
+      "impact_n_gt": 90.0,
+      "abs_y_m_gt": 0.65,
+      "fall_upright_lt": 0.8
+    },
+    "acceptance": {
+      "source": "mujoco_screen.py:295",
+      "levels_ordered": 5,
+      "top_stable_s_ge": 0.5,
+      "peak_nonwheel_impact_n_lt": 50.0
+    },
+    "nonwheel_contact": {
+      "source": "mujoco_screen.py:254",
+      "contact_force_n_ge": 1.0,
+      "note": "a contact at or above this force counts as a non-wheel touch"
+    }
+  },
+  "torque": {
+    "clip_mode": "90pct",
+    "budget_nm": 13.5,
+    "budget_source": "deploy/as2w/contracts/wheel_contract_v1.json torque_budget_nm = 13.5 (90 % of the verified 15 Nm hardware limit); AGENTS.md section 3 applies 90 % to every axis",
+    "groups_nm": {
+      "hip": 54.0,
+      "thigh": 54.0,
+      "calf": 81.0,
+      "wheel": 13.5
+    },
+    "raw_ctrlrange_nm": {
+      "hip": 60.0,
+      "thigh": 60.0,
+      "calf": 90.0,
+      "wheel": 15.0
+    },
+    "deviation_from_pinned": "the pinned training source clips all 16 axes at the raw MJCF ctrlrange (100 %: hip/thigh 60, calf 90, wheel 15). Every existing stair baseline, including the 5/6 initial arm, was trained at 100 %. The 90pct mode is the AGENTS.md-compliant configuration and the default here; --torque-clip mjcf_ctrlrange reproduces the baseline envelope in one command.",
+    "modes": {
+      "90pct": "hip/thigh 54, calf 81, wheel 13.5",
+      "mjcf_ctrlrange": "hip/thigh 60, calf 90, wheel 15"
+    }
+  },
+  "torque_evidence": {
+    "mujoco": {
+      "label": "measured",
+      "detail": "contact forces from mj_contactForce plus the exact actuator ctrl clip; per-frame peak and saturation counts are logged"
+    },
+    "isaac": {
+      "label": "estimated",
+      "detail": "Isaac implicit-drive effort telemetry is a software clamp estimate; not used by this line"
+    },
+    "actual_drive_torque": {
+      "label": "not_measured",
+      "detail": "no trustworthy real-actuator torque readback exists for AS2-W"
+    }
+  },
+  "holdout_seeds": [
+    28001,
+    28002,
+    28003,
+    28004,
+    28005,
+    28006
+  ],
+  "train_scene_seed_range": [
+    100000,
+    1000000000
+  ],
+  "evidence_rules": {
+    "improvement_rule": "With 6 holdout seeds the resolution is 1/6. An arm counts as better only when it improves at least 2 seeds on the compared metric; a 1-seed difference is reported as no difference. Aggregate means must never hide single-seed noise.",
+    "seed_list": [
+      28001,
+      28002,
+      28003,
+      28004,
+      28005,
+      28006
+    ],
+    "no_aggregate_only": true,
+    "threshold_pairs": "training termination and formal acceptance thresholds are recorded separately and never merged"
+  },
+  "baseline": {
+    "source": "prior from-scratch short runs in /root/gpufree-data/as2w-runs/w1w2-stair-scratch.kuZUnA (h1, h6), 16384 env steps, 4 CPU workers, rise 0.06, supported progress, seeds 28001-28006",
+    "h1": {
+      "arm": "single frame 60",
+      "wheel_levels": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "terminated": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "top_stable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "max_forward_m": [
+        0.0004,
+        0.0,
+        0.0,
+        4e-05,
+        0.0016,
+        8e-05
+      ],
+      "note": "stands still; std ~0.99 and approx_kl 0.065-0.179 show the policy never converged at 16384 steps"
+    },
+    "h6": {
+      "arm": "six frame 360",
+      "wheel_levels": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "terminated": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "top_stable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "max_forward_m": [
+        0.188,
+        0.167,
+        0.09,
+        0.127,
+        0.247,
+        0.128
+      ],
+      "note": "moves 0.09-0.25 m but never reaches the first riser"
+    },
+    "known_failure_modes": [
+      "the old from-scratch short run barely moves forward (best seed 0.079 m, 0.590 m from the first riser, never touched the stairs)",
+      "lateral drift past |y| = 0.65 is the shared blocker for every arm and every step count",
+      "four-wheel simultaneous top load caps at 0.26 s while acceptance needs 0.50 s, so course_completed-based promotion never fires",
+      "a 4096-step fine-tune destroys first-step ability ('Early stopping at step 0 due to reaching max kl'); freezing the actor at equal budget keeps 5/6"
+    ]
+  },
+  "diagnostic_evidence": {
+    "overlay_controls": {
+      "status": "not_implemented",
+      "note": "The diagnostic line ran controller-level single-factor overlays (action vector only; weights, reward, thresholds and geometry untouched) on one checkpoint and 6 seeds. Mechanism: with the stairs removed the same policy turns 32-163 deg and drifts 1.35-7.63 m on flat ground, so the lateral bound is a heading-loss consequence, not a geometry/contact problem. speedgate is the only overlay that moved D from 0/6 to 2/6. No overlay is implemented or enabled here; the training control law must match the formal contract. Operator decision OD-4.",
+      "rows": [
+        {
+          "overlay": "none",
+          "mean_max_abs_y_m": 0.5895,
+          "worst_max_abs_y_m": 0.6549,
+          "B_s1_A_top_C_top_D": [
+            5,
+            5,
+            4,
+            0
+          ],
+          "terminated": "6/6",
+          "mean_reward": 32.004
+        },
+        {
+          "overlay": "yawhold_soft(0.24/0.06)",
+          "mean_max_abs_y_m": 0.477,
+          "worst_max_abs_y_m": 0.6549,
+          "B_s1_A_top_C_top_D": [
+            5,
+            5,
+            4,
+            0
+          ],
+          "terminated": "5/6",
+          "mean_reward": 35.014
+        },
+        {
+          "overlay": "yawhold(0.60/0.15)",
+          "mean_max_abs_y_m": 0.2814,
+          "worst_max_abs_y_m": 0.4952,
+          "B_s1_A_top_C_top_D": [
+            4,
+            4,
+            4,
+            0
+          ],
+          "terminated": "3/6",
+          "mean_reward": 32.724
+        },
+        {
+          "overlay": "speedgate",
+          "mean_max_abs_y_m": 0.3749,
+          "worst_max_abs_y_m": 0.4914,
+          "B_s1_A_top_C_top_D": [
+            5,
+            4,
+            2,
+            2
+          ],
+          "terminated": "0/6",
+          "mean_reward": 33.365
+        }
+      ]
+    }
+  },
+  "flat_eval": {
+    "stage": "flat_approach",
+    "seeds": [
+      28101,
+      28102,
+      28103,
+      28104,
+      28105,
+      28106
+    ],
+    "approach_seconds": 3.0,
+    "episode_seconds": 6.0,
+    "stop_window_s": 1.5,
+    "gates": {
+      "min_forward_progress_m": 0.5,
+      "max_lateral_abs_y_m": 0.2,
+      "max_mean_approach_speed_m_s": 0.6,
+      "min_mean_approach_speed_m_s": 0.05,
+      "upright_ge": 0.94,
+      "nonwheel_impact_n_lt": 1.0,
+      "peak_impact_n_lt": 50.0,
+      "stop_drift_m_le": 0.15,
+      "stop_speed_m_s_le": 0.12,
+      "fall_upright_lt": 0.8
+    },
+    "note": "Research gate for the stair policy on flat ground only: low-speed approach and the natural stop at the approach line. Full flat driving (forward/reverse/turn/arc, braking distance, 10 s dwell) belongs to the rolling policy and is explicitly not evaluated here."
+  },
+  "operator_decisions": [
+    {
+      "id": "OD-1",
+      "question": "Promotion signal: keep the task-defined top_stable_hold (measured 0/6, ladder stalls at stage 0) or switch to all_wheels_top / longest_all4_top_s? Default stays top_stable_hold and the dry-run warns loudly."
+    },
+    {
+      "id": "OD-2",
+      "question": "Observation history: this line uses the consecutive six-frame 360-dim stack (100 ms), not the project's existing 720-dim subsampled history (480 ms). Confirm before comparing against any 720-dim policy."
+    },
+    {
+      "id": "OD-3",
+      "question": "Torque envelope: default 90pct (hip/thigh 54, calf 81, wheel 13.5) per AGENTS.md section 3, while every existing stair baseline was trained at 100 % MJCF ctrlrange. Confirm, or run --torque-clip mjcf_ctrlrange for a like-for-like baseline."
+    },
+    {
+      "id": "OD-4",
+      "question": "Candidate controller overlays (yawhold, speedgate) are documented but not implemented or enabled; confirm they stay out of the training contract."
+    },
+    {
+      "id": "OD-5",
+      "question": "Budget: 65536 env steps (4 CPU workers x 128 steps x 128 updates) is a trend budget, 4x the 16384 baseline. Confirm before any longer run."
+    }
+  ],
+  "sources": {
+    "pinned_training_copy": {
+      "path": "/root/gpufree-data/as2w-runs/w1w2-stair-scratch.kuZUnA/train_stair_curriculum.py",
+      "sha256": "a08b8d76f357c93e09352c3e66bac43136e744a5f127e60795f6bfb3bd1991dd",
+      "gating": true,
+      "role": "control / reward / termination contract; the repo copy is edited by the other stair agent so this copy is pinned instead"
+    },
+    "w1w2_stair_env": {
+      "path": "/root/gpufree-data/as2w-runs/w1w2-stair-ab.tTar7N/w1w2_stair_env.py",
+      "sha256": "8b470b84ea6b195dab465bcb45fb2eefcc60eb362ad8a92446128a179e8676db",
+      "gating": true,
+      "role": "milestone accounting / stage builder reference (parity gated)"
+    },
+    "mujoco_screen": {
+      "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-r284-release/deliveries/as2w-deploy/omni-blind-stairs-r152/runtime/mujoco_screen.py",
+      "sha256": "0aa9f80ba19e8c57fd36c499ee99e0a79857c526894388fba23f0ba75bde2bfd",
+      "gating": true,
+      "role": "MuJoCo model loading, target limits, dynamics stress"
+    },
+    "as2w_flat_xml": {
+      "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/assets/r237-train-root/local-step-diagnostic/as2w_flat.xml",
+      "sha256": "bd86aae1d8047a7be67aef8340c1303950f136af5fb5506dfeb451a1c94d0ce2",
+      "gating": true,
+      "role": "robot + ground MJCF used for every stage"
+    },
+    "as2w_urdf": {
+      "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/assets/r237-train-root/official-model/robots/as2w_description/as2w.urdf",
+      "sha256": "696aec2c0915ec1e06bcc91a63104d8234c51c0eb94331fa5496bf426c51e926",
+      "gating": true,
+      "role": "joint limits (load_target_limits)"
+    },
+    "fall_recovery_contract": {
+      "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/assets/r237-train-root/fall-baseline/fall-recovery-contract.json",
+      "sha256": "1e4e3fb76806e83dbe3541979fa0cb40f4b3150f5bf4de298224bf9baa9b0490",
+      "gating": true,
+      "role": "joint order / default pose / control_dt / action scales"
+    },
+    "wheel_contract": {
+      "path": "/root/gpufree-data/Rob2Nav/deploy/as2w/contracts/wheel_contract_v1.json",
+      "sha256": "8f79a9539abc961ec1eb1f80edb84aa1d375867f6cfb3a36e03b8ff5d5e061d2",
+      "gating": false,
+      "role": "torque budget source; the file is owned and being edited by the rolling line, so its hash is observed at prep time and only the consumed fields are checked"
+    },
+    "agents_md": {
+      "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/AGENTS.md",
+      "sha256": "a6a4e5e09c5218741e2b4a6f627d9b16ebf757027bec9725dafec211459faad5",
+      "gating": false,
+      "role": "rules (90 % torque, separated thresholds, delivery checklist) referenced by this config"
+    }
+  },
+  "assets": {
+    "assets_root": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/assets/r237-train-root",
+    "mjcf": {
+      "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/assets/r237-train-root/local-step-diagnostic/as2w_flat.xml",
+      "sha256": "bd86aae1d8047a7be67aef8340c1303950f136af5fb5506dfeb451a1c94d0ce2"
+    },
+    "urdf": {
+      "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/assets/r237-train-root/official-model/robots/as2w_description/as2w.urdf",
+      "sha256": "696aec2c0915ec1e06bcc91a63104d8234c51c0eb94331fa5496bf426c51e926"
+    },
+    "fall_recovery_contract": {
+      "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/assets/r237-train-root/fall-baseline/fall-recovery-contract.json",
+      "sha256": "1e4e3fb76806e83dbe3541979fa0cb40f4b3150f5bf4de298224bf9baa9b0490"
+    }
+  },
+  "control": {
+    "action_clip": 6.0,
+    "leg_action_scale": 0.35,
+    "wheel_action_scale": 16.0,
+    "wheel_target_filter_alpha": 1.0,
+    "wheel_target_rate_limit_per_s": null,
+    "leg_target_filter_alpha": 1.0,
+    "action_delay_frames": 0,
+    "reset_rule": "clear_filter_delay_and_history_on_episode_reset",
+    "history_reset_fill": "repeat_first_frame",
+    "torque_clip_mode": "90pct",
+    "torque_budget_nm": 13.5
+  },
+  "initial_state": {
+    "base_x_uniform_m": [
+      -0.12,
+      0.12
+    ],
+    "base_y_uniform_m": [
+      -0.15,
+      0.15
+    ],
+    "yaw_uniform_rad": [
+      -0.08,
+      0.08
+    ],
+    "joint_offset_uniform_rad": [
+      -0.12,
+      0.12
+    ],
+    "base_height_m": 0.37,
+    "start_back_flat_m": 0.35,
+    "scene_seed_range": [
+      100000,
+      1000000000
+    ]
+  },
+  "dispatch": {
+    "wheel_target_unit": "rad/s",
+    "dispatch_unit": "Nm at data.ctrl; data.actuator_force is the measured solver force",
+    "previous_action_semantics": "executed (delayed, clipped to +-action_clip) action; equals the raw policy action when |a| <= action_clip and delay = 0"
+  },
+  "tap_log": {
+    "enabled": true,
+    "stride": 1,
+    "max_rows": 50000,
+    "window_every_steps": 100,
+    "max_windows": 200,
+    "dir_pattern": "<out>/tap/triple_tap.worker<rank>.jsonl",
+    "window_dir": "<out>/windows",
+    "fields": [
+      {
+        "name": "env_id",
+        "size": 1,
+        "unit": "-",
+        "label": "worker id"
+      },
+      {
+        "name": "episode_id",
+        "size": 1,
+        "unit": "-",
+        "label": "episode counter"
+      },
+      {
+        "name": "policy_step",
+        "size": 1,
+        "unit": "-",
+        "label": "control step inside the episode"
+      },
+      {
+        "name": "target_wheel_pre_filter",
+        "size": 4,
+        "unit": "rad/s",
+        "label": "16*action[12:] after the action clip, before any wheel limit/filter"
+      },
+      {
+        "name": "target_wheel_clipped",
+        "size": 4,
+        "unit": "rad/s",
+        "label": "after the URDF wheel velocity limit"
+      },
+      {
+        "name": "target_wheel_dispatch",
+        "size": 4,
+        "unit": "rad/s",
+        "label": "final wheel target captured at the data.ctrl assignment point"
+      },
+      {
+        "name": "target_leg_pos_pre_filter",
+        "size": 12,
+        "unit": "rad",
+        "label": "default + 0.35*action[:12] before the leg limit"
+      },
+      {
+        "name": "target_leg_pos_dispatch",
+        "size": 12,
+        "unit": "rad",
+        "label": "after the leg_low/leg_high clip"
+      },
+      {
+        "name": "tau_request_est_nm",
+        "size": 16,
+        "unit": "Nm",
+        "label": "ESTIMATED PD request: kp*(leg-q)-kd*dq | kd*(wheel-dq)"
+      },
+      {
+        "name": "tau_actuator_coord_nm",
+        "size": 16,
+        "unit": "Nm",
+        "label": "data.actuator_force (joint torque only for gear=1 direct motors)"
+      },
+      {
+        "name": "tau_joint_qfrc_nm",
+        "size": 16,
+        "unit": "Nm",
+        "label": "data.qfrc_actuator: simulated joint actuator torque (dof space)"
+      },
+      {
+        "name": "torque_budget_nm",
+        "size": 1,
+        "unit": "Nm",
+        "label": "budget only (13.5); never a measurement"
+      },
+      {
+        "name": "torque_clip_mode",
+        "size": 1,
+        "unit": "-",
+        "label": "where the 90% budget bites (hip/thigh 54, calf 81, wheel 13.5)"
+      },
+      {
+        "name": "wheel_limit_rad_s",
+        "size": 4,
+        "unit": "rad/s",
+        "label": "URDF wheel speed limit used for the clip"
+      },
+      {
+        "name": "history_newest",
+        "size": 60,
+        "unit": "mixed",
+        "label": "newest frame the next policy step will see"
+      },
+      {
+        "name": "history_sha256",
+        "size": 1,
+        "unit": "-",
+        "label": "sha256 over the whole float32 window"
+      },
+      {
+        "name": "field_order",
+        "size": 60,
+        "unit": "-",
+        "label": "observation field names in contract order"
+      },
+      {
+        "name": "window_shape",
+        "size": 2,
+        "unit": "-",
+        "label": "[frames, 60]"
+      },
+      {
+        "name": "dtype",
+        "size": 1,
+        "unit": "-",
+        "label": "float32"
+      }
+    ],
+    "sampling": "one row per control step (stride 1) capped at max_rows; raw windows saved every window_every_steps steps, on the first 2 and last 2 steps of every episode, and for +/-3 steps around the first occurrence of each failure kind (max_windows), as .npz plus <out>/windows/index.jsonl",
+    "replay_command": "python fs_stair_train.py --replay --out <out> --replay-log <out>/tap/triple_tap.worker0.jsonl [--replay-window <a.npz> --replay-reference <b.npz>] --re-export-first-mismatch",
+    "divergence_note": "history_sha256 localises the first differing policy step; the field name/index needs that step's raw window (see fs_stair_replay.py)"
+  },
+  "phase_gate": {
+    "phase2_locked": true,
+    "unlock_requires": [
+      "--init-checkpoint <pt>",
+      "--allow-disturbance",
+      "--eval-record <json> (formal --run only)",
+      "exactly one --disturbance {none,load,push}",
+      "--phase disturbance"
+    ],
+    "baseline_definition": "minimal-variable baseline: deployment-consistent action wrapper (clip + explicit identity filter/rate-limit/delay), nominal mass/inertia, nominal friction, nominal gains, no push, no observation noise, one shared initial-state distribution",
+    "advance_to_disturbance_criteria": {
+      "rule": "the baseline does not auto-advance; the operator unlocks phase 2 after all three capabilities are demonstrated on the 6 holdout seeds",
+      "thresholds_status": "PENDING_OPERATOR_RULING",
+      "A_s1_flat_approach": {
+        "definition": "flat_approach stage completed: approach line reached and a stable four-wheel stance held for TOP_HOLD_S",
+        "metric": "flat_approach holdout episodes with complete=true and not terminated",
+        "command": "bash fs_stair_6frame.sh --stage flat_approach --run --out <dir>"
+      },
+      "B_s1_front_wheel_ascends": {
+        "definition": "at least one front wheel (FL/FR) credited with tread level >= 1 after >= 8 N sustained for >= 60 ms",
+        "metric": "A_s1: ever_levels max of FL/FR >= 1",
+        "command": "bash fs_stair_6frame.sh --stage step1 --run --out <dir>"
+      },
+      "C_top_rear_wheels_follow": {
+        "definition": "all four wheels credited with the top tread (rear wheels followed)",
+        "metric": "C_top: min(ever_levels) >= n_levels",
+        "command": "bash fs_stair_6frame.sh --stage continuous --run --out <dir>"
+      },
+      "D_top_hold": {
+        "definition": "all four wheels simultaneously loaded on the top tread for >= 0.5 s (TOP_HOLD_S), the mujoco_screen.py:295 criterion",
+        "metric": "course_completed and not terminated",
+        "command": "bash fs_stair_6frame.sh --stage continuous --run --out <dir>"
+      },
+      "holdout_seeds": [
+        28001,
+        28002,
+        28003,
+        28004,
+        28005,
+        28006
+      ],
+      "adjudication": "6 seeds give a 1/6 resolution; an improvement counts only when it changes at least 2 seeds"
+    }
+  },
+  "deployment_consistency": {
+    "sources": [
+      "deploy/as2w/runtime/deploy.yaml (rolling gyro-1: action clip 6.0, scales 0.35/16.0, torque_limits_nm hip/thigh 54, calf 81, wheel 13.5, observation filter none)",
+      "deliveries/as2w-deploy/omni-blind-stairs-r270-preview/rl_deploy.yaml (stair preview: command_filter alpha 0.12 on the COMMAND, 720-dim history)",
+      "deploy/as2w/runtime/r11_acceptance_ff.py (--action-delay-steps, default 0; link-loss detection 300 ms)"
+    ],
+    "action_clip": 6.0,
+    "leg_action_scale": 0.35,
+    "wheel_action_scale": 16.0,
+    "torque_limits_nm": {
+      "hip": 54.0,
+      "thigh": 54.0,
+      "calf": 81.0,
+      "wheel": 13.5
+    },
+    "action_filter": "none in the deployed wrapper; the stair preview's alpha=0.12 filter is on the COMMAND and the stair command is constant (0.4,0,0)",
+    "wheel_target_rate_limit": "none",
+    "action_delay": "0 frames by default; the eval-only switch exists for link-loss tests",
+    "history": "the deployed rolling wrapper has no history; the stair preview uses 720-dim subsampled history, which is a DIFFERENT contract from this 360-dim consecutive six-frame stack (OD-2)",
+    "phase1_status": "filter/rate-limit/delay are the identity at alpha=1.0/None/0, so the wrapper reproduces the pinned training env; every parameter is explicit and fingerprinted so a future deployment filter is a versioned change"
+  },
+  "phase_default": "baseline",
+  "control_contract": {
+    "version": "stair-dev-1",
+    "fingerprint": "a8270a642a78458c47f128e94f033f14ae2fb2aacfac37e54cb0d3e05c52ce2f",
+    "field_order": [
+      "command_error_vx",
+      "command_error_vy",
+      "command_error_wz",
+      "base_ang_vel_x",
+      "base_ang_vel_y",
+      "base_ang_vel_z",
+      "projected_gravity_x",
+      "projected_gravity_y",
+      "projected_gravity_z",
+      "height_reference",
+      "joint_pos_FL_hip",
+      "joint_pos_FR_hip",
+      "joint_pos_RL_hip",
+      "joint_pos_RR_hip",
+      "joint_pos_FL_thigh",
+      "joint_pos_FR_thigh",
+      "joint_pos_RL_thigh",
+      "joint_pos_RR_thigh",
+      "joint_pos_FL_calf",
+      "joint_pos_FR_calf",
+      "joint_pos_RL_calf",
+      "joint_pos_RR_calf",
+      "joint_pos_FL_foot",
+      "joint_pos_FR_foot",
+      "joint_pos_RL_foot",
+      "joint_pos_RR_foot",
+      "joint_vel_FL_hip",
+      "joint_vel_FR_hip",
+      "joint_vel_RL_hip",
+      "joint_vel_RR_hip",
+      "joint_vel_FL_thigh",
+      "joint_vel_FR_thigh",
+      "joint_vel_RL_thigh",
+      "joint_vel_RR_thigh",
+      "joint_vel_FL_calf",
+      "joint_vel_FR_calf",
+      "joint_vel_RL_calf",
+      "joint_vel_RR_calf",
+      "joint_vel_FL_foot",
+      "joint_vel_FR_foot",
+      "joint_vel_RL_foot",
+      "joint_vel_RR_foot",
+      "previous_action_0",
+      "previous_action_1",
+      "previous_action_2",
+      "previous_action_3",
+      "previous_action_4",
+      "previous_action_5",
+      "previous_action_6",
+      "previous_action_7",
+      "previous_action_8",
+      "previous_action_9",
+      "previous_action_10",
+      "previous_action_11",
+      "previous_action_12",
+      "previous_action_13",
+      "previous_action_14",
+      "previous_action_15",
+      "gait_clock_sin",
+      "gait_clock_cos"
+    ],
+    "change_rule": "Any change to the filter position/alpha, rate limit, action delay, history field semantics/order, action clip/scales, torque dispatch or the initial-state distribution changes contract_fingerprint. If the stored fingerprint no longer matches, the runner prints CONTROL_CONTRACT_CHANGED, refuses --run, and asks for a bumped control_contract_version plus replay and baseline regression. --accept-contract-change is accepted only with --dry-run/--replay.",
+    "per_arm_note": "the fingerprint is per arm because the history definition is part of the contract; the three arms share control/initial-state/dispatch"
+  }
+}

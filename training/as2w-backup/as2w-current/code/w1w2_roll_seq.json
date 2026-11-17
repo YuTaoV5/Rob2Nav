@@ -1,0 +1,291 @@
+{
+ "schema": "w1w2_roll_seq_v1",
+ "generated_by": "w1w2_roll_isaac_loaded.py --mode calibrate",
+ "order": [
+  "FL_foot",
+  "FR_foot",
+  "RL_foot",
+  "RR_foot"
+ ],
+ "units": "wheel angular velocity target, rad/s, positive = rolling forward",
+ "step_dt_s": 0.02,
+ "wheel_r_m": 0.086,
+ "track_width_m": 0.330795,
+ "wheelbase_m": 0.423798,
+ "note": "one physical-unit sequence consumed by BOTH simulators, verbatim",
+ "cases": [
+  {
+   "name": "cm_fwd_025",
+   "note": "common mode forward, 0.25 m/s tier",
+   "settle_s": 3.5,
+   "phases": [
+    {
+     "ph": "baseline",
+     "s": 1.5,
+     "tgt": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "ph": "drive",
+     "s": 3.0,
+     "tgt": [
+      2.906977,
+      2.906977,
+      2.906977,
+      2.906977
+     ]
+    },
+    {
+     "ph": "brake",
+     "s": 2.5,
+     "tgt": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "name": "cm_fwd_005",
+   "note": "common mode forward, 0.05 m/s tier",
+   "settle_s": 3.5,
+   "phases": [
+    {
+     "ph": "baseline",
+     "s": 1.5,
+     "tgt": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "ph": "drive",
+     "s": 3.0,
+     "tgt": [
+      0.581395,
+      0.581395,
+      0.581395,
+      0.581395
+     ]
+    },
+    {
+     "ph": "brake",
+     "s": 2.5,
+     "tgt": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "name": "cm_rev_025",
+   "note": "common mode reverse, 0.25 m/s tier",
+   "settle_s": 3.5,
+   "phases": [
+    {
+     "ph": "baseline",
+     "s": 1.5,
+     "tgt": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "ph": "drive",
+     "s": 3.0,
+     "tgt": [
+      -2.906977,
+      -2.906977,
+      -2.906977,
+      -2.906977
+     ]
+    },
+    {
+     "ph": "brake",
+     "s": 2.5,
+     "tgt": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "name": "diff_L_010",
+   "note": "mirror differential, +0.10 rad/s yaw equivalent (right side forward)",
+   "settle_s": 3.5,
+   "phases": [
+    {
+     "ph": "baseline",
+     "s": 1.5,
+     "tgt": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "ph": "drive",
+     "s": 3.0,
+     "tgt": [
+      -0.192323,
+      0.192323,
+      -0.192323,
+      0.192323
+     ]
+    },
+    {
+     "ph": "brake",
+     "s": 2.5,
+     "tgt": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "name": "diff_R_010",
+   "note": "mirror differential, -0.10 rad/s yaw equivalent (left side forward)",
+   "settle_s": 3.5,
+   "phases": [
+    {
+     "ph": "baseline",
+     "s": 1.5,
+     "tgt": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "ph": "drive",
+     "s": 3.0,
+     "tgt": [
+      0.192323,
+      -0.192323,
+      0.192323,
+      -0.192323
+     ]
+    },
+    {
+     "ph": "brake",
+     "s": 2.5,
+     "tgt": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "name": "diff_L_020",
+   "note": "mirror differential, +0.20 rad/s yaw equivalent, saturation reference",
+   "settle_s": 3.5,
+   "phases": [
+    {
+     "ph": "baseline",
+     "s": 1.5,
+     "tgt": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "ph": "drive",
+     "s": 3.0,
+     "tgt": [
+      -0.384645,
+      0.384645,
+      -0.384645,
+      0.384645
+     ]
+    },
+    {
+     "ph": "brake",
+     "s": 2.5,
+     "tgt": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  },
+  {
+   "name": "diff_R_020",
+   "note": "mirror differential, -0.20 rad/s yaw equivalent, saturation reference",
+   "settle_s": 3.5,
+   "phases": [
+    {
+     "ph": "baseline",
+     "s": 1.5,
+     "tgt": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "ph": "drive",
+     "s": 3.0,
+     "tgt": [
+      0.384645,
+      -0.384645,
+      0.384645,
+      -0.384645
+     ]
+    },
+    {
+     "ph": "brake",
+     "s": 2.5,
+     "tgt": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ]
+  }
+ ],
+ "differential_amplitude_rad_s": {
+  "yaw_0p10": 0.192323,
+  "yaw_0p20": 0.384645
+ },
+ "implied_body_wz_rad_s": {
+  "diff_L_010": 0.1,
+  "diff_R_010": -0.1,
+  "diff_L_020": 0.2,
+  "diff_R_020": -0.2
+ },
+ "implied_body_vx_m_s": {
+  "cm_fwd_025": 0.25,
+  "cm_fwd_005": 0.05
+ }
+}

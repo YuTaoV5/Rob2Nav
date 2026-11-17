@@ -1,0 +1,900 @@
+{
+  "schema": "fs_roll_config_v1",
+  "experiment": {
+    "id": "fs-roll--20261116-2345",
+    "arm": "B",
+    "arm_name": "six_frame_concat",
+    "status": "research",
+    "deployable": false,
+    "purpose": "from-scratch rolling comparison of observation/architecture arms A/B/C under ONE wheel contract, reward set, command curriculum and env-step budget"
+  },
+  "created_utc": "2026-11-16T16:20:56Z",
+  "change_provenance": [
+    "num_envs: operator adjusted 32768 -> 16384 on 2026-11-16.  Final value 16384; 32768 was a rejected option, not a typo.",
+    "iterations: operator raised 1500 -> 3000 so that the total budget is unchanged.",
+    "budget equality (self-proof): 32768*128*1500 = 6,291,456,000 and 16384*128*3000 = 6,291,456,000 -- the same total.  Only parallelism was halved (to save GPU memory); total compute budget did not change.  Parallelism and total budget are independent knobs.",
+    "per_round_steps: 32768*128 = 4,194,304 -> 16384*128 = 2,097,152 (envs halved).",
+    "legacy entry: as2w_isaac_flat_env_all.py:258 records steps_per_iteration = num_envs * 24.  This entry uses n_steps = 128 per round; the 24-step figure is superseded, not reused."
+  ],
+  "control": {
+    "control_period_s": 0.02,
+    "physics_dt_s": 0.005,
+    "decimation": 4,
+    "episode_length_s": 32.0,
+    "action_dim": 16,
+    "action_clip": 6.0,
+    "device_dry_run": "cpu",
+    "device_run": "cuda:0"
+  },
+  "observation": {
+    "dim": 65,
+    "source": "as2w_isaac_flat_env_all.observation() lines 59-81 with cfg.as2w_zero_memory=True",
+    "zero_memory": true,
+    "width_proof": {
+      "base_frame_dim": 60,
+      "appended_wheel_delta": 4,
+      "appended_zero_flag": 1,
+      "line_70": "if not env.cfg.as2w_zero_memory: return frame",
+      "line_81": "torch.cat((frame, (delta / .20).clamp(-3., 3.) * zero[:, None], zero[:, None]), dim=-1)",
+      "line_252": "expected_features = 65 if args.zero_memory else 60"
+    },
+    "semantics_notes": [
+      "60:64 is wheel angle minus the reference latched at zero-command entry, divided by 0.20 and clamped to +-3; it is not the raw wheel angle",
+      "64 is the zero-command flag; it multiplies 60:64, so the delta is 0 unless the command is exactly zero",
+      "58/59 are sin/cos of the 0.62 s episode clock"
+    ],
+    "layout": [
+      {
+        "name": "command_x",
+        "start": 0,
+        "end": 3,
+        "unit": "m/s, rad/s",
+        "source": "base_velocity command minus (0.4,0,0) bias"
+      },
+      {
+        "name": "body_gyro",
+        "start": 3,
+        "end": 6,
+        "unit": "rad/s",
+        "source": "root_ang_vel_b (IMU)"
+      },
+      {
+        "name": "gravity_b",
+        "start": 6,
+        "end": 9,
+        "unit": "g",
+        "source": "projected_gravity_b"
+      },
+      {
+        "name": "const_0p4",
+        "start": 9,
+        "end": 10,
+        "unit": "-",
+        "source": "constant 0.4"
+      },
+      {
+        "name": "joint_pos",
+        "start": 10,
+        "end": 26,
+        "unit": "rad",
+        "source": "joint_pos - default; wheels wrapped to [-2pi,2pi]"
+      },
+      {
+        "name": "joint_vel",
+        "start": 26,
+        "end": 42,
+        "unit": "rad/s",
+        "source": "joint velocity, canonical AS2-W order"
+      },
+      {
+        "name": "prev_action",
+        "start": 42,
+        "end": 58,
+        "unit": "-",
+        "source": "previous processed action after scale/clip"
+      },
+      {
+        "name": "phase_sin",
+        "start": 58,
+        "end": 59,
+        "unit": "-",
+        "source": "sin(2*pi*t/0.62)"
+      },
+      {
+        "name": "phase_cos",
+        "start": 59,
+        "end": 60,
+        "unit": "-",
+        "source": "cos(2*pi*t/0.62)"
+      },
+      {
+        "name": "wheel_delta",
+        "start": 60,
+        "end": 64,
+        "unit": "rad/0.20 clamped +-3",
+        "source": "wheel displacement since zero-command entry, gated"
+      },
+      {
+        "name": "zero_flag",
+        "start": 64,
+        "end": 65,
+        "unit": "-",
+        "source": "1.0 when command == 0; gates 60:64"
+      }
+    ]
+  },
+  "history": {
+    "frames": 6,
+    "includes_current_frame": true,
+    "order": "oldest_to_newest",
+    "advance": "exactly once per policy step (not per physics substep)",
+    "policy_step_s": 0.02,
+    "first_to_last_span_s": 0.1,
+    "reset": "fill all slots with the first frame of the new episode (no residue)",
+    "convention_note": "NOT the as2w_history.py 720-D sub-sampled convention (60 + 12*55, offsets 2..24, 480 ms, lift_actor zero padding); that convention is deliberately unused and flagged pending operator confirmation",
+    "arm_inputs": {
+      "A": 65,
+      "B": 390,
+      "C": 66
+    },
+    "materialisation": "each arm's input width is explicit; no arm is produced by padding another arm's weights (BLAS summation order makes that non-equivalent)"
+  },
+  "network": {
+    "actor": {
+      "input_dim": 390,
+      "hidden": [
+        128,
+        128,
+        128
+      ],
+      "output_dim": 16,
+      "activation": "elu",
+      "init": "orthogonal (hidden gain sqrt(2), output gain 0.01)",
+      "distribution": "diagonal Gaussian, state-independent log_std",
+      "init_noise_std": 0.25
+    },
+    "critic": {
+      "input_dim": 395,
+      "hidden": [
+        128,
+        128,
+        128
+      ],
+      "output_dim": 1,
+      "activation": "elu",
+      "init": "orthogonal (hidden gain sqrt(2), output gain 1.0)",
+      "privileged_dim": 5,
+      "privileged_fields": [
+        "vx",
+        "vy",
+        "vz",
+        "wz",
+        "root_height"
+      ]
+    },
+    "estimator": null
+  },
+  "ppo": {
+    "epochs": 5,
+    "minibatches": 4,
+    "learning_rate": 0.0003,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "clip": 0.2,
+    "entropy_coef": 0.005,
+    "value_coef": 1.0,
+    "max_grad_norm": 1.0,
+    "init_noise_std": 0.25,
+    "n_steps": 128
+  },
+  "budget": {
+    "preset": "large",
+    "presets": {
+      "small": {
+        "num_envs": 4096,
+        "n_steps": 24
+      },
+      "large": {
+        "num_envs": 16384,
+        "n_steps": 128
+      }
+    },
+    "num_envs": 16384,
+    "n_steps": 128,
+    "per_round_steps": 2097152,
+    "iterations": 3000,
+    "total_env_steps": 6291456000,
+    "remainder": 0,
+    "gradient_steps_per_iteration": 20,
+    "total_gradient_steps": 60000,
+    "formula": "per_round = num_envs * n_steps; total = iterations * per_round; remainder = total_declared % per_round",
+    "rsl_rl_name": "rsl_rl calls n_steps 'num_steps_per_env'; this entry re-implements the PPO loop, so one rollout = one iteration = epochs*minibatches gradient steps",
+    "legacy_steps_per_iteration": "num_envs * 24 (as2w_isaac_flat_env_all.py:258); superseded by n_steps=128 in this entry",
+    "iterations_is_primary_key": true,
+    "budget_self_proof": {
+      "rejected_option_total": 6291456000,
+      "final_total": 6291456000,
+      "equal": true,
+      "note": "parallelism halved to save GPU memory; total budget unchanged"
+    },
+    "switch_to_total_steps": "pass --total-steps; iterations becomes total // per_round and the remainder is reported (never silently truncated)"
+  },
+  "seed": 449,
+  "wheel_contract": {
+    "file": "/root/gpufree-data/Rob2Nav/deploy/as2w/contracts/wheel_contract_v1.json",
+    "sha256": "8f79a9539abc961ec1eb1f80edb84aa1d375867f6cfb3a36e03b8ff5d5e061d2",
+    "expected_sha256": "8f79a9539abc961ec1eb1f80edb84aa1d375867f6cfb3a36e03b8ff5d5e061d2",
+    "sha256_matches": true,
+    "selected_group": "w1w2_as2w_diagnostic_kd_1p5",
+    "selected_kd": 1.5,
+    "selection_status": "pending_validation",
+    "selection_reason": "dual-simulator same-target loaded evidence is insufficient",
+    "snapshot": {
+      "$comment": "Versioned wheel contract for AS2-W rolling. Training, Isaac Lab evaluation and MuJoCo evaluation MUST all read the wheel scale, wheel gain, compensation switch and limits from ONE entry here. This exists because the old r11 defaults (scale 16, kd 6, gyro-1) silently leaked into evaluations before.",
+      "contract_version": "wheel-contract-v1",
+      "created": "2026-11-17",
+      "wheel_order": [
+        "FL_foot",
+        "FR_foot",
+        "RL_foot",
+        "RR_foot"
+      ],
+      "wheel_positive_means": "rolling forward for all four wheels",
+      "differential_formula": "(FR + RR - FL - RL) / 2",
+      "diagonal_formula": "(FL + RR - FR - RL) / 2",
+      "torque_budget_nm": 13.5,
+      "torque_budget_note": "90 percent of the verified 15 Nm hardware limit; unified denominator is deploy.yaml torque_limits_nm, ratio must stay <= 1.00",
+      "observation_dim": 65,
+      "action_dim": 16,
+      "control_period_s": 0.02,
+      "contracts": {
+        "fanziqi_direct_v1": {
+          "description": "four independent wheel velocity channels straight from the actor; controller adapted from Fan Ziqi Robot Lab Go2-W; NOT yet validated on AS2-W",
+          "wheel_action_scale": 5.0,
+          "wheel_action_note": "wheel_target = 5.0 * wheel_action",
+          "wheel_kp": 0.0,
+          "wheel_kd": 0.5,
+          "wheel_mode": "velocity",
+          "gyro_enabled": false,
+          "gyro_yaw_kp": 0.0,
+          "gyro_ff_cap_nm": 0.0,
+          "gyro_ff_gain": 0.0,
+          "leg_kp": 55.0,
+          "leg_kd": 2.0,
+          "leg_action_scale": 0.35,
+          "status": "research",
+          "deployable": false
+        },
+        "w1w2_as2w_diagnostic_kd_0p5": {
+          "description": "AS2-W diagnostic gain arm. Only wheel_kd varies across these three arms. The 1.5 arm is inspired by W1W_2.",
+          "wheel_action_scale": 5.0,
+          "wheel_action_note": "wheel_target = 5.0 * wheel_action",
+          "wheel_kp": 0.0,
+          "wheel_kd": 0.5,
+          "wheel_mode": "velocity",
+          "gyro_enabled": false,
+          "gyro_yaw_kp": 0.0,
+          "gyro_ff_cap_nm": 0.0,
+          "gyro_ff_gain": 0.0,
+          "leg_kp": 55.0,
+          "leg_kd": 2.0,
+          "leg_action_scale": 0.35,
+          "status": "research",
+          "deployable": false
+        },
+        "w1w2_as2w_diagnostic_kd_1p5": {
+          "description": "AS2-W diagnostic gain arm. Only wheel_kd varies across these three arms. The 1.5 arm is inspired by W1W_2.",
+          "wheel_action_scale": 5.0,
+          "wheel_action_note": "wheel_target = 5.0 * wheel_action",
+          "wheel_kp": 0.0,
+          "wheel_kd": 1.5,
+          "wheel_mode": "velocity",
+          "gyro_enabled": false,
+          "gyro_yaw_kp": 0.0,
+          "gyro_ff_cap_nm": 0.0,
+          "gyro_ff_gain": 0.0,
+          "leg_kp": 55.0,
+          "leg_kd": 2.0,
+          "leg_action_scale": 0.35,
+          "status": "research",
+          "deployable": false
+        },
+        "w1w2_as2w_diagnostic_kd_2p0": {
+          "description": "AS2-W diagnostic gain arm. Only wheel_kd varies across these three arms. The 1.5 arm is inspired by W1W_2.",
+          "wheel_action_scale": 5.0,
+          "wheel_action_note": "wheel_target = 5.0 * wheel_action",
+          "wheel_kp": 0.0,
+          "wheel_kd": 2.0,
+          "wheel_mode": "velocity",
+          "gyro_enabled": false,
+          "gyro_yaw_kp": 0.0,
+          "gyro_ff_cap_nm": 0.0,
+          "gyro_ff_gain": 0.0,
+          "leg_kp": 55.0,
+          "leg_kd": 2.0,
+          "leg_action_scale": 0.35,
+          "status": "research",
+          "deployable": false
+        },
+        "r11_legacy": {
+          "description": "the r11 rolling wrapper this project has been evaluating so far; kept as the comparison arm",
+          "wheel_action_scale": 16.0,
+          "wheel_action_note": "wheel_target = 16.0 * wheel_action",
+          "wheel_kp": 0.0,
+          "wheel_kd": 6.0,
+          "wheel_mode": "velocity",
+          "gyro_enabled": false,
+          "gyro_enabled_variant": "gyro-1 adds ff = S*clip(yaw_kp*(wz_cmd - wz_meas), +-ff_cap) and dispatches sp = dq + tau/kd",
+          "gyro_yaw_kp": 60.0,
+          "gyro_ff_cap_nm": 4.0,
+          "gyro_ff_gain": 0.0,
+          "gyro_axis_vector_S": [
+            -1,
+            1,
+            -1,
+            1
+          ],
+          "leg_kp": 55.0,
+          "leg_kd": 2.0,
+          "leg_action_scale": 0.35,
+          "status": "research",
+          "deployable": false
+        }
+      },
+      "evaluation_requirements": {
+        "verify_before_running": [
+          "wheel_action_scale",
+          "wheel_kd",
+          "gyro_enabled",
+          "torque_budget_nm"
+        ],
+        "dispatch_verification": "feed a known non-zero action and confirm the wheel velocity target actually dispatched equals scale * action (after clipping)",
+        "torque_reporting": "Isaac implicit-drive effort telemetry is a software clamp estimate and must be labelled estimated; solver actual force is not_measured until a trustworthy readback exists",
+        "probe_rule": "any dispatch probe must preserve the original number of delayed() calls, otherwise it changes the controller it is measuring"
+      }
+    }
+  },
+  "action_mapping": {
+    "joint_order_canonical": [
+      "FL_hip",
+      "FR_hip",
+      "RL_hip",
+      "RR_hip",
+      "FL_thigh",
+      "FR_thigh",
+      "RL_thigh",
+      "RR_thigh",
+      "FL_calf",
+      "FR_calf",
+      "RL_calf",
+      "RR_calf",
+      "FL_foot",
+      "FR_foot",
+      "RL_foot",
+      "RR_foot"
+    ],
+    "urdf_document_order": [
+      "FL_hip",
+      "FL_thigh",
+      "FL_calf",
+      "FL_foot",
+      "FR_hip",
+      "FR_thigh",
+      "FR_calf",
+      "FR_foot",
+      "RL_hip",
+      "RL_thigh",
+      "RL_calf",
+      "RL_foot",
+      "RR_hip",
+      "RR_thigh",
+      "RR_calf",
+      "RR_foot",
+      "JT128"
+    ],
+    "order_note": "canonical order is part-major (hip x4, thigh x4, calf x4, foot x4); the articulation resolves names through FlatEnvironment.as2w_joint_ids, so URDF document order (leg-major) is not used as the articulation order",
+    "wheel_joint_order": [
+      "FL_foot",
+      "FR_foot",
+      "RL_foot",
+      "RR_foot"
+    ],
+    "wheel_action_channels": {
+      "FL_foot": 12,
+      "FR_foot": 13,
+      "RL_foot": 14,
+      "RR_foot": 15
+    },
+    "contact_body_regex": ".*_foot",
+    "contact_bodies": [
+      "FL_foot",
+      "FR_foot",
+      "RL_foot",
+      "RR_foot"
+    ],
+    "wheel_effort_limit_nm": 15.0,
+    "wheel_velocity_limit_rad_s": 98.47,
+    "mapping_source": "URDF joint/link names; --run additionally asserts the runtime joint name set, joint ids 12..15 and contact bodies"
+  },
+  "assets": {
+    "usd": {
+      "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/runs/r280-isaac-flat-preflight/kit3-as2w.usd/as2w/as2w.usda",
+      "sha256": "0c5786834c5deda135d3195062033dfe8312c9abf7daad689070925e89d3a55c"
+    },
+    "urdf": {
+      "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/assets/r237-train-root/official-model/robots/as2w_description/as2w.urdf",
+      "sha256": "696aec2c0915ec1e06bcc91a63104d8234c51c0eb94331fa5496bf426c51e926"
+    }
+  },
+  "sources": {
+    "git_commit": "bee6c5844634b392acb8e63a70fb9f0440f98253",
+    "git_branch": "main",
+    "commits_ahead_of_origin_main": 2,
+    "git_status_porcelain": [
+      "M deliveries/as2w-deploy/rolling-armD-turn65-research/runtime/r11_acceptance_ff.py",
+      " M deploy/as2w/contracts/wheel_contract_v1.json",
+      " M training/as2w-backup/as2w-current/code/eval_as2w_mujoco_rolling.py",
+      " M training/as2w-backup/as2w-current/code/train_stair_curriculum.py",
+      "?? deliveries/as2w-deploy/rolling-armD-turn65-research/runtime/r11_isaac_wheel_gain.py",
+      "?? training/as2w-backup/as2w-current/assets/r237-train-root/wheel_radius_measured.json",
+      "?? training/as2w-backup/as2w-current/code/as2w_isaac_robust_env.py.bak-actiondelay-20261116-012918",
+      "?? training/as2w-backup/as2w-current/code/configs/",
+      "?? training/as2w-backup/as2w-current/code/fs_stair_1frame.sh",
+      "?? training/as2w-backup/as2w-current/code/fs_stair_6frame.sh",
+      "?? training/as2w-backup/as2w-current/code/fs_stair_README.md",
+      "?? training/as2w-backup/as2w-current/code/fs_stair_contract.py",
+      "?? training/as2w-backup/as2w-current/code/fs_stair_env.py",
+      "?? training/as2w-backup/as2w-current/code/fs_stair_eval_flat.py",
+      "?? training/as2w-backup/as2w-current/code/fs_stair_replay.py",
+      "?? training/as2w-backup/as2w-current/code/fs_stair_train.py",
+      "?? training/as2w-backup/as2w-current/code/fs_stair_zero_history.sh",
+      "?? training/as2w-backup/as2w-current/code/w1w2_roll_compare.py",
+      "?? training/as2w-backup/as2w-current/code/w1w2_roll_isaac_loaded.py",
+      "?? training/as2w-backup/as2w-current/code/w1w2_roll_kd_evidence.md",
+      "?? training/as2w-backup/as2w-current/code/w1w2_roll_mujoco_loaded.py",
+      "?? training/as2w-backup/as2w-current/code/w1w2_roll_seq.json",
+      "?? training/as2w-backup/as2w-current/fs_roll/"
+    ],
+    "files": {
+      "as2w_isaac_flat_env_all.py": {
+        "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/code/as2w_isaac_flat_env_all.py",
+        "sha256": "e739dd1f9cd45ee1c280f49ffef1bde6db38719f0ad34e3b56d6f8b7bdd3b2ed"
+      },
+      "as2w_isaac_robust_env.py": {
+        "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/code/as2w_isaac_robust_env.py",
+        "sha256": "a8b0e3f12da259e5c34a54235ec3aea15ad43a86ba2930e6e3e23954142e6bfd"
+      },
+      "as2w_training_safety.py": {
+        "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/code/as2w_training_safety.py",
+        "sha256": "b8d6ea183d70d80fb97a2d6fa527e50f72d8b930bcbceafabf6c24c15bee58bd"
+      },
+      "as2w_knee_envelope.py": {
+        "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/code/as2w_knee_envelope.py",
+        "sha256": "3b459ac05e93d41342de3f4932e79555f5e5ca196a58c1eee80499dfc2e411df"
+      },
+      "as2w_isaac_speed_range.py": {
+        "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/code/as2w_isaac_speed_range.py",
+        "sha256": "86cd236651eed286143b6c1e7251289fd03c7e07c8ae5af8ef5e787c396cada2"
+      },
+      "as2w_predictive_joint_guard.py": {
+        "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/code/as2w_predictive_joint_guard.py",
+        "sha256": "5aaf9baf6dfad2fb2dcdfdc3e90cb950464f30e6e1783c2ac3533b1a0816897c"
+      },
+      "train_armE_support2p0.py": {
+        "path": "/root/gpufree-data/Rob2Nav/skills/as2w/rolling/train_armE_support2p0.py",
+        "sha256": "02fc3ec515170f784eb2a74df6e47e3faf6ca1290a318428ac09a0b51054aeda"
+      },
+      "wheel_contract_v1.json": {
+        "path": "/root/gpufree-data/Rob2Nav/deploy/as2w/contracts/wheel_contract_v1.json",
+        "sha256": "8f79a9539abc961ec1eb1f80edb84aa1d375867f6cfb3a36e03b8ff5d5e061d2"
+      },
+      "AGENTS.md": {
+        "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/AGENTS.md",
+        "sha256": "a6a4e5e09c5218741e2b4a6f627d9b16ebf757027bec9725dafec211459faad5"
+      },
+      "as2w.usda": {
+        "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/runs/r280-isaac-flat-preflight/kit3-as2w.usd/as2w/as2w.usda",
+        "sha256": "0c5786834c5deda135d3195062033dfe8312c9abf7daad689070925e89d3a55c"
+      },
+      "as2w.urdf": {
+        "path": "/root/gpufree-data/Rob2Nav/training/as2w-backup/as2w-current/assets/r237-train-root/official-model/robots/as2w_description/as2w.urdf",
+        "sha256": "696aec2c0915ec1e06bcc91a63104d8234c51c0eb94331fa5496bf426c51e926"
+      }
+    },
+    "arme_variants": [
+      {
+        "path": "/root/gpufree-data/Rob2Nav/skills/as2w/rolling/train_armE_support2p0.py",
+        "sha256": "02fc3ec515170f784eb2a74df6e47e3faf6ca1290a318428ac09a0b51054aeda",
+        "selected": true,
+        "why": "canonical skill directory (newest, 2026-11-16 18:29); the r11-turn-gyro copy omits the RollingCommands docstring/AB branch, the armD copy omits the long-dwell switch; the default armE command mixture used here is identical"
+      },
+      {
+        "path": "/root/gpufree-data/Rob2Nav/deliveries/as2w-deploy/rolling-r11-turn-gyro-research/training/train_armE_support2p0.py",
+        "sha256": "d36a4610e2a9877ddb1f1c48866bcf681e2728197b628178d8718692eaeda7da"
+      },
+      {
+        "path": "/root/gpufree-data/Rob2Nav/deliveries/as2w-deploy/rolling-armD-turn65-research/training/train_armE_support2p0.py",
+        "sha256": "a61b0bb57d41b32471efec16385bfddc33c358bd57aa47d262c7fce19ad1978a"
+      }
+    ],
+    "note": "new files only; the listed modifications are other agents' uncommitted work and are read, never touched"
+  },
+  "command_curriculum": {
+    "source": "armE RollingCommands (skills/as2w/rolling/train_armE_support2p0.py:57-147)",
+    "mixture": {
+      "hold": 0.2,
+      "straight": 0.15,
+      "spin": 0.4,
+      "arc": 0.25
+    },
+    "vx_range_m_s": [
+      -0.25,
+      0.25
+    ],
+    "wz_range_rad_s": [
+      -0.15,
+      0.15
+    ],
+    "min_abs_command": 0.05,
+    "resampling_time_range_s": [
+      10.0,
+      10.0
+    ],
+    "speed_curriculum_0_to_3_m_s": "available as curriculum.mode=staged_0_to_3; default mode is armE_mixture"
+  },
+  "curriculum": {
+    "mode": "armE_mixture",
+    "modes": [
+      "armE_mixture",
+      "staged_0_to_3"
+    ],
+    "armE_mixture": {
+      "vx_cap_m_s": 0.25,
+      "yaw_cap_rad_s": 0.15,
+      "min_abs_cmd": 0.05,
+      "mode_buckets": [
+        0.2,
+        0.35,
+        0.75
+      ],
+      "mixture": {
+        "hold": 0.2,
+        "straight": 0.15,
+        "spin": 0.4,
+        "arc": 0.25
+      },
+      "source": "skills/as2w/rolling/train_armE_support2p0.py:128-147 (RollingCommands default path)",
+      "description": "armE fixed mixture; caps at 0.25 m/s and is NOT a speed curriculum"
+    },
+    "staged_0_to_3": {
+      "max_speed_m_s": 3.0,
+      "stages": [
+        {
+          "index": 0,
+          "speed_m_s": 0.05,
+          "yaw_rad_s": 0.1,
+          "dwell_s": 10.0,
+          "share": 0.15
+        },
+        {
+          "index": 1,
+          "speed_m_s": 0.1,
+          "yaw_rad_s": 0.1,
+          "dwell_s": 10.0,
+          "share": 0.15
+        },
+        {
+          "index": 2,
+          "speed_m_s": 0.25,
+          "yaw_rad_s": 0.15,
+          "dwell_s": 10.0,
+          "share": 0.15
+        },
+        {
+          "index": 3,
+          "speed_m_s": 0.5,
+          "yaw_rad_s": 0.15,
+          "dwell_s": 10.0,
+          "share": 0.15
+        },
+        {
+          "index": 4,
+          "speed_m_s": 1.0,
+          "yaw_rad_s": 0.2,
+          "dwell_s": 12.0,
+          "share": 0.15
+        },
+        {
+          "index": 5,
+          "speed_m_s": 1.5,
+          "yaw_rad_s": 0.2,
+          "dwell_s": 12.0,
+          "share": 0.1
+        },
+        {
+          "index": 6,
+          "speed_m_s": 2.0,
+          "yaw_rad_s": 0.25,
+          "dwell_s": 12.0,
+          "share": 0.1
+        },
+        {
+          "index": 7,
+          "speed_m_s": 3.0,
+          "yaw_rad_s": 0.25,
+          "dwell_s": 15.0,
+          "share": 0.05
+        }
+      ],
+      "subtype_shares": {
+        "hold": 0.1,
+        "straight": 0.3,
+        "pure_turn": 0.3,
+        "arc": 0.3
+      },
+      "thresholds": {
+        "track": {
+          "lin_vel_abs_error_m_s_max": 0.1,
+          "yaw_rate_abs_error_rad_s_max": 0.05,
+          "in_band_fraction_min": 0.9
+        },
+        "attitude": {
+          "upright_cos_min": 0.9,
+          "roll_deg_max": 8.0,
+          "pitch_deg_max": 8.0
+        },
+        "contact": {
+          "min_loaded_wheels": 4,
+          "max_unload_ms": 60.0,
+          "nonwheel_contact_n_max": 4.0,
+          "wheel_normal_force_min_n": 2.0
+        },
+        "brake": {
+          "stop_time_max_s": 2.0,
+          "stop_distance_max_m": 1.0,
+          "post_stop_drift_m_s_max": 0.02,
+          "post_stop_hold_s": 10.0
+        }
+      },
+      "threshold_status": "PLACEHOLDER_PENDING_OPERATOR_RULING",
+      "threshold_source": "AGENTS.md section 1 only gives qualitative gates (tracking/attitude/contact/braking in band per stage, unlock only after all pass).  The numbers above are conservative placeholders, not measured and not operator-approved; status PLACEHOLDER_PENDING_OPERATOR_RULING.",
+      "policy": {
+        "passes_required": 3,
+        "hard_failure_policy": "demote_one_stage",
+        "high_speed_arc_from_stage": 5,
+        "high_speed_arc_open": false,
+        "mix_stages": false
+      },
+      "gate_classes": [
+        "track",
+        "attitude",
+        "contact",
+        "brake"
+      ],
+      "unlock_rule": "advance only after passes_required consecutive episodes with all four gate classes passing; hard failure demotes per policy",
+      "dwell_application": "per-stage dwell recorded; the command term uses resampling_time_range = (min_dwell, max_dwell) of the stage table",
+      "arc_high_speed": "needs_separate_validation, blocked by default"
+    },
+    "active": "armE_mixture"
+  },
+  "phase": {
+    "phase": "baseline",
+    "default_phase": "baseline",
+    "disturbance": "none",
+    "load_kg": 0.0,
+    "randomisation": {
+      "wheel_friction": {
+        "status": "OFF",
+        "phase2_candidate": true,
+        "note": "wheel-ground static/dynamic friction randomization"
+      },
+      "base_mass": {
+        "status": "OFF",
+        "phase2_candidate": true,
+        "note": "base mass scale randomization"
+      },
+      "base_com": {
+        "status": "OFF",
+        "phase2_candidate": true,
+        "note": "base center-of-mass randomization"
+      },
+      "gains": {
+        "status": "OFF",
+        "phase2_candidate": true,
+        "note": "actuator stiffness/damping scaling"
+      },
+      "bounded_push": {
+        "status": "OFF",
+        "phase2_candidate": true,
+        "note": "random push by setting velocity"
+      },
+      "reset_base": {
+        "status": "REDUCED",
+        "phase2_candidate": true,
+        "note": "nominal init pose (no pose/velocity range)"
+      },
+      "reset_robot_joints": {
+        "status": "REDUCED",
+        "phase2_candidate": true,
+        "note": "small fixed joint offset, no wheel spin"
+      },
+      "observation_noise": {
+        "status": "OFF",
+        "phase2_candidate": true,
+        "note": "gyro/joint observation noise (robust profile)"
+      },
+      "action_delay": {
+        "status": "OFF",
+        "phase2_candidate": true,
+        "note": "action delay randomization"
+      }
+    },
+    "randomisation_off_note": "every non-listed term is OFF in the baseline phase and is a phase-2 candidate",
+    "push_spec": {
+      "func": "mdp.push_by_setting_velocity",
+      "mode": "interval",
+      "interval_range_s": [
+        3.5,
+        8.0
+      ],
+      "velocity_range": {
+        "x": [
+          -0.08,
+          0.08
+        ],
+        "y": [
+          -0.06,
+          0.06
+        ],
+        "yaw": [
+          -0.08,
+          0.08
+        ]
+      },
+      "source": "as2w_training_safety.apply_safety(perturb=True) defaults",
+      "threshold_status": "PLACEHOLDER_PENDING_OPERATOR_RULING"
+    },
+    "phase_gate": {
+      "status": "PENDING_OPERATOR_RULING",
+      "baseline_to_disturbance": "baseline must pass the held-out rolling evaluation before any load/push continuation; no automatic promotion",
+      "evaluator_reuse": [
+        "deliveries/as2w-deploy/rolling-armD-turn65-research/runtime/r11_acceptance_ff.py",
+        "skills/as2w/rolling/r11_acceptance_matrix.py"
+      ],
+      "new_evaluator": "forbidden -- reuse one of the two existing evaluators",
+      "merge_rule": "load and push are run separately and must each pass before a merged (load+push) configuration is allowed; never start with load+push together"
+    },
+    "merge_rule": "load and push are run separately and must each pass before a merged (load+push) configuration is allowed; never start with load+push together"
+  },
+  "control_contract": {
+    "version": "dev-1",
+    "fingerprint": "e66daa00aecaf32cffd3bbd96ee9e4feeb86dd93ad6d678e584f5ec250db2592",
+    "spec": {
+      "name": "deploy_consistent_r11_v1",
+      "filter": {
+        "type": "none",
+        "cutoff_hz": null,
+        "location": "none",
+        "state": "none"
+      },
+      "rate_limit": {
+        "type": "none",
+        "limit": null,
+        "location": "none",
+        "state": "none"
+      },
+      "delay": {
+        "type": "policy_steps",
+        "policy_steps": 0,
+        "state_free": true,
+        "location": "none"
+      },
+      "torque_clip_nm": 13.5,
+      "torque_clip_location": "apply_actions, before set_joint_velocity_target_index",
+      "reset": {
+        "history": "fill_all_slots_with_first_frame",
+        "filter_state": "not_applicable",
+        "delay_buffer": "not_applicable",
+        "previous_action": "zeroed_on_episode_reset"
+      },
+      "history": {
+        "frames": 6,
+        "fields": [
+          "command_x",
+          "body_gyro",
+          "gravity_b",
+          "const_0p4",
+          "joint_pos",
+          "joint_vel",
+          "prev_action",
+          "phase_sin",
+          "phase_cos",
+          "wheel_delta",
+          "zero_flag"
+        ],
+        "order": "oldest_to_newest",
+        "step": "policy_step"
+      },
+      "source": "r11_acceptance_ff.py: no integrator, no filter state; as2w_gyro_wheel_action.py: state-free wheel term; wheel_contract_v1 torque budget",
+      "deployment_consistency": "identical wrapper instance/parameters for arms A, B and C"
+    },
+    "guard_rule": "filter position / filter frequency / delay / history field semantics change without a version bump -> CONTROL_CONTRACT_CHANGED and --run refuses (override only with --accept-contract-change, logged)",
+    "change_procedure": "bump control_contract_version, then redo replay and baseline regression"
+  },
+  "logging": {
+    "triple_tap": {
+      "fields": [
+        "env_id",
+        "episode_id",
+        "policy_step",
+        "target_wheel_pre_filter[4] rad/s",
+        "target_wheel_dispatch[4] rad/s",
+        "target_leg_pos_pre_filter[12] rad",
+        "target_leg_pos_dispatch[12] rad",
+        "history_newest[65]",
+        "history_sha256",
+        "dtype",
+        "field_order",
+        "window_shape",
+        "torque_budget_nm",
+        "torque_budget_location",
+        "tau_request_est_nm[4] ESTIMATED",
+        "tau_solver_nm (not_measured)"
+      ],
+      "join_key": "step_id = iteration * n_steps + step",
+      "run_path": "triple_tap.jsonl",
+      "dry_run_path": "triple_tap_sample.jsonl (one line only)",
+      "target_dispatch_source": "BudgetedWheelVelocity.last_dispatch, set immediately before set_joint_velocity_target_index"
+    }
+  },
+  "safety": {
+    "torque_budget_nm": 13.5,
+    "torque_hard_limit_nm": 15.0,
+    "torque_ratio": 0.9,
+    "torque_clamp_before_dispatch": "BudgetedWheelVelocity.apply_actions -> clamp_wheel_torque(target_vel, joint_vel, kd, 13.5)",
+    "effort_limit_sim_nm": 13.5,
+    "action_to_target": "wheel target = 5.0 * clip(action, +-6) = up to 30 rad/s before the 13.5 N*m torque clamp",
+    "leg_angle_clip": "apply_safety sets cfg.actions.joint_pos.clip = stand + 0.90 * (limit - stand) per axis; JointAction.process_actions clamps _processed_actions before apply_actions",
+    "wheel_velocity_clip_rad_s": 98.47
+  },
+  "rewards": {
+    "source": "as2w_isaac_flat_env_all.configuration + armE overrides",
+    "track_lin_vel_xy_exp_weight": 1.5,
+    "track_ang_vel_z_exp_weight": 1.5,
+    "track_ang_vel_z_exp_std": 0.08,
+    "rolling_wheel_support_weight": -0.65,
+    "rolling_knee_margin_weight": -3.0,
+    "zero_motion_weight": -0.4,
+    "note": "identical for all three arms"
+  },
+  "vx_supervision": null,
+  "gpu_memory": {
+    "baseline": {
+      "mib": 6931.0,
+      "envs": 4096,
+      "source": "operator measurement"
+    },
+    "target_envs": 16384,
+    "method": "linear extrapolation in env count; NOT a measurement of this configuration",
+    "available_mib": 46068.0,
+    "used_now_mib": 136.0,
+    "estimated_sim_mib": 27724.0,
+    "estimated_fraction": 0.6018,
+    "limit_mib": 41461.2,
+    "estimated_max_envs": 24502,
+    "rollout_buffer_mib": 3336.0,
+    "status": "OK_ESTIMATED"
+  },
+  "pending_validation": [
+    "contract_group_selection: pending_validation (dual-simulator same-target loaded evidence insufficient)",
+    "usd_drive_gain_source: not_measured -- the USD physics layer bakes stiffness=1.7453293 / damping=0.017453292 per joint (URDF converter rad values of 100 / 1.0) and ImplicitActuatorCfg carries leg kp 55 / kd 2.0, but the runtime write path from cfg to the PhysX drive was not located/verified in this phase.  Intended: cfg wins; unverified.",
+    "torque_budget_13p5: software pre-dispatch clamp + effort_limit_sim 13.5 are both present; solver-level torque is estimated, not measured",
+    "envs_16384: GPU memory is a linear extrapolation from the 6931 MiB @ 4096 envs measurement, not a measurement of this configuration",
+    "speed_curriculum: staged_0_to_3 is implemented (8 stages 0.05..3.00 m/s, four gate classes, per-stage unlock); gate thresholds are PLACEHOLDER_PENDING_OPERATOR_RULING and the staged runtime path was never executed",
+    "disturbance_phase: locked by default; --run requires --allow-disturbance + --init-checkpoint + --eval-record with matching checkpoint sha256; load and push must pass separately before any merge",
+    "control_contract: --accept-contract-change is a dry-run/replay diagnostic only and is rejected with --run",
+    "torque_solver: tau_solver_nm is not_measured (PhysX implicit drive does not expose applied joint effort); tau_request_est_nm is a software estimate and is labelled ESTIMATED",
+    "run_path_not_executed: --run was never executed in this phase (training forbidden)",
+    "wheel_radius_odometry: not used by this entry point"
+  ]
+}
