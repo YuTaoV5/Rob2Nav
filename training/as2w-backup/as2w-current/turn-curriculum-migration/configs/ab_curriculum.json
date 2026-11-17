@@ -17,7 +17,7 @@
     "budget_change": {
       "at": "2026-11-17T09:21:12+08:00",
       "wording": "课程A到1500后请你启动测评开启课程B",
-      "decision": "A endpoint = model_1500; B runs 1500 rounds; both 16000x128x1500"
+      "decision": "A endpoint = model_1400 (A stopped at 09:30 on operator instruction to start B immediately); B runs 1400 rounds; both 16000x128x1400"
     }
   },
   "start": {
@@ -99,7 +99,7 @@
   "shared_run": {
     "num_envs": 16000,
     "num_steps_per_env": 128,
-    "iterations": 1500,
+    "iterations": 1400,
     "seed": 311,
     "save_interval": 25,
     "learning_rate": 5e-05,
@@ -113,8 +113,8 @@
       1.1,
       3.4
     ],
-    "env_step_budget": 3072000000,
-    "env_step_budget_note": "operator instruction 2026-11-17 09:25: A stops at 1500 as the A endpoint and B runs 1500 rounds, so the pair stays equal-budget at 16000*128*1500 = 3,072,000,000 env steps per arm; this supersedes the earlier 3000-round budget",
+    "env_step_budget": 2867200000,
+    "env_step_budget_note": "A stopped at its model_1400 checkpoint as the A endpoint, so B runs exactly 1400 rounds: 16000*128*1400 = 2,867,200,000 env steps per arm (7.3x R4000), equal budget preserved",
     "common_flags": [
       "--viz none --device cuda:0",
       "--profile expanded --speed-cap .20 --speed-rolling",
