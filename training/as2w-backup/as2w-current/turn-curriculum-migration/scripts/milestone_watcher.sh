@@ -24,7 +24,7 @@ echo "WATCHER_START $(date -Iseconds)" >> "$OUTLOG"
 cd "$BASE"
 while true; do
   IT=$(grep -aoE 'Learning iteration [0-9]+' "$LOG" 2>/dev/null | tail -1 | grep -oE '[0-9]+' || echo 0)
-  for M in 1000 2000 3000; do
+  for M in 1000 1500 2000 3000; do
     [ "$IT" -ge "$M" ] || continue
     CK=$ARM_DIR/model_$M.pt
     [ -f "$CK" ] || continue
